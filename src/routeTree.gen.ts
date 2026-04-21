@@ -9,38 +9,268 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
+import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
+import { Route as AppTasksRouteImport } from './routes/app.tasks'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppReportsRouteImport } from './routes/app.reports'
+import { Route as AppPackagesRouteImport } from './routes/app.packages'
+import { Route as AppMarketingRouteImport } from './routes/app.marketing'
+import { Route as AppLeadsRouteImport } from './routes/app.leads'
+import { Route as AppInventoryRouteImport } from './routes/app.inventory'
+import { Route as AppGiftcardsRouteImport } from './routes/app.giftcards'
+import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
+import { Route as AppCouponsRouteImport } from './routes/app.coupons'
+import { Route as AppConsentRouteImport } from './routes/app.consent'
+import { Route as AppClientsRouteImport } from './routes/app.clients'
+import { Route as AppCalendarRouteImport } from './routes/app.calendar'
+import { Route as AppBookingRouteImport } from './routes/app.booking'
+import { Route as AppAutomationsRouteImport } from './routes/app.automations'
 
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSignUpRoute = AuthSignUpRouteImport.update({
+  id: '/auth/sign-up',
+  path: '/auth/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignInRoute = AuthSignInRouteImport.update({
+  id: '/auth/sign-in',
+  path: '/auth/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppTasksRoute = AppTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPackagesRoute = AppPackagesRouteImport.update({
+  id: '/packages',
+  path: '/packages',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMarketingRoute = AppMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeadsRoute = AppLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInventoryRoute = AppInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGiftcardsRoute = AppGiftcardsRouteImport.update({
+  id: '/giftcards',
+  path: '/giftcards',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCouponsRoute = AppCouponsRouteImport.update({
+  id: '/coupons',
+  path: '/coupons',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConsentRoute = AppConsentRouteImport.update({
+  id: '/consent',
+  path: '/consent',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientsRoute = AppClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalendarRoute = AppCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBookingRoute = AppBookingRouteImport.update({
+  id: '/booking',
+  path: '/booking',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAutomationsRoute = AppAutomationsRouteImport.update({
+  id: '/automations',
+  path: '/automations',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/automations': typeof AppAutomationsRoute
+  '/app/booking': typeof AppBookingRoute
+  '/app/calendar': typeof AppCalendarRoute
+  '/app/clients': typeof AppClientsRoute
+  '/app/consent': typeof AppConsentRoute
+  '/app/coupons': typeof AppCouponsRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inventory': typeof AppInventoryRoute
+  '/app/leads': typeof AppLeadsRoute
+  '/app/marketing': typeof AppMarketingRoute
+  '/app/packages': typeof AppPackagesRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/tasks': typeof AppTasksRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/automations': typeof AppAutomationsRoute
+  '/app/booking': typeof AppBookingRoute
+  '/app/calendar': typeof AppCalendarRoute
+  '/app/clients': typeof AppClientsRoute
+  '/app/consent': typeof AppConsentRoute
+  '/app/coupons': typeof AppCouponsRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inventory': typeof AppInventoryRoute
+  '/app/leads': typeof AppLeadsRoute
+  '/app/marketing': typeof AppMarketingRoute
+  '/app/packages': typeof AppPackagesRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/tasks': typeof AppTasksRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/automations': typeof AppAutomationsRoute
+  '/app/booking': typeof AppBookingRoute
+  '/app/calendar': typeof AppCalendarRoute
+  '/app/clients': typeof AppClientsRoute
+  '/app/consent': typeof AppConsentRoute
+  '/app/coupons': typeof AppCouponsRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inventory': typeof AppInventoryRoute
+  '/app/leads': typeof AppLeadsRoute
+  '/app/marketing': typeof AppMarketingRoute
+  '/app/packages': typeof AppPackagesRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/tasks': typeof AppTasksRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/app/automations'
+    | '/app/booking'
+    | '/app/calendar'
+    | '/app/clients'
+    | '/app/consent'
+    | '/app/coupons'
+    | '/app/dashboard'
+    | '/app/giftcards'
+    | '/app/inventory'
+    | '/app/leads'
+    | '/app/marketing'
+    | '/app/packages'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/tasks'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/app'
+    | '/app/automations'
+    | '/app/booking'
+    | '/app/calendar'
+    | '/app/clients'
+    | '/app/consent'
+    | '/app/coupons'
+    | '/app/dashboard'
+    | '/app/giftcards'
+    | '/app/inventory'
+    | '/app/leads'
+    | '/app/marketing'
+    | '/app/packages'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/tasks'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/app/automations'
+    | '/app/booking'
+    | '/app/calendar'
+    | '/app/clients'
+    | '/app/consent'
+    | '/app/coupons'
+    | '/app/dashboard'
+    | '/app/giftcards'
+    | '/app/inventory'
+    | '/app/leads'
+    | '/app/marketing'
+    | '/app/packages'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/tasks'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,21 +278,172 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/sign-up': {
+      id: '/auth/sign-up'
+      path: '/auth/sign-up'
+      fullPath: '/auth/sign-up'
+      preLoaderRoute: typeof AuthSignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/sign-in': {
+      id: '/auth/sign-in'
+      path: '/auth/sign-in'
+      fullPath: '/auth/sign-in'
+      preLoaderRoute: typeof AuthSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/tasks': {
+      id: '/app/tasks'
+      path: '/tasks'
+      fullPath: '/app/tasks'
+      preLoaderRoute: typeof AppTasksRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/packages': {
+      id: '/app/packages'
+      path: '/packages'
+      fullPath: '/app/packages'
+      preLoaderRoute: typeof AppPackagesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/marketing': {
+      id: '/app/marketing'
+      path: '/marketing'
+      fullPath: '/app/marketing'
+      preLoaderRoute: typeof AppMarketingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/leads': {
+      id: '/app/leads'
+      path: '/leads'
+      fullPath: '/app/leads'
+      preLoaderRoute: typeof AppLeadsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/inventory': {
+      id: '/app/inventory'
+      path: '/inventory'
+      fullPath: '/app/inventory'
+      preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/giftcards': {
+      id: '/app/giftcards'
+      path: '/giftcards'
+      fullPath: '/app/giftcards'
+      preLoaderRoute: typeof AppGiftcardsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/dashboard': {
+      id: '/app/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/coupons': {
+      id: '/app/coupons'
+      path: '/coupons'
+      fullPath: '/app/coupons'
+      preLoaderRoute: typeof AppCouponsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/consent': {
+      id: '/app/consent'
+      path: '/consent'
+      fullPath: '/app/consent'
+      preLoaderRoute: typeof AppConsentRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/clients': {
+      id: '/app/clients'
+      path: '/clients'
+      fullPath: '/app/clients'
+      preLoaderRoute: typeof AppClientsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/calendar': {
+      id: '/app/calendar'
+      path: '/calendar'
+      fullPath: '/app/calendar'
+      preLoaderRoute: typeof AppCalendarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/booking': {
+      id: '/app/booking'
+      path: '/booking'
+      fullPath: '/app/booking'
+      preLoaderRoute: typeof AppBookingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/automations': {
+      id: '/app/automations'
+      path: '/automations'
+      fullPath: '/app/automations'
+      preLoaderRoute: typeof AppAutomationsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAutomationsRoute: typeof AppAutomationsRoute
+  AppBookingRoute: typeof AppBookingRoute
+  AppCalendarRoute: typeof AppCalendarRoute
+  AppClientsRoute: typeof AppClientsRoute
+  AppConsentRoute: typeof AppConsentRoute
+  AppCouponsRoute: typeof AppCouponsRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppGiftcardsRoute: typeof AppGiftcardsRoute
+  AppInventoryRoute: typeof AppInventoryRoute
+  AppLeadsRoute: typeof AppLeadsRoute
+  AppMarketingRoute: typeof AppMarketingRoute
+  AppPackagesRoute: typeof AppPackagesRoute
+  AppReportsRoute: typeof AppReportsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppTasksRoute: typeof AppTasksRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAutomationsRoute: AppAutomationsRoute,
+  AppBookingRoute: AppBookingRoute,
+  AppCalendarRoute: AppCalendarRoute,
+  AppClientsRoute: AppClientsRoute,
+  AppConsentRoute: AppConsentRoute,
+  AppCouponsRoute: AppCouponsRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppGiftcardsRoute: AppGiftcardsRoute,
+  AppInventoryRoute: AppInventoryRoute,
+  AppLeadsRoute: AppLeadsRoute,
+  AppMarketingRoute: AppMarketingRoute,
+  AppPackagesRoute: AppPackagesRoute,
+  AppReportsRoute: AppReportsRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppTasksRoute: AppTasksRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthSignInRoute: AuthSignInRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
