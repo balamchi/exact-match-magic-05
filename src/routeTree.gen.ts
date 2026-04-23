@@ -14,7 +14,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
 import { Route as AppTasksRouteImport } from './routes/app.tasks'
+import { Route as AppStaffRouteImport } from './routes/app.staff'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppServicesRouteImport } from './routes/app.services'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppPackagesRouteImport } from './routes/app.packages'
 import { Route as AppMarketingRouteImport } from './routes/app.marketing'
@@ -54,9 +56,19 @@ const AppTasksRoute = AppTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AppRoute,
 } as any)
+const AppStaffRoute = AppStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppServicesRoute = AppServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => AppRoute,
 } as any)
 const AppReportsRoute = AppReportsRouteImport.update({
@@ -141,7 +153,9 @@ export interface FileRoutesByFullPath {
   '/app/marketing': typeof AppMarketingRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -162,7 +176,9 @@ export interface FileRoutesByTo {
   '/app/marketing': typeof AppMarketingRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -184,7 +200,9 @@ export interface FileRoutesById {
   '/app/marketing': typeof AppMarketingRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -207,7 +225,9 @@ export interface FileRouteTypes {
     | '/app/marketing'
     | '/app/packages'
     | '/app/reports'
+    | '/app/services'
     | '/app/settings'
+    | '/app/staff'
     | '/app/tasks'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -228,7 +248,9 @@ export interface FileRouteTypes {
     | '/app/marketing'
     | '/app/packages'
     | '/app/reports'
+    | '/app/services'
     | '/app/settings'
+    | '/app/staff'
     | '/app/tasks'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -249,7 +271,9 @@ export interface FileRouteTypes {
     | '/app/marketing'
     | '/app/packages'
     | '/app/reports'
+    | '/app/services'
     | '/app/settings'
+    | '/app/staff'
     | '/app/tasks'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -299,11 +323,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTasksRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/staff': {
+      id: '/app/staff'
+      path: '/staff'
+      fullPath: '/app/staff'
+      preLoaderRoute: typeof AppStaffRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/settings': {
       id: '/app/settings'
       path: '/settings'
       fullPath: '/app/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/services': {
+      id: '/app/services'
+      path: '/services'
+      fullPath: '/app/services'
+      preLoaderRoute: typeof AppServicesRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/reports': {
@@ -414,7 +452,9 @@ interface AppRouteChildren {
   AppMarketingRoute: typeof AppMarketingRoute
   AppPackagesRoute: typeof AppPackagesRoute
   AppReportsRoute: typeof AppReportsRoute
+  AppServicesRoute: typeof AppServicesRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppStaffRoute: typeof AppStaffRoute
   AppTasksRoute: typeof AppTasksRoute
 }
 
@@ -432,7 +472,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppMarketingRoute: AppMarketingRoute,
   AppPackagesRoute: AppPackagesRoute,
   AppReportsRoute: AppReportsRoute,
+  AppServicesRoute: AppServicesRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppStaffRoute: AppStaffRoute,
   AppTasksRoute: AppTasksRoute,
 }
 
