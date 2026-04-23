@@ -3,7 +3,8 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
   Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare,
-  Search, Bell, Plus, Settings, LogOut, ChevronDown, Sparkles
+  Search, Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
+  HeartPulse, UserCog
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,8 @@ const NAV = [
       { to: "/app/calendar", label: "Calendar", icon: Calendar },
       { to: "/app/consent", label: "Consent Forms", icon: Shield },
       { to: "/app/clients", label: "Clients", icon: Users },
+      { to: "/app/services", label: "Services", icon: HeartPulse },
+      { to: "/app/staff", label: "Staff", icon: UserCog },
       { to: "/app/leads", label: "Leads", icon: Target },
     ],
   },
