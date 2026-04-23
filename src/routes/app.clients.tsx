@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { CalendarDays, Mail, Pencil, Phone, Plus, Search, Tag, Trash2, UserRound, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -238,7 +238,7 @@ function ClientsPage() {
   );
 }
 
-function Metric({ label, value, icon }: { label: string; value: string; icon: JSX.Element }) {
+function Metric({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
       <div className="flex items-center justify-between">
