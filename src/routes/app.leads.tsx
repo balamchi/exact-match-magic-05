@@ -1,0 +1,9 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Target } from "lucide-react";
+import { ResourceModule } from "@/components/resource-module";
+
+export const Route = createFileRoute("/app/leads")({ component: LeadsPage });
+
+function LeadsPage() {
+  return <ResourceModule title="Leads" eyebrow="Pipeline" description="Track new inquiries from first contact through booked consults and closed revenue." table="leads" icon={<Target className="h-4.5 w-4.5" />} searchKeys={["name", "email", "phone", "source", "stage"]} columns={["name", "stage", "source", "email", "phone", "estimated_value_cents"]} defaults={{ stage: "new" }} metrics={[{ label: "New", value: (rows) => rows.filter((row) => row.stage === "new").length.toString() }, { label: "Pipeline value", value: (rows) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(rows.reduce((sum, row) => sum + Number(row.estimated_value_cents ?? 0), 0) / 100) }]} fields={[{ key: "name", label: "Name", required: true, max: 160 }, { key: "email", label: "Email", type: "email", max: 255 }, { key: "phone", label: "Phone", type: "tel", max: 60 }, { key: "source", label: "Source", max: 120 }, { key: "stage", label: "Stage", type: "select", options: [{ label: "New", value: "new" }, { label: "Contacted", value: "contacted" }, { label: "Qualified", value: "qualified" }, { label: "Consult booked", value: "consult_booked" }, { label: "Won", value: "won" }, { label: "Lost", value: "lost" }] }, { key: "estimated_value_cents", label: "Estimated value", type: "money", min: 0 }, { key: "notes", label: "Notes", type: "textarea", max: 1000 }]} />;
+}
