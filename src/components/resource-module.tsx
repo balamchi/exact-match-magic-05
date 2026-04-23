@@ -74,9 +74,9 @@ export function ResourceModule({ title, eyebrow, description, table, icon, field
 
   const schema = useMemo(() => z.object(Object.fromEntries(fields.map((field) => {
     if (field.type === "boolean") return [field.key, z.boolean()];
-    let rule = z.string().trim();
-    if (field.required) rule = rule.min(1, `${field.label} is required`);
-    if (field.max) rule = rule.max(field.max, `${field.label} is too long`);
+    let rule: z.ZodType<string> = z.string().trim();
+    if (field.required) rule = rule.pipe(z.string().min(1, `${field.label} is required`));
+    if (field.max) rule = rule.pipe(z.string().max(field.max, `${field.label} is too long`));
     if (field.type === "email") rule = rule.refine((value) => !value || z.string().email().safeParse(value).success, "Enter a valid email");
     return [field.key, rule];
   }))), [fields]);
