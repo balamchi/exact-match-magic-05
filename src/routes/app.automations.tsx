@@ -1,19 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Zap } from "lucide-react";
-import { PageStub } from "@/components/page-stub";
+import { ResourceModule } from "@/components/resource-module";
 
-export const Route = createFileRoute("/app/automations")({ component: () => (
-  <PageStub
-    title="Automations"
-    description="Triggered follow-ups, recall reminders, review requests, and more."
-    icon={<Zap className="h-6 w-6 text-primary-foreground" />}
-    features={[
-      "Visual workflow builder",
-      "Booking, no-show & post-visit triggers",
-      "Multi-step sequences",
-      "Conditional branching",
-      "Performance analytics",
-      "Pre-built template library",
-    ]}
-  />
-)});
+export const Route = createFileRoute("/app/automations")({ component: AutomationsPage });
+
+function AutomationsPage() {
+  return <ResourceModule title="Automations" eyebrow="Workflows" description="Configure clinic follow-ups, reminders, review requests, and task creation rules." table="automations" icon={<Zap className="h-4.5 w-4.5" />} searchKeys={["name", "trigger_event", "action_type"]} columns={["name", "trigger_event", "action_type", "active", "run_count"]} defaults={{ trigger_event: "appointment_completed", action_type: "email", active: true }} metrics={[{ label: "Active", value: (rows) => rows.filter((row) => row.active).length.toString() }, { label: "Runs", value: (rows) => rows.reduce((sum, row) => sum + Number(row.run_count ?? 0), 0).toString() }]} fields={[{ key: "name", label: "Workflow name", required: true, max: 160 }, { key: "trigger_event", label: "Trigger", type: "select", options: [{ label: "Appointment booked", value: "appointment_booked" }, { label: "Appointment completed", value: "appointment_completed" }, { label: "No-show", value: "no_show" }, { label: "Lead created", value: "lead_created" }, { label: "Birthday", value: "birthday" }] }, { key: "action_type", label: "Action", type: "select", options: [{ label: "Email", value: "email" }, { label: "SMS", value: "sms" }, { label: "Task", value: "task" }] }, { key: "active", label: "Active", type: "boolean" }, { key: "run_count", label: "Run count", type: "number", min: 0 }]} />;
+}

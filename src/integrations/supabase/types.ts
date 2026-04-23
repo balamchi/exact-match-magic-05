@@ -88,6 +88,42 @@ export type Database = {
           },
         ]
       }
+      automations: {
+        Row: {
+          action_type: string
+          active: boolean
+          clinic_id: string
+          created_at: string
+          id: string
+          name: string
+          run_count: number
+          trigger_event: string
+          updated_at: string
+        }
+        Insert: {
+          action_type?: string
+          active?: boolean
+          clinic_id: string
+          created_at?: string
+          id?: string
+          name: string
+          run_count?: number
+          trigger_event?: string
+          updated_at?: string
+        }
+        Update: {
+          action_type?: string
+          active?: boolean
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          run_count?: number
+          trigger_event?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           clinic_id: string
@@ -241,6 +277,138 @@ export type Database = {
           },
         ]
       }
+      coupons: {
+        Row: {
+          active: boolean
+          clinic_id: string
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          updated_at: string
+          usage_limit: number | null
+          used_count: number
+        }
+        Insert: {
+          active?: boolean
+          clinic_id: string
+          code: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Update: {
+          active?: boolean
+          clinic_id?: string
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Relationships: []
+      }
+      gift_cards: {
+        Row: {
+          active: boolean
+          balance_cents: number
+          clinic_id: string
+          code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          initial_value_cents: number
+          purchaser_name: string | null
+          recipient_email: string | null
+          recipient_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          balance_cents?: number
+          clinic_id: string
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          initial_value_cents?: number
+          purchaser_name?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          balance_cents?: number
+          clinic_id?: string
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          initial_value_cents?: number
+          purchaser_name?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      inventory_items: {
+        Row: {
+          active: boolean
+          clinic_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          name: string
+          reorder_threshold: number
+          sku: string | null
+          stock_quantity: number
+          supplier: string | null
+          unit_cost_cents: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          clinic_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          name: string
+          reorder_threshold?: number
+          sku?: string | null
+          stock_quantity?: number
+          supplier?: string | null
+          unit_cost_cents?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          clinic_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          name?: string
+          reorder_threshold?: number
+          sku?: string | null
+          stock_quantity?: number
+          supplier?: string | null
+          unit_cost_cents?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           clinic_id: string
@@ -290,6 +458,90 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      marketing_campaigns: {
+        Row: {
+          audience: string | null
+          channel: string
+          click_count: number
+          clinic_id: string
+          created_at: string
+          id: string
+          name: string
+          open_count: number
+          scheduled_at: string | null
+          sent_count: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          channel?: string
+          click_count?: number
+          clinic_id: string
+          created_at?: string
+          id?: string
+          name: string
+          open_count?: number
+          scheduled_at?: string | null
+          sent_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          channel?: string
+          click_count?: number
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          open_count?: number
+          scheduled_at?: string | null
+          sent_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      packages: {
+        Row: {
+          active: boolean
+          clinic_id: string
+          created_at: string
+          description: string | null
+          expires_after_days: number | null
+          id: string
+          name: string
+          price_cents: number
+          sessions: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          clinic_id: string
+          created_at?: string
+          description?: string | null
+          expires_after_days?: number | null
+          id?: string
+          name: string
+          price_cents?: number
+          sessions?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          clinic_id?: string
+          created_at?: string
+          description?: string | null
+          expires_after_days?: number | null
+          id?: string
+          name?: string
+          price_cents?: number
+          sessions?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       services: {
         Row: {

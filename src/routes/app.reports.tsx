@@ -1,19 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BarChart3 } from "lucide-react";
-import { PageStub } from "@/components/page-stub";
+import { useEffect, useState } from "react";
+import { BarChart3, CalendarDays, DollarSign, Target, Users } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/app/reports")({ component: () => (
-  <PageStub
-    title="Reports & Analytics"
-    description="Revenue, retention, no-show rates, staff performance, and 30+ pre-built reports."
-    icon={<BarChart3 className="h-6 w-6 text-primary-foreground" />}
-    features={[
-      "Revenue by service / staff / day",
-      "Booking density heat map",
-      "No-show & rebook rate",
-      "Client lifetime value",
-      "Cohort retention",
-      "Custom report builder",
-    ]}
-  />
-)});
+export const Route = createFileRoute("/app/reports")({ component: ReportsPage });
+
+function ReportsPage() {
+  const { activeClinic } = useAuth();
+  const [stats, setStats] = useState({ clients: 0, appointments: 0, leads: 0, revenue: 0 });
+  useEffect(() => { if (!activeClinic) return; Promise.all([supabase.from("clients").select("id", { count: "exact", head: true }).eq("clinic_id", activeClinic.clinic_id), supabase.from("appointments").select("id, price_cents, status").eq("clinic_id", activeClinic.clinic_id), supabase.from("leads").select("id", { count: "exact", head: true }).eq("clinic_id", activeClinic.clinic_id)]).then(([clients, appointments, leads]) => setStats({ clients: clients.count ?? 0, appointments: appointments.data?.length ?? 0, leads: leads.count ?? 0, revenue: (appointments.data ?? []).filter((row) => row.status === "completed").reduce((sum, row) => sum + Number(row.price_cents ?? 0), 0) })); }, [activeClinic?.clinic_id]);
+  return <div className="space-y-6"><div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Analytics</p><h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Reports</h1><p className="mt-1.5 text-sm text-muted-foreground">Clinic-wide performance snapshot across clients, bookings, leads, and revenue.</p></div><div className="grid grid-cols-1 gap-4 md:grid-cols-4"><Metric label="Clients" value={stats.clients.toString()} icon={<Users className="h-4.5 w-4.5" />} /><Metric label="Appointments" value={stats.appointments.toString()} icon={<CalendarDays className="h-4.5 w-4.5" />} /><Metric label="Leads" value={stats.leads.toString()} icon={<Target className="h-4.5 w-4.5" />} /><Metric label="Completed revenue" value={new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(stats.revenue / 100)} icon={<DollarSign className="h-4.5 w-4.5" />} /></div><section className="rounded-2xl border border-border bg-card p-6 shadow-card"><div className="mb-4 flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><BarChart3 className="h-5 w-5" /></div><div><h2 className="font-display text-xl font-semibold">Executive summary</h2><p className="text-sm text-muted-foreground">More charting and exports can layer on top of these live metrics.</p></div></div><div className="h-48 rounded-xl border border-dashed border-border bg-surface/40" /></section></div>;
+}
+
+function Metric({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) { return <div className="rounded-2xl border border-border bg-card p-5 shadow-card"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">{icon}</div><div className="mt-4 font-display text-3xl font-semibold tracking-tight">{value}</div><div className="mt-1 text-xs text-muted-foreground">{label}</div></div>; }
