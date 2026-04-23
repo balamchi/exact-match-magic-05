@@ -1,0 +1,9 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Send } from "lucide-react";
+import { ResourceModule } from "@/components/resource-module";
+
+export const Route = createFileRoute("/app/marketing")({ component: MarketingPage });
+
+function MarketingPage() {
+  return <ResourceModule title="Marketing" eyebrow="Campaigns" description="Plan email and SMS campaigns with audiences, scheduling, and performance metrics." table="marketing_campaigns" icon={<Send className="h-4.5 w-4.5" />} searchKeys={["name", "channel", "audience", "status"]} columns={["name", "channel", "audience", "status", "scheduled_at", "sent_count", "open_count", "click_count"]} defaults={{ channel: "email", status: "draft" }} metrics={[{ label: "Scheduled", value: (rows) => rows.filter((row) => row.status === "scheduled").length.toString() }, { label: "Sent", value: (rows) => rows.reduce((sum, row) => sum + Number(row.sent_count ?? 0), 0).toString() }]} fields={[{ key: "name", label: "Campaign name", required: true, max: 160 }, { key: "channel", label: "Channel", type: "select", options: [{ label: "Email", value: "email" }, { label: "SMS", value: "sms" }] }, { key: "audience", label: "Audience", max: 160, placeholder: "All clients, VIP, leads" }, { key: "status", label: "Status", type: "select", options: [{ label: "Draft", value: "draft" }, { label: "Scheduled", value: "scheduled" }, { label: "Sent", value: "sent" }, { label: "Paused", value: "paused" }] }, { key: "scheduled_at", label: "Scheduled time", type: "datetime" }, { key: "sent_count", label: "Sent count", type: "number", min: 0 }, { key: "open_count", label: "Open count", type: "number", min: 0 }, { key: "click_count", label: "Click count", type: "number", min: 0 }]} />;
+}

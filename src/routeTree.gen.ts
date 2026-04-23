@@ -17,7 +17,9 @@ import { Route as AppTasksRouteImport } from './routes/app.tasks'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppPackagesRouteImport } from './routes/app.packages'
+import { Route as AppMarketingRouteImport } from './routes/app.marketing'
 import { Route as AppLeadsRouteImport } from './routes/app.leads'
+import { Route as AppInventoryRouteImport } from './routes/app.inventory'
 import { Route as AppGiftcardsRouteImport } from './routes/app.giftcards'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppCouponsRouteImport } from './routes/app.coupons'
@@ -25,6 +27,7 @@ import { Route as AppConsentRouteImport } from './routes/app.consent'
 import { Route as AppClientsRouteImport } from './routes/app.clients'
 import { Route as AppCalendarRouteImport } from './routes/app.calendar'
 import { Route as AppBookingRouteImport } from './routes/app.booking'
+import { Route as AppAutomationsRouteImport } from './routes/app.automations'
 
 const AppRoute = AppRouteImport.update({
   id: '/app',
@@ -66,9 +69,19 @@ const AppPackagesRoute = AppPackagesRouteImport.update({
   path: '/packages',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMarketingRoute = AppMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLeadsRoute = AppLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInventoryRoute = AppInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
   getParentRoute: () => AppRoute,
 } as any)
 const AppGiftcardsRoute = AppGiftcardsRouteImport.update({
@@ -106,10 +119,16 @@ const AppBookingRoute = AppBookingRouteImport.update({
   path: '/booking',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAutomationsRoute = AppAutomationsRouteImport.update({
+  id: '/automations',
+  path: '/automations',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/automations': typeof AppAutomationsRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
   '/app/clients': typeof AppClientsRoute
@@ -117,7 +136,9 @@ export interface FileRoutesByFullPath {
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
+  '/app/marketing': typeof AppMarketingRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
@@ -128,6 +149,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/automations': typeof AppAutomationsRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
   '/app/clients': typeof AppClientsRoute
@@ -135,7 +157,9 @@ export interface FileRoutesByTo {
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
+  '/app/marketing': typeof AppMarketingRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
@@ -147,6 +171,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/automations': typeof AppAutomationsRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
   '/app/clients': typeof AppClientsRoute
@@ -154,7 +179,9 @@ export interface FileRoutesById {
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
+  '/app/marketing': typeof AppMarketingRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
@@ -167,6 +194,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/app/automations'
     | '/app/booking'
     | '/app/calendar'
     | '/app/clients'
@@ -174,7 +202,9 @@ export interface FileRouteTypes {
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/giftcards'
+    | '/app/inventory'
     | '/app/leads'
+    | '/app/marketing'
     | '/app/packages'
     | '/app/reports'
     | '/app/settings'
@@ -185,6 +215,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/app'
+    | '/app/automations'
     | '/app/booking'
     | '/app/calendar'
     | '/app/clients'
@@ -192,7 +223,9 @@ export interface FileRouteTypes {
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/giftcards'
+    | '/app/inventory'
     | '/app/leads'
+    | '/app/marketing'
     | '/app/packages'
     | '/app/reports'
     | '/app/settings'
@@ -203,6 +236,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/app'
+    | '/app/automations'
     | '/app/booking'
     | '/app/calendar'
     | '/app/clients'
@@ -210,7 +244,9 @@ export interface FileRouteTypes {
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/giftcards'
+    | '/app/inventory'
     | '/app/leads'
+    | '/app/marketing'
     | '/app/packages'
     | '/app/reports'
     | '/app/settings'
@@ -284,11 +320,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPackagesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/marketing': {
+      id: '/app/marketing'
+      path: '/marketing'
+      fullPath: '/app/marketing'
+      preLoaderRoute: typeof AppMarketingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/leads': {
       id: '/app/leads'
       path: '/leads'
       fullPath: '/app/leads'
       preLoaderRoute: typeof AppLeadsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/inventory': {
+      id: '/app/inventory'
+      path: '/inventory'
+      fullPath: '/app/inventory'
+      preLoaderRoute: typeof AppInventoryRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/giftcards': {
@@ -340,10 +390,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookingRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/automations': {
+      id: '/app/automations'
+      path: '/automations'
+      fullPath: '/app/automations'
+      preLoaderRoute: typeof AppAutomationsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAutomationsRoute: typeof AppAutomationsRoute
   AppBookingRoute: typeof AppBookingRoute
   AppCalendarRoute: typeof AppCalendarRoute
   AppClientsRoute: typeof AppClientsRoute
@@ -351,7 +409,9 @@ interface AppRouteChildren {
   AppCouponsRoute: typeof AppCouponsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppGiftcardsRoute: typeof AppGiftcardsRoute
+  AppInventoryRoute: typeof AppInventoryRoute
   AppLeadsRoute: typeof AppLeadsRoute
+  AppMarketingRoute: typeof AppMarketingRoute
   AppPackagesRoute: typeof AppPackagesRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -359,6 +419,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAutomationsRoute: AppAutomationsRoute,
   AppBookingRoute: AppBookingRoute,
   AppCalendarRoute: AppCalendarRoute,
   AppClientsRoute: AppClientsRoute,
@@ -366,7 +427,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppCouponsRoute: AppCouponsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppGiftcardsRoute: AppGiftcardsRoute,
+  AppInventoryRoute: AppInventoryRoute,
   AppLeadsRoute: AppLeadsRoute,
+  AppMarketingRoute: AppMarketingRoute,
   AppPackagesRoute: AppPackagesRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,

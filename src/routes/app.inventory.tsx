@@ -1,0 +1,9 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Boxes } from "lucide-react";
+import { ResourceModule } from "@/components/resource-module";
+
+export const Route = createFileRoute("/app/inventory")({ component: InventoryPage });
+
+function InventoryPage() {
+  return <ResourceModule title="Inventory" eyebrow="Stock control" description="Track products, suppliers, stock levels, reorder thresholds, and costs." table="inventory_items" icon={<Boxes className="h-4.5 w-4.5" />} searchKeys={["sku", "name", "supplier"]} columns={["sku", "name", "supplier", "stock_quantity", "reorder_threshold", "unit_cost_cents", "expires_at", "active"]} defaults={{ active: true, stock_quantity: "0", reorder_threshold: "0" }} metrics={[{ label: "Low stock", value: (rows) => rows.filter((row) => Number(row.stock_quantity ?? 0) <= Number(row.reorder_threshold ?? 0)).length.toString() }, { label: "Stock value", value: (rows) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(rows.reduce((sum, row) => sum + Number(row.stock_quantity ?? 0) * Number(row.unit_cost_cents ?? 0), 0) / 100) }]} fields={[{ key: "sku", label: "SKU", max: 80 }, { key: "name", label: "Product name", required: true, max: 160 }, { key: "supplier", label: "Supplier", max: 160 }, { key: "stock_quantity", label: "Stock quantity", type: "number", min: 0 }, { key: "reorder_threshold", label: "Reorder threshold", type: "number", min: 0 }, { key: "unit_cost_cents", label: "Unit cost", type: "money", min: 0 }, { key: "expires_at", label: "Expires", type: "date" }, { key: "active", label: "Active", type: "boolean" }]} />;
+}
