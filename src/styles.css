@@ -163,14 +163,21 @@
 
 @layer utilities {
   .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-brand { background: var(--gradient-brand); }
   .bg-gradient-surface { background: var(--gradient-surface); }
   .bg-gradient-glow { background: var(--gradient-glow); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-glow-strong { box-shadow: var(--shadow-glow-strong); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-elevated { box-shadow: var(--shadow-elevated); }
 
-  .glow-purple { box-shadow: 0 0 24px -8px oklch(0.68 0.21 295 / 0.5); }
+  .glow-purple { box-shadow: 0 0 24px -8px oklch(0.65 0.235 305 / 0.55); }
 
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 }
+
+/* RTL: swap Latin fonts for native scripts when document direction is RTL */
+:root[lang="fa"], :root[lang="fa"] body { font-family: "Vazirmatn", "Plus Jakarta Sans", system-ui, sans-serif; }
+:root[lang="ar"], :root[lang="ar"] body { font-family: "Tajawal", "Plus Jakarta Sans", system-ui, sans-serif; }
+[dir="rtl"] .rtl-flip { transform: scaleX(-1); }
