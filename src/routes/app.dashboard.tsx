@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CalendarDays, Users, DollarSign, TrendingUp, ArrowUpRight, Sparkles, Activity } from "lucide-react";
+import { CalendarDays, Users, DollarSign, TrendingUp, Sparkles, Activity } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { StatCard } from "@/components/stat-card";
 
 export const Route = createFileRoute("/app/dashboard")({
   component: Dashboard,
@@ -117,21 +118,14 @@ function Dashboard() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
-          <div key={card.label} className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card transition hover:border-primary/30">
-            <div className="flex items-start justify-between">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <card.icon className="h-4.5 w-4.5" />
-              </div>
-              <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
-            </div>
-            <div className="mt-4">
-              <div className="font-display text-3xl font-semibold tracking-tight">
-                {loading ? <span className="inline-block h-8 w-16 animate-pulse rounded bg-muted" /> : card.value}
-              </div>
-              <div className="mt-1 text-xs text-muted-foreground">{card.label}</div>
-              <div className="mt-2 text-[11px] text-muted-foreground/80">{card.hint}</div>
-            </div>
-          </div>
+          <StatCard
+            key={card.label}
+            label={card.label}
+            value={card.value}
+            icon={card.icon}
+            sub={card.hint}
+            loading={loading}
+          />
         ))}
       </div>
 
