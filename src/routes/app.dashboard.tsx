@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CalendarDays, Users, DollarSign, TrendingUp, ArrowUpRight, Sparkles, Activity } from "lucide-react";
+import { CalendarDays, Users, DollarSign, TrendingUp, Sparkles, Activity } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { StatCard } from "@/components/stat-card";
 
 export const Route = createFileRoute("/app/dashboard")({
   component: Dashboard,
