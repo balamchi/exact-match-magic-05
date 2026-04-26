@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
+import { useRealtimeTable } from "@/hooks/use-realtime-table";
 
 type Task = Tables<"tasks">;
 type Status = Task["status"];
@@ -57,6 +58,7 @@ function TasksPage() {
   const [dragOver, setDragOver] = useState<Status | null>(null);
 
   const load = async () => {
+  const load = useCallback(async () => {
     if (!activeClinic) return;
     setLoading(true);
     const { data, error } = await supabase
@@ -67,12 +69,13 @@ function TasksPage() {
     if (error) toast.error("Could not load tasks");
     setTasks(data ?? []);
     setLoading(false);
-  };
+  }, [activeClinic?.clinic_id]);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeClinic?.clinic_id]);
+  }, [load]);
+
+  useRealtimeTable("tasks", activeClinic?.clinic_id, load);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
