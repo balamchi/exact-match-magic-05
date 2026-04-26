@@ -154,7 +154,10 @@ function Landing() {
           <h1 className="font-display text-[clamp(56px,8vw,96px)] font-bold leading-[1] tracking-[-0.035em]">
             Run a clinic,<br />
             not{" "}
-            <em className="italic [background:linear-gradient(135deg,#A855F7,#D946EF)] bg-clip-text text-transparent">
+            <em
+              className="italic text-transparent bg-clip-text"
+              style={{ backgroundImage: "linear-gradient(135deg, #A855F7, #D946EF)", WebkitBackgroundClip: "text" }}
+            >
               software
             </em>
             .
