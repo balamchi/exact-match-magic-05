@@ -14,7 +14,6 @@ function getSupabase(): any {
 
 function planCodeFromProduct(productExternalId: string | undefined): string | null {
   if (!productExternalId) return null;
-  // products are named like "clinicpro_starter" -> plan_code "starter"
   const match = productExternalId.match(/^clinicpro_(.+)$/);
   return match ? match[1] : productExternalId;
 }
@@ -25,8 +24,42 @@ function billingIntervalFromPrice(priceExternalId: string | undefined): string {
   return "monthly";
 }
 
+function planNameFromCode(code: string | null | undefined): string {
+  if (!code) return "your plan";
+  return code.charAt(0).toUpperCase() + code.slice(1);
+}
+
+function appBaseUrl(): string {
+  return Deno.env.get("APP_BASE_URL") || "https://www.clinicpro.io";
+}
+
+async function findClinicForSubscription(
+  paddleSubscriptionId: string,
+  env: PaddleEnv
+): Promise<{ clinic_id: string; plan_code: string | null } | null> {
+  const { data } = await getSupabase()
+    .from("subscriptions")
+    .select("clinic_id, plan_code")
+    .eq("paddle_subscription_id", paddleSubscriptionId)
+    .eq("environment", env)
+    .maybeSingle();
+  return data ?? null;
+}
+
+async function findClinicOwnerEmail(clinicId: string): Promise<string | null> {
+  const { data: member } = await getSupabase()
+    .from("clinic_members")
+    .select("user_id")
+    .eq("clinic_id", clinicId)
+    .eq("role", "owner")
+    .maybeSingle();
+  if (!member?.user_id) return null;
+  const { data: userData } = await getSupabase().auth.admin.getUserById(member.user_id);
+  return userData?.user?.email ?? null;
+}
+
 async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
-  const { id, customerId, items, status, currentBillingPeriod, customData, startedAt } = data;
+  const { id, customerId, items, status, currentBillingPeriod, customData, startedAt, scheduledChange } = data;
 
   const clinicId = customData?.clinicId;
   if (!clinicId) {
@@ -46,14 +79,10 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
   }
 
   const planCode = planCodeFromProduct(productExternalId);
-  if (!planCode) {
-    console.warn("Could not derive plan_code from product", productExternalId);
-    return;
-  }
+  if (!planCode) return;
 
   const trialEndsAt = status === "trialing" ? currentBillingPeriod?.endsAt : null;
 
-  // Remove trial placeholder row for this clinic+env so the real Paddle row replaces it.
   await getSupabase()
     .from("subscriptions")
     .delete()
@@ -75,6 +104,9 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
       trial_ends_at: trialEndsAt,
       current_period_start: currentBillingPeriod?.startsAt,
       current_period_end: currentBillingPeriod?.endsAt,
+      scheduled_change_action: scheduledChange?.action ?? null,
+      scheduled_change_effective_at: scheduledChange?.effectiveAt ?? null,
+      scheduled_change_meta: scheduledChange ?? null,
       environment: env,
       updated_at: new Date().toISOString(),
     },
@@ -85,6 +117,13 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
 async function handleSubscriptionUpdated(data: any, env: PaddleEnv) {
   const { id, status, currentBillingPeriod, scheduledChange, items } = data;
 
+  const { data: prev } = await getSupabase()
+    .from("subscriptions")
+    .select("status, plan_code, clinic_id")
+    .eq("paddle_subscription_id", id)
+    .eq("environment", env)
+    .maybeSingle();
+
   const item = items?.[0];
   const priceExternalId = item?.price?.importMeta?.externalId;
   const productExternalId = item?.product?.importMeta?.externalId;
@@ -94,6 +133,9 @@ async function handleSubscriptionUpdated(data: any, env: PaddleEnv) {
     current_period_start: currentBillingPeriod?.startsAt,
     current_period_end: currentBillingPeriod?.endsAt,
     cancel_at_period_end: scheduledChange?.action === "cancel",
+    scheduled_change_action: scheduledChange?.action ?? null,
+    scheduled_change_effective_at: scheduledChange?.effectiveAt ?? null,
+    scheduled_change_meta: scheduledChange ?? null,
     updated_at: new Date().toISOString(),
   };
 
@@ -112,6 +154,12 @@ async function handleSubscriptionUpdated(data: any, env: PaddleEnv) {
     .update(update)
     .eq("paddle_subscription_id", id)
     .eq("environment", env);
+
+  if (status === "past_due" && prev && prev.status !== "past_due" && prev.clinic_id) {
+    await sendDunningEmail(prev.clinic_id, prev.plan_code).catch((e) =>
+      console.error("dunning email failed", e)
+    );
+  }
 }
 
 async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
@@ -120,10 +168,95 @@ async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
     .update({
       status: "canceled",
       canceled_at: new Date().toISOString(),
+      scheduled_change_action: null,
+      scheduled_change_effective_at: null,
+      scheduled_change_meta: null,
       updated_at: new Date().toISOString(),
     })
     .eq("paddle_subscription_id", data.id)
     .eq("environment", env);
+}
+
+async function persistTransaction(data: any, env: PaddleEnv, statusOverride?: string) {
+  const { id, subscriptionId, customerId, items, details, invoiceNumber, invoiceId, billedAt, origin, status } = data;
+
+  let clinicId: string | null = null;
+  let planCode: string | null = null;
+  if (subscriptionId) {
+    const sub = await findClinicForSubscription(subscriptionId, env);
+    clinicId = sub?.clinic_id ?? null;
+    planCode = sub?.plan_code ?? null;
+  }
+  if (!clinicId) {
+    console.warn("transaction has no matching subscription, skipping persist", { id, subscriptionId });
+    return null;
+  }
+
+  const item = items?.[0];
+  const priceExternalId = item?.price?.importMeta?.externalId ?? null;
+
+  const totals = details?.totals;
+  const amountCents = totals?.total ? parseInt(totals.total, 10) : 0;
+  const currency = totals?.currencyCode || data?.currencyCode || "USD";
+
+  const finalStatus = statusOverride || status || "unknown";
+  const invoicePdfUrl = finalStatus === "completed" && invoiceId
+    ? `https://my.paddle.com/invoice/${invoiceId}`
+    : null;
+
+  const { error } = await getSupabase()
+    .from("payment_transactions")
+    .upsert(
+      {
+        clinic_id: clinicId,
+        paddle_transaction_id: id,
+        paddle_subscription_id: subscriptionId ?? null,
+        paddle_customer_id: customerId ?? null,
+        plan_code: planCode,
+        price_id: priceExternalId,
+        amount_cents: amountCents,
+        currency: currency,
+        status: finalStatus,
+        origin: origin ?? null,
+        invoice_number: invoiceNumber ?? null,
+        invoice_pdf_url: invoicePdfUrl,
+        error_reason: data?.payments?.[0]?.errorCode ?? null,
+        billed_at: billedAt ?? null,
+        environment: env,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "paddle_transaction_id,environment" }
+    );
+  if (error) console.error("persistTransaction upsert error", error);
+  return { clinicId, planCode, amountCents, currency };
+}
+
+async function sendDunningEmail(clinicId: string, planCode: string | null) {
+  const ownerEmail = await findClinicOwnerEmail(clinicId);
+  if (!ownerEmail) {
+    console.warn("No owner email found for clinic", clinicId);
+    return;
+  }
+  const { data: clinic } = await getSupabase()
+    .from("clinics")
+    .select("name")
+    .eq("id", clinicId)
+    .maybeSingle();
+
+  const payload = {
+    template: "payment-failed",
+    recipientEmail: ownerEmail,
+    data: {
+      clinicName: clinic?.name ?? "your clinic",
+      planName: planNameFromCode(planCode),
+      billingPortalUrl: `${appBaseUrl()}/app/settings/billing`,
+    },
+  };
+  const { error } = await getSupabase().rpc("enqueue_email", {
+    queue_name: "transactional_emails",
+    payload,
+  });
+  if (error) console.error("enqueue dunning email failed", error);
 }
 
 async function handleWebhook(req: Request, env: PaddleEnv) {
@@ -139,6 +272,12 @@ async function handleWebhook(req: Request, env: PaddleEnv) {
       break;
     case EventName.SubscriptionCanceled:
       await handleSubscriptionCanceled(event.data, env);
+      break;
+    case EventName.TransactionCompleted:
+      await persistTransaction(event.data, env, "completed");
+      break;
+    case EventName.TransactionPaymentFailed:
+      await persistTransaction(event.data, env, "payment_failed");
       break;
     default:
       console.log("Unhandled event:", event.eventType);

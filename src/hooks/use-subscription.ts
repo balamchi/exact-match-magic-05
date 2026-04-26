@@ -23,6 +23,9 @@ export interface SubscriptionRow {
   canceled_at: string | null;
   environment: string;
   created_at: string;
+  scheduled_change_action: string | null;
+  scheduled_change_effective_at: string | null;
+  scheduled_change_meta: any | null;
 }
 
 export interface UseSubscriptionResult {
