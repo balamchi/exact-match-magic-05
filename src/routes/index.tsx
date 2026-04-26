@@ -149,7 +149,7 @@ function Landing() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-glow opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-glow" />
             </span>
-            Trusted by 500+ clinics across Toronto · Dubai · LA · London
+            Coming soon — built for clinics in Toronto · Dubai · LA · London
           </div>
           <h1 className="font-display text-[clamp(56px,8vw,96px)] font-bold leading-[1] tracking-[-0.035em]">
             Run a clinic,<br />
