@@ -218,6 +218,45 @@ function BillingPage() {
             </div>
           )}
 
+          {subscription.scheduled_change_action && subscription.scheduled_change_effective_at && (
+            <div className="flex items-start justify-between gap-3 rounded-2xl border border-warning/40 bg-warning/10 p-5">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-0.5 h-5 w-5 text-warning" />
+                <div>
+                  <div className="font-semibold capitalize text-warning">
+                    {subscription.scheduled_change_action === "cancel"
+                      ? "Cancellation scheduled"
+                      : `${subscription.scheduled_change_action} scheduled`}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Takes effect on {new Date(subscription.scheduled_change_effective_at).toLocaleDateString()}.
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={async () => {
+                  if (!activeClinic) return;
+                  if (!confirm("Cancel this scheduled change? Your subscription will continue as-is.")) return;
+                  try {
+                    const { data, error } = await supabase.functions.invoke("cancel-scheduled-change", {
+                      body: { clinicId: activeClinic.clinic_id, environment: getPaddleEnvironment() },
+                    });
+                    if (error) throw error;
+                    if ((data as any)?.error) throw new Error((data as any).error);
+                    toast.success("Scheduled change canceled");
+                    await refresh();
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : "Failed to cancel scheduled change");
+                  }
+                }}
+              >
+                Keep current plan
+              </Button>
+            </div>
+          )}
+
           <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
             <header className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
