@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
-import { CalendarDays, Mail, Pencil, Phone, Plus, Search, Tag, Trash2, UserRound, Users } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Mail, Pencil, Phone, Plus, Search, Tag, Trash2, UserRound, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
@@ -254,18 +254,25 @@ function Metric({ label, value, icon }: { label: string; value: string; icon: Re
 function ClientRow({ client, onEdit, onDelete }: { client: Client; onEdit: (client: Client) => void; onDelete: (client: Client) => void }) {
   const fullName = [client.first_name, client.last_name].filter(Boolean).join(" ");
   return (
-    <article className="grid gap-4 p-4 transition hover:bg-surface/60 md:grid-cols-[1.4fr_1fr_auto] md:items-center">
-      <div className="flex min-w-0 items-center gap-3">
+    <article className="group grid gap-4 p-4 transition hover:bg-surface/60 md:grid-cols-[1.4fr_1fr_auto] md:items-center">
+      <Link
+        to="/app/clients/$clientId"
+        params={{ clientId: client.id }}
+        className="flex min-w-0 items-center gap-3"
+      >
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-primary font-semibold text-primary-foreground shadow-glow">
           {client.first_name.slice(0, 1)}{client.last_name?.slice(0, 1) ?? ""}
         </div>
         <div className="min-w-0">
-          <h3 className="truncate font-medium">{fullName}</h3>
+          <h3 className="flex items-center gap-1.5 truncate font-medium group-hover:text-primary">
+            {fullName}
+            <ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition group-hover:opacity-100" />
+          </h3>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {(client.tags ?? []).slice(0, 3).map((tag) => <span key={tag} className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] text-primary">{tag}</span>)}
           </div>
         </div>
-      </div>
+      </Link>
       <div className="grid gap-1 text-sm text-muted-foreground">
         {client.email && <span className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" />{client.email}</span>}
         {client.phone && <span className="flex items-center gap-2"><Phone className="h-3.5 w-3.5" />{client.phone}</span>}
