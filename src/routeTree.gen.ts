@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -25,6 +26,7 @@ import { Route as AppMarketingRouteImport } from './routes/app.marketing'
 import { Route as AppLeadsRouteImport } from './routes/app.leads'
 import { Route as AppInventoryRouteImport } from './routes/app.inventory'
 import { Route as AppGiftcardsRouteImport } from './routes/app.giftcards'
+import { Route as AppEmailLogRouteImport } from './routes/app.email-log'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppCouponsRouteImport } from './routes/app.coupons'
 import { Route as AppConsentRouteImport } from './routes/app.consent'
@@ -39,6 +41,11 @@ import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lova
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -119,6 +126,11 @@ const AppGiftcardsRoute = AppGiftcardsRouteImport.update({
   path: '/giftcards',
   getParentRoute: () => AppRoute,
 } as any)
+const AppEmailLogRoute = AppEmailLogRouteImport.update({
+  id: '/email-log',
+  path: '/email-log',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -191,6 +203,7 @@ const LovableEmailQueueProcessRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
@@ -198,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
@@ -222,6 +236,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
@@ -229,6 +244,7 @@ export interface FileRoutesByTo {
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
@@ -254,6 +270,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
@@ -261,6 +278,7 @@ export interface FileRoutesById {
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
@@ -287,6 +305,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/unsubscribe'
     | '/app/automations'
     | '/app/booking'
     | '/app/calendar'
@@ -294,6 +313,7 @@ export interface FileRouteTypes {
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
+    | '/app/email-log'
     | '/app/giftcards'
     | '/app/inventory'
     | '/app/leads'
@@ -318,6 +338,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/app'
+    | '/unsubscribe'
     | '/app/automations'
     | '/app/booking'
     | '/app/calendar'
@@ -325,6 +346,7 @@ export interface FileRouteTypes {
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
+    | '/app/email-log'
     | '/app/giftcards'
     | '/app/inventory'
     | '/app/leads'
@@ -349,6 +371,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/app'
+    | '/unsubscribe'
     | '/app/automations'
     | '/app/booking'
     | '/app/calendar'
@@ -356,6 +379,7 @@ export interface FileRouteTypes {
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
+    | '/app/email-log'
     | '/app/giftcards'
     | '/app/inventory'
     | '/app/leads'
@@ -381,6 +405,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  UnsubscribeRoute: typeof UnsubscribeRoute
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
   BookSlugRoute: typeof BookSlugRoute
@@ -394,6 +419,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app': {
       id: '/app'
       path: '/app'
@@ -504,6 +536,13 @@ declare module '@tanstack/react-router' {
       path: '/giftcards'
       fullPath: '/app/giftcards'
       preLoaderRoute: typeof AppGiftcardsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/email-log': {
+      id: '/app/email-log'
+      path: '/email-log'
+      fullPath: '/app/email-log'
+      preLoaderRoute: typeof AppEmailLogRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/dashboard': {
@@ -620,6 +659,7 @@ interface AppRouteChildren {
   AppConsentRoute: typeof AppConsentRoute
   AppCouponsRoute: typeof AppCouponsRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppEmailLogRoute: typeof AppEmailLogRoute
   AppGiftcardsRoute: typeof AppGiftcardsRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppLeadsRoute: typeof AppLeadsRoute
@@ -640,6 +680,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppConsentRoute: AppConsentRoute,
   AppCouponsRoute: AppCouponsRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppEmailLogRoute: AppEmailLogRoute,
   AppGiftcardsRoute: AppGiftcardsRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppLeadsRoute: AppLeadsRoute,
@@ -657,6 +698,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  UnsubscribeRoute: UnsubscribeRoute,
   AuthSignInRoute: AuthSignInRoute,
   AuthSignUpRoute: AuthSignUpRoute,
   BookSlugRoute: BookSlugRoute,
