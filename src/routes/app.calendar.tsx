@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BookingWorkflow } from "@/components/booking-workflow";
+import { CalendarWeek } from "@/components/calendar-week";
 
 export const Route = createFileRoute("/app/calendar")({ component: CalendarPage });
 
 function CalendarPage() {
-  return <BookingWorkflow mode="calendar" />;
+  return <CalendarWeek />;
 }
