@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Building2, Users, Globe, LogOut, Save, Mail, Shield, Trash2 } from "lucide-react";
+import { Building2, Users, Globe, LogOut, Save, Mail, Shield, Trash2, Link2, Copy, ExternalLink } from "lucide-react";
 import { useAuth, type ClinicRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -313,6 +313,48 @@ function SettingsPage() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      {/* Public booking link */}
+      <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <header className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/15 text-primary">
+            <Link2 className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-semibold">Public booking link</h2>
+            <p className="text-xs text-muted-foreground">Share this URL so clients can request appointments online.</p>
+          </div>
+        </header>
+        {(() => {
+          const origin = typeof window !== "undefined" ? window.location.origin : "";
+          const url = `${origin}/book/${activeClinic.clinic.slug}`;
+          return (
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <code className="flex-1 truncate rounded-lg border border-border bg-surface px-3 py-2.5 text-xs">{url}</code>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(url);
+                    toast.success("Link copied");
+                  }}
+                >
+                  <Copy className="mr-2 h-4 w-4" /> Copy
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href={url} target="_blank" rel="noreferrer">
+                    <ExternalLink className="mr-2 h-4 w-4" /> Preview
+                  </a>
+                </Button>
+              </div>
+            </div>
+          );
+        })()}
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          Bookings arrive in <strong>Leads</strong> tagged <code>public_booking</code>. Confirm them into appointments from there.
+        </p>
       </section>
 
       {/* Clinic switcher */}
