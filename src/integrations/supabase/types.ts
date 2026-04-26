@@ -718,6 +718,155 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          active_clients_limit: number | null
+          ai_calls_included: number
+          annual_price_id: string | null
+          card_processing_rate: number
+          code: string
+          created_at: string
+          display_order: number
+          editions_included: number
+          email_included: number
+          features: Json
+          id: string
+          is_popular: boolean
+          is_public: boolean
+          locations_included: number | null
+          monthly_price_id: string | null
+          name: string
+          price_annual_cents: number
+          price_monthly_cents: number
+          sms_included: number
+          staff_seats_included: number | null
+          tagline: string | null
+          updated_at: string
+          whatsapp_included: number
+        }
+        Insert: {
+          active_clients_limit?: number | null
+          ai_calls_included?: number
+          annual_price_id?: string | null
+          card_processing_rate?: number
+          code: string
+          created_at?: string
+          display_order?: number
+          editions_included?: number
+          email_included?: number
+          features?: Json
+          id?: string
+          is_popular?: boolean
+          is_public?: boolean
+          locations_included?: number | null
+          monthly_price_id?: string | null
+          name: string
+          price_annual_cents?: number
+          price_monthly_cents?: number
+          sms_included?: number
+          staff_seats_included?: number | null
+          tagline?: string | null
+          updated_at?: string
+          whatsapp_included?: number
+        }
+        Update: {
+          active_clients_limit?: number | null
+          ai_calls_included?: number
+          annual_price_id?: string | null
+          card_processing_rate?: number
+          code?: string
+          created_at?: string
+          display_order?: number
+          editions_included?: number
+          email_included?: number
+          features?: Json
+          id?: string
+          is_popular?: boolean
+          is_public?: boolean
+          locations_included?: number | null
+          monthly_price_id?: string | null
+          name?: string
+          price_annual_cents?: number
+          price_monthly_cents?: number
+          sms_included?: number
+          staff_seats_included?: number | null
+          tagline?: string | null
+          updated_at?: string
+          whatsapp_included?: number
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          billing_interval: string
+          cancel_at_period_end: boolean
+          canceled_at: string | null
+          clinic_id: string
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          environment: string
+          id: string
+          paddle_customer_id: string
+          paddle_subscription_id: string
+          plan_code: string
+          price_id: string
+          product_id: string
+          status: string
+          trial_ends_at: string | null
+          trial_started_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_interval?: string
+          cancel_at_period_end?: boolean
+          canceled_at?: string | null
+          clinic_id: string
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          paddle_customer_id: string
+          paddle_subscription_id: string
+          plan_code: string
+          price_id: string
+          product_id: string
+          status?: string
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_interval?: string
+          cancel_at_period_end?: boolean
+          canceled_at?: string | null
+          clinic_id?: string
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string
+          id?: string
+          paddle_customer_id?: string
+          paddle_subscription_id?: string
+          plan_code?: string
+          price_id?: string
+          product_id?: string
+          status?: string
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -798,6 +947,10 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      has_active_subscription: {
+        Args: { check_env?: string; clinic_uuid: string }
+        Returns: boolean
       }
       has_clinic_role: {
         Args: {
