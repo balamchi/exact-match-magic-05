@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CreditCard, Check, ExternalLink, AlertTriangle, Sparkles, Zap } from "lucide-react";
+import { CreditCard, Check, ExternalLink, AlertTriangle, Sparkles, Zap, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useEffect, useState } from "react";
@@ -20,7 +20,9 @@ interface PlanRow {
   name: string;
   tagline: string | null;
   price_monthly_cents: number;
+  price_annual_cents: number;
   monthly_price_id: string | null;
+  annual_price_id: string | null;
   is_popular: boolean;
   display_order: number;
 }
@@ -31,17 +33,58 @@ function BillingPage() {
   const [portalLoading, setPortalLoading] = useState(false);
   const [trialLoading, setTrialLoading] = useState<string | null>(null);
   const [plans, setPlans] = useState<PlanRow[]>([]);
+  const [changingPlan, setChangingPlan] = useState<string | null>(null);
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
 
   useEffect(() => {
     supabase
       .from("subscription_plans")
-      .select("code, name, tagline, price_monthly_cents, monthly_price_id, is_popular, display_order")
+      .select("code, name, tagline, price_monthly_cents, price_annual_cents, monthly_price_id, annual_price_id, is_popular, display_order")
       .eq("is_public", true)
       .neq("code", "enterprise")
       .order("display_order")
       .then(({ data }) => setPlans((data ?? []) as PlanRow[]));
   }, []);
+
+  const changePlan = async (targetPlan: PlanRow, mode: "upgrade" | "downgrade") => {
+    if (!activeClinic || !subscription) return;
+    const interval = subscription.billing_interval === "annual" ? "annual" : "monthly";
+    const newPriceId = interval === "annual" ? targetPlan.annual_price_id : targetPlan.monthly_price_id;
+    if (!newPriceId) {
+      toast.error("This plan is not available for your current billing interval");
+      return;
+    }
+    const verb = mode === "upgrade" ? "Upgrade" : "Downgrade";
+    const detail =
+      mode === "upgrade"
+        ? "You'll be charged a prorated amount today."
+        : "Your plan will switch at the end of the current period.";
+    if (!confirm(`${verb} to ${targetPlan.name}?\n\n${detail}`)) return;
+
+    setChangingPlan(targetPlan.code);
+    try {
+      const { data, error } = await supabase.functions.invoke("change-plan", {
+        body: {
+          clinicId: activeClinic.clinic_id,
+          newPriceId,
+          mode,
+          environment: getPaddleEnvironment(),
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success(
+        mode === "upgrade"
+          ? `Upgraded to ${targetPlan.name} — prorated charge applied.`
+          : `Downgrade to ${targetPlan.name} scheduled at end of period.`
+      );
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to change plan");
+    } finally {
+      setChangingPlan(null);
+    }
+  };
 
   const openPortal = async () => {
     if (!activeClinic) return;
