@@ -27,7 +27,7 @@ export function getPaddleClient(env: PaddleEnv): Paddle {
       "X-Connection-Api-Key": connectionApiKey,
       "Lovable-API-Key": lovableApiKey,
     },
-  });
+  } as any);
 }
 
 export async function gatewayFetch(env: PaddleEnv, path: string, init?: RequestInit): Promise<Response> {

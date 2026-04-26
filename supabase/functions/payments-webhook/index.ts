@@ -1,8 +1,8 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { verifyWebhook, EventName, type PaddleEnv } from "../_shared/paddle.ts";
 
-let _supabase: ReturnType<typeof createClient> | null = null;
-function getSupabase() {
+let _supabase: any = null;
+function getSupabase(): any {
   if (!_supabase) {
     _supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -120,6 +120,7 @@ async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
 
 async function handleWebhook(req: Request, env: PaddleEnv) {
   const event = await verifyWebhook(req, env);
+  if (!event) throw new Error("Invalid webhook event");
 
   switch (event.eventType) {
     case EventName.SubscriptionCreated:
