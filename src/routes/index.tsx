@@ -126,7 +126,7 @@ function Landing() {
             <a href="#features" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Features</a>
             <a href="#vs" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Compare</a>
             <a href="#pricing" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Pricing</a>
-            <a href="#testimonials" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Customers</a>
+            
           </div>
           <div className="flex items-center gap-2">
             {!loading && user ? (
