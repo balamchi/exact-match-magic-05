@@ -1,22 +1,47 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CreditCard, Check, ExternalLink, AlertTriangle, Sparkles } from "lucide-react";
+import { CreditCard, Check, ExternalLink, AlertTriangle, Sparkles, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useSubscription } from "@/hooks/use-subscription";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getPaddleEnvironment } from "@/lib/paddle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PaymentTestModeBanner } from "@/components/payment-test-mode-banner";
+import { usePaddleCheckout } from "@/hooks/use-paddle-checkout";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/settings/billing")({
   component: BillingPage,
 });
 
+interface PlanRow {
+  code: string;
+  name: string;
+  tagline: string | null;
+  price_monthly_cents: number;
+  monthly_price_id: string | null;
+  is_popular: boolean;
+  display_order: number;
+}
+
 function BillingPage() {
-  const { activeClinic } = useAuth();
-  const { subscription, loading, isActive, isTrialing, isPastDue, trialDaysLeft } = useSubscription();
+  const { activeClinic, user } = useAuth();
+  const { subscription, loading, isActive, isTrialing, isPastDue, trialDaysLeft, refresh } = useSubscription();
   const [portalLoading, setPortalLoading] = useState(false);
+  const [trialLoading, setTrialLoading] = useState<string | null>(null);
+  const [plans, setPlans] = useState<PlanRow[]>([]);
+  const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
+
+  useEffect(() => {
+    supabase
+      .from("subscription_plans")
+      .select("code, name, tagline, price_monthly_cents, monthly_price_id, is_popular, display_order")
+      .eq("is_public", true)
+      .neq("code", "enterprise")
+      .order("display_order")
+      .then(({ data }) => setPlans((data ?? []) as PlanRow[]));
+  }, []);
 
   const openPortal = async () => {
     if (!activeClinic) return;
@@ -33,6 +58,38 @@ function BillingPage() {
       setPortalLoading(false);
     }
   };
+
+  const startTrial = async (planCode: string) => {
+    if (!activeClinic) return;
+    setTrialLoading(planCode);
+    try {
+      const { error } = await supabase.functions.invoke("start-trial", {
+        body: {
+          clinicId: activeClinic.clinic_id,
+          planCode,
+          environment: getPaddleEnvironment(),
+        },
+      });
+      if (error) throw error;
+      toast.success(`Your 14-day free trial of ${planCode} has started!`);
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to start trial");
+    } finally {
+      setTrialLoading(null);
+    }
+  };
+
+  const upgradeNow = (priceId: string) => {
+    if (!user || !activeClinic) return;
+    openCheckout({
+      priceId,
+      customerEmail: user.email,
+      clinicId: activeClinic.clinic_id,
+    });
+  };
+
+  const isTrialPlaceholder = subscription?.paddle_subscription_id?.startsWith("trial_");
 
   return (
     <div className="space-y-6">
@@ -53,25 +110,57 @@ function BillingPage() {
         </div>
       )}
 
+      {/* No subscription at all → trial picker */}
       {!loading && !subscription && (
-        <div className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/10 to-transparent p-8">
+        <section className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/10 to-transparent p-6 sm:p-8">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
               <Sparkles className="h-6 w-6 text-primary-foreground" />
             </div>
             <div className="flex-1">
-              <h2 className="font-display text-xl font-semibold">No active subscription</h2>
+              <h2 className="font-display text-xl font-semibold">Start your 14-day free trial</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Start your 14-day free trial. No credit card required to start.
+                Pick a plan below to unlock the full ClinicPro suite. No credit card required to start.
               </p>
-              <Link to="/pricing">
-                <Button className="mt-4">Choose a plan</Button>
-              </Link>
             </div>
           </div>
-        </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            {plans.map((plan) => (
+              <button
+                key={plan.code}
+                onClick={() => startTrial(plan.code)}
+                disabled={trialLoading !== null}
+                className={`group relative flex flex-col rounded-xl border p-5 text-start transition ${
+                  plan.is_popular
+                    ? "border-primary/50 bg-gradient-to-b from-primary/15 to-transparent hover:border-primary"
+                    : "border-border bg-card hover:border-primary/40"
+                } disabled:cursor-wait disabled:opacity-60`}
+              >
+                {plan.is_popular && (
+                  <span className="absolute -top-2.5 left-4 rounded-full bg-gradient-primary px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary-foreground">
+                    Most popular
+                  </span>
+                )}
+                <div className="font-display text-base font-semibold">{plan.name}</div>
+                <p className="mt-1 text-xs text-muted-foreground">{plan.tagline}</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="font-display text-3xl font-bold">
+                    ${(plan.price_monthly_cents / 100).toFixed(0)}
+                  </span>
+                  <span className="text-xs text-muted-foreground">/mo after trial</span>
+                </div>
+                <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary">
+                  {trialLoading === plan.code ? "Starting…" : "Start free trial"}
+                  <Zap className="h-3 w-3" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
       )}
 
+      {/* Has a subscription (real or trial placeholder) */}
       {!loading && subscription && (
         <>
           {isPastDue && (
@@ -96,8 +185,8 @@ function BillingPage() {
                   <h2 className="font-display text-lg font-semibold capitalize">
                     {subscription.plan_code} plan
                   </h2>
-                  <p className="text-xs text-muted-foreground capitalize">
-                    {subscription.billing_interval} billing
+                  <p className="text-xs capitalize text-muted-foreground">
+                    {isTrialPlaceholder ? "Free trial · no card on file" : `${subscription.billing_interval} billing`}
                   </p>
                 </div>
               </div>
@@ -123,7 +212,7 @@ function BillingPage() {
                   )}
                 </div>
               )}
-              {subscription.current_period_end && (
+              {!isTrialPlaceholder && subscription.current_period_end && (
                 <div>
                   <dt className="text-muted-foreground">Next renewal</dt>
                   <dd className="mt-1 font-medium">
@@ -139,14 +228,39 @@ function BillingPage() {
               )}
             </dl>
 
+            {/* Trial placeholder → "Add payment method" instead of "Manage subscription" */}
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button onClick={openPortal} disabled={portalLoading}>
-                <ExternalLink className="me-2 h-4 w-4" />
-                {portalLoading ? "Opening…" : "Manage subscription"}
-              </Button>
-              <Link to="/pricing">
-                <Button variant="outline">Change plan</Button>
-              </Link>
+              {isTrialPlaceholder ? (
+                <>
+                  {plans
+                    .filter((p) => p.code === subscription.plan_code)
+                    .map((p) =>
+                      p.monthly_price_id ? (
+                        <Button
+                          key={p.code}
+                          onClick={() => upgradeNow(p.monthly_price_id!)}
+                          disabled={checkoutLoading}
+                        >
+                          <CreditCard className="me-2 h-4 w-4" />
+                          {checkoutLoading ? "Opening…" : "Add payment method"}
+                        </Button>
+                      ) : null
+                    )}
+                  <Link to="/pricing">
+                    <Button variant="outline">Change plan</Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Button onClick={openPortal} disabled={portalLoading}>
+                    <ExternalLink className="me-2 h-4 w-4" />
+                    {portalLoading ? "Opening…" : "Manage subscription"}
+                  </Button>
+                  <Link to="/pricing">
+                    <Button variant="outline">Change plan</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </section>
 
