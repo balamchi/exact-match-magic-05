@@ -412,12 +412,12 @@ function Landing() {
                 The operating system for modern clinics. Built by clinic owners. Trusted across Toronto, Dubai, LA, and London.
               </p>
             </div>
-            <FooterCol title="Product" items={["Features","Compare","Pricing","Integrations","Roadmap"]} />
-            <FooterCol title="Resources" items={["Blog","Customer stories","Help center","API docs","Migration guide"]} />
-            <FooterCol title="Company" items={["About","Contact","Careers","Privacy","Terms"]} />
+            <FooterCol title="Product" items={[{ label: "Features", href: "#" },{ label: "Compare", href: "#" },{ label: "Pricing", href: "/pricing" },{ label: "Integrations", href: "#" },{ label: "Roadmap", href: "#" }]} />
+            <FooterCol title="Resources" items={[{ label: "Blog", href: "#" },{ label: "Customer stories", href: "#" },{ label: "Help center", href: "#" },{ label: "API docs", href: "#" },{ label: "Migration guide", href: "#" }]} />
+            <FooterCol title="Company" items={[{ label: "About", href: "#" },{ label: "Contact", href: "mailto:support@clinicpro.io" },{ label: "Careers", href: "#" },{ label: "Privacy", href: "/privacy" },{ label: "Terms", href: "/terms" },{ label: "Refunds", href: "/refunds" }]} />
           </div>
           <div className="mt-12 flex flex-col items-start justify-between gap-2 border-t border-border/60 pt-8 text-[13px] text-muted-foreground/80 sm:flex-row sm:items-center">
-            <div>© 2026 ClinicPro · Built by Divan Group · Toronto, Canada</div>
+            <div>© 2026 ClinicPro · Built by Divan Digital Corp · Toronto, Canada</div>
             <div className="font-signature text-base text-foreground/70">Discipline · Consistency · Creativity</div>
           </div>
         </div>
@@ -474,13 +474,15 @@ function CompCell({ value, tone }: { value: string; tone?: "yes"|"no"|"meh"|"pla
   return <td className={`border-b border-border/60 px-5 py-[18px] ${cls}`}>{value}</td>;
 }
 
-function FooterCol({ title, items }: { title: string; items: string[] }) {
+function FooterCol({ title, items }: { title: string; items: { label: string; href: string }[] }) {
   return (
     <div>
       <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/70">{title}</h4>
       <ul className="space-y-2.5">
         {items.map((i) => (
-          <li key={i}><a href="#" className="text-sm text-muted-foreground transition hover:text-foreground">{i}</a></li>
+          <li key={i.label}>
+            <a href={i.href} className="text-sm text-muted-foreground transition hover:text-foreground">{i.label}</a>
+          </li>
         ))}
       </ul>
     </div>
