@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { ChevronLeft, ChevronRight, CalendarDays, Plus, X, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Plus, X, AlertTriangle, Columns3, Square } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
@@ -111,6 +111,7 @@ export function CalendarWeek() {
   const [editing, setEditing] = useState<Appointment | null>(null);
   const [saving, setSaving] = useState(false);
   const [draft, setDraft] = useState<DraftForm>(emptyDraft);
+  const [byProvider, setByProvider] = useState(false);
 
   const days = useMemo(() => Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i)), [weekStart]);
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart]);
@@ -299,6 +300,16 @@ export function CalendarWeek() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setByProvider((v) => !v)}
+            className="gap-2"
+            title={byProvider ? "Show single column per day" : "Split each day by provider"}
+          >
+            {byProvider ? <Square className="h-4 w-4" /> : <Columns3 className="h-4 w-4" />}
+            {byProvider ? "Combined" : "By provider"}
+          </Button>
           <Button variant="outline" size="icon" onClick={() => setWeekStart(addDays(weekStart, -7))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -324,8 +335,14 @@ export function CalendarWeek() {
           <div className="p-6 text-sm text-muted-foreground">Loading calendar…</div>
         ) : (
           <div className="overflow-x-auto">
-            <div className="min-w-[900px]">
-              <div className="grid border-b border-border" style={{ gridTemplateColumns: "60px repeat(7, minmax(0, 1fr))" }}>
+            <div style={{ minWidth: byProvider ? Math.max(900, 60 + 7 * Math.max(1, staff.length) * 110) : 900 }}>
+              {/* Day header row */}
+              <div
+                className="grid border-b border-border"
+                style={{
+                  gridTemplateColumns: `60px repeat(7, minmax(0, 1fr))`,
+                }}
+              >
                 <div />
                 {days.map((day) => {
                   const isToday = day.toDateString() === new Date().toDateString();
@@ -342,7 +359,38 @@ export function CalendarWeek() {
                 })}
               </div>
 
-              <div className="grid relative" style={{ gridTemplateColumns: "60px repeat(7, minmax(0, 1fr))" }}>
+              {/* Optional provider sub-header row */}
+              {byProvider && staff.length > 0 && (
+                <div
+                  className="grid border-b border-border bg-surface/30"
+                  style={{ gridTemplateColumns: `60px repeat(7, minmax(0, 1fr))` }}
+                >
+                  <div />
+                  {days.map((day) => (
+                    <div
+                      key={`hdr-${day.toISOString()}`}
+                      className="grid border-l border-border"
+                      style={{ gridTemplateColumns: `repeat(${staff.length}, minmax(0, 1fr))` }}
+                    >
+                      {staff.map((s) => (
+                        <div
+                          key={s.id}
+                          className="flex items-center justify-center gap-1.5 border-l border-border/40 px-1 py-1.5 text-[10px] font-medium first:border-l-0"
+                        >
+                          <span
+                            className="inline-block h-2 w-2 rounded-full"
+                            style={{ background: s.color ?? "var(--color-primary)" }}
+                          />
+                          <span className="truncate text-muted-foreground">{s.display_name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Time-grid body */}
+              <div className="grid relative" style={{ gridTemplateColumns: `60px repeat(7, minmax(0, 1fr))` }}>
                 <div className="border-r border-border">
                   {Array.from({ length: HOUR_END - HOUR_START }).map((_, i) => (
                     <div key={i} style={{ height: SLOT_PX * SLOTS_PER_HOUR }} className="relative">
@@ -358,6 +406,65 @@ export function CalendarWeek() {
                   const dayAppts = appointments.filter(
                     (a) => new Date(a.starts_at).toDateString() === day.toDateString()
                   );
+
+                  // Multi-provider column layout
+                  if (byProvider && staff.length > 0) {
+                    return (
+                      <div
+                        key={day.toISOString()}
+                        className="relative grid border-l border-border"
+                        style={{ height: totalHeight, gridTemplateColumns: `repeat(${staff.length}, minmax(0, 1fr))` }}
+                      >
+                        {staff.map((member) => {
+                          const colAppts = dayAppts.filter((a) => a.staff_id === member.id);
+                          return (
+                            <div
+                              key={`${day.toISOString()}-${member.id}`}
+                              className="relative border-l border-border/40 first:border-l-0"
+                              style={{ height: totalHeight }}
+                            >
+                              {Array.from({ length: slotCount }).map((_, slot) => {
+                                const hour = HOUR_START + Math.floor(slot / SLOTS_PER_HOUR);
+                                const minute = (slot % SLOTS_PER_HOUR) * SLOT_MIN;
+                                return (
+                                  <button
+                                    key={slot}
+                                    onClick={() => openSlot(day, hour, minute, member.id)}
+                                    className={cn(
+                                      "block w-full border-b border-border/40 transition hover:bg-primary/5",
+                                      minute === 0 && "border-border/60"
+                                    )}
+                                    style={{ height: SLOT_PX }}
+                                    aria-label={`Book ${member.display_name} ${day.toLocaleDateString()} ${hour}:${String(minute).padStart(2, "0")}`}
+                                  />
+                                );
+                              })}
+                              {colAppts.map((appointment) => {
+                                const { top, height } = positionFor(appointment);
+                                const svc = serviceById.get(appointment.service_id ?? "");
+                                return (
+                                  <button
+                                    key={appointment.id}
+                                    onClick={() => openExisting(appointment)}
+                                    className={cn(
+                                      "absolute left-1 right-1 overflow-hidden rounded-md border px-1.5 py-1 text-left text-[11px] shadow-sm transition hover:opacity-90",
+                                      STATUS_TINT[appointment.status]
+                                    )}
+                                    style={{ top, height, borderLeft: `3px solid ${member.color ?? "var(--color-primary)"}` }}
+                                  >
+                                    <div className="truncate font-medium">{fullName(clientById.get(appointment.client_id ?? ""))}</div>
+                                    <div className="truncate opacity-80">{svc?.name ?? "—"}</div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+
+                  // Combined day column
                   return (
                     <div key={day.toISOString()} className="relative border-l border-border" style={{ height: totalHeight }}>
                       {Array.from({ length: slotCount }).map((_, slot) => {
