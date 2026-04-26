@@ -1,10 +1,11 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarDays, Clock, DollarSign, Edit3, Plus, Search, Trash2, UserRound, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { useRealtimeTable } from "@/hooks/use-realtime-table";
 
 type Appointment = Tables<"appointments">;
 type Client = Tables<"clients">;
@@ -67,7 +68,7 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
   const serviceById = useMemo(() => new Map(services.map((service) => [service.id, service])), [services]);
   const staffById = useMemo(() => new Map(staff.map((member) => [member.id, member])), [staff]);
 
-  const loadAll = async () => {
+  const loadAll = useCallback(async () => {
     if (!activeClinic) return;
     setLoading(true);
     const clinicId = activeClinic.clinic_id;
@@ -88,11 +89,13 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
     setServices(serviceRes.data ?? []);
     setStaff(staffRes.data ?? []);
     setLoading(false);
-  };
+  }, [activeClinic?.clinic_id]);
 
   useEffect(() => {
     loadAll();
-  }, [activeClinic?.clinic_id]);
+  }, [loadAll]);
+
+  useRealtimeTable("appointments", activeClinic?.clinic_id, loadAll);
 
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();

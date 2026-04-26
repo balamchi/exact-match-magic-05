@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus, Search, Target, X, GripVertical } from "lucide-react";
 import { toast } from "sonner";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { useRealtimeTable } from "@/hooks/use-realtime-table";
 import { cn } from "@/lib/utils";
 
 type Lead = Tables<"leads">;
@@ -58,7 +59,7 @@ function LeadsPage() {
   const [dragging, setDragging] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<Stage | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!activeClinic) return;
     setLoading(true);
     const { data, error } = await supabase
@@ -69,12 +70,13 @@ function LeadsPage() {
     if (error) toast.error("Could not load leads");
     setLeads(data ?? []);
     setLoading(false);
-  };
+  }, [activeClinic?.clinic_id]);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeClinic?.clinic_id]);
+  }, [load]);
+
+  useRealtimeTable("leads", activeClinic?.clinic_id, load);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
