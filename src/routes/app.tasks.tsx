@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus, Search, CheckSquare, X, GripVertical, Calendar as CalendarIcon, Clock } from "lucide-react";
 import { toast } from "sonner";
