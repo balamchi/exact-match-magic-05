@@ -26,6 +26,7 @@ import { Route as AppMarketingRouteImport } from './routes/app.marketing'
 import { Route as AppLeadsRouteImport } from './routes/app.leads'
 import { Route as AppInventoryRouteImport } from './routes/app.inventory'
 import { Route as AppGiftcardsRouteImport } from './routes/app.giftcards'
+import { Route as AppEmailLogRouteImport } from './routes/app.email-log'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppCouponsRouteImport } from './routes/app.coupons'
 import { Route as AppConsentRouteImport } from './routes/app.consent'
@@ -125,6 +126,11 @@ const AppGiftcardsRoute = AppGiftcardsRouteImport.update({
   path: '/giftcards',
   getParentRoute: () => AppRoute,
 } as any)
+const AppEmailLogRoute = AppEmailLogRouteImport.update({
+  id: '/email-log',
+  path: '/email-log',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -205,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/leads': typeof AppLeadsRoute
@@ -304,6 +313,7 @@ export interface FileRouteTypes {
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
+    | '/app/email-log'
     | '/app/giftcards'
     | '/app/inventory'
     | '/app/leads'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
+    | '/app/email-log'
     | '/app/giftcards'
     | '/app/inventory'
     | '/app/leads'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
+    | '/app/email-log'
     | '/app/giftcards'
     | '/app/inventory'
     | '/app/leads'
@@ -526,6 +538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppGiftcardsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/email-log': {
+      id: '/app/email-log'
+      path: '/email-log'
+      fullPath: '/app/email-log'
+      preLoaderRoute: typeof AppEmailLogRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/dashboard': {
       id: '/app/dashboard'
       path: '/dashboard'
@@ -640,6 +659,7 @@ interface AppRouteChildren {
   AppConsentRoute: typeof AppConsentRoute
   AppCouponsRoute: typeof AppCouponsRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppEmailLogRoute: typeof AppEmailLogRoute
   AppGiftcardsRoute: typeof AppGiftcardsRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppLeadsRoute: typeof AppLeadsRoute
@@ -660,6 +680,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppConsentRoute: AppConsentRoute,
   AppCouponsRoute: AppCouponsRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppEmailLogRoute: AppEmailLogRoute,
   AppGiftcardsRoute: AppGiftcardsRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppLeadsRoute: AppLeadsRoute,
@@ -691,3 +712,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
