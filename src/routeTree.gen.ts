@@ -34,6 +34,7 @@ import { Route as AppBookingRouteImport } from './routes/app.booking'
 import { Route as AppAutomationsRouteImport } from './routes/app.automations'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AppClientsClientIdRouteImport } from './routes/app.clients.$clientId'
+import { Route as ApiPublicBookingRouteImport } from './routes/api.public.booking'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -163,6 +164,11 @@ const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
   path: '/$clientId',
   getParentRoute: () => AppClientsRoute,
 } as any)
+const ApiPublicBookingRoute = ApiPublicBookingRouteImport.update({
+  id: '/api/public/booking',
+  path: '/api/public/booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -206,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -236,6 +243,7 @@ export interface FileRoutesByTo {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -267,6 +275,7 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -299,6 +308,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/book/$slug'
     | '/email/unsubscribe'
+    | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
@@ -329,6 +339,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/book/$slug'
     | '/email/unsubscribe'
+    | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/book/$slug'
     | '/email/unsubscribe'
+    | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
@@ -373,6 +385,7 @@ export interface RootRouteChildren {
   AuthSignUpRoute: typeof AuthSignUpRoute
   BookSlugRoute: typeof BookSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  ApiPublicBookingRoute: typeof ApiPublicBookingRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -556,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientsClientIdRouteImport
       parentRoute: typeof AppClientsRoute
     }
+    '/api/public/booking': {
+      id: '/api/public/booking'
+      path: '/api/public/booking'
+      fullPath: '/api/public/booking'
+      preLoaderRoute: typeof ApiPublicBookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -641,6 +661,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignUpRoute: AuthSignUpRoute,
   BookSlugRoute: BookSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  ApiPublicBookingRoute: ApiPublicBookingRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,

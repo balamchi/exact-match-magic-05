@@ -93,33 +93,33 @@ function PublicBookingPage() {
   const submitBooking = async () => {
     if (!clinic || !selectedService) return;
     setSubmitting(true);
-    const desiredTime = `${date}T${time}`;
-    const requestedAt = new Date(desiredTime).toLocaleString();
-    const noteText = [
-      `📅 Requested: ${requestedAt}`,
-      `💆 Service: ${selectedService.name} (${selectedService.duration_minutes} min · ${money(selectedService.price_cents)})`,
-      selectedStaff ? `👤 Provider: ${selectedStaff.display_name}` : "👤 Provider: No preference",
-      notes.trim() ? `\n📝 Client note:\n${notes.trim()}` : "",
-    ].filter(Boolean).join("\n");
-
-    const { error } = await supabase.from("leads").insert({
-      clinic_id: clinic.id,
-      name: name.trim(),
-      email: email.trim() || null,
-      phone: phone.trim() || null,
-      source: "public_booking",
-      stage: "new",
-      estimated_value_cents: selectedService.price_cents,
-      notes: noteText,
-    });
-
-    setSubmitting(false);
-    if (error) {
+    try {
+      const res = await fetch("/api/public/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clinicSlug: clinic.slug,
+          name: name.trim(),
+          email: email.trim() || null,
+          phone: phone.trim() || null,
+          serviceId: selectedService.id,
+          staffId: selectedStaff?.id ?? null,
+          date,
+          time,
+          notes: notes.trim() || null,
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || "Request failed");
+      }
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
       toast.error("Couldn't submit your request. Please try again.");
-      console.error(error);
-      return;
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitted(true);
   };
 
   if (loading) {
