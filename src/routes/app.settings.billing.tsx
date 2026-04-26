@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { CreditCard, Check, ExternalLink, AlertTriangle, Sparkles, Zap, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useSubscription } from "@/hooks/use-subscription";
@@ -13,9 +13,6 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/settings/billing")({
   component: BillingPage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    checkout: typeof search.checkout === "string" ? (search.checkout as "success") : undefined,
-  }),
 });
 
 interface PlanRow {
@@ -38,12 +35,12 @@ function BillingPage() {
   const [plans, setPlans] = useState<PlanRow[]>([]);
   const [changingPlan, setChangingPlan] = useState<string | null>(null);
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
-  const search = useSearch({ from: "/app/settings/billing" });
-  const navigate = Route.useNavigate();
 
   // Post-checkout success — toast + poll until webhook upserts the real subscription
   useEffect(() => {
-    if (search.checkout !== "success") return;
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") !== "success") return;
     toast.success("Payment received — activating your subscription…");
     let cancelled = false;
     let tries = 0;
@@ -56,12 +53,12 @@ function BillingPage() {
     };
     poll();
     // strip the query param so a refresh doesn't re-toast
-    navigate({ to: "/app/settings/billing", search: {}, replace: true });
+    window.history.replaceState({}, "", window.location.pathname);
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search.checkout]);
+  }, []);
 
   useEffect(() => {
     supabase
