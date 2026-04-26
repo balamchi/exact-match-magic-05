@@ -1,6 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CalendarDays, Users, DollarSign, TrendingUp, Sparkles, Activity, AlertTriangle, ArrowRight, Clock, Target } from "lucide-react";
+import {
+  CalendarDays,
+  Users,
+  DollarSign,
+  Repeat,
+  Sparkles,
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  Clock,
+  Target,
+  TrendingUp,
+  Lightbulb,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { StatCard } from "@/components/stat-card";
@@ -10,10 +23,10 @@ export const Route = createFileRoute("/app/dashboard")({ component: Dashboard })
 
 interface Stats {
   todayAppointments: number;
-  weekAppointments: number;
-  totalClients: number;
-  weekRevenueCents: number;
-  newLeads: number;
+  todayRevenueCents: number;
+  monthRevenueCents: number;
+  activeClients: number;        // distinct clients with appt in last 90d
+  rebookRatePct: number;        // % of clients in last 90d with 2+ visits
 }
 interface TodayAppt {
   id: string;
@@ -27,6 +40,9 @@ interface TodayAppt {
 }
 interface LowStockItem { id: string; name: string; stock_quantity: number; reorder_threshold: number }
 interface OverdueTask { id: string; title: string; due_at: string }
+
+// Default monthly revenue goal until per-clinic settings exist.
+const DEFAULT_MONTHLY_GOAL_CENTS = 5_000_000; // $50,000
 
 function formatMoney(cents: number, currency = "CAD") {
   return new Intl.NumberFormat("en-CA", { style: "currency", currency, maximumFractionDigits: 0 }).format(cents / 100);
@@ -59,17 +75,24 @@ function Dashboard() {
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
-      const startOfWeek = new Date(now.getTime() - 7 * 86400000).toISOString();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const startOf90d = new Date(now.getTime() - 90 * 86400000).toISOString();
 
-      const [todayList, weekRes, clientsRes, leadsRes, inv, tasks] = await Promise.all([
+      const [todayList, monthRes, last90Res, inv, tasks] = await Promise.all([
         supabase.from("appointments")
           .select("id, starts_at, ends_at, status, price_cents, client:clients(first_name,last_name), service:services(name), staff:staff(display_name,color)")
           .eq("clinic_id", clinicId)
           .gte("starts_at", startOfDay).lt("starts_at", endOfDay)
           .order("starts_at", { ascending: true }),
-        supabase.from("appointments").select("id, price_cents, status").eq("clinic_id", clinicId).gte("starts_at", startOfWeek),
-        supabase.from("clients").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
-        supabase.from("leads").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).eq("stage", "new"),
+        supabase.from("appointments")
+          .select("price_cents, status")
+          .eq("clinic_id", clinicId)
+          .gte("starts_at", startOfMonth),
+        supabase.from("appointments")
+          .select("client_id, status")
+          .eq("clinic_id", clinicId)
+          .gte("starts_at", startOf90d)
+          .not("client_id", "is", null),
         supabase.from("inventory_items").select("id, name, stock_quantity, reorder_threshold").eq("clinic_id", clinicId).eq("active", true),
         supabase.from("tasks").select("id, title, due_at").eq("clinic_id", clinicId).neq("status", "done").not("due_at", "is", null).lt("due_at", now.toISOString()).order("due_at", { ascending: true }).limit(5),
       ]);
@@ -77,15 +100,32 @@ function Dashboard() {
       const todayRows = (todayList.data ?? []) as unknown as TodayAppt[];
       setTodaySchedule(todayRows);
 
-      const weekRows = weekRes.data ?? [];
-      const weekRevenue = weekRows.filter((r) => r.status === "completed").reduce((sum, r) => sum + (r.price_cents ?? 0), 0);
+      const todayRevenue = todayRows
+        .filter((r) => r.status === "completed")
+        .reduce((sum, r) => sum + (r.price_cents ?? 0), 0);
+
+      const monthRows = monthRes.data ?? [];
+      const monthRevenue = monthRows
+        .filter((r) => r.status === "completed")
+        .reduce((sum, r) => sum + (r.price_cents ?? 0), 0);
+
+      const last90Rows = (last90Res.data ?? []) as Array<{ client_id: string | null; status: string }>;
+      const counts = new Map<string, number>();
+      for (const r of last90Rows) {
+        if (!r.client_id) continue;
+        if (r.status === "cancelled" || r.status === "no_show") continue;
+        counts.set(r.client_id, (counts.get(r.client_id) ?? 0) + 1);
+      }
+      const activeClients = counts.size;
+      const repeat = Array.from(counts.values()).filter((n) => n >= 2).length;
+      const rebookRatePct = activeClients > 0 ? Math.round((repeat / activeClients) * 100) : 0;
 
       setStats({
         todayAppointments: todayRows.length,
-        weekAppointments: weekRows.length,
-        totalClients: clientsRes.count ?? 0,
-        weekRevenueCents: weekRevenue,
-        newLeads: leadsRes.count ?? 0,
+        todayRevenueCents: todayRevenue,
+        monthRevenueCents: monthRevenue,
+        activeClients,
+        rebookRatePct,
       });
 
       setLowStock((inv.data ?? []).filter((i) => i.stock_quantity <= i.reorder_threshold).slice(0, 5));
@@ -95,11 +135,39 @@ function Dashboard() {
     load();
   }, [activeClinic]);
 
+  const currency = activeClinic?.clinic.currency ?? "CAD";
+
   const cards = [
-    { label: "Today's appointments", value: stats?.todayAppointments ?? 0, icon: CalendarDays, hint: `${stats?.weekAppointments ?? 0} this week` },
-    { label: "Total clients", value: stats?.totalClients ?? 0, icon: Users, hint: "All-time" },
-    { label: "Revenue (7d)", value: formatMoney(stats?.weekRevenueCents ?? 0, activeClinic?.clinic.currency ?? "CAD"), icon: DollarSign, hint: "Completed appointments" },
-    { label: "New leads", value: stats?.newLeads ?? 0, icon: TrendingUp, hint: "Awaiting contact" },
+    { label: "Today's appointments", value: stats?.todayAppointments ?? 0, icon: CalendarDays, hint: "Scheduled today" },
+    { label: "Today's revenue", value: formatMoney(stats?.todayRevenueCents ?? 0, currency), icon: DollarSign, hint: "Completed visits" },
+    { label: "Active clients (90d)", value: stats?.activeClients ?? 0, icon: Users, hint: "Visited in last 90 days" },
+    { label: "Rebook rate (90d)", value: `${stats?.rebookRatePct ?? 0}%`, icon: Repeat, hint: "Clients with 2+ visits" },
+  ];
+
+  const goalCents = DEFAULT_MONTHLY_GOAL_CENTS;
+  const progressCents = stats?.monthRevenueCents ?? 0;
+  const progressPct = Math.min(100, Math.round((progressCents / goalCents) * 100));
+  const monthName = new Date().toLocaleDateString(undefined, { month: "long" });
+
+  const insights: { icon: typeof Lightbulb; title: string; body: string; tone: "primary" | "success" | "amber" }[] = [
+    {
+      icon: TrendingUp,
+      tone: "primary",
+      title: "Friday afternoons are your peak",
+      body: "Last 30 days: Fri 2–5pm averages 92% utilization. Consider opening a 6pm slot.",
+    },
+    {
+      icon: Repeat,
+      tone: "success",
+      title: "12 clients due for a rebook",
+      body: "Filler clients last seen 75–90 days ago haven't booked. Send a touch-up reminder.",
+    },
+    {
+      icon: AlertTriangle,
+      tone: "amber",
+      title: "No-show rate trending up",
+      body: "Up 3% week-over-week. Enable the 24h confirmation automation to recover ~$1.2k/mo.",
+    },
   ];
 
   const greeting = (() => {
@@ -130,6 +198,76 @@ function Dashboard() {
         {cards.map((card) => (
           <StatCard key={card.label} label={card.label} value={card.value} icon={card.icon} sub={card.hint} loading={loading} />
         ))}
+      </div>
+
+      {/* Monthly goal + AI Insights */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-gradient-surface p-6 shadow-card">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Revenue goal</p>
+              <h3 className="mt-1 font-display text-lg font-semibold">{monthName} target</h3>
+            </div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <Target className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-5 flex items-baseline justify-between">
+            <span className="font-display text-3xl font-semibold tracking-tight">
+              {formatMoney(progressCents, currency)}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              of {formatMoney(goalCents, currency)}
+            </span>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-gradient-primary shadow-glow transition-all"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>{progressPct}% complete</span>
+            <Link to="/app/settings" className="text-primary hover:underline">Edit goal</Link>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-card lg:col-span-2">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
+                <Sparkles className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-semibold">AI Insights</h3>
+                <p className="text-[11px] text-muted-foreground">Sample suggestions — full intelligence unlocks in Round 4.</p>
+              </div>
+            </div>
+            <Link to="/app/ai" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+              Ask AI <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <ul className="grid grid-cols-1 gap-2 md:grid-cols-3">
+            {insights.map((ins) => {
+              const Icon = ins.icon;
+              const tone =
+                ins.tone === "success"
+                  ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-300"
+                  : ins.tone === "amber"
+                  ? "border-amber-500/30 bg-amber-500/5 text-amber-300"
+                  : "border-primary/30 bg-primary/5 text-primary";
+              return (
+                <li key={ins.title} className={cn("rounded-xl border p-3", tone)}>
+                  <div className="mb-1.5 flex h-7 w-7 items-center justify-center rounded-lg bg-background/40">
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <p className="text-xs font-semibold leading-snug text-foreground">{ins.title}</p>
+                  <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{ins.body}</p>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
