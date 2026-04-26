@@ -12,7 +12,7 @@ import {
   Target,
   BarChart3,
   Globe,
-  Star,
+  
   Check,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -85,11 +85,6 @@ const COMPARISON_ROWS: Array<{ feature: string; mb: string; bd: string; fr: stri
   { feature: "Starting price (per location)", mb: "$199/mo", bd: "$176/mo", fr: "Free*", vg: "$50/mo", us: "$149/mo", mbT: "plain", bdT: "plain", frT: "plain", vgT: "plain" },
 ];
 
-const TESTIMONIALS = [
-  { name: "Dr. Maria Gonzalez", role: "Owner, Roda Clinic · Toronto", initials: "DM", quote: "We switched from Boulevard to ClinicPro and saved $200/month while getting 3x the features. The 73 pre-loaded consent forms alone saved us weeks of legal work. AI insights find revenue we'd otherwise miss every single day." },
-  { name: "Dr. Ahmad Mehdi", role: "Founder, Dr. Ariana Aesthetics · Dubai", initials: "DA", quote: "I run clinics in Toronto and Dubai. ClinicPro is the only platform that supports Persian and Arabic with proper RTL. WhatsApp integration alone justified the switch — 87% of my Dubai clients message via WhatsApp." },
-  { name: "Lana Vazquez", role: "Owner, Lavista Cosmetic · Toronto", initials: "LV", quote: "Took my first booking 12 minutes after signing up. The Botox annual package template alone has driven $48k in pre-paid revenue this quarter. I'd pay 5x what they charge." },
-];
 
 const PLANS = [
   { name: "Starter", tag: "For solo or small clinics", price: "$149", per: "/mo", featured: false, features: ["Up to 3 staff members", "1 location", "Online booking + Calendar", "CRM with 322 services pre-loaded", "SMS + Email (1,000 messages)", "10 consent form templates", "Stripe payments + deposits", "Basic reports"] },
@@ -126,7 +121,7 @@ function Landing() {
             <a href="#features" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Features</a>
             <a href="#vs" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Compare</a>
             <a href="#pricing" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Pricing</a>
-            <a href="#testimonials" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Customers</a>
+            
           </div>
           <div className="flex items-center gap-2">
             {!loading && user ? (
@@ -149,7 +144,7 @@ function Landing() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-glow opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-glow" />
             </span>
-            Trusted by 500+ clinics across Toronto · Dubai · LA · London
+            Coming soon — built for clinics in Toronto · Dubai · LA · London
           </div>
           <h1 className="font-display text-[clamp(56px,8vw,96px)] font-bold leading-[1] tracking-[-0.035em]">
             Run a clinic,<br />
@@ -332,34 +327,7 @@ function Landing() {
         </div>
       </Section>
 
-      {/* TESTIMONIALS */}
-      <Section id="testimonials">
-        <SectionLabel>Clinic owners love it</SectionLabel>
-        <SectionTitle>"This is the system clinics have needed for ten years."</SectionTitle>
-        <SectionSub>From beta clinics in Toronto, Dubai, and Los Angeles. Real results, real revenue.</SectionSub>
-
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} className="rounded-[20px] border border-border/60 bg-surface p-7">
-              <div className="mb-4 flex gap-0.5 text-[#F59E0B]">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <p className="text-base leading-relaxed text-zinc-300">{t.quote}</p>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold text-white [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-                  {t.initials}
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Section>
+      {/* TESTIMONIALS — hidden until launch */}
 
       {/* PRICING */}
       <Section id="pricing">
