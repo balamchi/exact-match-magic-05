@@ -883,6 +883,9 @@ export type Database = {
           plan_code: string
           price_id: string
           product_id: string
+          scheduled_change_action: string | null
+          scheduled_change_effective_at: string | null
+          scheduled_change_meta: Json | null
           status: string
           trial_ends_at: string | null
           trial_started_at: string | null
@@ -903,6 +906,9 @@ export type Database = {
           plan_code: string
           price_id: string
           product_id: string
+          scheduled_change_action?: string | null
+          scheduled_change_effective_at?: string | null
+          scheduled_change_meta?: Json | null
           status?: string
           trial_ends_at?: string | null
           trial_started_at?: string | null
@@ -923,6 +929,9 @@ export type Database = {
           plan_code?: string
           price_id?: string
           product_id?: string
+          scheduled_change_action?: string | null
+          scheduled_change_effective_at?: string | null
+          scheduled_change_meta?: Json | null
           status?: string
           trial_ends_at?: string | null
           trial_started_at?: string | null
