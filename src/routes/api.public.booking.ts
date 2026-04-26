@@ -280,7 +280,7 @@ export const Route = createFileRoute("/api/public/booking")({
         // Errors are logged inside sendEmail.
         await Promise.allSettled(tasks);
 
-        return Response.json({ success: true, leadId: lead.id });
+        return Response.json({ success: true, leadId: lead.id, appointmentId, clientId });
       },
     },
   },
