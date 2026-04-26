@@ -56,7 +56,7 @@ function BillingPage() {
     };
     poll();
     // strip the query param so a refresh doesn't re-toast
-    navigate({ to: "/app/settings/billing", replace: true });
+    navigate({ to: "/app/settings/billing", search: {}, replace: true });
     return () => {
       cancelled = true;
     };
