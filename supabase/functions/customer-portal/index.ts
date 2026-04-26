@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Missing authorization");
 
-    const supabase = createClient(
+    const supabase: any = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!,
       { global: { headers: { Authorization: authHeader } } }
@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     if (!member) throw new Error("Access denied");
 
     // Use service role to read subscription (RLS-safe lookup)
-    const adminClient = createClient(
+    const adminClient: any = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
