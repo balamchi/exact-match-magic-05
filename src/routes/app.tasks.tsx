@@ -57,7 +57,6 @@ function TasksPage() {
   const [dragging, setDragging] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<Status | null>(null);
 
-  const load = async () => {
   const load = useCallback(async () => {
     if (!activeClinic) return;
     setLoading(true);
