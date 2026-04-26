@@ -85,11 +85,6 @@ const COMPARISON_ROWS: Array<{ feature: string; mb: string; bd: string; fr: stri
   { feature: "Starting price (per location)", mb: "$199/mo", bd: "$176/mo", fr: "Free*", vg: "$50/mo", us: "$149/mo", mbT: "plain", bdT: "plain", frT: "plain", vgT: "plain" },
 ];
 
-const TESTIMONIALS = [
-  { name: "Dr. Maria Gonzalez", role: "Owner, Roda Clinic · Toronto", initials: "DM", quote: "We switched from Boulevard to ClinicPro and saved $200/month while getting 3x the features. The 73 pre-loaded consent forms alone saved us weeks of legal work. AI insights find revenue we'd otherwise miss every single day." },
-  { name: "Dr. Ahmad Mehdi", role: "Founder, Dr. Ariana Aesthetics · Dubai", initials: "DA", quote: "I run clinics in Toronto and Dubai. ClinicPro is the only platform that supports Persian and Arabic with proper RTL. WhatsApp integration alone justified the switch — 87% of my Dubai clients message via WhatsApp." },
-  { name: "Lana Vazquez", role: "Owner, Lavista Cosmetic · Toronto", initials: "LV", quote: "Took my first booking 12 minutes after signing up. The Botox annual package template alone has driven $48k in pre-paid revenue this quarter. I'd pay 5x what they charge." },
-];
 
 const PLANS = [
   { name: "Starter", tag: "For solo or small clinics", price: "$149", per: "/mo", featured: false, features: ["Up to 3 staff members", "1 location", "Online booking + Calendar", "CRM with 322 services pre-loaded", "SMS + Email (1,000 messages)", "10 consent form templates", "Stripe payments + deposits", "Basic reports"] },
