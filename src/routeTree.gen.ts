@@ -16,24 +16,38 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
+import { Route as AppTreatmentPlansRouteImport } from './routes/app.treatment-plans'
 import { Route as AppTasksRouteImport } from './routes/app.tasks'
 import { Route as AppStaffRouteImport } from './routes/app.staff'
+import { Route as AppSoapNotesRouteImport } from './routes/app.soap-notes'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppServicesRouteImport } from './routes/app.services'
+import { Route as AppReviewsRouteImport } from './routes/app.reviews'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
+import { Route as AppReferralsRouteImport } from './routes/app.referrals'
+import { Route as AppPosRouteImport } from './routes/app.pos'
 import { Route as AppPackagesRouteImport } from './routes/app.packages'
+import { Route as AppMembershipsRouteImport } from './routes/app.memberships'
 import { Route as AppMarketingRouteImport } from './routes/app.marketing'
+import { Route as AppLoyaltyRouteImport } from './routes/app.loyalty'
+import { Route as AppLocationsRouteImport } from './routes/app.locations'
 import { Route as AppLeadsRouteImport } from './routes/app.leads'
+import { Route as AppInvoicesRouteImport } from './routes/app.invoices'
 import { Route as AppInventoryRouteImport } from './routes/app.inventory'
+import { Route as AppInjectionMappingRouteImport } from './routes/app.injection-mapping'
+import { Route as AppInboxRouteImport } from './routes/app.inbox'
 import { Route as AppGiftcardsRouteImport } from './routes/app.giftcards'
 import { Route as AppEmailLogRouteImport } from './routes/app.email-log'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppCouponsRouteImport } from './routes/app.coupons'
 import { Route as AppConsentRouteImport } from './routes/app.consent'
 import { Route as AppClientsRouteImport } from './routes/app.clients'
+import { Route as AppCheckinRouteImport } from './routes/app.checkin'
 import { Route as AppCalendarRouteImport } from './routes/app.calendar'
 import { Route as AppBookingRouteImport } from './routes/app.booking'
+import { Route as AppBeforeAfterRouteImport } from './routes/app.before-after'
 import { Route as AppAutomationsRouteImport } from './routes/app.automations'
+import { Route as AppAiRouteImport } from './routes/app.ai'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AppClientsClientIdRouteImport } from './routes/app.clients.$clientId'
 import { Route as ApiPublicBookingRouteImport } from './routes/api.public.booking'
@@ -76,6 +90,11 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
   path: '/auth/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTreatmentPlansRoute = AppTreatmentPlansRouteImport.update({
+  id: '/treatment-plans',
+  path: '/treatment-plans',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppTasksRoute = AppTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -84,6 +103,11 @@ const AppTasksRoute = AppTasksRouteImport.update({
 const AppStaffRoute = AppStaffRouteImport.update({
   id: '/staff',
   path: '/staff',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSoapNotesRoute = AppSoapNotesRouteImport.update({
+  id: '/soap-notes',
+  path: '/soap-notes',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -96,9 +120,24 @@ const AppServicesRoute = AppServicesRouteImport.update({
   path: '/services',
   getParentRoute: () => AppRoute,
 } as any)
+const AppReviewsRoute = AppReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppReportsRoute = AppReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReferralsRoute = AppReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPosRoute = AppPosRouteImport.update({
+  id: '/pos',
+  path: '/pos',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPackagesRoute = AppPackagesRouteImport.update({
@@ -106,9 +145,24 @@ const AppPackagesRoute = AppPackagesRouteImport.update({
   path: '/packages',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMembershipsRoute = AppMembershipsRouteImport.update({
+  id: '/memberships',
+  path: '/memberships',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMarketingRoute = AppMarketingRouteImport.update({
   id: '/marketing',
   path: '/marketing',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLoyaltyRoute = AppLoyaltyRouteImport.update({
+  id: '/loyalty',
+  path: '/loyalty',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLocationsRoute = AppLocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLeadsRoute = AppLeadsRouteImport.update({
@@ -116,9 +170,24 @@ const AppLeadsRoute = AppLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInvoicesRoute = AppInvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInventoryRoute = AppInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInjectionMappingRoute = AppInjectionMappingRouteImport.update({
+  id: '/injection-mapping',
+  path: '/injection-mapping',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInboxRoute = AppInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
   getParentRoute: () => AppRoute,
 } as any)
 const AppGiftcardsRoute = AppGiftcardsRouteImport.update({
@@ -151,6 +220,11 @@ const AppClientsRoute = AppClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCheckinRoute = AppCheckinRouteImport.update({
+  id: '/checkin',
+  path: '/checkin',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCalendarRoute = AppCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
@@ -161,9 +235,19 @@ const AppBookingRoute = AppBookingRouteImport.update({
   path: '/booking',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBeforeAfterRoute = AppBeforeAfterRouteImport.update({
+  id: '/before-after',
+  path: '/before-after',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAutomationsRoute = AppAutomationsRouteImport.update({
   id: '/automations',
   path: '/automations',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAiRoute = AppAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
   getParentRoute: () => AppRoute,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
@@ -204,24 +288,38 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
+  '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
+  '/app/before-after': typeof AppBeforeAfterRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
+  '/app/checkin': typeof AppCheckinRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inbox': typeof AppInboxRoute
+  '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/invoices': typeof AppInvoicesRoute
   '/app/leads': typeof AppLeadsRoute
+  '/app/locations': typeof AppLocationsRoute
+  '/app/loyalty': typeof AppLoyaltyRoute
   '/app/marketing': typeof AppMarketingRoute
+  '/app/memberships': typeof AppMembershipsRoute
   '/app/packages': typeof AppPackagesRoute
+  '/app/pos': typeof AppPosRoute
+  '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/reviews': typeof AppReviewsRoute
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/soap-notes': typeof AppSoapNotesRoute
   '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
+  '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
@@ -237,24 +335,38 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
+  '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
+  '/app/before-after': typeof AppBeforeAfterRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
+  '/app/checkin': typeof AppCheckinRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inbox': typeof AppInboxRoute
+  '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/invoices': typeof AppInvoicesRoute
   '/app/leads': typeof AppLeadsRoute
+  '/app/locations': typeof AppLocationsRoute
+  '/app/loyalty': typeof AppLoyaltyRoute
   '/app/marketing': typeof AppMarketingRoute
+  '/app/memberships': typeof AppMembershipsRoute
   '/app/packages': typeof AppPackagesRoute
+  '/app/pos': typeof AppPosRoute
+  '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/reviews': typeof AppReviewsRoute
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/soap-notes': typeof AppSoapNotesRoute
   '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
+  '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
@@ -271,24 +383,38 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
+  '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
+  '/app/before-after': typeof AppBeforeAfterRoute
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
+  '/app/checkin': typeof AppCheckinRoute
   '/app/clients': typeof AppClientsRouteWithChildren
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/inbox': typeof AppInboxRoute
+  '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/invoices': typeof AppInvoicesRoute
   '/app/leads': typeof AppLeadsRoute
+  '/app/locations': typeof AppLocationsRoute
+  '/app/loyalty': typeof AppLoyaltyRoute
   '/app/marketing': typeof AppMarketingRoute
+  '/app/memberships': typeof AppMembershipsRoute
   '/app/packages': typeof AppPackagesRoute
+  '/app/pos': typeof AppPosRoute
+  '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/reviews': typeof AppReviewsRoute
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/soap-notes': typeof AppSoapNotesRoute
   '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
+  '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
@@ -306,24 +432,38 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/unsubscribe'
+    | '/app/ai'
     | '/app/automations'
+    | '/app/before-after'
     | '/app/booking'
     | '/app/calendar'
+    | '/app/checkin'
     | '/app/clients'
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/inbox'
+    | '/app/injection-mapping'
     | '/app/inventory'
+    | '/app/invoices'
     | '/app/leads'
+    | '/app/locations'
+    | '/app/loyalty'
     | '/app/marketing'
+    | '/app/memberships'
     | '/app/packages'
+    | '/app/pos'
+    | '/app/referrals'
     | '/app/reports'
+    | '/app/reviews'
     | '/app/services'
     | '/app/settings'
+    | '/app/soap-notes'
     | '/app/staff'
     | '/app/tasks'
+    | '/app/treatment-plans'
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/book/$slug'
@@ -339,24 +479,38 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/unsubscribe'
+    | '/app/ai'
     | '/app/automations'
+    | '/app/before-after'
     | '/app/booking'
     | '/app/calendar'
+    | '/app/checkin'
     | '/app/clients'
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/inbox'
+    | '/app/injection-mapping'
     | '/app/inventory'
+    | '/app/invoices'
     | '/app/leads'
+    | '/app/locations'
+    | '/app/loyalty'
     | '/app/marketing'
+    | '/app/memberships'
     | '/app/packages'
+    | '/app/pos'
+    | '/app/referrals'
     | '/app/reports'
+    | '/app/reviews'
     | '/app/services'
     | '/app/settings'
+    | '/app/soap-notes'
     | '/app/staff'
     | '/app/tasks'
+    | '/app/treatment-plans'
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/book/$slug'
@@ -372,24 +526,38 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/unsubscribe'
+    | '/app/ai'
     | '/app/automations'
+    | '/app/before-after'
     | '/app/booking'
     | '/app/calendar'
+    | '/app/checkin'
     | '/app/clients'
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/inbox'
+    | '/app/injection-mapping'
     | '/app/inventory'
+    | '/app/invoices'
     | '/app/leads'
+    | '/app/locations'
+    | '/app/loyalty'
     | '/app/marketing'
+    | '/app/memberships'
     | '/app/packages'
+    | '/app/pos'
+    | '/app/referrals'
     | '/app/reports'
+    | '/app/reviews'
     | '/app/services'
     | '/app/settings'
+    | '/app/soap-notes'
     | '/app/staff'
     | '/app/tasks'
+    | '/app/treatment-plans'
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/book/$slug'
@@ -468,6 +636,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/treatment-plans': {
+      id: '/app/treatment-plans'
+      path: '/treatment-plans'
+      fullPath: '/app/treatment-plans'
+      preLoaderRoute: typeof AppTreatmentPlansRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/tasks': {
       id: '/app/tasks'
       path: '/tasks'
@@ -480,6 +655,13 @@ declare module '@tanstack/react-router' {
       path: '/staff'
       fullPath: '/app/staff'
       preLoaderRoute: typeof AppStaffRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/soap-notes': {
+      id: '/app/soap-notes'
+      path: '/soap-notes'
+      fullPath: '/app/soap-notes'
+      preLoaderRoute: typeof AppSoapNotesRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/settings': {
@@ -496,11 +678,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppServicesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/reviews': {
+      id: '/app/reviews'
+      path: '/reviews'
+      fullPath: '/app/reviews'
+      preLoaderRoute: typeof AppReviewsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/reports': {
       id: '/app/reports'
       path: '/reports'
       fullPath: '/app/reports'
       preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/referrals': {
+      id: '/app/referrals'
+      path: '/referrals'
+      fullPath: '/app/referrals'
+      preLoaderRoute: typeof AppReferralsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pos': {
+      id: '/app/pos'
+      path: '/pos'
+      fullPath: '/app/pos'
+      preLoaderRoute: typeof AppPosRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/packages': {
@@ -510,11 +713,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPackagesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/memberships': {
+      id: '/app/memberships'
+      path: '/memberships'
+      fullPath: '/app/memberships'
+      preLoaderRoute: typeof AppMembershipsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/marketing': {
       id: '/app/marketing'
       path: '/marketing'
       fullPath: '/app/marketing'
       preLoaderRoute: typeof AppMarketingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/loyalty': {
+      id: '/app/loyalty'
+      path: '/loyalty'
+      fullPath: '/app/loyalty'
+      preLoaderRoute: typeof AppLoyaltyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/locations': {
+      id: '/app/locations'
+      path: '/locations'
+      fullPath: '/app/locations'
+      preLoaderRoute: typeof AppLocationsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/leads': {
@@ -524,11 +748,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLeadsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/invoices': {
+      id: '/app/invoices'
+      path: '/invoices'
+      fullPath: '/app/invoices'
+      preLoaderRoute: typeof AppInvoicesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/inventory': {
       id: '/app/inventory'
       path: '/inventory'
       fullPath: '/app/inventory'
       preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/injection-mapping': {
+      id: '/app/injection-mapping'
+      path: '/injection-mapping'
+      fullPath: '/app/injection-mapping'
+      preLoaderRoute: typeof AppInjectionMappingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/inbox': {
+      id: '/app/inbox'
+      path: '/inbox'
+      fullPath: '/app/inbox'
+      preLoaderRoute: typeof AppInboxRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/giftcards': {
@@ -573,6 +818,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/checkin': {
+      id: '/app/checkin'
+      path: '/checkin'
+      fullPath: '/app/checkin'
+      preLoaderRoute: typeof AppCheckinRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/calendar': {
       id: '/app/calendar'
       path: '/calendar'
@@ -587,11 +839,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookingRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/before-after': {
+      id: '/app/before-after'
+      path: '/before-after'
+      fullPath: '/app/before-after'
+      preLoaderRoute: typeof AppBeforeAfterRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/automations': {
       id: '/app/automations'
       path: '/automations'
       fullPath: '/app/automations'
       preLoaderRoute: typeof AppAutomationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/ai': {
+      id: '/app/ai'
+      path: '/ai'
+      fullPath: '/app/ai'
+      preLoaderRoute: typeof AppAiRouteImport
       parentRoute: typeof AppRoute
     }
     '/lovable/email/suppression': {
@@ -652,45 +918,73 @@ const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAiRoute: typeof AppAiRoute
   AppAutomationsRoute: typeof AppAutomationsRoute
+  AppBeforeAfterRoute: typeof AppBeforeAfterRoute
   AppBookingRoute: typeof AppBookingRoute
   AppCalendarRoute: typeof AppCalendarRoute
+  AppCheckinRoute: typeof AppCheckinRoute
   AppClientsRoute: typeof AppClientsRouteWithChildren
   AppConsentRoute: typeof AppConsentRoute
   AppCouponsRoute: typeof AppCouponsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppEmailLogRoute: typeof AppEmailLogRoute
   AppGiftcardsRoute: typeof AppGiftcardsRoute
+  AppInboxRoute: typeof AppInboxRoute
+  AppInjectionMappingRoute: typeof AppInjectionMappingRoute
   AppInventoryRoute: typeof AppInventoryRoute
+  AppInvoicesRoute: typeof AppInvoicesRoute
   AppLeadsRoute: typeof AppLeadsRoute
+  AppLocationsRoute: typeof AppLocationsRoute
+  AppLoyaltyRoute: typeof AppLoyaltyRoute
   AppMarketingRoute: typeof AppMarketingRoute
+  AppMembershipsRoute: typeof AppMembershipsRoute
   AppPackagesRoute: typeof AppPackagesRoute
+  AppPosRoute: typeof AppPosRoute
+  AppReferralsRoute: typeof AppReferralsRoute
   AppReportsRoute: typeof AppReportsRoute
+  AppReviewsRoute: typeof AppReviewsRoute
   AppServicesRoute: typeof AppServicesRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppSoapNotesRoute: typeof AppSoapNotesRoute
   AppStaffRoute: typeof AppStaffRoute
   AppTasksRoute: typeof AppTasksRoute
+  AppTreatmentPlansRoute: typeof AppTreatmentPlansRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAiRoute: AppAiRoute,
   AppAutomationsRoute: AppAutomationsRoute,
+  AppBeforeAfterRoute: AppBeforeAfterRoute,
   AppBookingRoute: AppBookingRoute,
   AppCalendarRoute: AppCalendarRoute,
+  AppCheckinRoute: AppCheckinRoute,
   AppClientsRoute: AppClientsRouteWithChildren,
   AppConsentRoute: AppConsentRoute,
   AppCouponsRoute: AppCouponsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppEmailLogRoute: AppEmailLogRoute,
   AppGiftcardsRoute: AppGiftcardsRoute,
+  AppInboxRoute: AppInboxRoute,
+  AppInjectionMappingRoute: AppInjectionMappingRoute,
   AppInventoryRoute: AppInventoryRoute,
+  AppInvoicesRoute: AppInvoicesRoute,
   AppLeadsRoute: AppLeadsRoute,
+  AppLocationsRoute: AppLocationsRoute,
+  AppLoyaltyRoute: AppLoyaltyRoute,
   AppMarketingRoute: AppMarketingRoute,
+  AppMembershipsRoute: AppMembershipsRoute,
   AppPackagesRoute: AppPackagesRoute,
+  AppPosRoute: AppPosRoute,
+  AppReferralsRoute: AppReferralsRoute,
   AppReportsRoute: AppReportsRoute,
+  AppReviewsRoute: AppReviewsRoute,
   AppServicesRoute: AppServicesRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppSoapNotesRoute: AppSoapNotesRoute,
   AppStaffRoute: AppStaffRoute,
   AppTasksRoute: AppTasksRoute,
+  AppTreatmentPlansRoute: AppTreatmentPlansRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
