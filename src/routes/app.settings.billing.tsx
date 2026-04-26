@@ -36,6 +36,30 @@ function BillingPage() {
   const [changingPlan, setChangingPlan] = useState<string | null>(null);
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
 
+  // Post-checkout success — toast + poll until webhook upserts the real subscription
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") !== "success") return;
+    toast.success("Payment received — activating your subscription…");
+    let cancelled = false;
+    let tries = 0;
+    const poll = async () => {
+      while (!cancelled && tries < 10) {
+        await refresh();
+        tries += 1;
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+    };
+    poll();
+    // strip the query param so a refresh doesn't re-toast
+    window.history.replaceState({}, "", window.location.pathname);
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     supabase
       .from("subscription_plans")
