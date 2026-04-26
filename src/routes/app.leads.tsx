@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { Plus, Search, Target, X, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -43,16 +44,7 @@ const emptyDraft: DraftForm = {
   notes: "",
 };
 
-export const Route = createFileRouteWrapper();
-
-function createFileRouteWrapper() {
-  // Routed below
-  return null as unknown as never;
-}
-
-import { createFileRoute } from "@tanstack/react-router";
-
-export const RouteDef = createFileRoute("/app/leads")({ component: LeadsPage });
+export const Route = createFileRoute("/app/leads")({ component: LeadsPage });
 
 function LeadsPage() {
   const { activeClinic } = useAuth();
