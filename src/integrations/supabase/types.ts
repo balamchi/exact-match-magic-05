@@ -630,6 +630,77 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount_cents: number
+          billed_at: string | null
+          clinic_id: string
+          created_at: string
+          currency: string
+          environment: string
+          error_reason: string | null
+          id: string
+          invoice_number: string | null
+          invoice_pdf_url: string | null
+          origin: string | null
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
+          paddle_transaction_id: string
+          plan_code: string | null
+          price_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          billed_at?: string | null
+          clinic_id: string
+          created_at?: string
+          currency?: string
+          environment?: string
+          error_reason?: string | null
+          id?: string
+          invoice_number?: string | null
+          invoice_pdf_url?: string | null
+          origin?: string | null
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          paddle_transaction_id: string
+          plan_code?: string | null
+          price_id?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          billed_at?: string | null
+          clinic_id?: string
+          created_at?: string
+          currency?: string
+          environment?: string
+          error_reason?: string | null
+          id?: string
+          invoice_number?: string | null
+          invoice_pdf_url?: string | null
+          origin?: string | null
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          paddle_transaction_id?: string
+          plan_code?: string | null
+          price_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       services: {
         Row: {
           active: boolean
