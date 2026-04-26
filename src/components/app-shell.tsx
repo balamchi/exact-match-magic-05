@@ -235,6 +235,17 @@ function Header({ onMenu }: { onMenu: () => void }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
+      <div
+        className="hidden items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-success md:inline-flex"
+        title="Realtime sync is active across calendar, leads, tasks & inventory"
+      >
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+        </span>
+        Live
+      </div>
+
       <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
         <Bell className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
         <span className="absolute end-2 top-2 h-1.5 w-1.5 rounded-full bg-primary glow-purple" />
