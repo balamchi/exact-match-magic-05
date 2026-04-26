@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -49,6 +50,7 @@ import { Route as AppBeforeAfterRouteImport } from './routes/app.before-after'
 import { Route as AppAutomationsRouteImport } from './routes/app.automations'
 import { Route as AppAiRouteImport } from './routes/app.ai'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppClientsClientIdRouteImport } from './routes/app.clients.$clientId'
 import { Route as ApiPublicBookingRouteImport } from './routes/api.public.booking'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -58,6 +60,11 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -255,6 +262,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppSettingsRoute,
+} as any)
 const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
   id: '/$clientId',
   path: '/$clientId',
@@ -287,6 +299,7 @@ const LovableEmailQueueProcessRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/pricing': typeof PricingRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
@@ -315,7 +328,7 @@ export interface FileRoutesByFullPath {
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
   '/app/services': typeof AppServicesRoute
-  '/app/settings': typeof AppSettingsRoute
+  '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
   '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
@@ -326,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -334,6 +348,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/pricing': typeof PricingRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
@@ -362,7 +377,7 @@ export interface FileRoutesByTo {
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
   '/app/services': typeof AppServicesRoute
-  '/app/settings': typeof AppSettingsRoute
+  '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
   '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
@@ -373,6 +388,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -382,6 +398,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/pricing': typeof PricingRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
@@ -410,7 +427,7 @@ export interface FileRoutesById {
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
   '/app/services': typeof AppServicesRoute
-  '/app/settings': typeof AppSettingsRoute
+  '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
   '/app/staff': typeof AppStaffRoute
   '/app/tasks': typeof AppTasksRoute
@@ -421,6 +438,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -431,6 +449,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/pricing'
     | '/unsubscribe'
     | '/app/ai'
     | '/app/automations'
@@ -470,6 +489,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/api/public/booking'
     | '/app/clients/$clientId'
+    | '/app/settings/billing'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -478,6 +498,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/app'
+    | '/pricing'
     | '/unsubscribe'
     | '/app/ai'
     | '/app/automations'
@@ -517,6 +538,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/api/public/booking'
     | '/app/clients/$clientId'
+    | '/app/settings/billing'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -525,6 +547,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/app'
+    | '/pricing'
     | '/unsubscribe'
     | '/app/ai'
     | '/app/automations'
@@ -564,6 +587,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/api/public/booking'
     | '/app/clients/$clientId'
+    | '/app/settings/billing'
     | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -573,6 +597,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  PricingRoute: typeof PricingRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
@@ -592,6 +617,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -867,6 +899,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/settings/billing': {
+      id: '/app/settings/billing'
+      path: '/billing'
+      fullPath: '/app/settings/billing'
+      preLoaderRoute: typeof AppSettingsBillingRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
     '/app/clients/$clientId': {
       id: '/app/clients/$clientId'
       path: '/$clientId'
@@ -917,6 +956,18 @@ const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
   AppClientsRouteChildren,
 )
 
+interface AppSettingsRouteChildren {
+  AppSettingsBillingRoute: typeof AppSettingsBillingRoute
+}
+
+const AppSettingsRouteChildren: AppSettingsRouteChildren = {
+  AppSettingsBillingRoute: AppSettingsBillingRoute,
+}
+
+const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
+  AppSettingsRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAiRoute: typeof AppAiRoute
   AppAutomationsRoute: typeof AppAutomationsRoute
@@ -945,7 +996,7 @@ interface AppRouteChildren {
   AppReportsRoute: typeof AppReportsRoute
   AppReviewsRoute: typeof AppReviewsRoute
   AppServicesRoute: typeof AppServicesRoute
-  AppSettingsRoute: typeof AppSettingsRoute
+  AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppSoapNotesRoute: typeof AppSoapNotesRoute
   AppStaffRoute: typeof AppStaffRoute
   AppTasksRoute: typeof AppTasksRoute
@@ -980,7 +1031,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppReportsRoute: AppReportsRoute,
   AppReviewsRoute: AppReviewsRoute,
   AppServicesRoute: AppServicesRoute,
-  AppSettingsRoute: AppSettingsRoute,
+  AppSettingsRoute: AppSettingsRouteWithChildren,
   AppSoapNotesRoute: AppSoapNotesRoute,
   AppStaffRoute: AppStaffRoute,
   AppTasksRoute: AppTasksRoute,
@@ -992,6 +1043,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  PricingRoute: PricingRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   AuthSignInRoute: AuthSignInRoute,
   AuthSignUpRoute: AuthSignUpRoute,

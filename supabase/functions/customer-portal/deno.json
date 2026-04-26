@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "npm:@paddle/paddle-node-sdk": "npm:@paddle/paddle-node-sdk@^1.4.0",
+    "npm:@supabase/supabase-js@2": "npm:@supabase/supabase-js@^2.39.0"
+  }
+}
