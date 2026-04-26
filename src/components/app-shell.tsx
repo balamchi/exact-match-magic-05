@@ -53,6 +53,7 @@ const NAV: NavGroup[] = [
       { to: "/app/marketing", label: "Marketing", icon: Send },
       { to: "/app/automations", label: "Automations", icon: Zap },
       { to: "/app/tasks", label: "Tasks", icon: CheckSquare },
+      { to: "/app/email-log", label: "Email Log", icon: Bell },
     ],
   },
 ];
