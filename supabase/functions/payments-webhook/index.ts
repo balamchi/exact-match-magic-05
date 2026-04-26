@@ -53,6 +53,14 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
 
   const trialEndsAt = status === "trialing" ? currentBillingPeriod?.endsAt : null;
 
+  // Remove trial placeholder row for this clinic+env so the real Paddle row replaces it.
+  await getSupabase()
+    .from("subscriptions")
+    .delete()
+    .eq("clinic_id", clinicId)
+    .eq("environment", env)
+    .like("paddle_subscription_id", "trial_%");
+
   await getSupabase().from("subscriptions").upsert(
     {
       clinic_id: clinicId,
