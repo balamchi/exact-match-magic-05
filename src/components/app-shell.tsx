@@ -17,6 +17,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TrialBanner } from "@/components/trial-banner";
 
 interface NavItem { to: string; label: string; icon: LucideIcon; }
 interface NavGroup { section: string; items: NavItem[]; }
@@ -93,6 +94,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main column */}
       <div className="flex min-w-0 flex-1 flex-col">
+        <TrialBanner />
         <Header onMenu={() => setMobileOpen(true)} />
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8">{children}</div>
