@@ -76,12 +76,20 @@ export function useSubscription(): UseSubscriptionResult {
 
   // Realtime — refetch on any subscription change for this clinic
   useEffect(() => {
-    if (!activeClinic) return;
-    const channel = supabase
-      .channel(`subs-${activeClinic.clinic_id}`)
+    const clinicId = activeClinic?.clinic_id;
+    if (!clinicId) return;
+    const channel = supabase.channel(
+      `subs-${clinicId}-${Math.random().toString(36).slice(2, 8)}`
+    );
+    channel
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "subscriptions", filter: `clinic_id=eq.${activeClinic.clinic_id}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "subscriptions",
+          filter: `clinic_id=eq.${clinicId}`,
+        },
         () => load()
       )
       .subscribe();
