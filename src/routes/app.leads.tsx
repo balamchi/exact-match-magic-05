@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { useRealtimeTable } from "@/hooks/use-realtime-table";
 import { cn } from "@/lib/utils";
 
 type Lead = Tables<"leads">;
