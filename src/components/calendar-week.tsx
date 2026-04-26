@@ -111,6 +111,7 @@ export function CalendarWeek() {
   const [editing, setEditing] = useState<Appointment | null>(null);
   const [saving, setSaving] = useState(false);
   const [draft, setDraft] = useState<DraftForm>(emptyDraft);
+  const [byProvider, setByProvider] = useState(false);
 
   const days = useMemo(() => Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i)), [weekStart]);
   const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart]);
