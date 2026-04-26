@@ -4,7 +4,10 @@ import {
   Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
   Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare,
   Search, Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
-  HeartPulse, UserCog, Menu, Languages, type LucideIcon,
+  HeartPulse, UserCog, Menu, Languages,
+  MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
+  Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
+  type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useLocale, LOCALES } from "@/lib/locale-context";
@@ -24,6 +27,7 @@ const NAV: NavGroup[] = [
     items: [
       { to: "/app/dashboard", label: "Dashboard", icon: Activity },
       { to: "/app/reports", label: "Reports", icon: BarChart3 },
+      { to: "/app/ai", label: "AI Assistant", icon: Bot },
     ],
   },
   {
@@ -31,29 +35,47 @@ const NAV: NavGroup[] = [
     items: [
       { to: "/app/booking", label: "Booking", icon: CalendarDays },
       { to: "/app/calendar", label: "Calendar", icon: Calendar },
+      { to: "/app/checkin", label: "Check-In", icon: ClipboardCheck },
       { to: "/app/consent", label: "Consent Forms", icon: Shield },
       { to: "/app/clients", label: "Clients", icon: Users },
       { to: "/app/services", label: "Services", icon: HeartPulse },
       { to: "/app/staff", label: "Staff", icon: UserCog },
+      { to: "/app/locations", label: "Locations", icon: MapPin },
       { to: "/app/leads", label: "Leads", icon: Target },
     ],
   },
   {
     section: "REVENUE",
     items: [
+      { to: "/app/pos", label: "POS & Payments", icon: CreditCard },
+      { to: "/app/invoices", label: "Invoices", icon: FileText },
       { to: "/app/coupons", label: "Coupons", icon: Ticket },
       { to: "/app/giftcards", label: "Gift Cards", icon: Gift },
       { to: "/app/packages", label: "Packages", icon: Package },
+      { to: "/app/memberships", label: "Memberships", icon: BadgeCheck },
+      { to: "/app/loyalty", label: "Loyalty", icon: Sparkles },
       { to: "/app/inventory", label: "Inventory", icon: Boxes },
     ],
   },
   {
     section: "GROWTH",
     items: [
-      { to: "/app/marketing", label: "Marketing", icon: Send },
+      { to: "/app/inbox", label: "Inbox", icon: Inbox },
+      { to: "/app/marketing", label: "Campaigns", icon: Send },
       { to: "/app/automations", label: "Automations", icon: Zap },
+      { to: "/app/reviews", label: "Reviews", icon: Star },
+      { to: "/app/referrals", label: "Referrals", icon: Share2 },
       { to: "/app/tasks", label: "Tasks", icon: CheckSquare },
       { to: "/app/email-log", label: "Email Log", icon: Bell },
+    ],
+  },
+  {
+    section: "CLINICAL",
+    items: [
+      { to: "/app/injection-mapping", label: "Injection Mapping", icon: Syringe },
+      { to: "/app/treatment-plans", label: "Treatment Plans", icon: ListChecks },
+      { to: "/app/before-after", label: "Before / After", icon: Images },
+      { to: "/app/soap-notes", label: "SOAP Notes", icon: Stethoscope },
     ],
   },
 ];
