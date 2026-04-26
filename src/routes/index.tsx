@@ -12,7 +12,7 @@ import {
   Target,
   BarChart3,
   Globe,
-  Star,
+  
   Check,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
