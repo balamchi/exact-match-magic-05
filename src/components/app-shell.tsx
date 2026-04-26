@@ -19,34 +19,35 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TrialBanner } from "@/components/trial-banner";
 
-interface NavItem { to: string; label: string; icon: LucideIcon; }
+type Badge = { kind: "count"; value: number } | { kind: "pill"; label: string; tone: "new" | "live" };
+interface NavItem { to: string; label: string; icon: LucideIcon; badge?: Badge; }
 interface NavGroup { section: string; items: NavItem[]; }
 
 const NAV: NavGroup[] = [
   {
-    section: "OVERVIEW",
+    section: "Overview",
     items: [
       { to: "/app/dashboard", label: "Dashboard", icon: Activity },
       { to: "/app/reports", label: "Reports", icon: BarChart3 },
-      { to: "/app/ai", label: "AI Assistant", icon: Bot },
+      { to: "/app/ai", label: "AI Assistant", icon: Bot, badge: { kind: "pill", label: "NEW", tone: "new" } },
     ],
   },
   {
-    section: "OPERATIONS",
+    section: "Operations",
     items: [
       { to: "/app/booking", label: "Booking", icon: CalendarDays },
-      { to: "/app/calendar", label: "Calendar", icon: Calendar },
-      { to: "/app/checkin", label: "Check-In", icon: ClipboardCheck },
+      { to: "/app/calendar", label: "Calendar", icon: Calendar, badge: { kind: "count", value: 28 } },
+      { to: "/app/checkin", label: "Check-In", icon: ClipboardCheck, badge: { kind: "count", value: 4 } },
       { to: "/app/consent", label: "Consent Forms", icon: Shield },
-      { to: "/app/clients", label: "Clients", icon: Users },
-      { to: "/app/services", label: "Services", icon: HeartPulse },
+      { to: "/app/clients", label: "Clients", icon: Users, badge: { kind: "count", value: 1842 } },
+      { to: "/app/services", label: "Services", icon: HeartPulse, badge: { kind: "count", value: 322 } },
       { to: "/app/staff", label: "Staff", icon: UserCog },
       { to: "/app/locations", label: "Locations", icon: MapPin },
-      { to: "/app/leads", label: "Leads", icon: Target },
+      { to: "/app/leads", label: "Leads", icon: Target, badge: { kind: "count", value: 17 } },
     ],
   },
   {
-    section: "REVENUE",
+    section: "Revenue",
     items: [
       { to: "/app/pos", label: "POS & Payments", icon: CreditCard },
       { to: "/app/invoices", label: "Invoices", icon: FileText },
@@ -59,19 +60,19 @@ const NAV: NavGroup[] = [
     ],
   },
   {
-    section: "GROWTH",
+    section: "Growth",
     items: [
-      { to: "/app/inbox", label: "Inbox", icon: Inbox },
+      { to: "/app/inbox", label: "Inbox", icon: Inbox, badge: { kind: "count", value: 12 } },
       { to: "/app/marketing", label: "Campaigns", icon: Send },
-      { to: "/app/automations", label: "Automations", icon: Zap },
+      { to: "/app/automations", label: "Automations", icon: Zap, badge: { kind: "count", value: 43 } },
       { to: "/app/reviews", label: "Reviews", icon: Star },
       { to: "/app/referrals", label: "Referrals", icon: Share2 },
-      { to: "/app/tasks", label: "Tasks", icon: CheckSquare },
+      { to: "/app/tasks", label: "Tasks", icon: CheckSquare, badge: { kind: "count", value: 6 } },
       { to: "/app/email-log", label: "Email Log", icon: Bell },
     ],
   },
   {
-    section: "CLINICAL",
+    section: "Clinical",
     items: [
       { to: "/app/injection-mapping", label: "Injection Mapping", icon: Syringe },
       { to: "/app/treatment-plans", label: "Treatment Plans", icon: ListChecks },
@@ -79,7 +80,48 @@ const NAV: NavGroup[] = [
       { to: "/app/soap-notes", label: "SOAP Notes", icon: Stethoscope },
     ],
   },
+  {
+    section: "Admin",
+    items: [
+      { to: "/app/settings", label: "Settings", icon: Settings },
+      { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
+    ],
+  },
 ];
+
+function formatCount(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, "") + "k";
+  return String(n);
+}
+
+function NavBadge({ badge, active }: { badge: Badge; active: boolean }) {
+  if (badge.kind === "pill") {
+    return (
+      <span
+        className={[
+          "ms-auto rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+          badge.tone === "new"
+            ? "bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground shadow-glow"
+            : "bg-success/20 text-success",
+        ].join(" ")}
+      >
+        {badge.label}
+      </span>
+    );
+  }
+  return (
+    <span
+      className={[
+        "ms-auto rounded-md px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums",
+        active
+          ? "bg-primary/20 text-primary"
+          : "bg-sidebar-accent/60 text-muted-foreground",
+      ].join(" ")}
+    >
+      {formatCount(badge.value)}
+    </span>
+  );
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
