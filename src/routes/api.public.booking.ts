@@ -106,7 +106,7 @@ export const Route = createFileRoute("/api/public/booking")({
           .filter(Boolean)
           .join("\n");
 
-        // Insert the lead
+        // Insert the lead (so the clinic can follow up / track funnel)
         const { data: lead, error: leadErr } = await admin
           .from("leads")
           .insert({
@@ -115,7 +115,7 @@ export const Route = createFileRoute("/api/public/booking")({
             email: parsed.email?.trim() || null,
             phone: parsed.phone?.trim() || null,
             source: "public_booking",
-            stage: "new",
+            stage: "consult_booked",
             estimated_value_cents: service.price_cents,
             notes: noteText,
           })
@@ -124,6 +124,78 @@ export const Route = createFileRoute("/api/public/booking")({
         if (leadErr || !lead) {
           console.error("Failed to insert lead", leadErr);
           return Response.json({ error: "Failed to save booking" }, { status: 500 });
+        }
+
+        // Try to find / create a matching client by email or phone, so the
+        // appointment links to a real client row.
+        let clientId: string | null = null;
+        try {
+          if (parsed.email?.trim()) {
+            const { data: existing } = await admin
+              .from("clients")
+              .select("id")
+              .eq("clinic_id", clinic.id)
+              .eq("email", parsed.email.trim())
+              .maybeSingle();
+            clientId = existing?.id ?? null;
+          }
+          if (!clientId && parsed.phone?.trim()) {
+            const { data: existing } = await admin
+              .from("clients")
+              .select("id")
+              .eq("clinic_id", clinic.id)
+              .eq("phone", parsed.phone.trim())
+              .maybeSingle();
+            clientId = existing?.id ?? null;
+          }
+          if (!clientId) {
+            const [first, ...rest] = parsed.name.trim().split(/\s+/);
+            const { data: created } = await admin
+              .from("clients")
+              .insert({
+                clinic_id: clinic.id,
+                first_name: first || parsed.name.trim(),
+                last_name: rest.join(" ") || null,
+                email: parsed.email?.trim() || null,
+                phone: parsed.phone?.trim() || null,
+                tags: ["online-booking"],
+              })
+              .select("id")
+              .single();
+            clientId = created?.id ?? null;
+          }
+        } catch (err) {
+          console.error("Client upsert failed", err);
+        }
+
+        // Create the appointment in `scheduled` status — clinic can confirm.
+        let appointmentId: string | null = null;
+        try {
+          const startsAt = new Date(`${parsed.date}T${parsed.time}`);
+          if (!Number.isNaN(startsAt.getTime())) {
+            const endsAt = new Date(
+              startsAt.getTime() + (service.duration_minutes ?? 60) * 60_000,
+            );
+            const { data: appt, error: apptErr } = await admin
+              .from("appointments")
+              .insert({
+                clinic_id: clinic.id,
+                client_id: clientId,
+                service_id: service.id,
+                staff_id: staff?.id ?? null,
+                starts_at: startsAt.toISOString(),
+                ends_at: endsAt.toISOString(),
+                status: "scheduled",
+                price_cents: service.price_cents,
+                notes: parsed.notes?.trim() || null,
+              })
+              .select("id")
+              .single();
+            if (apptErr) console.error("Failed to create appointment", apptErr);
+            else appointmentId = appt?.id ?? null;
+          }
+        } catch (err) {
+          console.error("Appointment insert threw", err);
         }
 
         // Look up the clinic owner's email so we can notify them.
@@ -208,7 +280,7 @@ export const Route = createFileRoute("/api/public/booking")({
         // Errors are logged inside sendEmail.
         await Promise.allSettled(tasks);
 
-        return Response.json({ success: true, leadId: lead.id });
+        return Response.json({ success: true, leadId: lead.id, appointmentId, clientId });
       },
     },
   },
