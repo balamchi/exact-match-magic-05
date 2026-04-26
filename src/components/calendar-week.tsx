@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { ChevronLeft, ChevronRight, CalendarDays, Plus, X, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Plus, X, AlertTriangle, Columns3, Square } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
