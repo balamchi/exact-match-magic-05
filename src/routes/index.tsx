@@ -332,34 +332,7 @@ function Landing() {
         </div>
       </Section>
 
-      {/* TESTIMONIALS */}
-      <Section id="testimonials">
-        <SectionLabel>Clinic owners love it</SectionLabel>
-        <SectionTitle>"This is the system clinics have needed for ten years."</SectionTitle>
-        <SectionSub>From beta clinics in Toronto, Dubai, and Los Angeles. Real results, real revenue.</SectionSub>
-
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <div key={t.name} className="rounded-[20px] border border-border/60 bg-surface p-7">
-              <div className="mb-4 flex gap-0.5 text-[#F59E0B]">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <p className="text-base leading-relaxed text-zinc-300">{t.quote}</p>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold text-white [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-                  {t.initials}
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Section>
+      {/* TESTIMONIALS — hidden until launch */}
 
       {/* PRICING */}
       <Section id="pricing">
