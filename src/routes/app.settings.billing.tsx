@@ -307,6 +307,73 @@ function BillingPage() {
             </div>
           </section>
 
+          {!isTrialPlaceholder && (
+            <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <header className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Change plan</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Upgrades take effect immediately with prorated billing. Downgrades apply at the end of your current period.
+                  </p>
+                </div>
+                <Badge variant="outline" className="capitalize">{subscription.billing_interval}</Badge>
+              </header>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                {plans.map((p) => {
+                  const currentRank = plans.find((x) => x.code === subscription.plan_code)?.display_order ?? 0;
+                  const isCurrent = p.code === subscription.plan_code;
+                  const mode: "upgrade" | "downgrade" = p.display_order > currentRank ? "upgrade" : "downgrade";
+                  const interval = subscription.billing_interval === "annual" ? "annual" : "monthly";
+                  const cents = interval === "annual" ? p.price_annual_cents : p.price_monthly_cents;
+                  const perLabel = interval === "annual" ? "/yr" : "/mo";
+                  return (
+                    <div
+                      key={p.code}
+                      className={`flex flex-col rounded-xl border p-4 ${
+                        isCurrent
+                          ? "border-primary/50 bg-primary/5"
+                          : "border-border bg-background"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="font-display text-sm font-semibold">{p.name}</div>
+                        {isCurrent && (
+                          <Badge variant="secondary" className="text-[10px]">Current</Badge>
+                        )}
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.tagline}</p>
+                      <div className="mt-3 flex items-baseline gap-1">
+                        <span className="font-display text-2xl font-bold">${(cents / 100).toFixed(0)}</span>
+                        <span className="text-xs text-muted-foreground">{perLabel}</span>
+                      </div>
+                      {!isCurrent && (
+                        <Button
+                          size="sm"
+                          variant={mode === "upgrade" ? "default" : "outline"}
+                          className="mt-4 w-full"
+                          disabled={changingPlan !== null}
+                          onClick={() => changePlan(p, mode)}
+                        >
+                          {mode === "upgrade" ? (
+                            <ArrowUpRight className="me-1.5 h-3.5 w-3.5" />
+                          ) : (
+                            <ArrowDownRight className="me-1.5 h-3.5 w-3.5" />
+                          )}
+                          {changingPlan === p.code
+                            ? "Working…"
+                            : mode === "upgrade"
+                              ? "Upgrade"
+                              : "Downgrade"}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
           <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
             <h2 className="font-display text-lg font-semibold">What's included in your plan</h2>
             <p className="mt-1 text-xs text-muted-foreground">
