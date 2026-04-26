@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus, Search, Boxes, X, AlertTriangle, CalendarClock, Minus, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
@@ -48,7 +48,7 @@ function InventoryPage() {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!activeClinic) return;
     setLoading(true);
     const { data, error } = await supabase
@@ -59,12 +59,13 @@ function InventoryPage() {
     if (error) toast.error("Could not load inventory");
     setItems(data ?? []);
     setLoading(false);
-  };
+  }, [activeClinic?.clinic_id]);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeClinic?.clinic_id]);
+  }, [load]);
+
+  useRealtimeTable("inventory_items", activeClinic?.clinic_id, load);
 
   const lowStock = items.filter((i) => i.active && i.stock_quantity <= i.reorder_threshold);
   const expiring = items.filter((i) => expirySoon(i.expires_at) === "soon");
