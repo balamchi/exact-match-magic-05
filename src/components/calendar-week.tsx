@@ -300,6 +300,16 @@ export function CalendarWeek() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setByProvider((v) => !v)}
+            className="gap-2"
+            title={byProvider ? "Show single column per day" : "Split each day by provider"}
+          >
+            {byProvider ? <Square className="h-4 w-4" /> : <Columns3 className="h-4 w-4" />}
+            {byProvider ? "Combined" : "By provider"}
+          </Button>
           <Button variant="outline" size="icon" onClick={() => setWeekStart(addDays(weekStart, -7))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
