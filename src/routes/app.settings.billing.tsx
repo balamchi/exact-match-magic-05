@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CreditCard, Check, ExternalLink, AlertTriangle, Sparkles, Zap } from "lucide-react";
+import { CreditCard, Check, ExternalLink, AlertTriangle, Sparkles, Zap, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useEffect, useState } from "react";
@@ -20,7 +20,9 @@ interface PlanRow {
   name: string;
   tagline: string | null;
   price_monthly_cents: number;
+  price_annual_cents: number;
   monthly_price_id: string | null;
+  annual_price_id: string | null;
   is_popular: boolean;
   display_order: number;
 }
@@ -31,17 +33,58 @@ function BillingPage() {
   const [portalLoading, setPortalLoading] = useState(false);
   const [trialLoading, setTrialLoading] = useState<string | null>(null);
   const [plans, setPlans] = useState<PlanRow[]>([]);
+  const [changingPlan, setChangingPlan] = useState<string | null>(null);
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
 
   useEffect(() => {
     supabase
       .from("subscription_plans")
-      .select("code, name, tagline, price_monthly_cents, monthly_price_id, is_popular, display_order")
+      .select("code, name, tagline, price_monthly_cents, price_annual_cents, monthly_price_id, annual_price_id, is_popular, display_order")
       .eq("is_public", true)
       .neq("code", "enterprise")
       .order("display_order")
       .then(({ data }) => setPlans((data ?? []) as PlanRow[]));
   }, []);
+
+  const changePlan = async (targetPlan: PlanRow, mode: "upgrade" | "downgrade") => {
+    if (!activeClinic || !subscription) return;
+    const interval = subscription.billing_interval === "annual" ? "annual" : "monthly";
+    const newPriceId = interval === "annual" ? targetPlan.annual_price_id : targetPlan.monthly_price_id;
+    if (!newPriceId) {
+      toast.error("This plan is not available for your current billing interval");
+      return;
+    }
+    const verb = mode === "upgrade" ? "Upgrade" : "Downgrade";
+    const detail =
+      mode === "upgrade"
+        ? "You'll be charged a prorated amount today."
+        : "Your plan will switch at the end of the current period.";
+    if (!confirm(`${verb} to ${targetPlan.name}?\n\n${detail}`)) return;
+
+    setChangingPlan(targetPlan.code);
+    try {
+      const { data, error } = await supabase.functions.invoke("change-plan", {
+        body: {
+          clinicId: activeClinic.clinic_id,
+          newPriceId,
+          mode,
+          environment: getPaddleEnvironment(),
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success(
+        mode === "upgrade"
+          ? `Upgraded to ${targetPlan.name} — prorated charge applied.`
+          : `Downgrade to ${targetPlan.name} scheduled at end of period.`
+      );
+      await refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to change plan");
+    } finally {
+      setChangingPlan(null);
+    }
+  };
 
   const openPortal = async () => {
     if (!activeClinic) return;
@@ -263,6 +306,73 @@ function BillingPage() {
               )}
             </div>
           </section>
+
+          {!isTrialPlaceholder && (
+            <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+              <header className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Change plan</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Upgrades take effect immediately with prorated billing. Downgrades apply at the end of your current period.
+                  </p>
+                </div>
+                <Badge variant="outline" className="capitalize">{subscription.billing_interval}</Badge>
+              </header>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                {plans.map((p) => {
+                  const currentRank = plans.find((x) => x.code === subscription.plan_code)?.display_order ?? 0;
+                  const isCurrent = p.code === subscription.plan_code;
+                  const mode: "upgrade" | "downgrade" = p.display_order > currentRank ? "upgrade" : "downgrade";
+                  const interval = subscription.billing_interval === "annual" ? "annual" : "monthly";
+                  const cents = interval === "annual" ? p.price_annual_cents : p.price_monthly_cents;
+                  const perLabel = interval === "annual" ? "/yr" : "/mo";
+                  return (
+                    <div
+                      key={p.code}
+                      className={`flex flex-col rounded-xl border p-4 ${
+                        isCurrent
+                          ? "border-primary/50 bg-primary/5"
+                          : "border-border bg-background"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="font-display text-sm font-semibold">{p.name}</div>
+                        {isCurrent && (
+                          <Badge variant="secondary" className="text-[10px]">Current</Badge>
+                        )}
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.tagline}</p>
+                      <div className="mt-3 flex items-baseline gap-1">
+                        <span className="font-display text-2xl font-bold">${(cents / 100).toFixed(0)}</span>
+                        <span className="text-xs text-muted-foreground">{perLabel}</span>
+                      </div>
+                      {!isCurrent && (
+                        <Button
+                          size="sm"
+                          variant={mode === "upgrade" ? "default" : "outline"}
+                          className="mt-4 w-full"
+                          disabled={changingPlan !== null}
+                          onClick={() => changePlan(p, mode)}
+                        >
+                          {mode === "upgrade" ? (
+                            <ArrowUpRight className="me-1.5 h-3.5 w-3.5" />
+                          ) : (
+                            <ArrowDownRight className="me-1.5 h-3.5 w-3.5" />
+                          )}
+                          {changingPlan === p.code
+                            ? "Working…"
+                            : mode === "upgrade"
+                              ? "Upgrade"
+                              : "Downgrade"}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
 
           <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
             <h2 className="font-display text-lg font-semibold">What's included in your plan</h2>
