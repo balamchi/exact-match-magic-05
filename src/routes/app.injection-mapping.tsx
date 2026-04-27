@@ -900,49 +900,11 @@ function FaceSilhouette({ view }: { view: ViewKey }) {
   const featureSoft = "#52525B";
   const gradId = `clinicalFill-${view}`;
 
-  if (view === "body") {
-    return (
-      <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
-        <defs>
-          <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={fillTop} />
-            <stop offset="100%" stopColor={fillBottom} />
-          </linearGradient>
-        </defs>
-        {/* Head */}
-        <ellipse cx="50" cy="13" rx="7.5" ry="9" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        {/* Eyes */}
-        <ellipse cx="47" cy="12" rx="0.9" ry="0.5" fill={feature} />
-        <ellipse cx="53" cy="12" rx="0.9" ry="0.5" fill={feature} />
-        {/* Mouth */}
-        <path d="M48 16 Q50 17 52 16" stroke={feature} strokeWidth="0.6" fill="none" strokeLinecap="round" />
-        {/* Neck */}
-        <path d="M45 21 Q50 23 55 21 L56 26 Q50 27 44 26 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        {/* Shoulders & torso */}
-        <path
-          d="M28 30 Q38 26 50 27 Q62 26 72 30 L74 44 Q72 56 70 70 Q68 84 66 96 L34 96 Q32 84 30 70 Q28 56 26 44 Z"
-          fill={`url(#${gradId})`}
-          stroke={outline}
-          strokeWidth="1.2"
-        />
-        {/* Collarbones */}
-        <path d="M34 30 Q42 33 50 32 Q58 33 66 30" stroke={featureSoft} strokeWidth="0.6" fill="none" opacity="0.6" />
-        {/* Sternum / center line */}
-        <path d="M50 33 L50 70" stroke={featureSoft} strokeWidth="0.5" fill="none" opacity="0.4" />
-        {/* Chest contour */}
-        <path d="M36 42 Q44 50 50 50 Q56 50 64 42" stroke={featureSoft} strokeWidth="0.55" fill="none" opacity="0.5" />
-        {/* Waist hint */}
-        <path d="M34 70 Q50 72 66 70" stroke={featureSoft} strokeWidth="0.55" fill="none" opacity="0.5" />
-        {/* Arms */}
-        <path d="M28 31 Q22 44 18 60 Q17 72 19 82 L24 82 Q22 72 22 60 Q24 44 28 36 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        <path d="M72 31 Q78 44 82 60 Q83 72 81 82 L76 82 Q78 72 78 60 Q76 44 72 36 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        {/* Hands */}
-        <ellipse cx="20.5" cy="86" rx="3" ry="4" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        <ellipse cx="79.5" cy="86" rx="3" ry="4" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        {/* Hips/legs */}
-        <path d="M34 96 Q40 110 42 124 L48 124 Q49 110 49 96 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        <path d="M66 96 Q60 110 58 124 L52 124 Q51 110 51 96 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-      </svg>
+  if (view === "body-front" || view === "body-back") {
+    return view === "body-front" ? (
+      <BodyFront fillTop={fillTop} fillBottom={fillBottom} outline={outline} feature={feature} gradId={gradId} />
+    ) : (
+      <BodyBack fillTop={fillTop} fillBottom={fillBottom} outline={outline} feature={feature} gradId={gradId} />
     );
   }
 
