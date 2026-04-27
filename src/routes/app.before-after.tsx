@@ -13,7 +13,6 @@ import {
   Calendar,
   ImageOff,
   Sparkles,
-  Filter,
   ArrowLeftRight,
 } from "lucide-react";
 import { toast } from "sonner";
