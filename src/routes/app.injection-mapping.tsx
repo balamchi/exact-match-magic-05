@@ -815,32 +815,52 @@ function InjectionMappingPage() {
 
 function FaceSilhouette({ view }: { view: ViewKey }) {
   const stroke = "hsl(var(--border))";
+  const detail = "hsl(var(--muted-foreground) / 0.55)";
+  const soft = "hsl(var(--muted-foreground) / 0.3)";
+
   if (view === "body") {
     return (
       <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
         <defs>
           <radialGradient id="bodyFill" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stopColor="hsl(var(--primary) / 0.06)" />
+            <stop offset="0%" stopColor="hsl(var(--primary) / 0.07)" />
             <stop offset="100%" stopColor="hsl(var(--primary) / 0.01)" />
           </radialGradient>
         </defs>
         {/* Head */}
-        <ellipse cx="50" cy="14" rx="9" ry="11" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        <ellipse cx="50" cy="13" rx="7.5" ry="9" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        {/* Facial hints */}
+        <ellipse cx="47" cy="12" rx="0.9" ry="0.5" fill={detail} />
+        <ellipse cx="53" cy="12" rx="0.9" ry="0.5" fill={detail} />
+        <path d="M48 16 Q50 17 52 16" stroke={detail} strokeWidth="0.4" fill="none" />
         {/* Neck */}
-        <rect x="46" y="22" width="8" height="6" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
-        {/* Torso */}
+        <path d="M45 21 Q50 23 55 21 L56 26 Q50 27 44 26 Z" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        {/* Shoulders & torso */}
         <path
-          d="M30 32 Q50 28 70 32 L72 70 Q50 76 28 70 Z"
+          d="M28 30 Q38 26 50 27 Q62 26 72 30 L74 44 Q72 56 70 70 Q68 84 66 96 L34 96 Q32 84 30 70 Q28 56 26 44 Z"
           fill="url(#bodyFill)"
           stroke={stroke}
           strokeWidth="0.5"
         />
+        {/* Collarbones */}
+        <path d="M34 30 Q42 33 50 32 Q58 33 66 30" stroke={soft} strokeWidth="0.4" fill="none" />
+        {/* Sternum / center line */}
+        <path d="M50 33 L50 70" stroke={soft} strokeWidth="0.3" fill="none" />
+        {/* Chest contour */}
+        <path d="M36 42 Q44 50 50 50 Q56 50 64 42" stroke={soft} strokeWidth="0.35" fill="none" />
+        {/* Waist hint */}
+        <path d="M34 70 Q50 72 66 70" stroke={soft} strokeWidth="0.35" fill="none" />
         {/* Arms */}
-        <path d="M30 33 L18 60 L20 78" fill="none" stroke={stroke} strokeWidth="0.5" />
-        <path d="M70 33 L82 60 L80 78" fill="none" stroke={stroke} strokeWidth="0.5" />
+        <path d="M28 31 Q22 44 18 60 Q17 72 19 82" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        <path d="M72 31 Q78 44 82 60 Q83 72 81 82" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        <path d="M28 31 Q24 44 22 60 Q22 72 24 82" fill="none" stroke={stroke} strokeWidth="0.5" />
+        <path d="M72 31 Q76 44 78 60 Q78 72 76 82" fill="none" stroke={stroke} strokeWidth="0.5" />
         {/* Hands */}
-        <circle cx="20" cy="80" r="3.5" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
-        <circle cx="80" cy="80" r="3.5" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        <ellipse cx="20.5" cy="86" rx="3" ry="4" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        <ellipse cx="79.5" cy="86" rx="3" ry="4" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        {/* Hips/legs hint */}
+        <path d="M34 96 Q40 110 42 124 L48 124 Q49 110 49 96" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        <path d="M66 96 Q60 110 58 124 L52 124 Q51 110 51 96" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
       </svg>
     );
   }
@@ -852,55 +872,116 @@ function FaceSilhouette({ view }: { view: ViewKey }) {
       <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
         <defs>
           <radialGradient id="profileFill" cx="50%" cy="45%" r="55%">
-            <stop offset="0%" stopColor="hsl(var(--primary) / 0.06)" />
+            <stop offset="0%" stopColor="hsl(var(--primary) / 0.07)" />
             <stop offset="100%" stopColor="hsl(var(--primary) / 0.01)" />
           </radialGradient>
         </defs>
         <g transform={flip ? "translate(100,0) scale(-1,1)" : undefined}>
-          {/* Profile outline */}
+          {/* Profile outline — forehead → nose → lips → chin → jaw → ear → back of skull */}
           <path
-            d="M58 14 Q72 16 76 32 Q80 48 72 64 Q68 76 60 84 Q55 92 48 96 Q40 92 36 80 Q32 64 34 48 Q38 26 58 14 Z"
+            d="M40 18 Q34 30 34 44 Q34 50 36 54 L40 56 Q42 60 44 60 L46 62 Q44 64 46 66 L50 68 Q48 70 50 72 Q52 74 50 76 L48 80 Q50 86 56 92 Q62 94 68 92 Q74 86 76 78 Q78 66 78 54 Q78 36 70 24 Q60 14 50 14 Q44 14 40 18 Z"
             fill="url(#profileFill)"
             stroke={stroke}
             strokeWidth="0.6"
           />
-          {/* Ear */}
-          <ellipse cx="42" cy="52" rx="3" ry="5" fill="none" stroke={stroke} strokeWidth="0.4" />
-          {/* Eye hint */}
-          <ellipse cx="58" cy="44" rx="2" ry="0.9" fill="none" stroke={stroke} strokeWidth="0.4" />
+          {/* Nose bridge to tip */}
+          <path d="M40 40 Q38 48 42 56 Q44 58 46 58" stroke={detail} strokeWidth="0.5" fill="none" />
+          {/* Nostril */}
+          <path d="M44 60 Q46 61 47 60" stroke={detail} strokeWidth="0.4" fill="none" />
+          {/* Lips — upper & lower */}
+          <path d="M46 66 Q49 65 52 66" stroke={detail} strokeWidth="0.5" fill="none" />
+          <path d="M46 68 Q49 70 52 68" stroke={detail} strokeWidth="0.5" fill="none" />
+          <path d="M46 67 L52 67" stroke={detail} strokeWidth="0.3" />
+          {/* Eye */}
+          <path d="M48 44 Q52 42 56 44 Q52 46 48 44 Z" fill="none" stroke={detail} strokeWidth="0.45" />
+          <circle cx="52" cy="44" r="0.7" fill={detail} />
           {/* Brow */}
-          <path d="M54 39 Q60 37 64 40" stroke={stroke} strokeWidth="0.4" fill="none" />
-          {/* Nose tip */}
-          <path d="M76 50 Q80 54 76 58" stroke={stroke} strokeWidth="0.4" fill="none" />
-          {/* Lips */}
-          <path d="M68 66 Q72 67 70 70" stroke={stroke} strokeWidth="0.4" fill="none" />
+          <path d="M48 40 Q52 38 58 40" stroke={detail} strokeWidth="0.5" fill="none" />
+          {/* Ear */}
+          <path d="M68 48 Q72 50 72 56 Q72 62 68 62 Q66 58 67 52 Z" fill="none" stroke={detail} strokeWidth="0.45" />
+          <path d="M69 53 Q70 56 69 59" stroke={soft} strokeWidth="0.3" fill="none" />
+          {/* Jawline accent */}
+          <path d="M52 78 Q60 86 68 86" stroke={soft} strokeWidth="0.35" fill="none" />
+          {/* Hair line */}
+          <path d="M40 22 Q56 12 72 26" stroke={soft} strokeWidth="0.4" fill="none" />
         </g>
       </svg>
     );
   }
 
-  // Front
+  // Front view — anatomical face with eyes, brows, nose, lips, jaw
   return (
     <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
       <defs>
         <radialGradient id="frontFill" cx="50%" cy="45%" r="55%">
-          <stop offset="0%" stopColor="hsl(var(--primary) / 0.06)" />
+          <stop offset="0%" stopColor="hsl(var(--primary) / 0.07)" />
           <stop offset="100%" stopColor="hsl(var(--primary) / 0.01)" />
         </radialGradient>
       </defs>
-      <ellipse cx="50" cy="55" rx="32" ry="44" fill="url(#frontFill)" stroke={stroke} strokeWidth="0.6" />
+      {/* Face shape — oval with refined jaw */}
+      <path
+        d="M50 12 Q72 14 78 36 Q80 56 74 76 Q68 92 50 100 Q32 92 26 76 Q20 56 22 36 Q28 14 50 12 Z"
+        fill="url(#frontFill)"
+        stroke={stroke}
+        strokeWidth="0.6"
+      />
+      {/* Hairline */}
+      <path d="M28 24 Q50 14 72 24" stroke={soft} strokeWidth="0.4" fill="none" />
+      {/* Forehead center line (subtle) */}
+      <path d="M50 26 L50 38" stroke={soft} strokeWidth="0.25" fill="none" />
+
       {/* Brows */}
-      <path d="M28 38 Q34 34 42 37" stroke={stroke} strokeWidth="0.5" fill="none" />
-      <path d="M58 37 Q66 34 72 38" stroke={stroke} strokeWidth="0.5" fill="none" />
-      {/* Eyes */}
-      <ellipse cx="36" cy="44" rx="3" ry="1.4" fill="none" stroke={stroke} strokeWidth="0.5" />
-      <ellipse cx="64" cy="44" rx="3" ry="1.4" fill="none" stroke={stroke} strokeWidth="0.5" />
-      {/* Nose */}
-      <path d="M50 46 Q48 60 50 66 Q52 60 50 46" stroke={stroke} strokeWidth="0.4" fill="none" />
-      {/* Lips */}
-      <path d="M42 72 Q50 75 58 72 Q50 78 42 72" stroke={stroke} strokeWidth="0.5" fill="none" />
-      {/* Jaw hint */}
-      <path d="M22 72 Q50 102 78 72" stroke={stroke} strokeWidth="0.4" fill="none" opacity="0.5" />
+      <path d="M30 38 Q36 35 42 38 Q38 36.5 30 38 Z" fill={detail} stroke={detail} strokeWidth="0.4" />
+      <path d="M58 38 Q64 35 70 38 Q62 36.5 58 38 Z" fill={detail} stroke={detail} strokeWidth="0.4" />
+
+      {/* Eyes — almond shape with iris and pupil */}
+      <path d="M32 45 Q36 42 40 45 Q36 48 32 45 Z" fill="hsl(var(--background))" stroke={detail} strokeWidth="0.45" />
+      <circle cx="36" cy="45" r="1.4" fill={detail} />
+      <circle cx="36" cy="45" r="0.6" fill="hsl(var(--background))" />
+      <path d="M60 45 Q64 42 68 45 Q64 48 60 45 Z" fill="hsl(var(--background))" stroke={detail} strokeWidth="0.45" />
+      <circle cx="64" cy="45" r="1.4" fill={detail} />
+      <circle cx="64" cy="45" r="0.6" fill="hsl(var(--background))" />
+      {/* Lash hint */}
+      <path d="M32 45 Q36 43.5 40 45" stroke={detail} strokeWidth="0.5" fill="none" />
+      <path d="M60 45 Q64 43.5 68 45" stroke={detail} strokeWidth="0.5" fill="none" />
+
+      {/* Nose — bridge, tip, nostrils */}
+      <path d="M48 48 Q47 58 46 65 Q48 68 50 68 Q52 68 54 65 Q53 58 52 48" stroke={detail} strokeWidth="0.4" fill="none" />
+      <ellipse cx="47.5" cy="66" rx="1.2" ry="0.6" fill={detail} />
+      <ellipse cx="52.5" cy="66" rx="1.2" ry="0.6" fill={detail} />
+
+      {/* Philtrum */}
+      <path d="M50 68 L50 72" stroke={soft} strokeWidth="0.3" fill="none" />
+
+      {/* Lips — upper and lower with cupid's bow */}
+      <path
+        d="M40 73 Q44 71 47 73 Q50 71 53 73 Q56 71 60 73 Q56 74 50 74 Q44 74 40 73 Z"
+        fill={detail}
+        stroke={detail}
+        strokeWidth="0.35"
+        opacity="0.85"
+      />
+      <path
+        d="M40 73 Q44 78 50 78.5 Q56 78 60 73 Q55 76 50 76 Q45 76 40 73 Z"
+        fill={detail}
+        stroke={detail}
+        strokeWidth="0.35"
+        opacity="0.7"
+      />
+      <path d="M40 73 Q50 74.5 60 73" stroke={stroke} strokeWidth="0.3" fill="none" />
+
+      {/* Chin dimple hint */}
+      <path d="M50 84 Q49 87 50 89 Q51 87 50 84" stroke={soft} strokeWidth="0.3" fill="none" />
+
+      {/* Jaw contour */}
+      <path d="M26 70 Q38 92 50 96 Q62 92 74 70" stroke={soft} strokeWidth="0.35" fill="none" />
+
+      {/* Cheek hints */}
+      <path d="M28 56 Q32 62 36 60" stroke={soft} strokeWidth="0.3" fill="none" />
+      <path d="M72 56 Q68 62 64 60" stroke={soft} strokeWidth="0.3" fill="none" />
+
+      {/* Neck */}
+      <path d="M42 100 L42 110 Q50 112 58 110 L58 100" fill="url(#frontFill)" stroke={stroke} strokeWidth="0.5" />
     </svg>
   );
 }
