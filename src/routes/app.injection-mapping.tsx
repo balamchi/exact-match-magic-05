@@ -432,19 +432,52 @@ function InjectionMappingPage() {
           <div className="rounded-2xl border border-border bg-card shadow-card">
             {/* Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
-              <div className="inline-flex rounded-xl border border-border bg-surface p-1">
-                {(["front", "left", "right", "body"] as const).map((v) => (
-                  <button
-                    key={v}
-                    onClick={() => setView(v)}
-                    className={cn(
-                      "rounded-lg px-4 py-1.5 text-sm font-medium capitalize transition",
-                      view === v ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {v}
-                  </button>
-                ))}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex rounded-xl border border-border bg-surface p-1">
+                  {([
+                    { v: "front" as const, label: "Front" },
+                    { v: "left" as const, label: "Left" },
+                    { v: "right" as const, label: "Right" },
+                    { v: "body-front" as const, label: "Body" },
+                  ]).map(({ v, label }) => {
+                    const isActive = v === "body-front" ? view === "body-front" || view === "body-back" : view === v;
+                    return (
+                      <button
+                        key={v}
+                        onClick={() => setView(v)}
+                        className={cn(
+                          "rounded-lg px-4 py-1.5 text-sm font-medium transition",
+                          isActive ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Body sub-toggle — only when on body view */}
+                {(view === "body-front" || view === "body-back") && (
+                  <div className="inline-flex rounded-xl border border-border bg-surface p-1">
+                    {([
+                      { v: "body-front" as const, label: "Front body" },
+                      { v: "body-back" as const, label: "Back body" },
+                    ]).map(({ v, label }) => (
+                      <button
+                        key={v}
+                        onClick={() => setView(v)}
+                        className={cn(
+                          "rounded-lg px-3 py-1 text-xs font-medium transition",
+                          view === v
+                            ? "bg-primary/15 text-primary ring-1 ring-primary/30"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col items-end gap-1">
