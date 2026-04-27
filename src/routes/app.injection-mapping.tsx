@@ -424,29 +424,33 @@ function InjectionMappingPage() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 text-xs">
-                <Legend swatch="bg-violet-500" label="Neuromodulator" />
-                <Legend swatch="bg-pink-500" label="Filler" />
-                <Legend swatch="bg-amber-500" label="Biostimulator" />
+              <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center gap-3 text-xs">
+                  <Legend swatch="bg-violet-500" label="Neuromodulator" />
+                  <Legend swatch="bg-pink-500" label="Filler" />
+                  <Legend swatch="bg-amber-500" label="Biostimulator" />
+                </div>
+                <p className="text-[10px] text-muted-foreground/70">
+                  Click any zone to log a dose · Hover to preview
+                </p>
               </div>
             </div>
 
             {/* Stage */}
-            <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-b-2xl bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.04),transparent_60%)]">
-              {/* Stylized silhouette — perfectly centered */}
-              <div className="absolute left-1/2 top-1/2 h-[88%] w-[42%] -translate-x-1/2 -translate-y-1/2">
+            <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-b-2xl bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.05),transparent_65%)]">
+              {/* Stylized silhouette — perfectly centered, scaled larger for easier interaction */}
+              <div className="absolute left-1/2 top-1/2 h-[94%] w-[68%] -translate-x-1/2 -translate-y-1/2">
                 <FaceSilhouette view={view} />
 
-                {/* Markers */}
+                {/* Markers — used regions (filled, color-coded by product) */}
                 {canvasMarkers.map((m) => {
                   const tone = productTone(m.records[0].product);
                   return (
                     <button
                       key={m.region.key}
                       onClick={() => openEdit(m.records[0])}
-                      title={`${m.region.label} · ${m.total}u · ${m.records[0].product}`}
                       className={cn(
-                        "group absolute z-10 flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 text-[11px] font-bold transition hover:scale-110",
+                        "group absolute z-10 flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[1.5px] border-white text-[10px] font-bold transition-all duration-200 hover:scale-125",
                         tone.bg,
                         tone.text,
                         tone.ring
@@ -461,17 +465,17 @@ function InjectionMappingPage() {
                   );
                 })}
 
-                {/* Empty-region affordances (faint dots that say "click to add") */}
+                {/* Empty-region affordances — visible, pulsing, click to add */}
                 {REGIONS.filter((r) => r.view === view && !canvasMarkers.find((m) => m.region.key === r.key)).map((r) => (
                   <button
                     key={r.key}
                     onClick={() => openCreate({ region: r.key })}
-                    title={`Add to ${r.label}`}
-                    className="group absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/60 bg-background/40 opacity-30 transition hover:opacity-100 hover:border-primary/60 hover:bg-primary/30"
+                    className="group absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-violet-400/40 bg-white/[0.04] transition-all duration-200 animate-injection-pulse hover:h-4 hover:w-4 hover:border-violet-400 hover:bg-violet-500/20"
                     style={{ left: `${r.x}%`, top: `${r.y}%` }}
                   >
-                    <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-card px-2 py-0.5 text-[10px] text-muted-foreground shadow-elevated group-hover:block">
-                      + {r.label}
+                    <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-card px-2 py-1 text-[10px] text-foreground shadow-elevated group-hover:block">
+                      <span className="font-semibold">{r.label}</span>
+                      <span className="ml-1 text-muted-foreground">· click to log</span>
                     </span>
                   </button>
                 ))}
@@ -500,6 +504,9 @@ function InjectionMappingPage() {
                 </div>
               )}
             </div>
+
+            {/* Recent activity strip */}
+            <RecentActivityStrip sites={sites} />
 
             {/* This session panel */}
             <div className="border-t border-border p-4">
