@@ -99,8 +99,10 @@ function formatWait(min: number) {
 }
 
 function CheckinPage() {
-  const { clinicId } = useAuth();
-  const { rows, loading } = useRealtimeTable<CheckinRow>("checkins", clinicId, "checked_in_at");
+  const { activeClinic } = useAuth();
+  const clinicId = activeClinic?.clinic_id ?? null;
+  const [rows, setRows] = useState<CheckinRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"active" | StatusKey | "all">("active");
   const [composeOpen, setComposeOpen] = useState(false);
@@ -112,6 +114,36 @@ function CheckinPage() {
     const t = setInterval(() => forceTick((n) => n + 1), 30000);
     return () => clearInterval(t);
   }, []);
+
+  useEffect(() => {
+    if (!clinicId) return;
+    let active = true;
+    const load = async () => {
+      const { data, error } = await supabase
+        .from("checkins")
+        .select("*")
+        .eq("clinic_id", clinicId)
+        .order("checked_in_at", { ascending: false });
+      if (!active) return;
+      if (error) toast.error(error.message);
+      setRows((data as CheckinRow[]) ?? []);
+      setLoading(false);
+    };
+    load();
+    const channel = supabase
+      .channel(`checkins-${clinicId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "checkins", filter: `clinic_id=eq.${clinicId}` },
+        load,
+      )
+      .subscribe();
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [clinicId]);
+
 
   const counts = useMemo(() => {
     const c = { waiting: 0, seated: 0, completed: 0, cancelled: 0, total: rows.length };
