@@ -829,175 +829,205 @@ function InjectionMappingPage() {
 }
 
 function FaceSilhouette({ view }: { view: ViewKey }) {
-  const stroke = "hsl(var(--border))";
-  const detail = "hsl(var(--muted-foreground) / 0.55)";
-  const soft = "hsl(var(--muted-foreground) / 0.3)";
+  // Clinical-grade tones: dark slate gradient face, mid-grey outline, lighter-grey features
+  const fillTop = "#1F1F23";
+  const fillBottom = "#0F0F11";
+  const outline = "#3F3F46";
+  const feature = "#52525B";
+  const featureSoft = "#52525B";
+  const gradId = `clinicalFill-${view}`;
 
   if (view === "body") {
     return (
       <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
         <defs>
-          <radialGradient id="bodyFill" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stopColor="hsl(var(--primary) / 0.07)" />
-            <stop offset="100%" stopColor="hsl(var(--primary) / 0.01)" />
-          </radialGradient>
+          <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={fillTop} />
+            <stop offset="100%" stopColor={fillBottom} />
+          </linearGradient>
         </defs>
         {/* Head */}
-        <ellipse cx="50" cy="13" rx="7.5" ry="9" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
-        {/* Facial hints */}
-        <ellipse cx="47" cy="12" rx="0.9" ry="0.5" fill={detail} />
-        <ellipse cx="53" cy="12" rx="0.9" ry="0.5" fill={detail} />
-        <path d="M48 16 Q50 17 52 16" stroke={detail} strokeWidth="0.4" fill="none" />
+        <ellipse cx="50" cy="13" rx="7.5" ry="9" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
+        {/* Eyes */}
+        <ellipse cx="47" cy="12" rx="0.9" ry="0.5" fill={feature} />
+        <ellipse cx="53" cy="12" rx="0.9" ry="0.5" fill={feature} />
+        {/* Mouth */}
+        <path d="M48 16 Q50 17 52 16" stroke={feature} strokeWidth="0.6" fill="none" strokeLinecap="round" />
         {/* Neck */}
-        <path d="M45 21 Q50 23 55 21 L56 26 Q50 27 44 26 Z" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        <path d="M45 21 Q50 23 55 21 L56 26 Q50 27 44 26 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
         {/* Shoulders & torso */}
         <path
           d="M28 30 Q38 26 50 27 Q62 26 72 30 L74 44 Q72 56 70 70 Q68 84 66 96 L34 96 Q32 84 30 70 Q28 56 26 44 Z"
-          fill="url(#bodyFill)"
-          stroke={stroke}
-          strokeWidth="0.5"
+          fill={`url(#${gradId})`}
+          stroke={outline}
+          strokeWidth="1.2"
         />
         {/* Collarbones */}
-        <path d="M34 30 Q42 33 50 32 Q58 33 66 30" stroke={soft} strokeWidth="0.4" fill="none" />
+        <path d="M34 30 Q42 33 50 32 Q58 33 66 30" stroke={featureSoft} strokeWidth="0.6" fill="none" opacity="0.6" />
         {/* Sternum / center line */}
-        <path d="M50 33 L50 70" stroke={soft} strokeWidth="0.3" fill="none" />
+        <path d="M50 33 L50 70" stroke={featureSoft} strokeWidth="0.5" fill="none" opacity="0.4" />
         {/* Chest contour */}
-        <path d="M36 42 Q44 50 50 50 Q56 50 64 42" stroke={soft} strokeWidth="0.35" fill="none" />
+        <path d="M36 42 Q44 50 50 50 Q56 50 64 42" stroke={featureSoft} strokeWidth="0.55" fill="none" opacity="0.5" />
         {/* Waist hint */}
-        <path d="M34 70 Q50 72 66 70" stroke={soft} strokeWidth="0.35" fill="none" />
+        <path d="M34 70 Q50 72 66 70" stroke={featureSoft} strokeWidth="0.55" fill="none" opacity="0.5" />
         {/* Arms */}
-        <path d="M28 31 Q22 44 18 60 Q17 72 19 82" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
-        <path d="M72 31 Q78 44 82 60 Q83 72 81 82" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
-        <path d="M28 31 Q24 44 22 60 Q22 72 24 82" fill="none" stroke={stroke} strokeWidth="0.5" />
-        <path d="M72 31 Q76 44 78 60 Q78 72 76 82" fill="none" stroke={stroke} strokeWidth="0.5" />
+        <path d="M28 31 Q22 44 18 60 Q17 72 19 82 L24 82 Q22 72 22 60 Q24 44 28 36 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
+        <path d="M72 31 Q78 44 82 60 Q83 72 81 82 L76 82 Q78 72 78 60 Q76 44 72 36 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
         {/* Hands */}
-        <ellipse cx="20.5" cy="86" rx="3" ry="4" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
-        <ellipse cx="79.5" cy="86" rx="3" ry="4" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
-        {/* Hips/legs hint */}
-        <path d="M34 96 Q40 110 42 124 L48 124 Q49 110 49 96" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
-        <path d="M66 96 Q60 110 58 124 L52 124 Q51 110 51 96" fill="url(#bodyFill)" stroke={stroke} strokeWidth="0.5" />
+        <ellipse cx="20.5" cy="86" rx="3" ry="4" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
+        <ellipse cx="79.5" cy="86" rx="3" ry="4" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
+        {/* Hips/legs */}
+        <path d="M34 96 Q40 110 42 124 L48 124 Q49 110 49 96 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
+        <path d="M66 96 Q60 110 58 124 L52 124 Q51 110 51 96 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
       </svg>
     );
   }
 
-  // Profile views — same drawing mirrored via transform
+  // Profile views — left and right (mirrored)
   if (view === "left" || view === "right") {
     const flip = view === "right";
     return (
       <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
         <defs>
-          <radialGradient id="profileFill" cx="50%" cy="45%" r="55%">
-            <stop offset="0%" stopColor="hsl(var(--primary) / 0.07)" />
-            <stop offset="100%" stopColor="hsl(var(--primary) / 0.01)" />
-          </radialGradient>
+          <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={fillTop} />
+            <stop offset="100%" stopColor={fillBottom} />
+          </linearGradient>
         </defs>
         <g transform={flip ? "translate(100,0) scale(-1,1)" : undefined}>
-          {/* Profile outline — forehead → nose → lips → chin → jaw → ear → back of skull */}
+          {/* Profile outline */}
           <path
             d="M40 18 Q34 30 34 44 Q34 50 36 54 L40 56 Q42 60 44 60 L46 62 Q44 64 46 66 L50 68 Q48 70 50 72 Q52 74 50 76 L48 80 Q50 86 56 92 Q62 94 68 92 Q74 86 76 78 Q78 66 78 54 Q78 36 70 24 Q60 14 50 14 Q44 14 40 18 Z"
-            fill="url(#profileFill)"
-            stroke={stroke}
-            strokeWidth="0.6"
+            fill={`url(#${gradId})`}
+            stroke={outline}
+            strokeWidth="1.5"
+            strokeLinejoin="round"
           />
           {/* Nose bridge to tip */}
-          <path d="M40 40 Q38 48 42 56 Q44 58 46 58" stroke={detail} strokeWidth="0.5" fill="none" />
+          <path d="M40 40 Q38 48 42 56 Q44 58 46 58" stroke={feature} strokeWidth="1.5" fill="none" strokeLinecap="round" />
           {/* Nostril */}
-          <path d="M44 60 Q46 61 47 60" stroke={detail} strokeWidth="0.4" fill="none" />
-          {/* Lips — upper & lower */}
-          <path d="M46 66 Q49 65 52 66" stroke={detail} strokeWidth="0.5" fill="none" />
-          <path d="M46 68 Q49 70 52 68" stroke={detail} strokeWidth="0.5" fill="none" />
-          <path d="M46 67 L52 67" stroke={detail} strokeWidth="0.3" />
-          {/* Eye */}
-          <path d="M48 44 Q52 42 56 44 Q52 46 48 44 Z" fill="none" stroke={detail} strokeWidth="0.45" />
-          <circle cx="52" cy="44" r="0.7" fill={detail} />
+          <path d="M44 60 Q46 61 47 60" stroke={feature} strokeWidth="0.8" fill="none" strokeLinecap="round" />
+          {/* Lips */}
+          <path d="M46 66 Q49 65 52 66" stroke={feature} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <path d="M46 68 Q49 70 52 68" stroke={feature} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          {/* Eye almond */}
+          <path d="M48 44 Q52 42 56 44 Q52 46 48 44 Z" fill="none" stroke={feature} strokeWidth="1.5" strokeLinejoin="round" />
+          <circle cx="52" cy="44" r="0.9" fill={feature} />
           {/* Brow */}
-          <path d="M48 40 Q52 38 58 40" stroke={detail} strokeWidth="0.5" fill="none" />
+          <path d="M48 39 Q52 37 58 39" stroke={feature} strokeWidth="1.5" fill="none" strokeLinecap="round" />
           {/* Ear */}
-          <path d="M68 48 Q72 50 72 56 Q72 62 68 62 Q66 58 67 52 Z" fill="none" stroke={detail} strokeWidth="0.45" />
-          <path d="M69 53 Q70 56 69 59" stroke={soft} strokeWidth="0.3" fill="none" />
-          {/* Jawline accent */}
-          <path d="M52 78 Q60 86 68 86" stroke={soft} strokeWidth="0.35" fill="none" />
+          <path d="M68 48 Q72 50 72 56 Q72 62 68 62 Q66 58 67 52 Z" fill="none" stroke={feature} strokeWidth="1" strokeLinejoin="round" />
           {/* Hair line */}
-          <path d="M40 22 Q56 12 72 26" stroke={soft} strokeWidth="0.4" fill="none" />
+          <path d="M40 22 Q56 12 72 26" stroke={featureSoft} strokeWidth="0.7" fill="none" opacity="0.6" />
         </g>
       </svg>
     );
   }
 
-  // Front view — anatomical face with eyes, brows, nose, lips, jaw
+  // Front view — anatomical face with clearly visible eyes, brows, nose, lips
   return (
     <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
       <defs>
-        <radialGradient id="frontFill" cx="50%" cy="45%" r="55%">
-          <stop offset="0%" stopColor="hsl(var(--primary) / 0.07)" />
-          <stop offset="100%" stopColor="hsl(var(--primary) / 0.01)" />
-        </radialGradient>
+        <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={fillTop} />
+          <stop offset="100%" stopColor={fillBottom} />
+        </linearGradient>
       </defs>
-      {/* Face shape — oval with refined jaw */}
+      {/* Face shape — refined oval */}
       <path
         d="M50 12 Q72 14 78 36 Q80 56 74 76 Q68 92 50 100 Q32 92 26 76 Q20 56 22 36 Q28 14 50 12 Z"
-        fill="url(#frontFill)"
-        stroke={stroke}
-        strokeWidth="0.6"
+        fill={`url(#${gradId})`}
+        stroke={outline}
+        strokeWidth="1.5"
+        strokeLinejoin="round"
       />
       {/* Hairline */}
-      <path d="M28 24 Q50 14 72 24" stroke={soft} strokeWidth="0.4" fill="none" />
-      {/* Forehead center line (subtle) */}
-      <path d="M50 26 L50 38" stroke={soft} strokeWidth="0.25" fill="none" />
+      <path d="M28 24 Q50 14 72 24" stroke={featureSoft} strokeWidth="0.7" fill="none" opacity="0.55" />
 
-      {/* Brows */}
-      <path d="M30 38 Q36 35 42 38 Q38 36.5 30 38 Z" fill={detail} stroke={detail} strokeWidth="0.4" />
-      <path d="M58 38 Q64 35 70 38 Q62 36.5 58 38 Z" fill={detail} stroke={detail} strokeWidth="0.4" />
+      {/* Brows — arched strokes */}
+      <path d="M30 38 Q36 34 42 38" stroke={feature} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <path d="M58 38 Q64 34 70 38" stroke={feature} strokeWidth="1.5" fill="none" strokeLinecap="round" />
 
-      {/* Eyes — almond shape with iris and pupil */}
-      <path d="M32 45 Q36 42 40 45 Q36 48 32 45 Z" fill="hsl(var(--background))" stroke={detail} strokeWidth="0.45" />
-      <circle cx="36" cy="45" r="1.4" fill={detail} />
-      <circle cx="36" cy="45" r="0.6" fill="hsl(var(--background))" />
-      <path d="M60 45 Q64 42 68 45 Q64 48 60 45 Z" fill="hsl(var(--background))" stroke={detail} strokeWidth="0.45" />
-      <circle cx="64" cy="45" r="1.4" fill={detail} />
-      <circle cx="64" cy="45" r="0.6" fill="hsl(var(--background))" />
-      {/* Lash hint */}
-      <path d="M32 45 Q36 43.5 40 45" stroke={detail} strokeWidth="0.5" fill="none" />
-      <path d="M60 45 Q64 43.5 68 45" stroke={detail} strokeWidth="0.5" fill="none" />
+      {/* Eyes — almond outlines */}
+      <path d="M30 45 Q36 41 42 45 Q36 49 30 45 Z" fill="none" stroke={feature} strokeWidth="1.5" strokeLinejoin="round" />
+      <circle cx="36" cy="45" r="1.4" fill={feature} />
+      <path d="M58 45 Q64 41 70 45 Q64 49 58 45 Z" fill="none" stroke={feature} strokeWidth="1.5" strokeLinejoin="round" />
+      <circle cx="64" cy="45" r="1.4" fill={feature} />
 
-      {/* Nose — bridge, tip, nostrils */}
-      <path d="M48 48 Q47 58 46 65 Q48 68 50 68 Q52 68 54 65 Q53 58 52 48" stroke={detail} strokeWidth="0.4" fill="none" />
-      <ellipse cx="47.5" cy="66" rx="1.2" ry="0.6" fill={detail} />
-      <ellipse cx="52.5" cy="66" rx="1.2" ry="0.6" fill={detail} />
+      {/* Nose — vertical ridge with nostrils */}
+      <path d="M50 47 L50 64" stroke={feature} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <path d="M46 65 Q48 67 50 67 Q52 67 54 65" stroke={feature} strokeWidth="1.2" fill="none" strokeLinecap="round" />
 
-      {/* Philtrum */}
-      <path d="M50 68 L50 72" stroke={soft} strokeWidth="0.3" fill="none" />
+      {/* Mouth — subtle curve at lower third */}
+      <path d="M40 74 Q50 78 60 74" stroke={feature} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <path d="M42 74 Q50 71 58 74" stroke={feature} strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.7" />
 
-      {/* Lips — upper and lower with cupid's bow */}
-      <path
-        d="M40 73 Q44 71 47 73 Q50 71 53 73 Q56 71 60 73 Q56 74 50 74 Q44 74 40 73 Z"
-        fill={detail}
-        stroke={detail}
-        strokeWidth="0.35"
-        opacity="0.85"
-      />
-      <path
-        d="M40 73 Q44 78 50 78.5 Q56 78 60 73 Q55 76 50 76 Q45 76 40 73 Z"
-        fill={detail}
-        stroke={detail}
-        strokeWidth="0.35"
-        opacity="0.7"
-      />
-      <path d="M40 73 Q50 74.5 60 73" stroke={stroke} strokeWidth="0.3" fill="none" />
+      {/* Chin contour */}
+      <path d="M44 92 Q50 96 56 92" stroke={featureSoft} strokeWidth="0.7" fill="none" opacity="0.5" />
 
-      {/* Chin dimple hint */}
-      <path d="M50 84 Q49 87 50 89 Q51 87 50 84" stroke={soft} strokeWidth="0.3" fill="none" />
-
-      {/* Jaw contour */}
-      <path d="M26 70 Q38 92 50 96 Q62 92 74 70" stroke={soft} strokeWidth="0.35" fill="none" />
-
-      {/* Cheek hints */}
-      <path d="M28 56 Q32 62 36 60" stroke={soft} strokeWidth="0.3" fill="none" />
-      <path d="M72 56 Q68 62 64 60" stroke={soft} strokeWidth="0.3" fill="none" />
+      {/* Jaw line accent */}
+      <path d="M26 70 Q38 92 50 96 Q62 92 74 70" stroke={featureSoft} strokeWidth="0.6" fill="none" opacity="0.4" />
 
       {/* Neck */}
-      <path d="M42 100 L42 110 Q50 112 58 110 L58 100" fill="url(#frontFill)" stroke={stroke} strokeWidth="0.5" />
+      <path d="M42 100 L42 110 Q50 112 58 110 L58 100" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
     </svg>
+  );
+}
+
+function RecentActivityStrip({ sites }: { sites: Site[] }) {
+  const recent = useMemo(() => {
+    return [...sites]
+      .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+      .slice(0, 5);
+  }, [sites]);
+
+  if (recent.length === 0) return null;
+
+  const fmtTime = (iso: string) => {
+    const d = new Date(iso);
+    const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    if (sameDay) {
+      return `Today ${d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).toLowerCase()}`;
+    }
+    const yesterday = new Date(now.getTime() - 86400000);
+    if (d.toDateString() === yesterday.toDateString()) {
+      return `Yesterday ${d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).toLowerCase()}`;
+    }
+    return d.toLocaleDateString([], { month: "short", day: "numeric" });
+  };
+
+  return (
+    <div className="border-t border-border px-4 py-3">
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Recent activity
+        </h3>
+        <span className="text-[10px] text-muted-foreground/70">Last {recent.length}</span>
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {recent.map((s) => {
+          const tone = productTone(s.product);
+          return (
+            <div
+              key={s.id}
+              className="flex shrink-0 items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1.5 text-[11px]"
+            >
+              <span className={cn("h-1.5 w-1.5 rounded-full", tone.bg)} />
+              <span className="text-muted-foreground">{fmtTime(s.updated_at)}</span>
+              <span className="text-muted-foreground/50">·</span>
+              <span className="font-medium text-foreground">{s.region}</span>
+              <span className="text-muted-foreground/50">·</span>
+              <span className="text-muted-foreground">
+                {s.product} {s.units}u
+              </span>
+              <span className="text-muted-foreground/50">·</span>
+              <span className="text-muted-foreground/80">{s.client_name}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
