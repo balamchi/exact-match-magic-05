@@ -41,7 +41,8 @@ type Site = {
   updated_at: string;
 };
 
-type ViewKey = "front" | "left" | "right" | "body";
+type ViewKey = "front" | "left" | "right" | "body-front" | "body-back";
+type BodySide = "body-front" | "body-back";
 
 type RegionPoint = {
   key: string; // canonical region label stored in DB
@@ -84,21 +85,43 @@ const REGIONS: RegionPoint[] = [
   { key: "Jawline R", label: "Jawline", view: "right", x: 50, y: 78 },
   { key: "Masseter R", label: "Masseter", view: "right", x: 62, y: 64 },
 
-  // BODY
-  { key: "Neck", label: "Neck", view: "body", x: 50, y: 19 },
-  { key: "Décolletage", label: "Décolletage", view: "body", x: 50, y: 30 },
-  { key: "Shoulder L", label: "Shoulder L", view: "body", x: 33, y: 32 },
-  { key: "Shoulder R", label: "Shoulder R", view: "body", x: 67, y: 32 },
-  { key: "Abdomen", label: "Abdomen", view: "body", x: 50, y: 60 },
-  { key: "Glutes", label: "Glutes", view: "body", x: 50, y: 78 },
-  { key: "Outer thigh L", label: "Outer thigh L", view: "body", x: 38, y: 88 },
-  { key: "Outer thigh R", label: "Outer thigh R", view: "body", x: 62, y: 88 },
-  { key: "Inner thigh L", label: "Inner thigh L", view: "body", x: 46, y: 92 },
-  { key: "Inner thigh R", label: "Inner thigh R", view: "body", x: 54, y: 92 },
-  { key: "Knee L", label: "Knee L", view: "body", x: 42, y: 108 },
-  { key: "Knee R", label: "Knee R", view: "body", x: 58, y: 108 },
-  { key: "Hand L", label: "Hand L", view: "body", x: 19, y: 80 },
-  { key: "Hand R", label: "Hand R", view: "body", x: 81, y: 80 },
+  // BODY — FRONT
+  { key: "Platysmal bands", label: "Platysmal bands", view: "body-front", x: 50, y: 14 },
+  { key: "Décolletage", label: "Décolletage (V-zone)", view: "body-front", x: 50, y: 22 },
+  { key: "Deltoid L", label: "Deltoid L", view: "body-front", x: 30, y: 28 },
+  { key: "Deltoid R", label: "Deltoid R", view: "body-front", x: 70, y: 28 },
+  { key: "Bicep L", label: "Bicep L", view: "body-front", x: 24, y: 40 },
+  { key: "Bicep R", label: "Bicep R", view: "body-front", x: 76, y: 40 },
+  { key: "Forearm L", label: "Forearm L", view: "body-front", x: 19, y: 54 },
+  { key: "Forearm R", label: "Forearm R", view: "body-front", x: 81, y: 54 },
+  { key: "Dorsal hand L", label: "Dorsal hand L", view: "body-front", x: 16, y: 67 },
+  { key: "Dorsal hand R", label: "Dorsal hand R", view: "body-front", x: 84, y: 67 },
+  { key: "Periumbilical", label: "Periumbilical (fat dissolving)", view: "body-front", x: 50, y: 56 },
+  { key: "Anterior thigh L", label: "Anterior thigh L", view: "body-front", x: 44, y: 78 },
+  { key: "Anterior thigh R", label: "Anterior thigh R", view: "body-front", x: 56, y: 78 },
+  { key: "Lateral thigh L", label: "Lateral thigh L", view: "body-front", x: 36, y: 78 },
+  { key: "Lateral thigh R", label: "Lateral thigh R", view: "body-front", x: 64, y: 78 },
+  { key: "Medial thigh L", label: "Medial thigh L", view: "body-front", x: 47, y: 84 },
+  { key: "Medial thigh R", label: "Medial thigh R", view: "body-front", x: 53, y: 84 },
+  { key: "Suprapatellar L", label: "Suprapatellar fat pad L", view: "body-front", x: 43, y: 92 },
+  { key: "Suprapatellar R", label: "Suprapatellar fat pad R", view: "body-front", x: 57, y: 92 },
+
+  // BODY — BACK
+  { key: "Trapezius L", label: "Trapezius L", view: "body-back", x: 40, y: 18 },
+  { key: "Trapezius R", label: "Trapezius R", view: "body-back", x: 60, y: 18 },
+  { key: "Posterior deltoid L", label: "Posterior deltoid L", view: "body-back", x: 28, y: 28 },
+  { key: "Posterior deltoid R", label: "Posterior deltoid R", view: "body-back", x: 72, y: 28 },
+  { key: "Tricep L", label: "Tricep L", view: "body-back", x: 22, y: 42 },
+  { key: "Tricep R", label: "Tricep R", view: "body-back", x: 78, y: 42 },
+  { key: "Lower back", label: "Lower back (sacral)", view: "body-back", x: 50, y: 60 },
+  { key: "Glute upper L", label: "Glute upper L", view: "body-back", x: 44, y: 66 },
+  { key: "Glute upper R", label: "Glute upper R", view: "body-back", x: 56, y: 66 },
+  { key: "Glute lower L", label: "Glute lower L", view: "body-back", x: 44, y: 73 },
+  { key: "Glute lower R", label: "Glute lower R", view: "body-back", x: 56, y: 73 },
+  { key: "Posterior thigh L", label: "Posterior thigh L (hamstring)", view: "body-back", x: 44, y: 84 },
+  { key: "Posterior thigh R", label: "Posterior thigh R (hamstring)", view: "body-back", x: 56, y: 84 },
+  { key: "Calf L", label: "Calf L", view: "body-back", x: 44, y: 96 },
+  { key: "Calf R", label: "Calf R", view: "body-back", x: 56, y: 96 },
 ];
 
 const PRODUCT_PRESETS = ["Botox", "Dysport", "Xeomin", "Juvederm", "Restylane", "Sculptra", "Radiesse", "Belotero"];
@@ -409,19 +432,52 @@ function InjectionMappingPage() {
           <div className="rounded-2xl border border-border bg-card shadow-card">
             {/* Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
-              <div className="inline-flex rounded-xl border border-border bg-surface p-1">
-                {(["front", "left", "right", "body"] as const).map((v) => (
-                  <button
-                    key={v}
-                    onClick={() => setView(v)}
-                    className={cn(
-                      "rounded-lg px-4 py-1.5 text-sm font-medium capitalize transition",
-                      view === v ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {v}
-                  </button>
-                ))}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex rounded-xl border border-border bg-surface p-1">
+                  {([
+                    { v: "front" as const, label: "Front" },
+                    { v: "left" as const, label: "Left" },
+                    { v: "right" as const, label: "Right" },
+                    { v: "body-front" as const, label: "Body" },
+                  ]).map(({ v, label }) => {
+                    const isActive = v === "body-front" ? view === "body-front" || view === "body-back" : view === v;
+                    return (
+                      <button
+                        key={v}
+                        onClick={() => setView(v)}
+                        className={cn(
+                          "rounded-lg px-4 py-1.5 text-sm font-medium transition",
+                          isActive ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Body sub-toggle — only when on body view */}
+                {(view === "body-front" || view === "body-back") && (
+                  <div className="inline-flex rounded-xl border border-border bg-surface p-1">
+                    {([
+                      { v: "body-front" as const, label: "Front body" },
+                      { v: "body-back" as const, label: "Back body" },
+                    ]).map(({ v, label }) => (
+                      <button
+                        key={v}
+                        onClick={() => setView(v)}
+                        className={cn(
+                          "rounded-lg px-3 py-1 text-xs font-medium transition",
+                          view === v
+                            ? "bg-primary/15 text-primary ring-1 ring-primary/30"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col items-end gap-1">
@@ -465,20 +521,27 @@ function InjectionMappingPage() {
                   );
                 })}
 
-                {/* Empty-region affordances — visible, pulsing, click to add */}
-                {REGIONS.filter((r) => r.view === view && !canvasMarkers.find((m) => m.region.key === r.key)).map((r) => (
-                  <button
-                    key={r.key}
-                    onClick={() => openCreate({ region: r.key })}
-                    className="group absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-violet-400/40 bg-white/[0.04] transition-all duration-200 animate-injection-pulse hover:h-4 hover:w-4 hover:border-violet-400 hover:bg-violet-500/20"
-                    style={{ left: `${r.x}%`, top: `${r.y}%` }}
-                  >
-                    <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-card px-2 py-1 text-[10px] text-foreground shadow-elevated group-hover:block">
-                      <span className="font-semibold">{r.label}</span>
-                      <span className="ml-1 text-muted-foreground">· click to log</span>
-                    </span>
-                  </button>
-                ))}
+                {/* Empty-region affordances — pulsing zone targets.
+                    On body views, only show when a client is selected (avoids cluttered "scattered points" look). */}
+                {(() => {
+                  const isBody = view === "body-front" || view === "body-back";
+                  if (isBody && !clientFilter) return null;
+                  return REGIONS.filter(
+                    (r) => r.view === view && !canvasMarkers.find((m) => m.region.key === r.key)
+                  ).map((r) => (
+                    <button
+                      key={r.key}
+                      onClick={() => openCreate({ region: r.key })}
+                      className="group absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-violet-400/40 bg-white/[0.04] transition-all duration-200 animate-injection-pulse hover:h-4 hover:w-4 hover:border-violet-400 hover:bg-violet-500/20"
+                      style={{ left: `${r.x}%`, top: `${r.y}%` }}
+                    >
+                      <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-card px-2 py-1 text-[10px] text-foreground shadow-elevated group-hover:block">
+                        <span className="font-semibold">{r.label}</span>
+                        <span className="ml-1 text-muted-foreground">· click to log</span>
+                      </span>
+                    </button>
+                  ));
+                })()}
               </div>
 
               {/* Session pager (only when a client is selected) */}
@@ -837,49 +900,11 @@ function FaceSilhouette({ view }: { view: ViewKey }) {
   const featureSoft = "#52525B";
   const gradId = `clinicalFill-${view}`;
 
-  if (view === "body") {
-    return (
-      <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
-        <defs>
-          <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={fillTop} />
-            <stop offset="100%" stopColor={fillBottom} />
-          </linearGradient>
-        </defs>
-        {/* Head */}
-        <ellipse cx="50" cy="13" rx="7.5" ry="9" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        {/* Eyes */}
-        <ellipse cx="47" cy="12" rx="0.9" ry="0.5" fill={feature} />
-        <ellipse cx="53" cy="12" rx="0.9" ry="0.5" fill={feature} />
-        {/* Mouth */}
-        <path d="M48 16 Q50 17 52 16" stroke={feature} strokeWidth="0.6" fill="none" strokeLinecap="round" />
-        {/* Neck */}
-        <path d="M45 21 Q50 23 55 21 L56 26 Q50 27 44 26 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        {/* Shoulders & torso */}
-        <path
-          d="M28 30 Q38 26 50 27 Q62 26 72 30 L74 44 Q72 56 70 70 Q68 84 66 96 L34 96 Q32 84 30 70 Q28 56 26 44 Z"
-          fill={`url(#${gradId})`}
-          stroke={outline}
-          strokeWidth="1.2"
-        />
-        {/* Collarbones */}
-        <path d="M34 30 Q42 33 50 32 Q58 33 66 30" stroke={featureSoft} strokeWidth="0.6" fill="none" opacity="0.6" />
-        {/* Sternum / center line */}
-        <path d="M50 33 L50 70" stroke={featureSoft} strokeWidth="0.5" fill="none" opacity="0.4" />
-        {/* Chest contour */}
-        <path d="M36 42 Q44 50 50 50 Q56 50 64 42" stroke={featureSoft} strokeWidth="0.55" fill="none" opacity="0.5" />
-        {/* Waist hint */}
-        <path d="M34 70 Q50 72 66 70" stroke={featureSoft} strokeWidth="0.55" fill="none" opacity="0.5" />
-        {/* Arms */}
-        <path d="M28 31 Q22 44 18 60 Q17 72 19 82 L24 82 Q22 72 22 60 Q24 44 28 36 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        <path d="M72 31 Q78 44 82 60 Q83 72 81 82 L76 82 Q78 72 78 60 Q76 44 72 36 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        {/* Hands */}
-        <ellipse cx="20.5" cy="86" rx="3" ry="4" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        <ellipse cx="79.5" cy="86" rx="3" ry="4" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        {/* Hips/legs */}
-        <path d="M34 96 Q40 110 42 124 L48 124 Q49 110 49 96 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-        <path d="M66 96 Q60 110 58 124 L52 124 Q51 110 51 96 Z" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
-      </svg>
+  if (view === "body-front" || view === "body-back") {
+    return view === "body-front" ? (
+      <BodyFront fillTop={fillTop} fillBottom={fillBottom} outline={outline} feature={feature} gradId={gradId} />
+    ) : (
+      <BodyBack fillTop={fillTop} fillBottom={fillBottom} outline={outline} feature={feature} gradId={gradId} />
     );
   }
 
@@ -970,6 +995,282 @@ function FaceSilhouette({ view }: { view: ViewKey }) {
 
       {/* Neck */}
       <path d="M42 100 L42 110 Q50 112 58 110 L58 100" fill={`url(#${gradId})`} stroke={outline} strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+type BodyProps = {
+  fillTop: string;
+  fillBottom: string;
+  outline: string;
+  feature: string;
+  gradId: string;
+};
+
+/**
+ * Anatomical FRONT body — medical reference style.
+ * Shows clavicles, pectoral curves, sternum, costal margin, linea alba,
+ * iliac crests, inguinal lines, patella, tibial crest, deltoid contours,
+ * bicep/tricep separation, wrist articulation.
+ */
+function BodyFront({ fillTop, fillBottom, outline, feature, gradId }: BodyProps) {
+  const FILL = `url(#${gradId})`;
+  const STROKE_BODY = 1.5;
+  const STROKE_DETAIL = 1;
+  return (
+    <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
+      <defs>
+        <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={fillTop} />
+          <stop offset="100%" stopColor={fillBottom} />
+        </linearGradient>
+      </defs>
+
+      {/* HEAD — anatomical oval, no facial features */}
+      <ellipse cx="50" cy="11" rx="6.5" ry="8.5" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} />
+
+      {/* NECK — sternocleidomastoid hint via slight taper */}
+      <path d="M45.5 19 Q50 21 54.5 19 L55.5 25 Q50 26.5 44.5 25 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
+
+      {/* TORSO — shoulders → ribcage → waist → hip flare */}
+      <path
+        d="M28 28 Q38 25 50 25.5 Q62 25 72 28
+           Q74 30 75 34
+           Q73 42 72 50
+           Q70 60 68 68
+           Q66 74 64 78
+           Q60 82 50 82
+           Q40 82 36 78
+           Q34 74 32 68
+           Q30 60 28 50
+           Q27 42 25 34
+           Q26 30 28 28 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+
+      {/* CLAVICLES — two angled lines neck→shoulders */}
+      <path d="M46 26 L33 30" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+      <path d="M54 26 L67 30" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+
+      {/* DELTOID contours */}
+      <path d="M28 28 Q26 34 28 40" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" />
+      <path d="M72 28 Q74 34 72 40" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" />
+
+      {/* PECTORAL muscle curves */}
+      <path d="M37 33 Q44 42 49 42" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+      <path d="M63 33 Q56 42 51 42" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+
+      {/* STERNUM — vertical center line through chest */}
+      <line x1="50" y1="32" x2="50" y2="46" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+
+      {/* COSTAL MARGIN — ribcage outline (subtle V) */}
+      <path d="M40 46 Q50 52 60 46" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" opacity="0.85" />
+
+      {/* LINEA ALBA — abdominal midline */}
+      <line x1="50" y1="46" x2="50" y2="68" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+
+      {/* UMBILICUS */}
+      <circle cx="50" cy="58" r="0.8" fill={feature} />
+
+      {/* ILIAC CRESTS — hip bones at waist */}
+      <path d="M34 68 Q40 70 46 70" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+      <path d="M66 68 Q60 70 54 70" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+
+      {/* INGUINAL LINES — hip flexor V */}
+      <path d="M40 76 Q50 80 50 82" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+      <path d="M60 76 Q50 80 50 82" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+
+      {/* ARMS — front view, deltoid → bicep → forearm → wrist */}
+      <path
+        d="M27 28 Q22 36 19 46 Q16 56 15 64 Q14 70 16 72 L21 72 Q22 70 22 64 Q23 56 25 46 Q27 36 30 30 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M73 28 Q78 36 81 46 Q84 56 85 64 Q86 70 84 72 L79 72 Q78 70 78 64 Q77 56 75 46 Q73 36 70 30 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+
+      {/* BICEP / TRICEP separation lines */}
+      <path d="M22 38 Q23 46 21 54" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
+      <path d="M78 38 Q77 46 79 54" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
+
+      {/* WRIST articulation lines */}
+      <line x1="16" y1="69" x2="21" y2="69" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+      <line x1="79" y1="69" x2="84" y2="69" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+
+      {/* HANDS — back of hand */}
+      <path d="M14 72 Q13 78 15 84 Q18 86 22 84 Q23 78 22 72 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
+      <path d="M86 72 Q87 78 85 84 Q82 86 78 84 Q77 78 78 72 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
+      {/* Knuckle/finger separation hints */}
+      <path d="M15 78 L21 78" stroke={feature} strokeWidth={STROKE_DETAIL} opacity="0.5" />
+      <path d="M79 78 L85 78" stroke={feature} strokeWidth={STROKE_DETAIL} opacity="0.5" />
+
+      {/* LEGS — front view, anterior thigh → knee → tibial crest → shin */}
+      <path
+        d="M36 82 Q34 96 35 110 Q36 122 38 128 L46 128 Q47 122 47 110 Q48 96 49 82 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M64 82 Q66 96 65 110 Q64 122 62 128 L54 128 Q53 122 53 110 Q52 96 51 82 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+
+      {/* PATELLA — kneecaps */}
+      <ellipse cx="42" cy="103" rx="3.5" ry="2.6" fill="none" stroke={feature} strokeWidth={STROKE_DETAIL} />
+      <ellipse cx="58" cy="103" rx="3.5" ry="2.6" fill="none" stroke={feature} strokeWidth={STROKE_DETAIL} />
+
+      {/* TIBIAL CRESTS — shin lines */}
+      <line x1="42" y1="108" x2="42" y2="124" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" opacity="0.8" />
+      <line x1="58" y1="108" x2="58" y2="124" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" opacity="0.8" />
+
+      {/* QUAD / anterior-thigh separation hint */}
+      <path d="M42 86 Q43 94 42 100" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.4" />
+      <path d="M58 86 Q57 94 58 100" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.4" />
+    </svg>
+  );
+}
+
+/**
+ * Anatomical BACK body — for posterior injections (trapezius, glutes, lower back, hamstrings, calves).
+ */
+function BodyBack({ fillTop, fillBottom, outline, feature, gradId }: BodyProps) {
+  const FILL = `url(#${gradId})`;
+  const STROKE_BODY = 1.5;
+  const STROKE_DETAIL = 1;
+  return (
+    <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
+      <defs>
+        <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={fillTop} />
+          <stop offset="100%" stopColor={fillBottom} />
+        </linearGradient>
+      </defs>
+
+      {/* HEAD — back of skull, no features */}
+      <ellipse cx="50" cy="11" rx="6.5" ry="8.5" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} />
+
+      {/* NECK */}
+      <path d="M45.5 19 Q50 21 54.5 19 L55.5 25 Q50 26.5 44.5 25 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
+
+      {/* BACK TORSO — same outline as front but with posterior musculature */}
+      <path
+        d="M28 28 Q38 25 50 25.5 Q62 25 72 28
+           Q74 30 75 34
+           Q73 42 72 50
+           Q70 60 68 68
+           Q66 74 64 78
+           Q60 82 50 82
+           Q40 82 36 78
+           Q34 74 32 68
+           Q30 60 28 50
+           Q27 42 25 34
+           Q26 30 28 28 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+
+      {/* TRAPEZIUS — diamond from neck to shoulders */}
+      <path d="M50 25 L36 30 Q34 36 38 40 L50 38 L62 40 Q66 36 64 30 Z" fill="none" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinejoin="round" opacity="0.85" />
+
+      {/* SCAPULA — shoulder blades */}
+      <path d="M33 36 Q38 44 44 48" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+      <path d="M67 36 Q62 44 56 48" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
+      <path d="M33 36 Q40 38 44 40" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
+      <path d="M67 36 Q60 38 56 40" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
+
+      {/* SPINE — vertebral column */}
+      <line x1="50" y1="26" x2="50" y2="68" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+      {/* Vertebra hints */}
+      {[32, 40, 48, 56, 64].map((y) => (
+        <line key={y} x1="48.5" y1={y} x2="51.5" y2={y} stroke={feature} strokeWidth="0.6" opacity="0.5" />
+      ))}
+
+      {/* LATISSIMUS contour */}
+      <path d="M30 48 Q34 56 38 62" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.5" />
+      <path d="M70 48 Q66 56 62 62" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.5" />
+
+      {/* SACRAL DIMPLES — lower back */}
+      <circle cx="46" cy="69" r="0.7" fill={feature} opacity="0.7" />
+      <circle cx="54" cy="69" r="0.7" fill={feature} opacity="0.7" />
+
+      {/* GLUTEAL CLEFT */}
+      <line x1="50" y1="72" x2="50" y2="82" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+      {/* Gluteal fold */}
+      <path d="M36 78 Q42 80 48 80" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
+      <path d="M64 78 Q58 80 52 80" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
+
+      {/* ARMS — back view, posterior deltoid → tricep → forearm */}
+      <path
+        d="M27 28 Q22 36 19 46 Q16 56 15 64 Q14 70 16 72 L21 72 Q22 70 22 64 Q23 56 25 46 Q27 36 30 30 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M73 28 Q78 36 81 46 Q84 56 85 64 Q86 70 84 72 L79 72 Q78 70 78 64 Q77 56 75 46 Q73 36 70 30 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+      {/* Tricep separation */}
+      <path d="M19 38 Q21 48 19 58" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
+      <path d="M81 38 Q79 48 81 58" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
+      {/* Wrist */}
+      <line x1="16" y1="69" x2="21" y2="69" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+      <line x1="79" y1="69" x2="84" y2="69" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+
+      {/* HANDS — palm side */}
+      <path d="M14 72 Q13 78 15 84 Q18 86 22 84 Q23 78 22 72 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
+      <path d="M86 72 Q87 78 85 84 Q82 86 78 84 Q77 78 78 72 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
+
+      {/* LEGS — back, hamstring → calf */}
+      <path
+        d="M36 82 Q34 96 35 110 Q36 122 38 128 L46 128 Q47 122 47 110 Q48 96 49 82 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+      <path
+        d="M64 82 Q66 96 65 110 Q64 122 62 128 L54 128 Q53 122 53 110 Q52 96 51 82 Z"
+        fill={FILL}
+        stroke={outline}
+        strokeWidth={STROKE_BODY}
+        strokeLinejoin="round"
+      />
+
+      {/* HAMSTRING separation */}
+      <path d="M42 88 Q43 96 42 102" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.45" />
+      <path d="M58 88 Q57 96 58 102" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.45" />
+
+      {/* POPLITEAL FOSSA — back of knee */}
+      <path d="M39 105 Q42 106 45 105" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" />
+      <path d="M55 105 Q58 106 61 105" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" />
+
+      {/* CALF muscle — gastrocnemius */}
+      <path d="M40 112 Q42 116 40 120" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
+      <path d="M44 112 Q42 116 44 120" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
+      <path d="M56 112 Q58 116 56 120" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
+      <path d="M60 112 Q58 116 60 120" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
     </svg>
   );
 }
