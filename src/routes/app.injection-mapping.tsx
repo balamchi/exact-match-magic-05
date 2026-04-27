@@ -522,7 +522,7 @@ function InjectionMappingPage() {
                 <div className="rounded-xl border border-dashed border-border p-5 text-center text-xs text-muted-foreground">
                   {clientFilter
                     ? "No injections recorded on this view for the selected session."
-                    : "Pick a client on the right to scope to one chart, or click any region to log a new dose."}
+                    : "Select a client from the right panel, or click any zone on the diagram to log a new injection."}
                 </div>
               ) : (
                 <div className="grid gap-1.5 md:grid-cols-2">
