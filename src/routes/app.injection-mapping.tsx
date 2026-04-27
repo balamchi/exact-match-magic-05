@@ -41,7 +41,8 @@ type Site = {
   updated_at: string;
 };
 
-type ViewKey = "front" | "left" | "right" | "body";
+type ViewKey = "front" | "left" | "right" | "body-front" | "body-back";
+type BodySide = "body-front" | "body-back";
 
 type RegionPoint = {
   key: string; // canonical region label stored in DB
