@@ -14,7 +14,6 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { useRealtimeTable } from "@/hooks/use-realtime-table";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
