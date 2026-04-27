@@ -85,12 +85,20 @@ const REGIONS: RegionPoint[] = [
   { key: "Masseter R", label: "Masseter", view: "right", x: 62, y: 64 },
 
   // BODY
-  { key: "Neck", label: "Neck", view: "body", x: 50, y: 18 },
-  { key: "Décolletage", label: "Décolletage", view: "body", x: 50, y: 32 },
-  { key: "Shoulder L", label: "Shoulder L", view: "body", x: 32, y: 32 },
-  { key: "Shoulder R", label: "Shoulder R", view: "body", x: 68, y: 32 },
-  { key: "Hand L", label: "Hand L", view: "body", x: 22, y: 70 },
-  { key: "Hand R", label: "Hand R", view: "body", x: 78, y: 70 },
+  { key: "Neck", label: "Neck", view: "body", x: 50, y: 19 },
+  { key: "Décolletage", label: "Décolletage", view: "body", x: 50, y: 30 },
+  { key: "Shoulder L", label: "Shoulder L", view: "body", x: 33, y: 32 },
+  { key: "Shoulder R", label: "Shoulder R", view: "body", x: 67, y: 32 },
+  { key: "Abdomen", label: "Abdomen", view: "body", x: 50, y: 60 },
+  { key: "Glutes", label: "Glutes", view: "body", x: 50, y: 78 },
+  { key: "Outer thigh L", label: "Outer thigh L", view: "body", x: 38, y: 88 },
+  { key: "Outer thigh R", label: "Outer thigh R", view: "body", x: 62, y: 88 },
+  { key: "Inner thigh L", label: "Inner thigh L", view: "body", x: 46, y: 92 },
+  { key: "Inner thigh R", label: "Inner thigh R", view: "body", x: 54, y: 92 },
+  { key: "Knee L", label: "Knee L", view: "body", x: 42, y: 108 },
+  { key: "Knee R", label: "Knee R", view: "body", x: 58, y: 108 },
+  { key: "Hand L", label: "Hand L", view: "body", x: 19, y: 80 },
+  { key: "Hand R", label: "Hand R", view: "body", x: 81, y: 80 },
 ];
 
 const PRODUCT_PRESETS = ["Botox", "Dysport", "Xeomin", "Juvederm", "Restylane", "Sculptra", "Radiesse", "Belotero"];
