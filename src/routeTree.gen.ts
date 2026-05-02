@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as ApiRouteImport } from './routes/api'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalSlugRouteImport } from './routes/portal.$slug'
 import { Route as LovableEmailRouteImport } from './routes/lovable.email'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email.unsubscribe'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
@@ -47,6 +48,7 @@ import { Route as AppInvoicesRouteImport } from './routes/app.invoices'
 import { Route as AppInventoryRouteImport } from './routes/app.inventory'
 import { Route as AppInjectionMappingRouteImport } from './routes/app.injection-mapping'
 import { Route as AppInboxRouteImport } from './routes/app.inbox'
+import { Route as AppHelpRouteImport } from './routes/app.help'
 import { Route as AppGiftcardsRouteImport } from './routes/app.giftcards'
 import { Route as AppEmailLogRouteImport } from './routes/app.email-log'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
@@ -72,6 +74,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable.email.queue.process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable.email.auth.webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable.email.auth.preview'
+import { Route as AppStaffHrStaffIdRouteImport } from './routes/app.staff.hr.$staffId'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -126,6 +129,11 @@ const ApiRoute = ApiRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalSlugRoute = PortalSlugRouteImport.update({
+  id: '/portal/$slug',
+  path: '/portal/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailRoute = LovableEmailRouteImport.update({
@@ -263,6 +271,11 @@ const AppInboxRoute = AppInboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHelpRoute = AppHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppGiftcardsRoute = AppGiftcardsRouteImport.update({
   id: '/giftcards',
   path: '/giftcards',
@@ -392,6 +405,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/preview',
   getParentRoute: () => LovableEmailAuthRoute,
 } as any)
+const AppStaffHrStaffIdRoute = AppStaffHrStaffIdRouteImport.update({
+  id: '/hr/$staffId',
+  path: '/hr/$staffId',
+  getParentRoute: () => AppStaffRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -418,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
   '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
@@ -435,7 +454,7 @@ export interface FileRoutesByFullPath {
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
-  '/app/staff': typeof AppStaffRoute
+  '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -445,6 +464,7 @@ export interface FileRoutesByFullPath {
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
+  '/portal/$slug': typeof PortalSlugRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -452,6 +472,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -483,6 +504,7 @@ export interface FileRoutesByTo {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
   '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
@@ -500,7 +522,7 @@ export interface FileRoutesByTo {
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
-  '/app/staff': typeof AppStaffRoute
+  '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -510,6 +532,7 @@ export interface FileRoutesByTo {
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
+  '/portal/$slug': typeof PortalSlugRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -517,6 +540,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -549,6 +573,7 @@ export interface FileRoutesById {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
   '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
@@ -566,7 +591,7 @@ export interface FileRoutesById {
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
-  '/app/staff': typeof AppStaffRoute
+  '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -576,6 +601,7 @@ export interface FileRoutesById {
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
+  '/portal/$slug': typeof PortalSlugRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -583,6 +609,7 @@ export interface FileRoutesById {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -616,6 +643,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/help'
     | '/app/inbox'
     | '/app/injection-mapping'
     | '/app/inventory'
@@ -643,6 +671,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/email/unsubscribe'
     | '/lovable/email'
+    | '/portal/$slug'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
@@ -650,6 +679,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -681,6 +711,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/help'
     | '/app/inbox'
     | '/app/injection-mapping'
     | '/app/inventory'
@@ -708,6 +739,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/email/unsubscribe'
     | '/lovable/email'
+    | '/portal/$slug'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
@@ -715,6 +747,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -746,6 +779,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/help'
     | '/app/inbox'
     | '/app/injection-mapping'
     | '/app/inventory'
@@ -773,6 +807,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/email/unsubscribe'
     | '/lovable/email'
+    | '/portal/$slug'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
@@ -780,6 +815,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -800,6 +836,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   BookSlugRoute: typeof BookSlugRoute
+  PortalSlugRoute: typeof PortalSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -879,6 +916,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/$slug': {
+      id: '/portal/$slug'
+      path: '/portal/$slug'
+      fullPath: '/portal/$slug'
+      preLoaderRoute: typeof PortalSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email': {
@@ -1070,6 +1114,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInboxRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/help': {
+      id: '/app/help'
+      path: '/help'
+      fullPath: '/app/help'
+      preLoaderRoute: typeof AppHelpRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/giftcards': {
       id: '/app/giftcards'
       path: '/giftcards'
@@ -1245,6 +1296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof LovableEmailAuthRoute
     }
+    '/app/staff/hr/$staffId': {
+      id: '/app/staff/hr/$staffId'
+      path: '/hr/$staffId'
+      fullPath: '/app/staff/hr/$staffId'
+      preLoaderRoute: typeof AppStaffHrStaffIdRouteImport
+      parentRoute: typeof AppStaffRoute
+    }
   }
 }
 
@@ -1294,6 +1352,18 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
   AppSettingsRouteChildren,
 )
 
+interface AppStaffRouteChildren {
+  AppStaffHrStaffIdRoute: typeof AppStaffHrStaffIdRoute
+}
+
+const AppStaffRouteChildren: AppStaffRouteChildren = {
+  AppStaffHrStaffIdRoute: AppStaffHrStaffIdRoute,
+}
+
+const AppStaffRouteWithChildren = AppStaffRoute._addFileChildren(
+  AppStaffRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAiRoute: typeof AppAiRoute
   AppAutomationsRoute: typeof AppAutomationsRoute
@@ -1307,6 +1377,7 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppEmailLogRoute: typeof AppEmailLogRoute
   AppGiftcardsRoute: typeof AppGiftcardsRoute
+  AppHelpRoute: typeof AppHelpRoute
   AppInboxRoute: typeof AppInboxRoute
   AppInjectionMappingRoute: typeof AppInjectionMappingRoute
   AppInventoryRoute: typeof AppInventoryRoute
@@ -1324,7 +1395,7 @@ interface AppRouteChildren {
   AppServicesRoute: typeof AppServicesRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppSoapNotesRoute: typeof AppSoapNotesRoute
-  AppStaffRoute: typeof AppStaffRoute
+  AppStaffRoute: typeof AppStaffRouteWithChildren
   AppTasksRoute: typeof AppTasksRoute
   AppTreatmentPlansRoute: typeof AppTreatmentPlansRoute
 }
@@ -1342,6 +1413,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppEmailLogRoute: AppEmailLogRoute,
   AppGiftcardsRoute: AppGiftcardsRoute,
+  AppHelpRoute: AppHelpRoute,
   AppInboxRoute: AppInboxRoute,
   AppInjectionMappingRoute: AppInjectionMappingRoute,
   AppInventoryRoute: AppInventoryRoute,
@@ -1359,7 +1431,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppServicesRoute: AppServicesRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
   AppSoapNotesRoute: AppSoapNotesRoute,
-  AppStaffRoute: AppStaffRoute,
+  AppStaffRoute: AppStaffRouteWithChildren,
   AppTasksRoute: AppTasksRoute,
   AppTreatmentPlansRoute: AppTreatmentPlansRoute,
 }
@@ -1475,6 +1547,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   BookSlugRoute: BookSlugRoute,
+  PortalSlugRoute: PortalSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
