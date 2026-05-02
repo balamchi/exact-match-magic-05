@@ -15,6 +15,17 @@ type Staff = Tables<"staff">;
 
 export const Route = createFileRoute("/book/$slug")({
   component: PublicBookingPage,
+  head: () => ({
+    meta: [
+      { title: "Book an Appointment — ClinicPro" },
+      {
+        name: "description",
+        content:
+          "Choose a service, pick your provider, and book your appointment online in seconds.",
+      },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 const STEPS = ["Service", "Provider", "Time", "Details", "Confirm"] as const;
