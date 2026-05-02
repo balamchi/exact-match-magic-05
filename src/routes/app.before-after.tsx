@@ -60,8 +60,8 @@ const photoSchema = z.object({
   client_name: z.string().trim().min(1, "Client name is required").max(160),
   treatment: z.string().trim().max(160).optional().or(z.literal("")),
   taken_on: z.string().min(1, "Date is required"),
-  before_url: z.string().trim().url("Invalid URL").max(500).optional().or(z.literal("")),
-  after_url: z.string().trim().url("Invalid URL").max(500).optional().or(z.literal("")),
+  before_url: z.string().trim().max(500).optional().or(z.literal("")),
+  after_url: z.string().trim().max(500).optional().or(z.literal("")),
   consent_given: z.boolean(),
   notes: z.string().trim().max(1000).optional().or(z.literal("")),
 });
