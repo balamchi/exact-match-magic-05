@@ -207,10 +207,12 @@ function ClientDetailPage() {
       ) : null}
 
       {/* Stats grid */}
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <StatTile icon={<Activity className="h-4 w-4" />} label="Total visits" value={stats.visits.toString()} />
-        <StatTile icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming.toString()} />
         <StatTile icon={<DollarSign className="h-4 w-4" />} label="Lifetime value" value={formatMoney(stats.lifetimeValueCents, currency)} />
+        <StatTile icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming.toString()} />
+        <StatTile icon={<Ban className="h-4 w-4" />} label="No-shows" value={`${noShows}${stats.visits > 0 ? ` (${Math.round(noShows / stats.visits * 100)}%)` : ""}`} />
+        <StatTile icon={<XCircle className="h-4 w-4" />} label="Cancellations" value={cancellations.toString()} />
         <StatTile icon={<Clock className="h-4 w-4" />} label="Last visit" value={stats.lastVisit ? new Date(stats.lastVisit).toLocaleDateString() : "—"} />
       </section>
 
