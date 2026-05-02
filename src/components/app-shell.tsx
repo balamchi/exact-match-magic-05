@@ -1,9 +1,10 @@
 import { ReactNode, useState } from "react";
+import { GlobalSearch } from "@/components/global-search";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
   Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare,
-  Search, Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
+  Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
   HeartPulse, UserCog, Menu, Languages,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
@@ -289,13 +290,8 @@ function Header({ onMenu }: { onMenu: () => void }) {
         <Menu className="h-5 w-5" />
       </Button>
 
-      <div className="relative max-w-md flex-1">
-        <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search clients, appointments…"
-          className="h-10 w-full rounded-lg border border-input bg-surface ps-9 pe-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30"
-        />
+      <div className="max-w-md flex-1">
+        <GlobalSearch />
       </div>
 
       <DropdownMenu>
