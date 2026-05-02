@@ -337,14 +337,22 @@ function WhatsAppPage() {
           </div>
 
           <div className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-card">
-            <h2 className="font-display text-xl font-semibold">Broadcast History</h2>
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                <Clock className="h-6 w-6" />
+            <h2 className="font-display text-xl font-semibold">Quick Send (Test)</h2>
+            <p className="text-sm text-muted-foreground">Send a single WhatsApp/SMS message via Twilio to test your connection.</p>
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Phone Number</label>
+                <Input value={testPhone} onChange={(e) => setTestPhone(e.target.value)} placeholder="+1 555 000 0000" />
               </div>
-              <h3 className="font-medium">No broadcasts yet</h3>
-              <p className="mt-1 max-w-xs text-xs text-muted-foreground">
-                Your broadcast history will appear here once you send your first WhatsApp campaign.
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Message</label>
+                <Textarea value={testMessage} onChange={(e) => setTestMessage(e.target.value)} rows={3} placeholder="Hi! This is a test from ClinicPro." />
+              </div>
+              <Button onClick={sendTestMessage} disabled={sending} className="w-full gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+                <Send className="h-4 w-4" /> {sending ? "Sending…" : "Send Test Message"}
+              </Button>
+            </div>
+          </div>
               </p>
             </div>
           </div>
