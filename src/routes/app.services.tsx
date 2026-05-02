@@ -18,6 +18,8 @@ interface ServiceForm {
   duration_minutes: string;
   price_cents: string;
   active: boolean;
+  deposit_required: boolean;
+  deposit_cents: string;
 }
 
 const emptyForm: ServiceForm = {
@@ -26,6 +28,8 @@ const emptyForm: ServiceForm = {
   duration_minutes: "60",
   price_cents: "0",
   active: true,
+  deposit_required: false,
+  deposit_cents: "0",
 };
 
 const formSchema = z.object({
@@ -119,6 +123,8 @@ function ServicesPage() {
       duration_minutes: String(service.duration_minutes),
       price_cents: String((service.price_cents ?? 0) / 100),
       active: service.active,
+      deposit_required: (service as any).deposit_required ?? false,
+      deposit_cents: String(((service as any).deposit_cents ?? 0) / 100),
     });
     setOpen(true);
   };
@@ -139,6 +145,8 @@ function ServicesPage() {
       duration_minutes: parsed.data.duration_minutes,
       price_cents: Math.round(parsed.data.price_cents * 100),
       active: parsed.data.active,
+      deposit_required: form.deposit_required,
+      deposit_cents: Math.round(Number(form.deposit_cents || 0) * 100),
     };
     const result = editing
       ? await supabase.from("services").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id)
