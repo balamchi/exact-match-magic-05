@@ -53,13 +53,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const handleSeed = async () => {
     setSeeding(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        toast.error("Please sign in again.");
-        setSeeding(false);
-        return;
-      }
-      const result = await seedClinicDefaults({ data: { accessToken: session.access_token } });
+      const result = await seedClinicDefaults();
       if (result.seeded) {
         toast.success(
           `Loaded ${result.summary.services} services, ${result.summary.consentForms} consent forms, ${result.summary.automations} automations, and ${result.summary.memberships} memberships!`
