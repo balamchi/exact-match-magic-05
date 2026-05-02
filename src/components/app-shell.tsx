@@ -1,4 +1,5 @@
 import { ReactNode, useState } from "react";
+import { GlobalSearch } from "@/components/global-search";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
