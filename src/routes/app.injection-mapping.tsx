@@ -492,6 +492,15 @@ function InjectionMappingPage() {
               </div>
             </div>
 
+            {/* View label */}
+            {(view === "body-front" || view === "body-back") && (
+              <div className="px-4 pb-1 pt-2 text-center">
+                <span className="text-[11px] font-medium tracking-wide text-muted-foreground/70">
+                  {view === "body-front" ? "Front view — anterior anatomy" : "Back view — posterior anatomy"}
+                </span>
+              </div>
+            )}
+
             {/* Stage */}
             <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-b-2xl bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.05),transparent_65%)]">
               {/* Stylized silhouette — perfectly centered, scaled larger for easier interaction */}
