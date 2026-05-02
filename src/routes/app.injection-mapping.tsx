@@ -1151,8 +1151,8 @@ function BodyFront({ fillTop, fillBottom, outline, feature, gradId }: BodyProps)
  */
 function BodyBack({ fillTop, fillBottom, outline, feature, gradId }: BodyProps) {
   const FILL = `url(#${gradId})`;
-  const STROKE_BODY = 1.5;
-  const STROKE_DETAIL = 1;
+  const S = 1.5;
+  const D = 1;
   return (
     <svg viewBox="0 0 100 130" className="absolute inset-0 h-full w-full" aria-hidden="true">
       <defs>
@@ -1162,116 +1162,110 @@ function BodyBack({ fillTop, fillBottom, outline, feature, gradId }: BodyProps) 
         </linearGradient>
       </defs>
 
-      {/* HEAD — back of skull, no features */}
-      <ellipse cx="50" cy="11" rx="6.5" ry="8.5" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} />
+      {/* HEAD — back of skull, NO chin line, hair whorl hint */}
+      <ellipse cx="50" cy="11" rx="6.5" ry="8.5" fill={FILL} stroke={outline} strokeWidth={S} />
+      {/* Occipital ridge — identifies rear view */}
+      <path d="M45 6 Q50 4 55 6" stroke={feature} strokeWidth="0.6" fill="none" opacity="0.5" />
 
-      {/* NECK */}
-      <path d="M45.5 19 Q50 21 54.5 19 L55.5 25 Q50 26.5 44.5 25 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
+      {/* NECK — wider at base, showing nape */}
+      <path d="M45.5 19 Q50 21 54.5 19 L56 25 Q50 26.5 44 25 Z" fill={FILL} stroke={outline} strokeWidth={S} strokeLinejoin="round" />
+      {/* Posterior neck midline */}
+      <line x1="50" y1="19" x2="50" y2="25" stroke={feature} strokeWidth="0.6" opacity="0.5" />
 
-      {/* BACK TORSO — same outline as front but with posterior musculature */}
+      {/* BACK TORSO */}
       <path
         d="M28 28 Q38 25 50 25.5 Q62 25 72 28
-           Q74 30 75 34
-           Q73 42 72 50
-           Q70 60 68 68
-           Q66 74 64 78
-           Q60 82 50 82
-           Q40 82 36 78
-           Q34 74 32 68
-           Q30 60 28 50
-           Q27 42 25 34
-           Q26 30 28 28 Z"
-        fill={FILL}
-        stroke={outline}
-        strokeWidth={STROKE_BODY}
-        strokeLinejoin="round"
+           Q74 30 75 34 Q73 42 72 50 Q70 60 68 68
+           Q66 74 64 78 Q60 82 50 82 Q40 82 36 78
+           Q34 74 32 68 Q30 60 28 50 Q27 42 25 34 Q26 30 28 28 Z"
+        fill={FILL} stroke={outline} strokeWidth={S} strokeLinejoin="round"
       />
 
-      {/* TRAPEZIUS — diamond from neck to shoulders */}
-      <path d="M50 25 L36 30 Q34 36 38 40 L50 38 L62 40 Q66 36 64 30 Z" fill="none" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinejoin="round" opacity="0.85" />
+      {/* TRAPEZIUS — two angled lines from neck spreading to shoulders (key back identifier) */}
+      <path d="M50 25 L34 32" stroke={feature} strokeWidth={D} fill="none" strokeLinecap="round" />
+      <path d="M50 25 L66 32" stroke={feature} strokeWidth={D} fill="none" strokeLinecap="round" />
+      {/* Lower trapezius to mid-back */}
+      <path d="M34 32 Q40 36 50 38" stroke={feature} strokeWidth="0.7" fill="none" opacity="0.6" />
+      <path d="M66 32 Q60 36 50 38" stroke={feature} strokeWidth="0.7" fill="none" opacity="0.6" />
 
-      {/* SCAPULA — shoulder blades */}
-      <path d="M33 36 Q38 44 44 48" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
-      <path d="M67 36 Q62 44 56 48" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" strokeLinecap="round" />
-      <path d="M33 36 Q40 38 44 40" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
-      <path d="M67 36 Q60 38 56 40" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
-
-      {/* SPINE — vertebral column */}
-      <line x1="50" y1="26" x2="50" y2="68" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
-      {/* Vertebra hints */}
-      {[32, 40, 48, 56, 64].map((y) => (
-        <line key={y} x1="48.5" y1={y} x2="51.5" y2={y} stroke={feature} strokeWidth="0.6" opacity="0.5" />
+      {/* SPINE — CONTINUOUS vertical line from neck to lower back (key back identifier) */}
+      <line x1="50" y1="25" x2="50" y2="70" stroke={feature} strokeWidth={D} strokeLinecap="round" />
+      {/* Vertebra cross-marks */}
+      {[30, 36, 42, 48, 54, 60, 66].map((y) => (
+        <line key={y} x1="48.5" y1={y} x2="51.5" y2={y} stroke={feature} strokeWidth="0.5" opacity="0.45" />
       ))}
 
-      {/* LATISSIMUS contour */}
-      <path d="M30 48 Q34 56 38 62" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.5" />
-      <path d="M70 48 Q66 56 62 62" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.5" />
+      {/* SCAPULAE — shoulder blades (curved triangular shapes) */}
+      <path d="M35 34 Q38 42 44 46 L44 38 Z" fill="none" stroke={feature} strokeWidth={D} strokeLinejoin="round" opacity="0.7" />
+      <path d="M65 34 Q62 42 56 46 L56 38 Z" fill="none" stroke={feature} strokeWidth={D} strokeLinejoin="round" opacity="0.7" />
 
-      {/* SACRAL DIMPLES — lower back */}
-      <circle cx="46" cy="69" r="0.7" fill={feature} opacity="0.7" />
-      <circle cx="54" cy="69" r="0.7" fill={feature} opacity="0.7" />
+      {/* LATISSIMUS contour */}
+      <path d="M30 46 Q34 54 38 60" stroke={feature} strokeWidth={D} fill="none" opacity="0.4" />
+      <path d="M70 46 Q66 54 62 60" stroke={feature} strokeWidth={D} fill="none" opacity="0.4" />
+
+      {/* SACRAL DIMPLES — small marks above glutes (key back identifier) */}
+      <circle cx="46" cy="70" r="1" fill="none" stroke={feature} strokeWidth="0.7" opacity="0.7" />
+      <circle cx="54" cy="70" r="1" fill="none" stroke={feature} strokeWidth="0.7" opacity="0.7" />
 
       {/* GLUTEAL CLEFT */}
-      <line x1="50" y1="72" x2="50" y2="82" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
-      {/* Gluteal fold */}
-      <path d="M36 78 Q42 80 48 80" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
-      <path d="M64 78 Q58 80 52 80" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.7" />
+      <line x1="50" y1="72" x2="50" y2="82" stroke={feature} strokeWidth={D} strokeLinecap="round" />
+      {/* GLUTEAL CURVES — rounded shape (key back identifier) */}
+      <path d="M38 74 Q42 80 49 80" stroke={feature} strokeWidth={D} fill="none" strokeLinecap="round" />
+      <path d="M62 74 Q58 80 51 80" stroke={feature} strokeWidth={D} fill="none" strokeLinecap="round" />
+      {/* Upper glute contour */}
+      <path d="M36 72 Q42 74 48 72" stroke={feature} strokeWidth="0.7" fill="none" opacity="0.5" />
+      <path d="M64 72 Q58 74 52 72" stroke={feature} strokeWidth="0.7" fill="none" opacity="0.5" />
 
-      {/* ARMS — back view, posterior deltoid → tricep → forearm */}
+      {/* DELTOID contours */}
+      <path d="M28 28 Q26 34 28 40" stroke={feature} strokeWidth={D} fill="none" />
+      <path d="M72 28 Q74 34 72 40" stroke={feature} strokeWidth={D} fill="none" />
+
+      {/* ARMS — back view with knuckle-facing hands */}
       <path
         d="M27 28 Q22 36 19 46 Q16 56 15 64 Q14 70 16 72 L21 72 Q22 70 22 64 Q23 56 25 46 Q27 36 30 30 Z"
-        fill={FILL}
-        stroke={outline}
-        strokeWidth={STROKE_BODY}
-        strokeLinejoin="round"
+        fill={FILL} stroke={outline} strokeWidth={S} strokeLinejoin="round"
       />
       <path
         d="M73 28 Q78 36 81 46 Q84 56 85 64 Q86 70 84 72 L79 72 Q78 70 78 64 Q77 56 75 46 Q73 36 70 30 Z"
-        fill={FILL}
-        stroke={outline}
-        strokeWidth={STROKE_BODY}
-        strokeLinejoin="round"
+        fill={FILL} stroke={outline} strokeWidth={S} strokeLinejoin="round"
       />
       {/* Tricep separation */}
-      <path d="M19 38 Q21 48 19 58" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
-      <path d="M81 38 Q79 48 81 58" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
+      <path d="M19 38 Q21 48 19 58" stroke={feature} strokeWidth={D} fill="none" opacity="0.5" />
+      <path d="M81 38 Q79 48 81 58" stroke={feature} strokeWidth={D} fill="none" opacity="0.5" />
       {/* Wrist */}
-      <line x1="16" y1="69" x2="21" y2="69" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
-      <line x1="79" y1="69" x2="84" y2="69" stroke={feature} strokeWidth={STROKE_DETAIL} strokeLinecap="round" />
+      <line x1="16" y1="69" x2="21" y2="69" stroke={feature} strokeWidth={D} strokeLinecap="round" />
+      <line x1="79" y1="69" x2="84" y2="69" stroke={feature} strokeWidth={D} strokeLinecap="round" />
 
-      {/* HANDS — palm side */}
-      <path d="M14 72 Q13 78 15 84 Q18 86 22 84 Q23 78 22 72 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
-      <path d="M86 72 Q87 78 85 84 Q82 86 78 84 Q77 78 78 72 Z" fill={FILL} stroke={outline} strokeWidth={STROKE_BODY} strokeLinejoin="round" />
+      {/* HANDS — knuckles facing viewer */}
+      <path d="M14 72 Q13 78 15 84 Q18 86 22 84 Q23 78 22 72 Z" fill={FILL} stroke={outline} strokeWidth={S} strokeLinejoin="round" />
+      <path d="M86 72 Q87 78 85 84 Q82 86 78 84 Q77 78 78 72 Z" fill={FILL} stroke={outline} strokeWidth={S} strokeLinejoin="round" />
+      {/* Knuckle lines */}
+      <path d="M15 78 L21 78" stroke={feature} strokeWidth="0.6" opacity="0.5" />
+      <path d="M79 78 L85 78" stroke={feature} strokeWidth="0.6" opacity="0.5" />
 
-      {/* LEGS — back, hamstring → calf */}
+      {/* LEGS — posterior with hamstrings */}
       <path
         d="M36 82 Q34 96 35 110 Q36 122 38 128 L46 128 Q47 122 47 110 Q48 96 49 82 Z"
-        fill={FILL}
-        stroke={outline}
-        strokeWidth={STROKE_BODY}
-        strokeLinejoin="round"
+        fill={FILL} stroke={outline} strokeWidth={S} strokeLinejoin="round"
       />
       <path
         d="M64 82 Q66 96 65 110 Q64 122 62 128 L54 128 Q53 122 53 110 Q52 96 51 82 Z"
-        fill={FILL}
-        stroke={outline}
-        strokeWidth={STROKE_BODY}
-        strokeLinejoin="round"
+        fill={FILL} stroke={outline} strokeWidth={S} strokeLinejoin="round"
       />
 
-      {/* HAMSTRING separation */}
-      <path d="M42 88 Q43 96 42 102" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.45" />
-      <path d="M58 88 Q57 96 58 102" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.45" />
+      {/* HAMSTRING separation lines */}
+      <path d="M42 86 Q43 94 42 102" stroke={feature} strokeWidth={D} fill="none" opacity="0.4" />
+      <path d="M58 86 Q57 94 58 102" stroke={feature} strokeWidth={D} fill="none" opacity="0.4" />
 
       {/* POPLITEAL FOSSA — back of knee */}
-      <path d="M39 105 Q42 106 45 105" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" />
-      <path d="M55 105 Q58 106 61 105" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" />
+      <path d="M39 105 Q42 107 45 105" stroke={feature} strokeWidth={D} fill="none" />
+      <path d="M55 105 Q58 107 61 105" stroke={feature} strokeWidth={D} fill="none" />
 
-      {/* CALF muscle — gastrocnemius */}
-      <path d="M40 112 Q42 116 40 120" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
-      <path d="M44 112 Q42 116 44 120" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
-      <path d="M56 112 Q58 116 56 120" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
-      <path d="M60 112 Q58 116 60 120" stroke={feature} strokeWidth={STROKE_DETAIL} fill="none" opacity="0.6" />
+      {/* CALF — gastrocnemius diamond */}
+      <path d="M40 110 Q42 116 40 122" stroke={feature} strokeWidth={D} fill="none" opacity="0.5" />
+      <path d="M44 110 Q42 116 44 122" stroke={feature} strokeWidth={D} fill="none" opacity="0.5" />
+      <path d="M56 110 Q58 116 56 122" stroke={feature} strokeWidth={D} fill="none" opacity="0.5" />
+      <path d="M60 110 Q58 116 60 122" stroke={feature} strokeWidth={D} fill="none" opacity="0.5" />
     </svg>
   );
 }
