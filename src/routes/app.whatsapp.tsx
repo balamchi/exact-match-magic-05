@@ -60,6 +60,29 @@ function WhatsAppPage() {
   const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
   const [activeTab, setActiveTab] = useState<"setup" | "templates" | "broadcast">("setup");
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
+  const [testPhone, setTestPhone] = useState("");
+  const [testMessage, setTestMessage] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const sendTestMessage = async () => {
+    if (!testPhone.trim() || !testMessage.trim()) {
+      toast.error("Enter a phone number and message");
+      return;
+    }
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-sms", {
+        body: { to: testPhone, body: testMessage, channel: "whatsapp" },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Message sent!", { description: `SID: ${data.sid}` });
+      setTestMessage("");
+    } catch (e: any) {
+      toast.error(e.message || "Failed to send message");
+    }
+    setSending(false);
+  };
 
   const tabs = [
     { id: "setup" as const, label: "Setup & Connection", icon: Settings },
