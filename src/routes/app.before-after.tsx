@@ -245,6 +245,20 @@ function BeforeAfterPage() {
     else toast.success("Photo set deleted");
   };
 
+  const handleFileUpload = async (file: File | undefined, type: "before" | "after") => {
+    if (!file || !clinicId) return;
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+    const path = `${clinicId}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("clinic-photos").upload(path, file, { upsert: true });
+    if (error) {
+      toast.error(`Upload failed: ${error.message}`);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("clinic-photos").getPublicUrl(path);
+    setForm((prev) => ({ ...prev, [`${type}_url`]: urlData.publicUrl }));
+    toast.success(`${type === "before" ? "Before" : "After"} image uploaded`);
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
