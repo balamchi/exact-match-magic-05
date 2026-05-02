@@ -63,6 +63,8 @@ function PosPage() {
   const [staffName, setStaffName] = useState("");
   const [notes, setNotes] = useState("");
   const [processing, setProcessing] = useState<null | "card" | "tap" | "cash" | "bnpl">(null);
+  const [depositMode, setDepositMode] = useState(false);
+  const [depositPercent, setDepositPercent] = useState(50);
   const [todayCents, setTodayCents] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
 
