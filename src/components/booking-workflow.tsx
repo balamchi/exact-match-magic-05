@@ -148,6 +148,9 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
       status: appointment.status,
       price: String((appointment.price_cents ?? 0) / 100),
       notes: appointment.notes ?? "",
+      collect_deposit: false,
+      deposit_amount: "0",
+      deposit_method: "card",
     });
     setOpen(true);
   };
@@ -157,7 +160,17 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
     const start = form.starts_at ? new Date(form.starts_at) : new Date();
     const duration = service?.duration_minutes ?? 60;
     const end = new Date(start.getTime() + duration * 60000);
-    setForm({ ...form, service_id: serviceId, price: String((service?.price_cents ?? 0) / 100), ends_at: toDatetimeLocal(end) });
+    const depositRequired = (service as any)?.deposit_required ?? false;
+    const depositCents = (service as any)?.deposit_cents ?? 0;
+    setForm({
+      ...form,
+      service_id: serviceId,
+      price: String((service?.price_cents ?? 0) / 100),
+      ends_at: toDatetimeLocal(end),
+      collect_deposit: depositRequired,
+      deposit_amount: String(depositCents / 100),
+      deposit_method: form.deposit_method,
+    });
   };
 
   const updateStart = (startsAt: string) => {
