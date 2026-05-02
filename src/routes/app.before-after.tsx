@@ -500,34 +500,34 @@ function BeforeAfterPage() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="before">Before image URL</Label>
-                  <Input
-                    id="before"
-                    value={form.before_url}
-                    onChange={(e) => setForm({ ...form, before_url: e.target.value })}
-                    placeholder="https://…"
-                    maxLength={500}
-                  />
+                  <Label htmlFor="before">Before image</Label>
                   {form.before_url && (
                     <div className="overflow-hidden rounded-lg border border-border/60">
                       <img src={form.before_url} alt="Before preview" className="h-32 w-full object-cover" />
                     </div>
                   )}
+                  <input
+                    id="before"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload(e.target.files?.[0], "before")}
+                    className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-primary hover:file:bg-primary/20"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="after">After image URL</Label>
-                  <Input
-                    id="after"
-                    value={form.after_url}
-                    onChange={(e) => setForm({ ...form, after_url: e.target.value })}
-                    placeholder="https://…"
-                    maxLength={500}
-                  />
+                  <Label htmlFor="after">After image</Label>
                   {form.after_url && (
                     <div className="overflow-hidden rounded-lg border border-border/60">
                       <img src={form.after_url} alt="After preview" className="h-32 w-full object-cover" />
                     </div>
                   )}
+                  <input
+                    id="after"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload(e.target.files?.[0], "after")}
+                    className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-primary hover:file:bg-primary/20"
+                  />
                 </div>
               </div>
 
