@@ -72,6 +72,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable.email.queue.process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable.email.auth.webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable.email.auth.preview'
+import { Route as AppStaffHrStaffIdRouteImport } from './routes/app.staff.hr.$staffId'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -392,6 +393,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/preview',
   getParentRoute: () => LovableEmailAuthRoute,
 } as any)
+const AppStaffHrStaffIdRoute = AppStaffHrStaffIdRouteImport.update({
+  id: '/hr/$staffId',
+  path: '/hr/$staffId',
+  getParentRoute: () => AppStaffRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -435,7 +441,7 @@ export interface FileRoutesByFullPath {
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
-  '/app/staff': typeof AppStaffRoute
+  '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -452,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -500,7 +507,7 @@ export interface FileRoutesByTo {
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
-  '/app/staff': typeof AppStaffRoute
+  '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -517,6 +524,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -566,7 +574,7 @@ export interface FileRoutesById {
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
-  '/app/staff': typeof AppStaffRoute
+  '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -583,6 +591,7 @@ export interface FileRoutesById {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -650,6 +659,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -715,6 +725,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -780,6 +791,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1245,6 +1257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof LovableEmailAuthRoute
     }
+    '/app/staff/hr/$staffId': {
+      id: '/app/staff/hr/$staffId'
+      path: '/hr/$staffId'
+      fullPath: '/app/staff/hr/$staffId'
+      preLoaderRoute: typeof AppStaffHrStaffIdRouteImport
+      parentRoute: typeof AppStaffRoute
+    }
   }
 }
 
@@ -1294,6 +1313,18 @@ const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
   AppSettingsRouteChildren,
 )
 
+interface AppStaffRouteChildren {
+  AppStaffHrStaffIdRoute: typeof AppStaffHrStaffIdRoute
+}
+
+const AppStaffRouteChildren: AppStaffRouteChildren = {
+  AppStaffHrStaffIdRoute: AppStaffHrStaffIdRoute,
+}
+
+const AppStaffRouteWithChildren = AppStaffRoute._addFileChildren(
+  AppStaffRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAiRoute: typeof AppAiRoute
   AppAutomationsRoute: typeof AppAutomationsRoute
@@ -1324,7 +1355,7 @@ interface AppRouteChildren {
   AppServicesRoute: typeof AppServicesRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppSoapNotesRoute: typeof AppSoapNotesRoute
-  AppStaffRoute: typeof AppStaffRoute
+  AppStaffRoute: typeof AppStaffRouteWithChildren
   AppTasksRoute: typeof AppTasksRoute
   AppTreatmentPlansRoute: typeof AppTreatmentPlansRoute
 }
@@ -1359,7 +1390,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppServicesRoute: AppServicesRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
   AppSoapNotesRoute: AppSoapNotesRoute,
-  AppStaffRoute: AppStaffRoute,
+  AppStaffRoute: AppStaffRouteWithChildren,
   AppTasksRoute: AppTasksRoute,
   AppTreatmentPlansRoute: AppTreatmentPlansRoute,
 }
