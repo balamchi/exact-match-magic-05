@@ -187,6 +187,7 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
     if (new Date(form.ends_at).getTime() <= new Date(form.starts_at).getTime()) return toast.error("End time must be after start time");
     setSaving(true);
 
+    const depositStatus = form.collect_deposit ? "pending" : null;
     const payload = {
       clinic_id: activeClinic.clinic_id,
       client_id: form.client_id || null,
@@ -197,17 +198,40 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
       status: form.status,
       price_cents: Math.round(Number(form.price || 0) * 100),
       notes: form.notes.trim() || null,
+      deposit_status: depositStatus,
     };
 
-    const result = editing
-      ? await supabase.from("appointments").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id)
-      : await supabase.from("appointments").insert(payload);
-
-    if (result.error) toast.error(result.error.message);
-    else {
-      toast.success(editing ? "Appointment updated" : "Appointment booked");
-      setOpen(false);
-      await loadAll();
+    if (editing) {
+      const result = await supabase.from("appointments").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id);
+      if (result.error) toast.error(result.error.message);
+      else {
+        toast.success("Appointment updated");
+        setOpen(false);
+        await loadAll();
+      }
+    } else {
+      const result = await supabase.from("appointments").insert(payload).select().single();
+      if (result.error) {
+        toast.error(result.error.message);
+      } else {
+        // Create deposit record if needed
+        if (form.collect_deposit && result.data) {
+          const depositCents = Math.round(Number(form.deposit_amount || 0) * 100);
+          if (depositCents > 0) {
+            await supabase.from("deposits").insert({
+              clinic_id: activeClinic.clinic_id,
+              appointment_id: result.data.id,
+              client_id: form.client_id || null,
+              amount_cents: depositCents,
+              method: form.deposit_method,
+              status: "pending",
+            });
+          }
+        }
+        toast.success("Appointment booked" + (form.collect_deposit ? " — deposit pending" : ""));
+        setOpen(false);
+        await loadAll();
+      }
     }
     setSaving(false);
   };
