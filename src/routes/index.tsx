@@ -19,6 +19,30 @@ import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/")({
   component: Landing,
+  head: () => ({
+    meta: [
+      { title: "ClinicPro — All-in-One Clinic Management Software" },
+      {
+        name: "description",
+        content:
+          "ClinicPro replaces 8–12 separate tools with a single dark-themed platform for medical aesthetic, dental, and beauty clinics. Booking, CRM, consent, payments & more.",
+      },
+      { property: "og:title", content: "ClinicPro — All-in-One Clinic Management Software" },
+      {
+        property: "og:description",
+        content:
+          "One luxurious dashboard for booking, CRM, consent forms, payments, inventory, and marketing. Built for modern clinics.",
+      },
+      { property: "og:url", content: "https://clinicpro.io" },
+      { name: "twitter:title", content: "ClinicPro — All-in-One Clinic Management Software" },
+      {
+        name: "twitter:description",
+        content:
+          "One luxurious dashboard for booking, CRM, consent forms, payments, inventory, and marketing. Built for modern clinics.",
+      },
+    ],
+    links: [{ rel: "canonical", href: "https://clinicpro.io" }],
+  }),
 });
 
 /* ------------------------------ Brand mark ------------------------------ */
