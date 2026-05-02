@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as ApiRouteImport } from './routes/api'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalSlugRouteImport } from './routes/portal.$slug'
 import { Route as LovableEmailRouteImport } from './routes/lovable.email'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email.unsubscribe'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
@@ -127,6 +128,11 @@ const ApiRoute = ApiRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalSlugRoute = PortalSlugRouteImport.update({
+  id: '/portal/$slug',
+  path: '/portal/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailRoute = LovableEmailRouteImport.update({
@@ -451,6 +457,7 @@ export interface FileRoutesByFullPath {
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
+  '/portal/$slug': typeof PortalSlugRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -517,6 +524,7 @@ export interface FileRoutesByTo {
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
+  '/portal/$slug': typeof PortalSlugRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -584,6 +592,7 @@ export interface FileRoutesById {
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
+  '/portal/$slug': typeof PortalSlugRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -652,6 +661,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/email/unsubscribe'
     | '/lovable/email'
+    | '/portal/$slug'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
@@ -718,6 +728,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/email/unsubscribe'
     | '/lovable/email'
+    | '/portal/$slug'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
@@ -784,6 +795,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/email/unsubscribe'
     | '/lovable/email'
+    | '/portal/$slug'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
@@ -812,6 +824,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   BookSlugRoute: typeof BookSlugRoute
+  PortalSlugRoute: typeof PortalSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -891,6 +904,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/$slug': {
+      id: '/portal/$slug'
+      path: '/portal/$slug'
+      fullPath: '/portal/$slug'
+      preLoaderRoute: typeof PortalSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email': {
@@ -1506,6 +1526,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   BookSlugRoute: BookSlugRoute,
+  PortalSlugRoute: PortalSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
