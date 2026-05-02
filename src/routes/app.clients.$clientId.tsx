@@ -128,11 +128,18 @@ function ClientDetailPage() {
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Client profile</p>
-              <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight">{fullName}</h1>
+              <h1 className="mt-1 flex items-center gap-2 font-display text-3xl font-semibold tracking-tight">
+                {fullName}
+                {clientAny.vip_status && <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-400"><Crown className="h-3 w-3" />VIP</span>}
+              </h1>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                {age != null && <span>{age} yo</span>}
+                {clientAny.pronouns && <span>· {clientAny.pronouns}</span>}
+                {clientAny.city && <span>· {clientAny.city}</span>}
+              </div>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 {client.email && <span className="inline-flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> {client.email}</span>}
                 {client.phone && <span className="inline-flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {client.phone}</span>}
-                {client.date_of_birth && <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" /> {new Date(client.date_of_birth).toLocaleDateString()}</span>}
               </div>
             </div>
           </div>
