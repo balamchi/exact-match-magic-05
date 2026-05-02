@@ -284,6 +284,30 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
 function Header({ onMenu }: { onMenu: () => void }) {
   const { locale, setLocale } = useLocale();
   const current = LOCALES.find((l) => l.code === locale);
+  const { activeClinic } = useAuth();
+  const [locations, setLocations] = useState<{ id: string; name: string; active: boolean }[]>([]);
+  const [activeLocationId, setActiveLocationId] = useState<string | null>(null);
+
+  // Load locations for the switcher
+  useState(() => {
+    if (!activeClinic?.clinic_id) return;
+    import("@/integrations/supabase/client").then(({ supabase }) => {
+      supabase
+        .from("locations")
+        .select("id,name,active")
+        .eq("clinic_id", activeClinic.clinic_id)
+        .eq("active", true)
+        .order("name")
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            setLocations(data);
+            setActiveLocationId(data[0].id);
+          }
+        });
+    });
+  });
+
+  const activeLocation = locations.find((l) => l.id === activeLocationId);
 
   return (
     <header className="flex h-16 items-center gap-2 border-b border-border bg-background/80 px-4 backdrop-blur sm:gap-3 sm:px-6">
@@ -300,6 +324,31 @@ function Header({ onMenu }: { onMenu: () => void }) {
       <div className="max-w-md flex-1">
         <GlobalSearch />
       </div>
+
+      {/* Location Switcher */}
+      {locations.length > 1 && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="hidden gap-1.5 text-xs sm:inline-flex">
+              <MapPin className="h-3.5 w-3.5 text-primary" />
+              <span className="max-w-[100px] truncate">{activeLocation?.name ?? "All"}</span>
+              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Location
+            </DropdownMenuLabel>
+            {locations.map((loc) => (
+              <DropdownMenuItem key={loc.id} onClick={() => setActiveLocationId(loc.id)}>
+                <MapPin className="me-2 h-3.5 w-3.5" />
+                {loc.name}
+                {loc.id === activeLocationId && <span className="ms-auto text-primary">✓</span>}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
