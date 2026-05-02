@@ -65,6 +65,7 @@ const NAV: NavGroup[] = [
     section: "Growth",
     items: [
       { to: "/app/inbox", label: "Inbox", icon: Inbox, badge: { kind: "count", value: 12 } },
+      { to: "/app/whatsapp", label: "WhatsApp", icon: Phone, badge: { kind: "pill", label: "NEW", tone: "new" } },
       { to: "/app/marketing", label: "Campaigns", icon: Send },
       { to: "/app/automations", label: "Automations", icon: Zap, badge: { kind: "count", value: 43 } },
       { to: "/app/reviews", label: "Reviews", icon: Star },
