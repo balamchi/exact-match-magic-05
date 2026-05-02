@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles,
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
-  AlertTriangle, Pill, ShieldAlert,
+  AlertTriangle, Pill, ShieldAlert, Crown, Ban, XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
