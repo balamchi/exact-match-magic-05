@@ -289,7 +289,7 @@ function Header({ onMenu }: { onMenu: () => void }) {
   const [activeLocationId, setActiveLocationId] = useState<string | null>(null);
 
   // Load locations for the switcher
-  useState(() => {
+  useEffect(() => {
     if (!activeClinic?.clinic_id) return;
     import("@/integrations/supabase/client").then(({ supabase }) => {
       supabase
@@ -305,7 +305,7 @@ function Header({ onMenu }: { onMenu: () => void }) {
           }
         });
     });
-  });
+  }, [activeClinic?.clinic_id]);
 
   const activeLocation = locations.find((l) => l.id === activeLocationId);
 
