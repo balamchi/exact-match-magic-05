@@ -412,7 +412,49 @@ function PosPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-gradient-to-br from-surface to-background p-5">
+          {/* Deposit toggle */}
+          <div className="rounded-xl border border-border bg-surface p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  Deposit / Partial Payment
+                </h2>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">Collect a deposit now, charge the rest at appointment</p>
+              </div>
+              <button
+                onClick={() => setDepositMode(!depositMode)}
+                className={[
+                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                  depositMode ? "bg-primary" : "bg-muted",
+                ].join(" ")}
+              >
+                <span className={[
+                  "inline-block h-4 w-4 rounded-full bg-white transition-transform",
+                  depositMode ? "translate-x-6" : "translate-x-1",
+                ].join(" ")} />
+              </button>
+            </div>
+            {depositMode && (
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                {[25, 50, 75, 100].map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setDepositPercent(p)}
+                    className={[
+                      "rounded-lg border px-2 py-2 text-sm font-semibold transition-all",
+                      p === depositPercent
+                        ? "border-primary/50 bg-gradient-to-br from-primary/25 to-fuchsia-500/10 text-primary shadow-glow"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground",
+                    ].join(" ")}
+                  >
+                    {p}%
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+
             <Row label="Subtotal" value={formatCAD(subtotal)} />
             <Row label={`Tax (${(TAX_RATE * 100).toFixed(0)}%)`} value={formatCAD(tax)} />
             <Row label="Tip" value={formatCAD(tip)} />
