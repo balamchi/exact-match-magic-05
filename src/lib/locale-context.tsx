@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { getTranslations } from "./i18n";
 
 export type Locale = "en" | "fr" | "es" | "fa" | "ar";
 
@@ -20,6 +21,7 @@ interface LocaleCtx {
   locale: Locale;
   dir: "ltr" | "rtl";
   setLocale: (l: Locale) => void;
+  t: (key: string, fallback?: string) => string;
 }
 
 const LocaleContext = createContext<LocaleCtx | null>(null);
@@ -33,6 +35,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   });
 
   const dir = useMemo(() => LOCALES.find((l) => l.code === locale)?.dir ?? "ltr", [locale]);
+  const t = useMemo(() => getTranslations(locale), [locale]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -46,7 +49,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, next);
   };
 
-  return <LocaleContext.Provider value={{ locale, dir, setLocale }}>{children}</LocaleContext.Provider>;
+  return <LocaleContext.Provider value={{ locale, dir, setLocale, t }}>{children}</LocaleContext.Provider>;
 }
 
 export function useLocale() {
