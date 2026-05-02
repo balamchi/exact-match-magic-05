@@ -251,6 +251,11 @@ function ServicesPage() {
                               Inactive
                             </span>
                           )}
+                          {(service as any).deposit_required && (
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                              Deposit {formatMoney((service as any).deposit_cents ?? 0, currency)}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
