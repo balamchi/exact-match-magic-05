@@ -184,6 +184,11 @@ function AutomationsPage() {
   const [editing, setEditing] = useState<Automation | null>(null);
   const [form, setForm] = useState<AutomationForm>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [builderNodes, setBuilderNodes] = useState<WorkflowNode[]>([
+    { id: "t1", kind: "trigger", label: "Appointment Completed", config: { type: "appointment_completed" } },
+    { id: "d1", kind: "delay", label: "Wait 1 hour", config: { duration: "1", unit: "hours" } },
+    { id: "a1", kind: "action", label: "Send Thank-You Email", config: { type: "send_email", template: "post-visit-thanks" } },
+  ]);
 
   const load = async () => {
     if (!activeClinic) return;
