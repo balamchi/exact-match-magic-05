@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { WorkflowBuilder, type WorkflowNode } from "@/components/workflow-builder";
 import {
   ArrowRight,
   Bell,
