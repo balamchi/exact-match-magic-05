@@ -5,7 +5,7 @@ import {
   Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
   Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare,
   Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
-  HeartPulse, UserCog, Menu, Languages,
+  HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
   type LucideIcon,
@@ -82,10 +82,17 @@ const NAV: NavGroup[] = [
     ],
   },
   {
+    section: "AI",
+    items: [
+      { to: "/app/ai-optimizer", label: "Schedule Optimizer", icon: Brain, badge: { kind: "pill", label: "AI", tone: "new" } },
+    ],
+  },
+  {
     section: "Admin",
     items: [
       { to: "/app/settings", label: "Settings", icon: Settings },
       { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
+      { to: "/app/api-settings", label: "API & Webhooks", icon: Globe },
     ],
   },
 ];

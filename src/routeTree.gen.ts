@@ -60,6 +60,8 @@ import { Route as AppCalendarRouteImport } from './routes/app.calendar'
 import { Route as AppBookingRouteImport } from './routes/app.booking'
 import { Route as AppBeforeAfterRouteImport } from './routes/app.before-after'
 import { Route as AppAutomationsRouteImport } from './routes/app.automations'
+import { Route as AppApiSettingsRouteImport } from './routes/app.api-settings'
+import { Route as AppAiOptimizerRouteImport } from './routes/app.ai-optimizer'
 import { Route as AppAiRouteImport } from './routes/app.ai'
 import { Route as ApiPublicRouteImport } from './routes/api.public'
 import { Route as LovableEmailTransactionalRouteImport } from './routes/lovable.email.transactional'
@@ -331,6 +333,16 @@ const AppAutomationsRoute = AppAutomationsRouteImport.update({
   path: '/automations',
   getParentRoute: () => AppRoute,
 } as any)
+const AppApiSettingsRoute = AppApiSettingsRouteImport.update({
+  id: '/api-settings',
+  path: '/api-settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAiOptimizerRoute = AppAiOptimizerRouteImport.update({
+  id: '/ai-optimizer',
+  path: '/ai-optimizer',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAiRoute = AppAiRouteImport.update({
   id: '/ai',
   path: '/ai',
@@ -425,6 +437,8 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/api/public': typeof ApiPublicRouteWithChildren
   '/app/ai': typeof AppAiRoute
+  '/app/ai-optimizer': typeof AppAiOptimizerRoute
+  '/app/api-settings': typeof AppApiSettingsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/before-after': typeof AppBeforeAfterRoute
   '/app/booking': typeof AppBookingRoute
@@ -493,6 +507,8 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/api/public': typeof ApiPublicRouteWithChildren
   '/app/ai': typeof AppAiRoute
+  '/app/ai-optimizer': typeof AppAiOptimizerRoute
+  '/app/api-settings': typeof AppApiSettingsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/before-after': typeof AppBeforeAfterRoute
   '/app/booking': typeof AppBookingRoute
@@ -562,6 +578,8 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/api/public': typeof ApiPublicRouteWithChildren
   '/app/ai': typeof AppAiRoute
+  '/app/ai-optimizer': typeof AppAiOptimizerRoute
+  '/app/api-settings': typeof AppApiSettingsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/before-after': typeof AppBeforeAfterRoute
   '/app/booking': typeof AppBookingRoute
@@ -632,6 +650,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/api/public'
     | '/app/ai'
+    | '/app/ai-optimizer'
+    | '/app/api-settings'
     | '/app/automations'
     | '/app/before-after'
     | '/app/booking'
@@ -700,6 +720,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/api/public'
     | '/app/ai'
+    | '/app/ai-optimizer'
+    | '/app/api-settings'
     | '/app/automations'
     | '/app/before-after'
     | '/app/booking'
@@ -768,6 +790,8 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/api/public'
     | '/app/ai'
+    | '/app/ai-optimizer'
+    | '/app/api-settings'
     | '/app/automations'
     | '/app/before-after'
     | '/app/booking'
@@ -1198,6 +1222,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAutomationsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/api-settings': {
+      id: '/app/api-settings'
+      path: '/api-settings'
+      fullPath: '/app/api-settings'
+      preLoaderRoute: typeof AppApiSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/ai-optimizer': {
+      id: '/app/ai-optimizer'
+      path: '/ai-optimizer'
+      fullPath: '/app/ai-optimizer'
+      preLoaderRoute: typeof AppAiOptimizerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/ai': {
       id: '/app/ai'
       path: '/ai'
@@ -1366,6 +1404,8 @@ const AppStaffRouteWithChildren = AppStaffRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppAiRoute: typeof AppAiRoute
+  AppAiOptimizerRoute: typeof AppAiOptimizerRoute
+  AppApiSettingsRoute: typeof AppApiSettingsRoute
   AppAutomationsRoute: typeof AppAutomationsRoute
   AppBeforeAfterRoute: typeof AppBeforeAfterRoute
   AppBookingRoute: typeof AppBookingRoute
@@ -1402,6 +1442,8 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAiRoute: AppAiRoute,
+  AppAiOptimizerRoute: AppAiOptimizerRoute,
+  AppApiSettingsRoute: AppApiSettingsRoute,
   AppAutomationsRoute: AppAutomationsRoute,
   AppBeforeAfterRoute: AppBeforeAfterRoute,
   AppBookingRoute: AppBookingRoute,
