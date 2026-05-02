@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "cmdk";
+import {
+  CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
+} from "@/components/ui/command";
 import {
   Activity, BarChart3, Bot, CalendarDays, Calendar, CheckSquare, ClipboardCheck,
   CreditCard, FileText, Gift, HeartPulse, Images, Inbox, MapPin, Package,
@@ -61,7 +63,7 @@ export function GlobalSearch() {
   const navigate = useNavigate();
   const { activeClinic } = useAuth();
 
-  // Keyboard shortcut
+  // ⌘K shortcut
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -73,7 +75,7 @@ export function GlobalSearch() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  // Search clients when query changes
+  // Live client search
   useEffect(() => {
     if (!query || query.length < 2 || !activeClinic) {
       setClients([]);
@@ -110,10 +112,6 @@ export function GlobalSearch() {
     [navigate]
   );
 
-  const filteredPages = query
-    ? PAGES.filter((p) => p.label.toLowerCase().includes(query.toLowerCase()))
-    : PAGES;
-
   return (
     <>
       <button
@@ -128,45 +126,45 @@ export function GlobalSearch() {
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <Command shouldFilter={false} className="rounded-lg border border-border shadow-2xl">
-          <CommandInput
-            placeholder="Search clients, pages, or actions…"
-            value={query}
-            onValueChange={setQuery}
-          />
-          <CommandList className="max-h-[420px]">
-            <CommandEmpty>No results found.</CommandEmpty>
+        <CommandInput
+          placeholder="Search clients, pages, or actions…"
+          value={query}
+          onValueChange={setQuery}
+        />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
 
-            {clients.length > 0 && (
-              <CommandGroup heading="Clients">
-                {clients.map((c) => {
-                  const Icon = c.icon;
-                  return (
-                    <CommandItem key={c.id} value={c.id} onSelect={() => select(c.to)} className="gap-3">
-                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm">{c.label}</div>
-                        {c.sublabel && <div className="truncate text-xs text-muted-foreground">{c.sublabel}</div>}
-                      </div>
-                    </CommandItem>
-                  );
-                })}
-              </CommandGroup>
-            )}
-
-            <CommandGroup heading="Pages">
-              {filteredPages.map((p) => {
-                const Icon = p.icon;
+          {clients.length > 0 && (
+            <CommandGroup heading="Clients">
+              {clients.map((c) => {
+                const Icon = c.icon;
                 return (
-                  <CommandItem key={p.id} value={p.id} onSelect={() => select(p.to)} className="gap-3">
-                    <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="text-sm">{p.label}</span>
+                  <CommandItem key={c.id} value={c.label} onSelect={() => select(c.to)}>
+                    <Icon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm">{c.label}</div>
+                      {c.sublabel && <div className="truncate text-xs text-muted-foreground">{c.sublabel}</div>}
+                    </div>
                   </CommandItem>
                 );
               })}
             </CommandGroup>
-          </CommandList>
-        </Command>
+          )}
+
+          <CommandGroup heading="Pages">
+            {PAGES.filter(
+              (p) => !query || p.label.toLowerCase().includes(query.toLowerCase())
+            ).map((p) => {
+              const Icon = p.icon;
+              return (
+                <CommandItem key={p.id} value={p.label} onSelect={() => select(p.to)}>
+                  <Icon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="text-sm">{p.label}</span>
+                </CommandItem>
+              );
+            })}
+          </CommandGroup>
+        </CommandList>
       </CommandDialog>
     </>
   );
