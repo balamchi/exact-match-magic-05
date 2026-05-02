@@ -394,6 +394,7 @@ export type Database = {
           created_at: string
           created_by: string
           currency: string
+          deposit_amount_cents: number
           id: string
           name: string
           slug: string
@@ -404,6 +405,7 @@ export type Database = {
           created_at?: string
           created_by: string
           currency?: string
+          deposit_amount_cents?: number
           id?: string
           name: string
           slug: string
@@ -414,6 +416,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           currency?: string
+          deposit_amount_cents?: number
           id?: string
           name?: string
           slug?: string
@@ -909,6 +912,8 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           region: string | null
+          tax_label: string
+          tax_rate: number
           timezone: string | null
           updated_at: string
         }
@@ -924,6 +929,8 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           region?: string | null
+          tax_label?: string
+          tax_rate?: number
           timezone?: string | null
           updated_at?: string
         }
@@ -939,6 +946,8 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           region?: string | null
+          tax_label?: string
+          tax_rate?: number
           timezone?: string | null
           updated_at?: string
         }
