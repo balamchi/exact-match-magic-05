@@ -15,6 +15,7 @@ import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LovableRouteImport } from './routes/lovable'
+import { Route as EmailRouteImport } from './routes/email'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as ApiRouteImport } from './routes/api'
 import { Route as IndexRouteImport } from './routes/index'
@@ -101,6 +102,11 @@ const LovableRoute = LovableRouteImport.update({
   path: '/lovable',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailRoute = EmailRouteImport.update({
+  id: '/email',
+  path: '/email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -122,9 +128,9 @@ const LovableEmailRoute = LovableEmailRouteImport.update({
   getParentRoute: () => LovableRoute,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => EmailRoute,
 } as any)
 const BookSlugRoute = BookSlugRouteImport.update({
   id: '/book/$slug',
@@ -385,6 +391,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/email': typeof EmailRouteWithChildren
   '/lovable': typeof LovableRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -448,6 +455,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/email': typeof EmailRouteWithChildren
   '/lovable': typeof LovableRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -512,6 +520,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/email': typeof EmailRouteWithChildren
   '/lovable': typeof LovableRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -577,6 +586,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api'
     | '/app'
+    | '/email'
     | '/lovable'
     | '/pricing'
     | '/privacy'
@@ -640,6 +650,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api'
     | '/app'
+    | '/email'
     | '/lovable'
     | '/pricing'
     | '/privacy'
@@ -703,6 +714,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api'
     | '/app'
+    | '/email'
     | '/lovable'
     | '/pricing'
     | '/privacy'
@@ -767,6 +779,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiRoute: typeof ApiRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
+  EmailRoute: typeof EmailRouteWithChildren
   LovableRoute: typeof LovableRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -778,7 +791,6 @@ export interface RootRouteChildren {
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
   BookSlugRoute: typeof BookSlugRoute
-  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -825,6 +837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email': {
+      id: '/email'
+      path: '/email'
+      fullPath: '/email'
+      preLoaderRoute: typeof EmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app': {
       id: '/app'
       path: '/app'
@@ -855,10 +874,10 @@ declare module '@tanstack/react-router' {
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
+      path: '/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EmailRoute
     }
     '/book/$slug': {
       id: '/book/$slug'
@@ -1331,6 +1350,16 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface EmailRouteChildren {
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+}
+
+const EmailRouteChildren: EmailRouteChildren = {
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+}
+
+const EmailRouteWithChildren = EmailRoute._addFileChildren(EmailRouteChildren)
+
 interface LovableEmailAuthRouteChildren {
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1405,6 +1434,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiRoute: ApiRouteWithChildren,
   AppRoute: AppRouteWithChildren,
+  EmailRoute: EmailRouteWithChildren,
   LovableRoute: LovableRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -1416,7 +1446,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignInRoute: AuthSignInRoute,
   AuthSignUpRoute: AuthSignUpRoute,
   BookSlugRoute: BookSlugRoute,
-  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
