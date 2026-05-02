@@ -528,12 +528,39 @@ function MarketingPage() {
               </label>
 
               {form.channel === "email" && (
-                <Field
-                  label="Subject line"
-                  value={form.subject}
-                  onChange={(v) => setForm({ ...form, subject: v })}
-                  placeholder="20% off your next Botox visit"
-                />
+                <>
+                  <Field
+                    label="Subject line"
+                    value={form.subject}
+                    onChange={(v) => setForm({ ...form, subject: v })}
+                    placeholder="20% off your next Botox visit"
+                  />
+
+                  {/* Template Presets */}
+                  <div className="md:col-span-2">
+                    <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Quick Templates</span>
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {[
+                        { label: "Promo Offer", body: "Hi {{first_name}},\n\nWe have a special offer just for you! Save 20% on your next visit when you book this week.\n\nBook now to secure your spot.\n\nBest,\n{{clinic_name}}" },
+                        { label: "Follow-Up", body: "Hi {{first_name}},\n\nThank you for your recent visit! We hope you loved your results.\n\nWe'd love to hear your feedback — reply to this email or leave us a review.\n\nSee you soon!\n{{clinic_name}}" },
+                        { label: "Rebook Reminder", body: "Hi {{first_name}},\n\nIt's been a while since your last appointment. Your results look best with regular maintenance.\n\nBook your next session today and keep looking your best!\n\n{{clinic_name}}" },
+                        { label: "New Service", body: "Hi {{first_name}},\n\nExciting news! We've just added a new treatment to our menu.\n\nBe among the first to try it — book your consultation today.\n\n{{clinic_name}}" },
+                      ].map((tpl) => (
+                        <button
+                          key={tpl.label}
+                          type="button"
+                          onClick={() => setForm({ ...form, body: tpl.body })}
+                          className={cn(
+                            "rounded-lg border px-3 py-2 text-xs font-medium transition",
+                            "border-border bg-surface/40 text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                          )}
+                        >
+                          {tpl.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
               )}
 
               <label className="md:col-span-2">
@@ -543,15 +570,40 @@ function MarketingPage() {
                 <textarea
                   value={form.body}
                   onChange={(e) => setForm({ ...form, body: e.target.value })}
-                  placeholder={form.channel === "sms" ? "Hey {{first_name}}, save 20% on your touch-up this week. Reply BOOK." : "Write a quick promo or treat-yourself note…"}
-                  rows={form.channel === "sms" ? 3 : 5}
+                  placeholder={form.channel === "sms" ? "Hey {{first_name}}, save 20% on your touch-up this week. Reply BOOK." : "Write your email content here. Use {{first_name}}, {{last_name}}, {{clinic_name}} as merge tags."}
+                  rows={form.channel === "sms" ? 3 : 8}
                   maxLength={form.channel === "sms" ? 320 : 4000}
-                  className="w-full rounded-lg border border-input bg-surface px-3 py-2 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30"
+                  className="w-full rounded-lg border border-input bg-surface px-3 py-2 text-sm font-mono placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30"
                 />
-                {form.channel === "sms" && (
-                  <p className="mt-1 text-[11px] text-muted-foreground">{form.body.length}/320 chars</p>
-                )}
+                <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>{form.body.length}/{form.channel === "sms" ? 320 : 4000} chars</span>
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" /> Merge tags: {"{{first_name}}, {{clinic_name}}"}
+                  </span>
+                </div>
               </label>
+
+              {/* Live Preview */}
+              {form.channel === "email" && form.body && (
+                <div className="md:col-span-2">
+                  <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Live Preview</span>
+                  <div className="rounded-lg border border-border bg-white p-6 text-sm text-gray-800">
+                    <div className="mb-4 border-b border-gray-200 pb-3">
+                      <p className="text-xs text-gray-500">Subject: {form.subject || "(no subject)"}</p>
+                      <p className="text-xs text-gray-500">To: {form.audience || "All clients"}</p>
+                    </div>
+                    <div className="whitespace-pre-wrap leading-relaxed">
+                      {form.body
+                        .replace(/\{\{first_name\}\}/g, "Jane")
+                        .replace(/\{\{last_name\}\}/g, "Smith")
+                        .replace(/\{\{clinic_name\}\}/g, "Your Clinic")}
+                    </div>
+                    <div className="mt-6 border-t border-gray-200 pt-3 text-[10px] text-gray-400">
+                      Sent via ClinicPro · Unsubscribe
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between border-t border-border p-5">

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { WorkflowBuilder, type WorkflowNode } from "@/components/workflow-builder";
 import {
   ArrowRight,
   Bell,
@@ -183,6 +184,11 @@ function AutomationsPage() {
   const [editing, setEditing] = useState<Automation | null>(null);
   const [form, setForm] = useState<AutomationForm>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [builderNodes, setBuilderNodes] = useState<WorkflowNode[]>([
+    { id: "t1", kind: "trigger", label: "Appointment Completed", config: { type: "appointment_completed" } },
+    { id: "d1", kind: "delay", label: "Wait 1 hour", config: { duration: "1", unit: "hours" } },
+    { id: "a1", kind: "action", label: "Send Thank-You Email", config: { type: "send_email", template: "post-visit-thanks" } },
+  ]);
 
   const load = async () => {
     if (!activeClinic) return;
@@ -364,6 +370,20 @@ function AutomationsPage() {
             );
           })}
         </div>
+      </section>
+
+      {/* Visual Builder */}
+      <section className="rounded-2xl border border-border bg-card shadow-card p-5">
+        <div className="mb-4">
+          <h2 className="font-display text-lg font-semibold flex items-center gap-2">
+            <Zap className="h-5 w-5 text-primary" />
+            Visual Workflow Builder
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Drag-and-drop nodes to build complex automation sequences. Add triggers, delays, conditions, and actions.
+          </p>
+        </div>
+        <WorkflowBuilder nodes={builderNodes} onChange={setBuilderNodes} />
       </section>
 
       {/* Workflow list */}
