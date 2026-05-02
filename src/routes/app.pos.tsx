@@ -14,6 +14,7 @@ import {
   Sparkles,
   Loader2,
   CheckCircle2,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,7 +62,7 @@ function PosPage() {
   const [clientName, setClientName] = useState("");
   const [staffName, setStaffName] = useState("");
   const [notes, setNotes] = useState("");
-  const [processing, setProcessing] = useState<null | "card" | "tap" | "cash">(null);
+  const [processing, setProcessing] = useState<null | "card" | "tap" | "cash" | "bnpl">(null);
   const [todayCents, setTodayCents] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
 
@@ -159,7 +160,7 @@ function PosPage() {
   const tip = customTipCents ?? Math.round(subtotal * (tipPercent / 100));
   const total = subtotal + tax + tip;
 
-  async function checkout(method: "card" | "tap" | "cash") {
+  async function checkout(method: "card" | "tap" | "cash" | "bnpl") {
     if (!clinicId) return;
     if (cart.length === 0) {
       toast.error("Cart is empty");
@@ -170,7 +171,7 @@ function PosPage() {
     if (method !== "cash") {
       await new Promise((r) => setTimeout(r, 1200));
     }
-    const paymentMethod = method === "tap" ? "card" : method;
+    const paymentMethod = method === "tap" ? "card" : method === "bnpl" ? "bnpl" : method;
     const noteSummary =
       cart.map((c) => `${c.qty}× ${c.name}`).join(", ") +
       (notes ? ` — ${notes}` : "") +
@@ -420,7 +421,7 @@ function PosPage() {
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-3 gap-2">
+            <div className="mt-5 grid grid-cols-4 gap-2">
               <PayButton
                 label="Card"
                 icon={CreditCard}
@@ -443,7 +444,19 @@ function PosPage() {
                 disabled={cart.length === 0 || processing !== null}
                 loading={processing === "cash"}
               />
+              <PayButton
+                label="BNPL"
+                icon={Clock}
+                onClick={() => checkout("bnpl")}
+                disabled={cart.length === 0 || processing !== null}
+                loading={processing === "bnpl"}
+              />
             </div>
+            {processing === "bnpl" && (
+              <p className="mt-2 text-center text-[11px] text-muted-foreground animate-pulse">
+                Generating installment plan…
+              </p>
+            )}
           </div>
         </aside>
       </div>
