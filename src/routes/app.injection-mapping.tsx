@@ -530,11 +530,8 @@ function InjectionMappingPage() {
                   );
                 })}
 
-                {/* Empty-region affordances — pulsing zone targets.
-                    On body views, only show when a client is selected (avoids cluttered "scattered points" look). */}
+                {/* Empty-region affordances — pulsing zone targets for all views (face + body). */}
                 {(() => {
-                  const isBody = view === "body-front" || view === "body-back";
-                  if (isBody && !clientFilter) return null;
                   return REGIONS.filter(
                     (r) => r.view === view && !canvasMarkers.find((m) => m.region.key === r.key)
                   ).map((r) => (
