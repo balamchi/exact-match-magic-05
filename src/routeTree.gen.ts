@@ -48,6 +48,7 @@ import { Route as AppInvoicesRouteImport } from './routes/app.invoices'
 import { Route as AppInventoryRouteImport } from './routes/app.inventory'
 import { Route as AppInjectionMappingRouteImport } from './routes/app.injection-mapping'
 import { Route as AppInboxRouteImport } from './routes/app.inbox'
+import { Route as AppHelpRouteImport } from './routes/app.help'
 import { Route as AppGiftcardsRouteImport } from './routes/app.giftcards'
 import { Route as AppEmailLogRouteImport } from './routes/app.email-log'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
@@ -270,6 +271,11 @@ const AppInboxRoute = AppInboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHelpRoute = AppHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppGiftcardsRoute = AppGiftcardsRouteImport.update({
   id: '/giftcards',
   path: '/giftcards',
@@ -430,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
   '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
@@ -497,6 +504,7 @@ export interface FileRoutesByTo {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
   '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
@@ -565,6 +573,7 @@ export interface FileRoutesById {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
   '/app/giftcards': typeof AppGiftcardsRoute
+  '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
   '/app/injection-mapping': typeof AppInjectionMappingRoute
   '/app/inventory': typeof AppInventoryRoute
@@ -634,6 +643,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/help'
     | '/app/inbox'
     | '/app/injection-mapping'
     | '/app/inventory'
@@ -701,6 +711,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/help'
     | '/app/inbox'
     | '/app/injection-mapping'
     | '/app/inventory'
@@ -768,6 +779,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/email-log'
     | '/app/giftcards'
+    | '/app/help'
     | '/app/inbox'
     | '/app/injection-mapping'
     | '/app/inventory'
@@ -1102,6 +1114,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInboxRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/help': {
+      id: '/app/help'
+      path: '/help'
+      fullPath: '/app/help'
+      preLoaderRoute: typeof AppHelpRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/giftcards': {
       id: '/app/giftcards'
       path: '/giftcards'
@@ -1358,6 +1377,7 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppEmailLogRoute: typeof AppEmailLogRoute
   AppGiftcardsRoute: typeof AppGiftcardsRoute
+  AppHelpRoute: typeof AppHelpRoute
   AppInboxRoute: typeof AppInboxRoute
   AppInjectionMappingRoute: typeof AppInjectionMappingRoute
   AppInventoryRoute: typeof AppInventoryRoute
@@ -1393,6 +1413,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppEmailLogRoute: AppEmailLogRoute,
   AppGiftcardsRoute: AppGiftcardsRoute,
+  AppHelpRoute: AppHelpRoute,
   AppInboxRoute: AppInboxRoute,
   AppInjectionMappingRoute: AppInjectionMappingRoute,
   AppInventoryRoute: AppInventoryRoute,
