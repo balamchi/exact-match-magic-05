@@ -1,20 +1,36 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 /**
- * Seeds a brand-new clinic with default content:
- * - 50+ aesthetic services across categories
- * - 5 consent form templates
- * - 10 automation workflows
- * - 3 membership tiers
- * - 1 loyalty program
- *
- * Safe to call multiple times — checks if services already exist.
+ * Seeds a brand-new clinic with default content.
+ * Accepts the user's access token as input since server function
+ * RPCs don't forward browser Authorization headers automatically.
  */
 export const seedClinicDefaults = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { supabase, userId } = context;
+  .inputValidator((data: { accessToken: string }) => {
+    if (!data.accessToken) throw new Error("accessToken is required");
+    return data;
+  })
+  .handler(async ({ data }) => {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+
+    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+      throw new Error("Missing Supabase environment variables");
+    }
+
+    const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      global: { headers: { Authorization: `Bearer ${data.accessToken}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const { data: userData, error: authError } = await supabase.auth.getUser(data.accessToken);
+    if (authError || !userData?.user) {
+      throw new Error("Unauthorized: Invalid token");
+    }
+
+    const userId = userData.user.id;
 
     // Get user's clinic
     const { data: membership } = await supabase
