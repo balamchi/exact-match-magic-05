@@ -300,6 +300,7 @@ export type Database = {
       }
       clients: {
         Row: {
+          allergies: string[] | null
           clinic_id: string
           created_at: string
           date_of_birth: string | null
@@ -307,12 +308,15 @@ export type Database = {
           first_name: string
           id: string
           last_name: string | null
+          medical_alerts: string | null
+          medications: string[] | null
           notes: string | null
           phone: string | null
           tags: string[] | null
           updated_at: string
         }
         Insert: {
+          allergies?: string[] | null
           clinic_id: string
           created_at?: string
           date_of_birth?: string | null
@@ -320,12 +324,15 @@ export type Database = {
           first_name: string
           id?: string
           last_name?: string | null
+          medical_alerts?: string | null
+          medications?: string[] | null
           notes?: string | null
           phone?: string | null
           tags?: string[] | null
           updated_at?: string
         }
         Update: {
+          allergies?: string[] | null
           clinic_id?: string
           created_at?: string
           date_of_birth?: string | null
@@ -333,6 +340,8 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string | null
+          medical_alerts?: string | null
+          medications?: string[] | null
           notes?: string | null
           phone?: string | null
           tags?: string[] | null
