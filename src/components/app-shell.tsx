@@ -8,6 +8,7 @@ import {
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
+  Phone, BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
