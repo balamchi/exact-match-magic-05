@@ -530,18 +530,21 @@ function InjectionMappingPage() {
                   );
                 })}
 
-                {/* Empty-region affordances — pulsing zone targets.
-                    On body views, only show when a client is selected (avoids cluttered "scattered points" look). */}
+                {/* Empty-region affordances — pulsing zone targets for all views (face + body). */}
                 {(() => {
                   const isBody = view === "body-front" || view === "body-back";
-                  if (isBody && !clientFilter) return null;
                   return REGIONS.filter(
                     (r) => r.view === view && !canvasMarkers.find((m) => m.region.key === r.key)
                   ).map((r) => (
                     <button
                       key={r.key}
                       onClick={() => openCreate({ region: r.key })}
-                      className="group absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-violet-400/40 bg-white/[0.04] transition-all duration-200 animate-injection-pulse hover:h-4 hover:w-4 hover:border-violet-400 hover:bg-violet-500/20"
+                      className={cn(
+                        "group absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-violet-400/40 bg-white/[0.04] transition-all duration-200 animate-injection-pulse cursor-pointer",
+                        isBody
+                          ? "h-5 w-5 hover:h-7 hover:w-7 hover:border-violet-400 hover:bg-violet-500/20"
+                          : "h-3 w-3 hover:h-4 hover:w-4 hover:border-violet-400 hover:bg-violet-500/20"
+                      )}
                       style={{ left: `${r.x}%`, top: `${r.y}%` }}
                     >
                       <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-border bg-card px-2 py-1 text-[10px] text-foreground shadow-elevated group-hover:block">

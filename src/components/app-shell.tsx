@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import { GlobalSearch } from "@/components/global-search";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
   Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare,
@@ -288,10 +288,10 @@ function Header({ onMenu }: { onMenu: () => void }) {
   const { locale, setLocale } = useLocale();
   const current = LOCALES.find((l) => l.code === locale);
   const { activeClinic } = useAuth();
+  const navigate = useNavigate();
   const [locations, setLocations] = useState<{ id: string; name: string; active: boolean }[]>([]);
   const [activeLocationId, setActiveLocationId] = useState<string | null>(null);
 
-  // Load locations for the switcher
   useEffect(() => {
     if (!activeClinic?.clinic_id) return;
     import("@/integrations/supabase/client").then(({ supabase }) => {
@@ -311,6 +311,16 @@ function Header({ onMenu }: { onMenu: () => void }) {
   }, [activeClinic?.clinic_id]);
 
   const activeLocation = locations.find((l) => l.id === activeLocationId);
+
+  const quickActions = [
+    { label: "📅 Appointment", path: "/app/booking" },
+    { label: "👤 Client", path: "/app/clients" },
+    { label: "💳 Sale (POS)", path: "/app/pos" },
+    { label: "📝 Consent Form", path: "/app/consent" },
+    { label: "✉ Send Message", path: "/app/inbox" },
+    { label: "🎁 Gift Card", path: "/app/giftcards" },
+    { label: "📋 Task", path: "/app/tasks" },
+  ];
 
   return (
     <header className="flex h-16 items-center gap-2 border-b border-border bg-background/80 px-4 backdrop-blur sm:gap-3 sm:px-6">
@@ -353,6 +363,7 @@ function Header({ onMenu }: { onMenu: () => void }) {
         </DropdownMenu>
       )}
 
+      {/* Language toggle */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="hidden sm:inline-flex" aria-label="Language">
@@ -372,8 +383,9 @@ function Header({ onMenu }: { onMenu: () => void }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* LIVE indicator */}
       <div
-        className="hidden items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-success md:inline-flex"
+        className="hidden items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-success md:inline-flex cursor-default"
         title="Realtime sync is active across calendar, leads, tasks & inventory"
       >
         <span className="relative flex h-2 w-2">
@@ -383,14 +395,40 @@ function Header({ onMenu }: { onMenu: () => void }) {
         Live
       </div>
 
-      <Button variant="ghost" size="icon" aria-label="Notifications">
-        <Bell className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
-      </Button>
+      {/* Notifications bell */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" aria-label="Notifications" className="relative">
+            <Bell className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-72">
+          <DropdownMenuLabel className="text-xs text-muted-foreground">Notifications</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <div className="p-4 text-center text-xs text-muted-foreground">
+            No new notifications
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-      <Button className="gap-1.5 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-        <Plus className="h-4 w-4" />
-        <span className="hidden sm:inline">New</span>
-      </Button>
+      {/* + New quick actions */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="gap-1.5 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+            <Plus className="h-4 w-4" />
+            <span className="hidden sm:inline">New</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">Quick create</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {quickActions.map((action) => (
+            <DropdownMenuItem key={action.path} onClick={() => navigate({ to: action.path as any })}>
+              {action.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }

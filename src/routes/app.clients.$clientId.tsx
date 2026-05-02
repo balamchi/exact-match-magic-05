@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles,
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
-  AlertTriangle, Pill, ShieldAlert,
+  AlertTriangle, Pill, ShieldAlert, Crown, Ban, XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -98,6 +98,10 @@ function ClientDetailPage() {
   const fullName = [client.first_name, client.last_name].filter(Boolean).join(" ");
   const initials = `${client.first_name.slice(0, 1)}${client.last_name?.slice(0, 1) ?? ""}`.toUpperCase();
   const currency = activeClinic?.clinic.currency ?? "CAD";
+  const clientAny = client as any;
+  const age = clientAny.date_of_birth ? (() => { const b = new Date(clientAny.date_of_birth); const n = new Date(); let a = n.getFullYear() - b.getFullYear(); if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) a--; return a; })() : null;
+  const noShows = appointments.filter((a) => a.status === "no_show").length;
+  const cancellations = appointments.filter((a) => a.status === "cancelled").length;
 
   const TABS: { id: Tab; label: string; icon: React.ReactNode; count: number }[] = [
     { id: "history", label: "Visits", icon: <CalendarDays className="h-3.5 w-3.5" />, count: appointments.length },
@@ -124,11 +128,18 @@ function ClientDetailPage() {
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Client profile</p>
-              <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight">{fullName}</h1>
+              <h1 className="mt-1 flex items-center gap-2 font-display text-3xl font-semibold tracking-tight">
+                {fullName}
+                {clientAny.vip_status && <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-400"><Crown className="h-3 w-3" />VIP</span>}
+              </h1>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                {age != null && <span>{age} yo</span>}
+                {clientAny.pronouns && <span>· {clientAny.pronouns}</span>}
+                {clientAny.city && <span>· {clientAny.city}</span>}
+              </div>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 {client.email && <span className="inline-flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> {client.email}</span>}
                 {client.phone && <span className="inline-flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {client.phone}</span>}
-                {client.date_of_birth && <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" /> {new Date(client.date_of_birth).toLocaleDateString()}</span>}
               </div>
             </div>
           </div>
@@ -152,13 +163,25 @@ function ClientDetailPage() {
       </section>
 
       {/* Medical Alerts Banner */}
-      {(client.medical_alerts || (client.allergies as string[] | null)?.length || (client.medications as string[] | null)?.length) ? (
+      {(client.medical_alerts || (client.allergies as string[] | null)?.length || (client.medications as string[] | null)?.length || (clientAny.medical_conditions as string[] | null)?.length) ? (
         <section className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5 shadow-card">
           <div className="flex items-center gap-2 text-destructive mb-3">
             <ShieldAlert className="h-5 w-5" />
             <h2 className="font-display text-lg font-semibold">Medical Alerts</h2>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {(clientAny.medical_conditions as string[] | null)?.length ? (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />Medical Conditions
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {(clientAny.medical_conditions as string[]).map((c: string) => (
+                    <span key={c} className="rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">{c}</span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             {client.medical_alerts && (
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
@@ -196,10 +219,12 @@ function ClientDetailPage() {
       ) : null}
 
       {/* Stats grid */}
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <StatTile icon={<Activity className="h-4 w-4" />} label="Total visits" value={stats.visits.toString()} />
-        <StatTile icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming.toString()} />
         <StatTile icon={<DollarSign className="h-4 w-4" />} label="Lifetime value" value={formatMoney(stats.lifetimeValueCents, currency)} />
+        <StatTile icon={<CalendarDays className="h-4 w-4" />} label="Upcoming" value={stats.upcoming.toString()} />
+        <StatTile icon={<Ban className="h-4 w-4" />} label="No-shows" value={`${noShows}${stats.visits > 0 ? ` (${Math.round(noShows / stats.visits * 100)}%)` : ""}`} />
+        <StatTile icon={<XCircle className="h-4 w-4" />} label="Cancellations" value={cancellations.toString()} />
         <StatTile icon={<Clock className="h-4 w-4" />} label="Last visit" value={stats.lastVisit ? new Date(stats.lastVisit).toLocaleDateString() : "—"} />
       </section>
 
