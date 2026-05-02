@@ -454,7 +454,7 @@ function PosPage() {
             )}
           </div>
 
-
+          <div className="rounded-xl border border-border bg-gradient-to-br from-surface to-background p-5">
             <Row label="Subtotal" value={formatCAD(subtotal)} />
             <Row label={`Tax (${(TAX_RATE * 100).toFixed(0)}%)`} value={formatCAD(tax)} />
             <Row label="Tip" value={formatCAD(tip)} />
