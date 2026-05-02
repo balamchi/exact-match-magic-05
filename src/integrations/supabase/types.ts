@@ -1513,6 +1513,136 @@ export type Database = {
           },
         ]
       }
+      staff_commissions: {
+        Row: {
+          active: boolean
+          applies_to: string
+          clinic_id: string
+          commission_type: string
+          created_at: string
+          id: string
+          rate: number
+          service_category: string | null
+          service_id: string | null
+          staff_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          applies_to?: string
+          clinic_id: string
+          commission_type?: string
+          created_at?: string
+          id?: string
+          rate?: number
+          service_category?: string | null
+          service_id?: string | null
+          staff_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          applies_to?: string
+          clinic_id?: string
+          commission_type?: string
+          created_at?: string
+          id?: string
+          rate?: number
+          service_category?: string | null
+          service_id?: string | null
+          staff_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_commissions_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_commissions_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_commissions_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_hr: {
+        Row: {
+          clinic_id: string
+          created_at: string
+          email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          employment_type: string
+          hire_date: string | null
+          hourly_rate_cents: number | null
+          id: string
+          notes: string | null
+          phone: string | null
+          salary_cents: number | null
+          staff_id: string
+          updated_at: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          employment_type?: string
+          hire_date?: string | null
+          hourly_rate_cents?: number | null
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          salary_cents?: number | null
+          staff_id: string
+          updated_at?: string
+        }
+        Update: {
+          clinic_id?: string
+          created_at?: string
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          employment_type?: string
+          hire_date?: string | null
+          hourly_rate_cents?: number | null
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          salary_cents?: number | null
+          staff_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_hr_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_hr_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: true
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           active_clients_limit: number | null
