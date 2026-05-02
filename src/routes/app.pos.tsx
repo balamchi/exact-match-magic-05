@@ -421,7 +421,7 @@ function PosPage() {
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-3 gap-2">
+            <div className="mt-5 grid grid-cols-4 gap-2">
               <PayButton
                 label="Card"
                 icon={CreditCard}
@@ -444,7 +444,19 @@ function PosPage() {
                 disabled={cart.length === 0 || processing !== null}
                 loading={processing === "cash"}
               />
+              <PayButton
+                label="BNPL"
+                icon={Clock}
+                onClick={() => checkout("bnpl")}
+                disabled={cart.length === 0 || processing !== null}
+                loading={processing === "bnpl"}
+              />
             </div>
+            {processing === "bnpl" && (
+              <p className="mt-2 text-center text-[11px] text-muted-foreground animate-pulse">
+                Generating installment plan…
+              </p>
+            )}
           </div>
         </aside>
       </div>
