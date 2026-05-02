@@ -61,7 +61,7 @@ function PosPage() {
   const [clientName, setClientName] = useState("");
   const [staffName, setStaffName] = useState("");
   const [notes, setNotes] = useState("");
-  const [processing, setProcessing] = useState<null | "card" | "tap" | "cash">(null);
+  const [processing, setProcessing] = useState<null | "card" | "tap" | "cash" | "bnpl">(null);
   const [todayCents, setTodayCents] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
 
@@ -159,7 +159,7 @@ function PosPage() {
   const tip = customTipCents ?? Math.round(subtotal * (tipPercent / 100));
   const total = subtotal + tax + tip;
 
-  async function checkout(method: "card" | "tap" | "cash") {
+  async function checkout(method: "card" | "tap" | "cash" | "bnpl") {
     if (!clinicId) return;
     if (cart.length === 0) {
       toast.error("Cart is empty");
