@@ -383,9 +383,8 @@ function Header({ onMenu }: { onMenu: () => void }) {
         Live
       </div>
 
-      <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
+      <Button variant="ghost" size="icon" aria-label="Notifications">
         <Bell className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
-        <span className="absolute end-2 top-2 h-1.5 w-1.5 rounded-full bg-primary glow-purple" />
       </Button>
 
       <Button className="gap-1.5 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
