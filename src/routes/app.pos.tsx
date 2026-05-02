@@ -63,6 +63,8 @@ function PosPage() {
   const [staffName, setStaffName] = useState("");
   const [notes, setNotes] = useState("");
   const [processing, setProcessing] = useState<null | "card" | "tap" | "cash" | "bnpl">(null);
+  const [depositMode, setDepositMode] = useState(false);
+  const [depositPercent, setDepositPercent] = useState(50);
   const [todayCents, setTodayCents] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
 
@@ -158,7 +160,9 @@ function PosPage() {
   const subtotal = cart.reduce((s, c) => s + c.unitCents * c.qty, 0);
   const tax = Math.round(subtotal * TAX_RATE);
   const tip = customTipCents ?? Math.round(subtotal * (tipPercent / 100));
-  const total = subtotal + tax + tip;
+  const fullTotal = subtotal + tax + tip;
+  const depositAmount = depositMode ? Math.round(fullTotal * (depositPercent / 100)) : 0;
+  const total = depositMode ? depositAmount : fullTotal;
 
   async function checkout(method: "card" | "tap" | "cash" | "bnpl") {
     if (!clinicId) return;
@@ -408,17 +412,72 @@ function PosPage() {
             </div>
           </div>
 
+          {/* Deposit toggle */}
+          <div className="rounded-xl border border-border bg-surface p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  Deposit / Partial Payment
+                </h2>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">Collect a deposit now, charge the rest at appointment</p>
+              </div>
+              <button
+                onClick={() => setDepositMode(!depositMode)}
+                className={[
+                  "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+                  depositMode ? "bg-primary" : "bg-muted",
+                ].join(" ")}
+              >
+                <span className={[
+                  "inline-block h-4 w-4 rounded-full bg-white transition-transform",
+                  depositMode ? "translate-x-6" : "translate-x-1",
+                ].join(" ")} />
+              </button>
+            </div>
+            {depositMode && (
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                {[25, 50, 75, 100].map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setDepositPercent(p)}
+                    className={[
+                      "rounded-lg border px-2 py-2 text-sm font-semibold transition-all",
+                      p === depositPercent
+                        ? "border-primary/50 bg-gradient-to-br from-primary/25 to-fuchsia-500/10 text-primary shadow-glow"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-foreground",
+                    ].join(" ")}
+                  >
+                    {p}%
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="rounded-xl border border-border bg-gradient-to-br from-surface to-background p-5">
             <Row label="Subtotal" value={formatCAD(subtotal)} />
             <Row label={`Tax (${(TAX_RATE * 100).toFixed(0)}%)`} value={formatCAD(tax)} />
             <Row label="Tip" value={formatCAD(tip)} />
             <div className="mt-3 border-t border-border pt-3">
+              {depositMode && (
+                <div className="mb-2 flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Full total</span>
+                  <span className="font-mono tabular-nums line-through opacity-50">{formatCAD(fullTotal)}</span>
+                </div>
+              )}
               <div className="flex items-baseline justify-between">
-                <span className="text-sm font-medium text-muted-foreground">Total</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {depositMode ? `Deposit (${depositPercent}%)` : "Total"}
+                </span>
                 <span className="bg-gradient-to-r from-primary to-fuchsia-400 bg-clip-text font-mono text-3xl font-bold tabular-nums text-transparent">
                   {formatCAD(total)}
                 </span>
               </div>
+              {depositMode && (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Remaining balance of {formatCAD(fullTotal - depositAmount)} due at appointment
+                </p>
+              )}
             </div>
 
             <div className="mt-5 grid grid-cols-4 gap-2">

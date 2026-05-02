@@ -395,6 +395,28 @@ function InboxPage() {
                 </div>
               </div>
 
+              {/* Quick reply templates */}
+              <div className="border-t border-border px-4 pt-3">
+                <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Quick Replies</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    "Thanks for your message! We'll get back to you shortly.",
+                    "Your appointment is confirmed. See you then! ✅",
+                    "Would you like to reschedule? Reply with your preferred date/time.",
+                    "Thank you for choosing us! Don't forget to leave a review. ⭐",
+                  ].map((tpl) => (
+                    <button
+                      key={tpl}
+                      type="button"
+                      onClick={() => setReply(tpl)}
+                      className="rounded-full border border-border bg-surface/60 px-2.5 py-1 text-[11px] text-muted-foreground transition hover:border-primary/30 hover:text-foreground"
+                    >
+                      {tpl.slice(0, 40)}…
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Composer */}
               <form onSubmit={sendReply} className="border-t border-border p-4">
                 <div className="rounded-xl border border-input bg-surface focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">

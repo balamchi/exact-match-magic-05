@@ -8,6 +8,7 @@ import {
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
+  Phone, BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -64,6 +65,7 @@ const NAV: NavGroup[] = [
     section: "Growth",
     items: [
       { to: "/app/inbox", label: "Inbox", icon: Inbox, badge: { kind: "count", value: 12 } },
+      { to: "/app/whatsapp", label: "WhatsApp", icon: Phone, badge: { kind: "pill", label: "NEW", tone: "new" } },
       { to: "/app/marketing", label: "Campaigns", icon: Send },
       { to: "/app/automations", label: "Automations", icon: Zap, badge: { kind: "count", value: 43 } },
       { to: "/app/reviews", label: "Reviews", icon: Star },
@@ -92,6 +94,7 @@ const NAV: NavGroup[] = [
     items: [
       { to: "/app/settings", label: "Settings", icon: Settings },
       { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
+      { to: "/app/quickbooks", label: "QuickBooks", icon: BookOpen },
       { to: "/app/api-settings", label: "API & Webhooks", icon: Globe },
     ],
   },

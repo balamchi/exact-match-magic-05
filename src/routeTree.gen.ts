@@ -31,6 +31,7 @@ import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AppWhatsappRouteImport } from './routes/app.whatsapp'
 import { Route as AppTreatmentPlansRouteImport } from './routes/app.treatment-plans'
 import { Route as AppTasksRouteImport } from './routes/app.tasks'
 import { Route as AppStaffRouteImport } from './routes/app.staff'
@@ -40,6 +41,7 @@ import { Route as AppServicesRouteImport } from './routes/app.services'
 import { Route as AppReviewsRouteImport } from './routes/app.reviews'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppReferralsRouteImport } from './routes/app.referrals'
+import { Route as AppQuickbooksRouteImport } from './routes/app.quickbooks'
 import { Route as AppQaChecklistRouteImport } from './routes/app.qa-checklist'
 import { Route as AppPosRouteImport } from './routes/app.pos'
 import { Route as AppPackagesRouteImport } from './routes/app.packages'
@@ -192,6 +194,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AppWhatsappRoute = AppWhatsappRouteImport.update({
+  id: '/whatsapp',
+  path: '/whatsapp',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppTreatmentPlansRoute = AppTreatmentPlansRouteImport.update({
   id: '/treatment-plans',
   path: '/treatment-plans',
@@ -235,6 +242,11 @@ const AppReportsRoute = AppReportsRouteImport.update({
 const AppReferralsRoute = AppReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQuickbooksRoute = AppQuickbooksRouteImport.update({
+  id: '/quickbooks',
+  path: '/quickbooks',
   getParentRoute: () => AppRoute,
 } as any)
 const AppQaChecklistRoute = AppQaChecklistRouteImport.update({
@@ -490,6 +502,7 @@ export interface FileRoutesByFullPath {
   '/app/packages': typeof AppPackagesRoute
   '/app/pos': typeof AppPosRoute
   '/app/qa-checklist': typeof AppQaChecklistRoute
+  '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
@@ -499,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
+  '/app/whatsapp': typeof AppWhatsappRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -564,6 +578,7 @@ export interface FileRoutesByTo {
   '/app/packages': typeof AppPackagesRoute
   '/app/pos': typeof AppPosRoute
   '/app/qa-checklist': typeof AppQaChecklistRoute
+  '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
@@ -573,6 +588,7 @@ export interface FileRoutesByTo {
   '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
+  '/app/whatsapp': typeof AppWhatsappRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -639,6 +655,7 @@ export interface FileRoutesById {
   '/app/packages': typeof AppPackagesRoute
   '/app/pos': typeof AppPosRoute
   '/app/qa-checklist': typeof AppQaChecklistRoute
+  '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
@@ -648,6 +665,7 @@ export interface FileRoutesById {
   '/app/staff': typeof AppStaffRouteWithChildren
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
+  '/app/whatsapp': typeof AppWhatsappRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -715,6 +733,7 @@ export interface FileRouteTypes {
     | '/app/packages'
     | '/app/pos'
     | '/app/qa-checklist'
+    | '/app/quickbooks'
     | '/app/referrals'
     | '/app/reports'
     | '/app/reviews'
@@ -724,6 +743,7 @@ export interface FileRouteTypes {
     | '/app/staff'
     | '/app/tasks'
     | '/app/treatment-plans'
+    | '/app/whatsapp'
     | '/auth/forgot-password'
     | '/auth/reset-password'
     | '/auth/sign-in'
@@ -789,6 +809,7 @@ export interface FileRouteTypes {
     | '/app/packages'
     | '/app/pos'
     | '/app/qa-checklist'
+    | '/app/quickbooks'
     | '/app/referrals'
     | '/app/reports'
     | '/app/reviews'
@@ -798,6 +819,7 @@ export interface FileRouteTypes {
     | '/app/staff'
     | '/app/tasks'
     | '/app/treatment-plans'
+    | '/app/whatsapp'
     | '/auth/forgot-password'
     | '/auth/reset-password'
     | '/auth/sign-in'
@@ -863,6 +885,7 @@ export interface FileRouteTypes {
     | '/app/packages'
     | '/app/pos'
     | '/app/qa-checklist'
+    | '/app/quickbooks'
     | '/app/referrals'
     | '/app/reports'
     | '/app/reviews'
@@ -872,6 +895,7 @@ export interface FileRouteTypes {
     | '/app/staff'
     | '/app/tasks'
     | '/app/treatment-plans'
+    | '/app/whatsapp'
     | '/auth/forgot-password'
     | '/auth/reset-password'
     | '/auth/sign-in'
@@ -1070,6 +1094,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/app/whatsapp': {
+      id: '/app/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/app/whatsapp'
+      preLoaderRoute: typeof AppWhatsappRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/treatment-plans': {
       id: '/app/treatment-plans'
       path: '/treatment-plans'
@@ -1131,6 +1162,13 @@ declare module '@tanstack/react-router' {
       path: '/referrals'
       fullPath: '/app/referrals'
       preLoaderRoute: typeof AppReferralsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/quickbooks': {
+      id: '/app/quickbooks'
+      path: '/quickbooks'
+      fullPath: '/app/quickbooks'
+      preLoaderRoute: typeof AppQuickbooksRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/qa-checklist': {
@@ -1509,6 +1547,7 @@ interface AppRouteChildren {
   AppPackagesRoute: typeof AppPackagesRoute
   AppPosRoute: typeof AppPosRoute
   AppQaChecklistRoute: typeof AppQaChecklistRoute
+  AppQuickbooksRoute: typeof AppQuickbooksRoute
   AppReferralsRoute: typeof AppReferralsRoute
   AppReportsRoute: typeof AppReportsRoute
   AppReviewsRoute: typeof AppReviewsRoute
@@ -1518,6 +1557,7 @@ interface AppRouteChildren {
   AppStaffRoute: typeof AppStaffRouteWithChildren
   AppTasksRoute: typeof AppTasksRoute
   AppTreatmentPlansRoute: typeof AppTreatmentPlansRoute
+  AppWhatsappRoute: typeof AppWhatsappRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -1548,6 +1588,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPackagesRoute: AppPackagesRoute,
   AppPosRoute: AppPosRoute,
   AppQaChecklistRoute: AppQaChecklistRoute,
+  AppQuickbooksRoute: AppQuickbooksRoute,
   AppReferralsRoute: AppReferralsRoute,
   AppReportsRoute: AppReportsRoute,
   AppReviewsRoute: AppReviewsRoute,
@@ -1557,6 +1598,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppStaffRoute: AppStaffRouteWithChildren,
   AppTasksRoute: AppTasksRoute,
   AppTreatmentPlansRoute: AppTreatmentPlansRoute,
+  AppWhatsappRoute: AppWhatsappRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
