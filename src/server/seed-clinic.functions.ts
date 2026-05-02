@@ -1,36 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "@/integrations/supabase/types";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
  * Seeds a brand-new clinic with default content.
- * Accepts the user's access token as input since server function
- * RPCs don't forward browser Authorization headers automatically.
+ * Uses requireSupabaseAuth middleware for secure authentication.
  */
 export const seedClinicDefaults = createServerFn({ method: "POST" })
-  .inputValidator((data: { accessToken: string }) => {
-    if (!data.accessToken) throw new Error("accessToken is required");
-    return data;
-  })
-  .handler(async ({ data }) => {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
-
-    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-      throw new Error("Missing Supabase environment variables");
-    }
-
-    const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-      global: { headers: { Authorization: `Bearer ${data.accessToken}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-
-    const { data: userData, error: authError } = await supabase.auth.getUser(data.accessToken);
-    if (authError || !userData?.user) {
-      throw new Error("Unauthorized: Invalid token");
-    }
-
-    const userId = userData.user.id;
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
 
     // Get user's clinic
     const { data: membership } = await supabase

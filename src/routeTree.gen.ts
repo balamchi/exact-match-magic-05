@@ -40,6 +40,7 @@ import { Route as AppServicesRouteImport } from './routes/app.services'
 import { Route as AppReviewsRouteImport } from './routes/app.reviews'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppReferralsRouteImport } from './routes/app.referrals'
+import { Route as AppQaChecklistRouteImport } from './routes/app.qa-checklist'
 import { Route as AppPosRouteImport } from './routes/app.pos'
 import { Route as AppPackagesRouteImport } from './routes/app.packages'
 import { Route as AppMembershipsRouteImport } from './routes/app.memberships'
@@ -234,6 +235,11 @@ const AppReportsRoute = AppReportsRouteImport.update({
 const AppReferralsRoute = AppReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQaChecklistRoute = AppQaChecklistRouteImport.update({
+  id: '/qa-checklist',
+  path: '/qa-checklist',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPosRoute = AppPosRouteImport.update({
@@ -483,6 +489,7 @@ export interface FileRoutesByFullPath {
   '/app/memberships': typeof AppMembershipsRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/pos': typeof AppPosRoute
+  '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
@@ -556,6 +563,7 @@ export interface FileRoutesByTo {
   '/app/memberships': typeof AppMembershipsRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/pos': typeof AppPosRoute
+  '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
@@ -630,6 +638,7 @@ export interface FileRoutesById {
   '/app/memberships': typeof AppMembershipsRoute
   '/app/packages': typeof AppPackagesRoute
   '/app/pos': typeof AppPosRoute
+  '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRoute
@@ -705,6 +714,7 @@ export interface FileRouteTypes {
     | '/app/memberships'
     | '/app/packages'
     | '/app/pos'
+    | '/app/qa-checklist'
     | '/app/referrals'
     | '/app/reports'
     | '/app/reviews'
@@ -778,6 +788,7 @@ export interface FileRouteTypes {
     | '/app/memberships'
     | '/app/packages'
     | '/app/pos'
+    | '/app/qa-checklist'
     | '/app/referrals'
     | '/app/reports'
     | '/app/reviews'
@@ -851,6 +862,7 @@ export interface FileRouteTypes {
     | '/app/memberships'
     | '/app/packages'
     | '/app/pos'
+    | '/app/qa-checklist'
     | '/app/referrals'
     | '/app/reports'
     | '/app/reviews'
@@ -1119,6 +1131,13 @@ declare module '@tanstack/react-router' {
       path: '/referrals'
       fullPath: '/app/referrals'
       preLoaderRoute: typeof AppReferralsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/qa-checklist': {
+      id: '/app/qa-checklist'
+      path: '/qa-checklist'
+      fullPath: '/app/qa-checklist'
+      preLoaderRoute: typeof AppQaChecklistRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/pos': {
@@ -1489,6 +1508,7 @@ interface AppRouteChildren {
   AppMembershipsRoute: typeof AppMembershipsRoute
   AppPackagesRoute: typeof AppPackagesRoute
   AppPosRoute: typeof AppPosRoute
+  AppQaChecklistRoute: typeof AppQaChecklistRoute
   AppReferralsRoute: typeof AppReferralsRoute
   AppReportsRoute: typeof AppReportsRoute
   AppReviewsRoute: typeof AppReviewsRoute
@@ -1527,6 +1547,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMembershipsRoute: AppMembershipsRoute,
   AppPackagesRoute: AppPackagesRoute,
   AppPosRoute: AppPosRoute,
+  AppQaChecklistRoute: AppQaChecklistRoute,
   AppReferralsRoute: AppReferralsRoute,
   AppReportsRoute: AppReportsRoute,
   AppReviewsRoute: AppReviewsRoute,
