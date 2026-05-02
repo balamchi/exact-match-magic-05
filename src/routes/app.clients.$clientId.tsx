@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles,
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
+  AlertTriangle, Pill, ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -149,6 +150,50 @@ function ClientDetailPage() {
           </div>
         )}
       </section>
+
+      {/* Medical Alerts Banner */}
+      {(client.medical_alerts || (client.allergies as string[] | null)?.length || (client.medications as string[] | null)?.length) ? (
+        <section className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5 shadow-card">
+          <div className="flex items-center gap-2 text-destructive mb-3">
+            <ShieldAlert className="h-5 w-5" />
+            <h2 className="font-display text-lg font-semibold">Medical Alerts</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {client.medical_alerts && (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />Conditions
+                </p>
+                <p className="text-sm text-foreground/85">{client.medical_alerts}</p>
+              </div>
+            )}
+            {(client.allergies as string[] | null)?.length ? (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />Allergies
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {(client.allergies as string[]).map((a) => (
+                    <span key={a} className="rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">{a}</span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {(client.medications as string[] | null)?.length ? (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-amber-500/80 mb-1">
+                  <Pill className="inline h-3 w-3 mr-1" />Medications
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {(client.medications as string[]).map((m) => (
+                    <span key={m} className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-400">{m}</span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
       {/* Stats grid */}
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">

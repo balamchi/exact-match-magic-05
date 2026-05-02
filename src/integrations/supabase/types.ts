@@ -300,6 +300,7 @@ export type Database = {
       }
       clients: {
         Row: {
+          allergies: string[] | null
           clinic_id: string
           created_at: string
           date_of_birth: string | null
@@ -307,12 +308,15 @@ export type Database = {
           first_name: string
           id: string
           last_name: string | null
+          medical_alerts: string | null
+          medications: string[] | null
           notes: string | null
           phone: string | null
           tags: string[] | null
           updated_at: string
         }
         Insert: {
+          allergies?: string[] | null
           clinic_id: string
           created_at?: string
           date_of_birth?: string | null
@@ -320,12 +324,15 @@ export type Database = {
           first_name: string
           id?: string
           last_name?: string | null
+          medical_alerts?: string | null
+          medications?: string[] | null
           notes?: string | null
           phone?: string | null
           tags?: string[] | null
           updated_at?: string
         }
         Update: {
+          allergies?: string[] | null
           clinic_id?: string
           created_at?: string
           date_of_birth?: string | null
@@ -333,6 +340,8 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string | null
+          medical_alerts?: string | null
+          medications?: string[] | null
           notes?: string | null
           phone?: string | null
           tags?: string[] | null
@@ -385,6 +394,7 @@ export type Database = {
           created_at: string
           created_by: string
           currency: string
+          deposit_amount_cents: number
           id: string
           name: string
           slug: string
@@ -395,6 +405,7 @@ export type Database = {
           created_at?: string
           created_by: string
           currency?: string
+          deposit_amount_cents?: number
           id?: string
           name: string
           slug: string
@@ -405,6 +416,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           currency?: string
+          deposit_amount_cents?: number
           id?: string
           name?: string
           slug?: string
@@ -900,6 +912,8 @@ export type Database = {
           phone: string | null
           postal_code: string | null
           region: string | null
+          tax_label: string
+          tax_rate: number
           timezone: string | null
           updated_at: string
         }
@@ -915,6 +929,8 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           region?: string | null
+          tax_label?: string
+          tax_rate?: number
           timezone?: string | null
           updated_at?: string
         }
@@ -930,6 +946,8 @@ export type Database = {
           phone?: string | null
           postal_code?: string | null
           region?: string | null
+          tax_label?: string
+          tax_rate?: number
           timezone?: string | null
           updated_at?: string
         }
