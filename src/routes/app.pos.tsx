@@ -160,7 +160,9 @@ function PosPage() {
   const subtotal = cart.reduce((s, c) => s + c.unitCents * c.qty, 0);
   const tax = Math.round(subtotal * TAX_RATE);
   const tip = customTipCents ?? Math.round(subtotal * (tipPercent / 100));
-  const total = subtotal + tax + tip;
+  const fullTotal = subtotal + tax + tip;
+  const depositAmount = depositMode ? Math.round(fullTotal * (depositPercent / 100)) : 0;
+  const total = depositMode ? depositAmount : fullTotal;
 
   async function checkout(method: "card" | "tap" | "cash" | "bnpl") {
     if (!clinicId) return;
