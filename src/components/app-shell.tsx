@@ -94,6 +94,7 @@ const NAV: NavGroup[] = [
     items: [
       { to: "/app/settings", label: "Settings", icon: Settings },
       { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
+      { to: "/app/quickbooks", label: "QuickBooks", icon: BookOpen },
       { to: "/app/api-settings", label: "API & Webhooks", icon: Globe },
     ],
   },
