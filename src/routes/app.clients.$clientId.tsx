@@ -98,6 +98,10 @@ function ClientDetailPage() {
   const fullName = [client.first_name, client.last_name].filter(Boolean).join(" ");
   const initials = `${client.first_name.slice(0, 1)}${client.last_name?.slice(0, 1) ?? ""}`.toUpperCase();
   const currency = activeClinic?.clinic.currency ?? "CAD";
+  const clientAny = client as any;
+  const age = clientAny.date_of_birth ? (() => { const b = new Date(clientAny.date_of_birth); const n = new Date(); let a = n.getFullYear() - b.getFullYear(); if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) a--; return a; })() : null;
+  const noShows = appointments.filter((a) => a.status === "no_show").length;
+  const cancellations = appointments.filter((a) => a.status === "cancelled").length;
 
   const TABS: { id: Tab; label: string; icon: React.ReactNode; count: number }[] = [
     { id: "history", label: "Visits", icon: <CalendarDays className="h-3.5 w-3.5" />, count: appointments.length },
