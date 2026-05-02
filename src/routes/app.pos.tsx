@@ -459,12 +459,25 @@ function PosPage() {
             <Row label={`Tax (${(TAX_RATE * 100).toFixed(0)}%)`} value={formatCAD(tax)} />
             <Row label="Tip" value={formatCAD(tip)} />
             <div className="mt-3 border-t border-border pt-3">
+              {depositMode && (
+                <div className="mb-2 flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Full total</span>
+                  <span className="font-mono tabular-nums line-through opacity-50">{formatCAD(fullTotal)}</span>
+                </div>
+              )}
               <div className="flex items-baseline justify-between">
-                <span className="text-sm font-medium text-muted-foreground">Total</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {depositMode ? `Deposit (${depositPercent}%)` : "Total"}
+                </span>
                 <span className="bg-gradient-to-r from-primary to-fuchsia-400 bg-clip-text font-mono text-3xl font-bold tabular-nums text-transparent">
                   {formatCAD(total)}
                 </span>
               </div>
+              {depositMode && (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Remaining balance of {formatCAD(fullTotal - depositAmount)} due at appointment
+                </p>
+              )}
             </div>
 
             <div className="mt-5 grid grid-cols-4 gap-2">
