@@ -358,6 +358,11 @@ function StaffPage() {
                     <Edit3 className="mr-1 h-3 w-3" />
                     Edit
                   </Button>
+                  <Link to="/app/staff/hr/$staffId" params={{ staffId: row.id }}>
+                    <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">
+                      <Briefcase className="h-3 w-3" />
+                    </Button>
+                  </Link>
                   <Button
                     size="sm"
                     variant="ghost"
