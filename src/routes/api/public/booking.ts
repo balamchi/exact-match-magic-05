@@ -14,7 +14,7 @@ const BookingSchema = z.object({
   notes: z.string().max(1000).nullable(),
 });
 
-export const Route = createFileRoute("/api/public/booking")({
+export const Route = createFileRoute("/api/public/booking" as any)({
   server: {
     handlers: {
       OPTIONS: async () => {
