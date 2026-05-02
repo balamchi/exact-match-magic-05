@@ -18,6 +18,8 @@ interface ServiceForm {
   duration_minutes: string;
   price_cents: string;
   active: boolean;
+  deposit_required: boolean;
+  deposit_cents: string;
 }
 
 const emptyForm: ServiceForm = {
@@ -26,6 +28,8 @@ const emptyForm: ServiceForm = {
   duration_minutes: "60",
   price_cents: "0",
   active: true,
+  deposit_required: false,
+  deposit_cents: "0",
 };
 
 const formSchema = z.object({
@@ -119,6 +123,8 @@ function ServicesPage() {
       duration_minutes: String(service.duration_minutes),
       price_cents: String((service.price_cents ?? 0) / 100),
       active: service.active,
+      deposit_required: (service as any).deposit_required ?? false,
+      deposit_cents: String(((service as any).deposit_cents ?? 0) / 100),
     });
     setOpen(true);
   };
@@ -139,6 +145,8 @@ function ServicesPage() {
       duration_minutes: parsed.data.duration_minutes,
       price_cents: Math.round(parsed.data.price_cents * 100),
       active: parsed.data.active,
+      deposit_required: form.deposit_required,
+      deposit_cents: Math.round(Number(form.deposit_cents || 0) * 100),
     };
     const result = editing
       ? await supabase.from("services").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id)
@@ -243,6 +251,11 @@ function ServicesPage() {
                               Inactive
                             </span>
                           )}
+                          {(service as any).deposit_required && (
+                            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                              Deposit {formatMoney((service as any).deposit_cents ?? 0, currency)}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
@@ -284,7 +297,7 @@ function ServicesPage() {
               <Field label="Category" value={form.category} onChange={(v) => setForm({ ...form, category: v })} placeholder="Injectables, Skin, Wellness…" />
               <Field label="Duration (minutes)" type="number" required value={form.duration_minutes} onChange={(v) => setForm({ ...form, duration_minutes: v })} />
               <Field label={`Price (${currency})`} type="number" step="0.01" required value={form.price_cents} onChange={(v) => setForm({ ...form, price_cents: v })} />
-              <label className="flex items-center gap-2 md:col-span-2">
+              <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={form.active}
@@ -293,6 +306,18 @@ function ServicesPage() {
                 />
                 <span className="text-sm">Active and bookable</span>
               </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={form.deposit_required}
+                  onChange={(e) => setForm({ ...form, deposit_required: e.target.checked })}
+                  className="h-5 w-5 accent-primary"
+                />
+                <span className="text-sm">Require deposit</span>
+              </label>
+              {form.deposit_required && (
+                <Field label={`Deposit amount (${currency})`} type="number" step="0.01" value={form.deposit_cents} onChange={(v) => setForm({ ...form, deposit_cents: v })} />
+              )}
             </div>
             <div className="flex justify-end gap-2 border-t border-border p-5">
               <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>

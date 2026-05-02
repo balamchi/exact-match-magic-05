@@ -22,6 +22,9 @@ interface AppointmentForm {
   status: Appointment["status"];
   price: string;
   notes: string;
+  collect_deposit: boolean;
+  deposit_amount: string;
+  deposit_method: string;
 }
 
 const statuses: Appointment["status"][] = ["scheduled", "confirmed", "checked_in", "completed", "no_show", "cancelled"];
@@ -34,6 +37,9 @@ const emptyForm: AppointmentForm = {
   status: "scheduled",
   price: "0",
   notes: "",
+  collect_deposit: false,
+  deposit_amount: "0",
+  deposit_method: "card",
 };
 
 function toDatetimeLocal(value: string | Date) {
@@ -142,6 +148,9 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
       status: appointment.status,
       price: String((appointment.price_cents ?? 0) / 100),
       notes: appointment.notes ?? "",
+      collect_deposit: false,
+      deposit_amount: "0",
+      deposit_method: "card",
     });
     setOpen(true);
   };
@@ -151,7 +160,17 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
     const start = form.starts_at ? new Date(form.starts_at) : new Date();
     const duration = service?.duration_minutes ?? 60;
     const end = new Date(start.getTime() + duration * 60000);
-    setForm({ ...form, service_id: serviceId, price: String((service?.price_cents ?? 0) / 100), ends_at: toDatetimeLocal(end) });
+    const depositRequired = (service as any)?.deposit_required ?? false;
+    const depositCents = (service as any)?.deposit_cents ?? 0;
+    setForm({
+      ...form,
+      service_id: serviceId,
+      price: String((service?.price_cents ?? 0) / 100),
+      ends_at: toDatetimeLocal(end),
+      collect_deposit: depositRequired,
+      deposit_amount: String(depositCents / 100),
+      deposit_method: form.deposit_method,
+    });
   };
 
   const updateStart = (startsAt: string) => {
@@ -168,6 +187,7 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
     if (new Date(form.ends_at).getTime() <= new Date(form.starts_at).getTime()) return toast.error("End time must be after start time");
     setSaving(true);
 
+    const depositStatus = form.collect_deposit ? "pending" : null;
     const payload = {
       clinic_id: activeClinic.clinic_id,
       client_id: form.client_id || null,
@@ -178,17 +198,40 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
       status: form.status,
       price_cents: Math.round(Number(form.price || 0) * 100),
       notes: form.notes.trim() || null,
+      deposit_status: depositStatus,
     };
 
-    const result = editing
-      ? await supabase.from("appointments").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id)
-      : await supabase.from("appointments").insert(payload);
-
-    if (result.error) toast.error(result.error.message);
-    else {
-      toast.success(editing ? "Appointment updated" : "Appointment booked");
-      setOpen(false);
-      await loadAll();
+    if (editing) {
+      const result = await supabase.from("appointments").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id);
+      if (result.error) toast.error(result.error.message);
+      else {
+        toast.success("Appointment updated");
+        setOpen(false);
+        await loadAll();
+      }
+    } else {
+      const result = await supabase.from("appointments").insert(payload).select().single();
+      if (result.error) {
+        toast.error(result.error.message);
+      } else {
+        // Create deposit record if needed
+        if (form.collect_deposit && result.data) {
+          const depositCents = Math.round(Number(form.deposit_amount || 0) * 100);
+          if (depositCents > 0) {
+            await supabase.from("deposits").insert({
+              clinic_id: activeClinic.clinic_id,
+              appointment_id: result.data.id,
+              client_id: form.client_id || null,
+              amount_cents: depositCents,
+              method: form.deposit_method,
+              status: "pending",
+            });
+          }
+        }
+        toast.success("Appointment booked" + (form.collect_deposit ? " — deposit pending" : ""));
+        setOpen(false);
+        await loadAll();
+      }
     }
     setSaving(false);
   };
@@ -255,7 +298,7 @@ export function BookingWorkflow({ mode }: { mode: BookingMode }) {
         )}
       </section>
 
-      {open && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"><form onSubmit={submit} className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated"><div className="border-b border-border p-5"><h2 className="font-display text-2xl font-semibold">{editing ? "Edit appointment" : "New appointment"}</h2><p className="mt-1 text-sm text-muted-foreground">Choose the client, service, provider, and time.</p></div><div className="grid gap-4 p-5 md:grid-cols-2"><Select label="Client" value={form.client_id} onChange={(value) => setForm({ ...form, client_id: value })} options={[{ label: "Walk-in / no client", value: "" }, ...clients.map((client) => ({ label: fullName(client), value: client.id }))]} /><Select label="Service" value={form.service_id} onChange={updateService} options={[{ label: "No service", value: "" }, ...services.map((service) => ({ label: `${service.name} · ${service.duration_minutes} min · ${money(service.price_cents)}`, value: service.id }))]} /><Select label="Staff" value={form.staff_id} onChange={(value) => setForm({ ...form, staff_id: value })} options={[{ label: "Unassigned", value: "" }, ...staff.map((member) => ({ label: `${member.display_name}${member.title ? ` · ${member.title}` : ""}`, value: member.id }))]} /><Select label="Status" value={form.status} onChange={(value) => setForm({ ...form, status: value as Appointment["status"] })} options={statuses.map((status) => ({ label: status.replace("_", " "), value: status }))} /><Field label="Starts" type="datetime-local" required value={form.starts_at} onChange={updateStart} /><Field label="Ends" type="datetime-local" required value={form.ends_at} onChange={(value) => setForm({ ...form, ends_at: value })} /><Field label="Price" type="number" value={form.price} onChange={(value) => setForm({ ...form, price: value })} /><label className="md:col-span-2"><span className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</span><textarea rows={4} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} className="w-full resize-none rounded-lg border border-input bg-surface px-3 py-2 text-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30" /></label></div><div className="flex justify-end gap-2 border-t border-border p-5"><Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button><Button disabled={saving} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">{saving ? "Saving…" : "Save appointment"}</Button></div></form></div>}
+      {open && <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"><form onSubmit={submit} className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated"><div className="border-b border-border p-5"><h2 className="font-display text-2xl font-semibold">{editing ? "Edit appointment" : "New appointment"}</h2><p className="mt-1 text-sm text-muted-foreground">Choose the client, service, provider, and time.</p></div><div className="grid gap-4 p-5 md:grid-cols-2"><Select label="Client" value={form.client_id} onChange={(value) => setForm({ ...form, client_id: value })} options={[{ label: "Walk-in / no client", value: "" }, ...clients.map((client) => ({ label: fullName(client), value: client.id }))]} /><Select label="Service" value={form.service_id} onChange={updateService} options={[{ label: "No service", value: "" }, ...services.map((service) => ({ label: `${service.name} · ${service.duration_minutes} min · ${money(service.price_cents)}`, value: service.id }))]} /><Select label="Staff" value={form.staff_id} onChange={(value) => setForm({ ...form, staff_id: value })} options={[{ label: "Unassigned", value: "" }, ...staff.map((member) => ({ label: `${member.display_name}${member.title ? ` · ${member.title}` : ""}`, value: member.id }))]} /><Select label="Status" value={form.status} onChange={(value) => setForm({ ...form, status: value as Appointment["status"] })} options={statuses.map((status) => ({ label: status.replace("_", " "), value: status }))} /><Field label="Starts" type="datetime-local" required value={form.starts_at} onChange={updateStart} /><Field label="Ends" type="datetime-local" required value={form.ends_at} onChange={(value) => setForm({ ...form, ends_at: value })} /><Field label="Price" type="number" value={form.price} onChange={(value) => setForm({ ...form, price: value })} />{/* Deposit section */}<div className="md:col-span-2 rounded-xl border border-border bg-surface/40 p-4 space-y-3"><div className="flex items-center gap-3"><label className="flex items-center gap-2"><input type="checkbox" checked={form.collect_deposit} onChange={(e) => setForm({ ...form, collect_deposit: e.target.checked })} className="h-5 w-5 accent-primary" /><span className="text-sm font-medium">Collect deposit</span></label>{form.collect_deposit && <span className="text-xs text-primary">💰 {money(Math.round(Number(form.deposit_amount || 0) * 100))} deposit</span>}</div>{form.collect_deposit && <div className="grid gap-3 md:grid-cols-2"><Field label="Deposit amount" type="number" value={form.deposit_amount} onChange={(value) => setForm({ ...form, deposit_amount: value })} /><Select label="Payment method" value={form.deposit_method} onChange={(value) => setForm({ ...form, deposit_method: value })} options={[{ label: "Credit card", value: "card" }, { label: "Cash", value: "cash" }, { label: "E-transfer", value: "e-transfer" }, { label: "Other", value: "other" }]} /></div>}</div><label className="md:col-span-2"><span className="mb-1.5 block text-xs font-medium text-muted-foreground">Notes</span><textarea rows={4} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} className="w-full resize-none rounded-lg border border-input bg-surface px-3 py-2 text-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30" /></label></div><div className="flex justify-end gap-2 border-t border-border p-5"><Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button><Button disabled={saving} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">{saving ? "Saving…" : "Save appointment"}</Button></div></form></div>}
     </div>
   );
 }
