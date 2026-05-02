@@ -11,13 +11,21 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as MigrateRouteImport } from './routes/migrate'
 import { Route as LovableRouteImport } from './routes/lovable'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as EmailRouteImport } from './routes/email'
+import { Route as DocsRouteImport } from './routes/docs'
+import { Route as CustomersRouteImport } from './routes/customers'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as ApiRouteImport } from './routes/api'
@@ -94,6 +102,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RefundsRoute = RefundsRouteImport.update({
   id: '/refunds',
   path: '/refunds',
@@ -109,9 +122,24 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MigrateRoute = MigrateRouteImport.update({
+  id: '/migrate',
+  path: '/migrate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableRoute = LovableRouteImport.update({
   id: '/lovable',
   path: '/lovable',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeaturesRoute = FeaturesRouteImport.update({
@@ -124,9 +152,29 @@ const EmailRoute = EmailRouteImport.update({
   path: '/email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomersRoute = CustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -465,13 +513,21 @@ export interface FileRoutesByFullPath {
   '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/customers': typeof CustomersRoute
+  '/docs': typeof DocsRoute
   '/email': typeof EmailRouteWithChildren
   '/features': typeof FeaturesRoute
+  '/help': typeof HelpRoute
+  '/integrations': typeof IntegrationsRoute
   '/lovable': typeof LovableRouteWithChildren
+  '/migrate': typeof MigrateRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
+  '/roadmap': typeof RoadmapRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/api/public': typeof ApiPublicRouteWithChildren
@@ -541,13 +597,21 @@ export interface FileRoutesByTo {
   '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/customers': typeof CustomersRoute
+  '/docs': typeof DocsRoute
   '/email': typeof EmailRouteWithChildren
   '/features': typeof FeaturesRoute
+  '/help': typeof HelpRoute
+  '/integrations': typeof IntegrationsRoute
   '/lovable': typeof LovableRouteWithChildren
+  '/migrate': typeof MigrateRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
+  '/roadmap': typeof RoadmapRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/api/public': typeof ApiPublicRouteWithChildren
@@ -618,13 +682,21 @@ export interface FileRoutesById {
   '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/blog': typeof BlogRoute
+  '/careers': typeof CareersRoute
   '/contact': typeof ContactRoute
+  '/customers': typeof CustomersRoute
+  '/docs': typeof DocsRoute
   '/email': typeof EmailRouteWithChildren
   '/features': typeof FeaturesRoute
+  '/help': typeof HelpRoute
+  '/integrations': typeof IntegrationsRoute
   '/lovable': typeof LovableRouteWithChildren
+  '/migrate': typeof MigrateRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
+  '/roadmap': typeof RoadmapRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/api/public': typeof ApiPublicRouteWithChildren
@@ -696,13 +768,21 @@ export interface FileRouteTypes {
     | '/api'
     | '/app'
     | '/auth'
+    | '/blog'
+    | '/careers'
     | '/contact'
+    | '/customers'
+    | '/docs'
     | '/email'
     | '/features'
+    | '/help'
+    | '/integrations'
     | '/lovable'
+    | '/migrate'
     | '/pricing'
     | '/privacy'
     | '/refunds'
+    | '/roadmap'
     | '/terms'
     | '/unsubscribe'
     | '/api/public'
@@ -772,13 +852,21 @@ export interface FileRouteTypes {
     | '/api'
     | '/app'
     | '/auth'
+    | '/blog'
+    | '/careers'
     | '/contact'
+    | '/customers'
+    | '/docs'
     | '/email'
     | '/features'
+    | '/help'
+    | '/integrations'
     | '/lovable'
+    | '/migrate'
     | '/pricing'
     | '/privacy'
     | '/refunds'
+    | '/roadmap'
     | '/terms'
     | '/unsubscribe'
     | '/api/public'
@@ -848,13 +936,21 @@ export interface FileRouteTypes {
     | '/api'
     | '/app'
     | '/auth'
+    | '/blog'
+    | '/careers'
     | '/contact'
+    | '/customers'
+    | '/docs'
     | '/email'
     | '/features'
+    | '/help'
+    | '/integrations'
     | '/lovable'
+    | '/migrate'
     | '/pricing'
     | '/privacy'
     | '/refunds'
+    | '/roadmap'
     | '/terms'
     | '/unsubscribe'
     | '/api/public'
@@ -925,13 +1021,21 @@ export interface RootRouteChildren {
   ApiRoute: typeof ApiRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  BlogRoute: typeof BlogRoute
+  CareersRoute: typeof CareersRoute
   ContactRoute: typeof ContactRoute
+  CustomersRoute: typeof CustomersRoute
+  DocsRoute: typeof DocsRoute
   EmailRoute: typeof EmailRouteWithChildren
   FeaturesRoute: typeof FeaturesRoute
+  HelpRoute: typeof HelpRoute
+  IntegrationsRoute: typeof IntegrationsRoute
   LovableRoute: typeof LovableRouteWithChildren
+  MigrateRoute: typeof MigrateRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundsRoute: typeof RefundsRoute
+  RoadmapRoute: typeof RoadmapRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   BookSlugRoute: typeof BookSlugRoute
@@ -952,6 +1056,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refunds': {
@@ -975,11 +1086,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/migrate': {
+      id: '/migrate'
+      path: '/migrate'
+      fullPath: '/migrate'
+      preLoaderRoute: typeof MigrateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable': {
       id: '/lovable'
       path: '/lovable'
       fullPath: '/lovable'
       preLoaderRoute: typeof LovableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/features': {
@@ -996,11 +1128,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customers': {
+      id: '/customers'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof CustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1705,13 +1865,21 @@ const rootRouteChildren: RootRouteChildren = {
   ApiRoute: ApiRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  BlogRoute: BlogRoute,
+  CareersRoute: CareersRoute,
   ContactRoute: ContactRoute,
+  CustomersRoute: CustomersRoute,
+  DocsRoute: DocsRoute,
   EmailRoute: EmailRouteWithChildren,
   FeaturesRoute: FeaturesRoute,
+  HelpRoute: HelpRoute,
+  IntegrationsRoute: IntegrationsRoute,
   LovableRoute: LovableRouteWithChildren,
+  MigrateRoute: MigrateRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundsRoute: RefundsRoute,
+  RoadmapRoute: RoadmapRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   BookSlugRoute: BookSlugRoute,

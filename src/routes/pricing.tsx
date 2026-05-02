@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — ClinicPro" },
-      { name: "description", content: "Simple, transparent pricing for clinics. 14-day free trial, no credit card required." },
+      { name: "description", content: "Plans starting at $69/mo. Free 14-day trial. Founding member pricing for first 100 clinics." },
     ],
   }),
 });
@@ -38,6 +38,9 @@ function PricingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("billing") === "annual") setInterval("annual");
+
     supabase
       .from("subscription_plans")
       .select("*")
@@ -107,6 +110,20 @@ function PricingPage() {
             14-day free trial on every plan. No credit card required. Cancel anytime.
           </p>
 
+          {/* Founding member banner */}
+          <div className="mx-auto mt-8 max-w-xl overflow-hidden rounded-2xl p-px [background:linear-gradient(135deg,#9333EA,#D946EF)]">
+            <div className="rounded-[15px] px-6 py-4 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
+              <div className="font-display text-lg font-bold text-white">🔒 Founding Member Pricing — Locked Forever</div>
+              <p className="mt-1 text-sm text-zinc-200">
+                First 100 clinics get <strong>$49/$149/$349</strong>/mo locked in for life.
+              </p>
+              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white">
+                <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                95 / 100 spots remaining
+              </div>
+            </div>
+          </div>
+
           <div className="mt-10 inline-flex items-center gap-1 rounded-full border border-border bg-card p-1">
             <button
               onClick={() => setInterval("monthly")}
@@ -129,11 +146,14 @@ function PricingPage() {
       </section>
 
       <section className="px-6 pb-24">
-        <div className="mx-auto grid max-w-[1280px] gap-6 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-[1280px] gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {loading && <div className="col-span-4 text-center text-muted-foreground">Loading plans…</div>}
           {plans.map((plan) => {
             const cents = interval === "monthly" ? plan.price_monthly_cents : Math.round(plan.price_annual_cents / 12);
             const display = plan.code === "enterprise" ? "Custom" : `$${(cents / 100).toFixed(0)}`;
+            const monthlyCents = plan.price_monthly_cents;
+            const annualMonthlyCents = Math.round(plan.price_annual_cents / 12);
+            const savings = plan.code !== "enterprise" && interval === "annual" ? ((monthlyCents - annualMonthlyCents) * 12 / 100) : 0;
             return (
               <div
                 key={plan.code}
@@ -157,7 +177,14 @@ function PricingPage() {
                   )}
                 </div>
                 {interval === "annual" && plan.code !== "enterprise" && (
-                  <p className="mt-1 text-xs text-success">Billed ${(plan.price_annual_cents / 100).toFixed(0)} yearly</p>
+                  <>
+                    <p className="mt-1 text-xs text-success">Billed ${(plan.price_annual_cents / 100).toFixed(0)} yearly</p>
+                    {savings > 0 && (
+                      <div className="mt-1 inline-flex w-fit rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-semibold text-success">
+                        Save ${savings.toFixed(0)}/year
+                      </div>
+                    )}
+                  </>
                 )}
                 <Button
                   className="mt-6 w-full"
