@@ -1,6 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles, Clock, DollarSign, Activity } from "lucide-react";
+import {
+  ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles,
+  Clock, DollarSign, Activity, FileText, Syringe, Camera,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
@@ -16,10 +19,15 @@ type Appointment = Tables<"appointments"> & {
   services?: Pick<Tables<"services">, "name" | "category"> | null;
   staff?: Pick<Tables<"staff">, "display_name" | "color"> | null;
 };
+type SoapNote = Tables<"soap_notes">;
+type InjectionSite = Tables<"injection_sites">;
+type BeforeAfter = Tables<"before_after_photos">;
 
 function formatMoney(cents: number, currency = "CAD") {
   return new Intl.NumberFormat("en-CA", { style: "currency", currency, maximumFractionDigits: 0 }).format(cents / 100);
 }
+
+type Tab = "history" | "soap" | "injections" | "photos";
 
 function ClientDetailPage() {
   const { clientId } = Route.useParams();
@@ -27,37 +35,35 @@ function ClientDetailPage() {
   const { activeClinic } = useAuth();
   const [client, setClient] = useState<Client | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [soapNotes, setSoapNotes] = useState<SoapNote[]>([]);
+  const [injections, setInjections] = useState<InjectionSite[]>([]);
+  const [photos, setPhotos] = useState<BeforeAfter[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<Tab>("history");
 
   useEffect(() => {
     if (!activeClinic) return;
     let cancelled = false;
     const load = async () => {
       setLoading(true);
-      const [clientRes, apptRes] = await Promise.all([
-        supabase
-          .from("clients")
-          .select("*")
-          .eq("id", clientId)
-          .eq("clinic_id", activeClinic.clinic_id)
-          .maybeSingle(),
-        supabase
-          .from("appointments")
-          .select("*, services(name, category), staff(display_name, color)")
-          .eq("clinic_id", activeClinic.clinic_id)
-          .eq("client_id", clientId)
-          .order("starts_at", { ascending: false }),
+      const [clientRes, apptRes, soapRes, injRes, photoRes] = await Promise.all([
+        supabase.from("clients").select("*").eq("id", clientId).eq("clinic_id", activeClinic.clinic_id).maybeSingle(),
+        supabase.from("appointments").select("*, services(name, category), staff(display_name, color)").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("starts_at", { ascending: false }),
+        supabase.from("soap_notes").select("*").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("visit_date", { ascending: false }),
+        supabase.from("injection_sites").select("*").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("visit_date", { ascending: false }),
+        supabase.from("before_after_photos").select("*").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("taken_on", { ascending: false }),
       ]);
       if (cancelled) return;
       if (clientRes.error) toast.error("Could not load client");
       setClient(clientRes.data ?? null);
       setAppointments((apptRes.data as Appointment[] | null) ?? []);
+      setSoapNotes(soapRes.data ?? []);
+      setInjections(injRes.data ?? []);
+      setPhotos(photoRes.data ?? []);
       setLoading(false);
     };
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [activeClinic?.clinic_id, clientId]);
 
   const stats = useMemo(() => {
@@ -65,12 +71,7 @@ function ClientDetailPage() {
     const upcoming = appointments.filter((a) => new Date(a.starts_at).getTime() > Date.now() && a.status !== "cancelled" && a.status !== "no_show");
     const lifetimeValueCents = completed.reduce((sum, a) => sum + (a.price_cents ?? 0), 0);
     const lastVisit = completed[0]?.starts_at ?? null;
-    return {
-      visits: completed.length,
-      upcoming: upcoming.length,
-      lifetimeValueCents,
-      lastVisit,
-    };
+    return { visits: completed.length, upcoming: upcoming.length, lifetimeValueCents, lastVisit };
   }, [appointments]);
 
   if (loading) {
@@ -97,13 +98,17 @@ function ClientDetailPage() {
   const initials = `${client.first_name.slice(0, 1)}${client.last_name?.slice(0, 1) ?? ""}`.toUpperCase();
   const currency = activeClinic?.clinic.currency ?? "CAD";
 
+  const TABS: { id: Tab; label: string; icon: React.ReactNode; count: number }[] = [
+    { id: "history", label: "Visits", icon: <CalendarDays className="h-3.5 w-3.5" />, count: appointments.length },
+    { id: "soap", label: "SOAP Notes", icon: <FileText className="h-3.5 w-3.5" />, count: soapNotes.length },
+    { id: "injections", label: "Injections", icon: <Syringe className="h-3.5 w-3.5" />, count: injections.length },
+    { id: "photos", label: "Photos", icon: <Camera className="h-3.5 w-3.5" />, count: photos.length },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
-        <button
-          onClick={() => navigate({ to: "/app/clients" })}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
-        >
+        <button onClick={() => navigate({ to: "/app/clients" })} className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground">
           <ArrowLeft className="h-3.5 w-3.5" /> All clients
         </button>
       </div>
@@ -120,39 +125,26 @@ function ClientDetailPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Client profile</p>
               <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight">{fullName}</h1>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                {client.email && (
-                  <span className="inline-flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> {client.email}</span>
-                )}
-                {client.phone && (
-                  <span className="inline-flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {client.phone}</span>
-                )}
-                {client.date_of_birth && (
-                  <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" /> {new Date(client.date_of_birth).toLocaleDateString()}</span>
-                )}
+                {client.email && <span className="inline-flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> {client.email}</span>}
+                {client.phone && <span className="inline-flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {client.phone}</span>}
+                {client.date_of_birth && <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" /> {new Date(client.date_of_birth).toLocaleDateString()}</span>}
               </div>
             </div>
           </div>
           <div className="flex gap-2">
             <Button asChild variant="outline" className="gap-2">
-              <Link to="/app/clients" search={{ edit: client.id } as never}>
-                <Pencil className="h-4 w-4" /> Edit
-              </Link>
+              <Link to="/app/clients" search={{ edit: client.id } as never}><Pencil className="h-4 w-4" /> Edit</Link>
             </Button>
             <Button asChild className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-              <Link to="/app/booking">
-                <Sparkles className="h-4 w-4" /> Book visit
-              </Link>
+              <Link to="/app/booking"><Sparkles className="h-4 w-4" /> Book visit</Link>
             </Button>
           </div>
         </div>
-
         {(client.tags ?? []).length > 0 && (
           <div className="relative mt-5 flex flex-wrap items-center gap-1.5">
             <Tag className="h-3.5 w-3.5 text-muted-foreground" />
             {(client.tags ?? []).map((tag) => (
-              <span key={tag} className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
-                {tag}
-              </span>
+              <span key={tag} className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{tag}</span>
             ))}
           </div>
         )}
@@ -166,63 +158,54 @@ function ClientDetailPage() {
         <StatTile icon={<Clock className="h-4 w-4" />} label="Last visit" value={stats.lastVisit ? new Date(stats.lastVisit).toLocaleDateString() : "—"} />
       </section>
 
-      {/* Two-column: history + sidebar */}
+      {/* Tabbed content */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <section className="rounded-2xl border border-border bg-card shadow-card lg:col-span-2">
-          <div className="flex items-center justify-between border-b border-border p-5">
-            <div>
-              <h2 className="font-display text-lg font-semibold">Appointment history</h2>
-              <p className="text-xs text-muted-foreground">{appointments.length} total visits on file.</p>
-            </div>
+          {/* Tabs */}
+          <div className="flex border-b border-border">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium transition ${
+                  activeTab === tab.id
+                    ? "border-b-2 border-primary text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+                {tab.count > 0 && (
+                  <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold">{tab.count}</span>
+                )}
+              </button>
+            ))}
           </div>
-          {appointments.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                <CalendarDays className="h-5 w-5" />
-              </div>
-              <h3 className="font-medium">No visits yet</h3>
-              <p className="mt-1 max-w-xs text-xs text-muted-foreground">Once you book this client they'll see their full treatment history here.</p>
-            </div>
-          ) : (
-            <ul className="divide-y divide-border">
-              {appointments.map((appt) => (
-                <li key={appt.id} className="grid gap-3 p-4 transition hover:bg-surface/60 md:grid-cols-[auto_1fr_auto] md:items-center">
-                  <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-surface text-center">
-                    <span className="text-[10px] font-semibold uppercase text-muted-foreground">
-                      {new Date(appt.starts_at).toLocaleDateString("en-US", { month: "short" })}
-                    </span>
-                    <span className="font-display text-base font-semibold leading-none">
-                      {new Date(appt.starts_at).getDate()}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="truncate font-medium">{appt.services?.name ?? "Custom appointment"}</h3>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span>{new Date(appt.starts_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
-                      {appt.staff && (
-                        <span className="inline-flex items-center gap-1">
-                          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: appt.staff.color ?? "#a78bfa" }} />
-                          {appt.staff.display_name}
-                        </span>
-                      )}
-                      <StatusPill status={appt.status} />
-                    </div>
-                  </div>
-                  <div className="text-right text-sm font-medium">
-                    {appt.price_cents > 0 ? formatMoney(appt.price_cents, currency) : "—"}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+
+          {/* Tab content */}
+          {activeTab === "history" && <AppointmentList appointments={appointments} currency={currency} />}
+          {activeTab === "soap" && <SoapNotesList notes={soapNotes} />}
+          {activeTab === "injections" && <InjectionsList injections={injections} />}
+          {activeTab === "photos" && <PhotosList photos={photos} />}
         </section>
 
+        {/* Sidebar */}
         <section className="rounded-2xl border border-border bg-card p-5 shadow-card">
           <h2 className="font-display text-lg font-semibold">Care notes</h2>
           <p className="mt-1 text-xs text-muted-foreground">Internal observations and reminders.</p>
           <div className="mt-4 whitespace-pre-wrap rounded-xl border border-dashed border-border bg-surface/40 p-4 text-sm leading-relaxed text-foreground/85">
             {client.notes?.trim() || <span className="text-muted-foreground">No notes added yet.</span>}
           </div>
+
+          {/* Spending breakdown */}
+          {stats.lifetimeValueCents > 0 && (
+            <div className="mt-5">
+              <h3 className="text-sm font-semibold">Spending by service</h3>
+              <SpendingBreakdown appointments={appointments} currency={currency} />
+            </div>
+          )}
+
           <div className="mt-5 space-y-2 text-xs text-muted-foreground">
             <div className="flex justify-between"><span>Created</span><span>{new Date(client.created_at).toLocaleDateString()}</span></div>
             <div className="flex justify-between"><span>Last updated</span><span>{new Date(client.updated_at).toLocaleDateString()}</span></div>
@@ -232,6 +215,8 @@ function ClientDetailPage() {
     </div>
   );
 }
+
+/* ——— Sub-components ——— */
 
 function StatTile({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
@@ -254,4 +239,178 @@ function StatusPill({ status }: { status: string }) {
   };
   const meta = map[status] ?? { label: status, className: "bg-muted text-muted-foreground" };
   return <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${meta.className}`}>{meta.label}</span>;
+}
+
+function AppointmentList({ appointments, currency }: { appointments: Appointment[]; currency: string }) {
+  if (appointments.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground"><CalendarDays className="h-5 w-5" /></div>
+        <h3 className="font-medium">No visits yet</h3>
+        <p className="mt-1 max-w-xs text-xs text-muted-foreground">Once you book this client they'll see their full treatment history here.</p>
+      </div>
+    );
+  }
+  return (
+    <ul className="divide-y divide-border">
+      {appointments.map((appt) => (
+        <li key={appt.id} className="grid gap-3 p-4 transition hover:bg-surface/60 md:grid-cols-[auto_1fr_auto] md:items-center">
+          <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-surface text-center">
+            <span className="text-[10px] font-semibold uppercase text-muted-foreground">{new Date(appt.starts_at).toLocaleDateString("en-US", { month: "short" })}</span>
+            <span className="font-display text-base font-semibold leading-none">{new Date(appt.starts_at).getDate()}</span>
+          </div>
+          <div className="min-w-0">
+            <h3 className="truncate font-medium">{appt.services?.name ?? "Custom appointment"}</h3>
+            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span>{new Date(appt.starts_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
+              {appt.staff && (
+                <span className="inline-flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: appt.staff.color ?? "#a78bfa" }} />
+                  {appt.staff.display_name}
+                </span>
+              )}
+              <StatusPill status={appt.status} />
+            </div>
+          </div>
+          <div className="text-right text-sm font-medium">{appt.price_cents > 0 ? formatMoney(appt.price_cents, currency) : "—"}</div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function SoapNotesList({ notes }: { notes: SoapNote[] }) {
+  if (notes.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground"><FileText className="h-5 w-5" /></div>
+        <h3 className="font-medium">No SOAP notes yet</h3>
+        <p className="mt-1 max-w-xs text-xs text-muted-foreground">SOAP notes from this client's visits will appear here.</p>
+      </div>
+    );
+  }
+  return (
+    <ul className="divide-y divide-border">
+      {notes.map((note) => (
+        <li key={note.id} className="p-4 transition hover:bg-surface/60">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{new Date(note.visit_date).toLocaleDateString()}</span>
+              {note.signed && <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-emerald-400">Signed</span>}
+            </div>
+          </div>
+          <div className="mt-2 grid gap-2 text-sm">
+            {note.subjective && <div><span className="font-semibold text-primary">S:</span> <span className="text-muted-foreground">{note.subjective}</span></div>}
+            {note.objective && <div><span className="font-semibold text-primary">O:</span> <span className="text-muted-foreground">{note.objective}</span></div>}
+            {note.assessment && <div><span className="font-semibold text-primary">A:</span> <span className="text-muted-foreground">{note.assessment}</span></div>}
+            {note.plan && <div><span className="font-semibold text-primary">P:</span> <span className="text-muted-foreground">{note.plan}</span></div>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function InjectionsList({ injections }: { injections: InjectionSite[] }) {
+  if (injections.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground"><Syringe className="h-5 w-5" /></div>
+        <h3 className="font-medium">No injection records</h3>
+        <p className="mt-1 max-w-xs text-xs text-muted-foreground">Injection mapping records for this client will appear here.</p>
+      </div>
+    );
+  }
+  return (
+    <ul className="divide-y divide-border">
+      {injections.map((inj) => (
+        <li key={inj.id} className="flex items-center gap-4 p-4 transition hover:bg-surface/60">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Syringe className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{inj.product}</span>
+              <span className="text-xs text-muted-foreground">·</span>
+              <span className="text-xs text-muted-foreground">{inj.region}</span>
+            </div>
+            <div className="mt-0.5 text-xs text-muted-foreground">
+              {new Date(inj.visit_date).toLocaleDateString()} · {Number(inj.units)} units
+              {inj.notes && <span> · {inj.notes}</span>}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function PhotosList({ photos }: { photos: BeforeAfter[] }) {
+  if (photos.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground"><Camera className="h-5 w-5" /></div>
+        <h3 className="font-medium">No photos yet</h3>
+        <p className="mt-1 max-w-xs text-xs text-muted-foreground">Before & after photos for this client will appear here.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="grid gap-4 p-4 sm:grid-cols-2">
+      {photos.map((p) => (
+        <div key={p.id} className="rounded-xl border border-border bg-surface/40 p-3">
+          <div className="grid grid-cols-2 gap-2">
+            {p.before_url ? (
+              <img src={p.before_url} alt="Before" className="h-32 w-full rounded-lg object-cover" />
+            ) : (
+              <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No before</div>
+            )}
+            {p.after_url ? (
+              <img src={p.after_url} alt="After" className="h-32 w-full rounded-lg object-cover" />
+            ) : (
+              <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No after</div>
+            )}
+          </div>
+          <div className="mt-2 text-xs">
+            <span className="font-medium">{p.treatment ?? "Treatment"}</span>
+            <span className="text-muted-foreground"> · {new Date(p.taken_on).toLocaleDateString()}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SpendingBreakdown({ appointments, currency }: { appointments: Appointment[]; currency: string }) {
+  const breakdown = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const a of appointments) {
+      if (a.status !== "completed" || !a.price_cents) continue;
+      const name = a.services?.name ?? "Other";
+      map.set(name, (map.get(name) ?? 0) + a.price_cents);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+  }, [appointments]);
+
+  if (breakdown.length === 0) return null;
+
+  const max = breakdown[0][1];
+
+  return (
+    <div className="mt-3 space-y-2">
+      {breakdown.map(([name, cents]) => (
+        <div key={name}>
+          <div className="flex items-center justify-between text-xs">
+            <span className="truncate">{name}</span>
+            <span className="font-medium">{formatMoney(cents, currency)}</span>
+          </div>
+          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
+            <div className="h-full rounded-full bg-primary" style={{ width: `${(cents / max) * 100}%` }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
