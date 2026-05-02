@@ -405,7 +405,7 @@ function StaffHrPage() {
                     className="h-8 w-20 text-xs"
                   />
                   <span className="text-xs text-muted-foreground">
-                    {c.commission_type === "percentage" ? "%" : activeClinic?.clinics?.currency || "CAD"}
+                    {c.commission_type === "percentage" ? "%" : activeClinic?.clinic?.currency || "CAD"}
                   </span>
                 </div>
 
