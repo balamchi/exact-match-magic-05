@@ -66,6 +66,7 @@ export type Database = {
           client_id: string | null
           clinic_id: string
           created_at: string
+          deposit_status: string | null
           ends_at: string
           id: string
           notes: string | null
@@ -80,6 +81,7 @@ export type Database = {
           client_id?: string | null
           clinic_id: string
           created_at?: string
+          deposit_status?: string | null
           ends_at: string
           id?: string
           notes?: string | null
@@ -94,6 +96,7 @@ export type Database = {
           client_id?: string | null
           clinic_id?: string
           created_at?: string
+          deposit_status?: string | null
           ends_at?: string
           id?: string
           notes?: string | null
@@ -504,6 +507,73 @@ export type Database = {
           used_count?: number
         }
         Relationships: []
+      }
+      deposits: {
+        Row: {
+          amount_cents: number
+          appointment_id: string
+          client_id: string | null
+          clinic_id: string
+          collected_at: string | null
+          created_at: string
+          id: string
+          method: string
+          notes: string | null
+          refunded_at: string | null
+          status: Database["public"]["Enums"]["deposit_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          appointment_id: string
+          client_id?: string | null
+          clinic_id: string
+          collected_at?: string | null
+          created_at?: string
+          id?: string
+          method?: string
+          notes?: string | null
+          refunded_at?: string | null
+          status?: Database["public"]["Enums"]["deposit_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          appointment_id?: string
+          client_id?: string | null
+          clinic_id?: string
+          collected_at?: string | null
+          created_at?: string
+          id?: string
+          method?: string
+          notes?: string | null
+          refunded_at?: string | null
+          status?: Database["public"]["Enums"]["deposit_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposits_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposits_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposits_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_send_log: {
         Row: {
@@ -1371,6 +1441,8 @@ export type Database = {
           category: string | null
           clinic_id: string
           created_at: string
+          deposit_cents: number
+          deposit_required: boolean
           duration_minutes: number
           id: string
           name: string
@@ -1382,6 +1454,8 @@ export type Database = {
           category?: string | null
           clinic_id: string
           created_at?: string
+          deposit_cents?: number
+          deposit_required?: boolean
           duration_minutes?: number
           id?: string
           name: string
@@ -1393,6 +1467,8 @@ export type Database = {
           category?: string | null
           clinic_id?: string
           created_at?: string
+          deposit_cents?: number
+          deposit_required?: boolean
           duration_minutes?: number
           id?: string
           name?: string
@@ -1979,6 +2055,7 @@ export type Database = {
         | "no_show"
         | "cancelled"
       clinic_role: "owner" | "admin" | "provider" | "front_desk"
+      deposit_status: "pending" | "collected" | "refunded" | "forfeited"
       lead_stage:
         | "new"
         | "contacted"
@@ -2123,6 +2200,7 @@ export const Constants = {
         "cancelled",
       ],
       clinic_role: ["owner", "admin", "provider", "front_desk"],
+      deposit_status: ["pending", "collected", "refunded", "forfeited"],
       lead_stage: [
         "new",
         "contacted",
