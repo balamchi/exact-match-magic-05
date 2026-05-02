@@ -31,21 +31,21 @@ const NAV: NavGroup[] = [
     items: [
       { to: "/app/dashboard", label: "Dashboard", icon: Activity },
       { to: "/app/reports", label: "Reports", icon: BarChart3 },
-      { to: "/app/ai", label: "AI Assistant", icon: Bot, badge: { kind: "pill", label: "NEW", tone: "new" } },
+      { to: "/app/ai", label: "AI Assistant", icon: Bot },
     ],
   },
   {
     section: "Operations",
     items: [
       { to: "/app/booking", label: "Booking", icon: CalendarDays },
-      { to: "/app/calendar", label: "Calendar", icon: Calendar, badge: { kind: "count", value: 28 } },
-      { to: "/app/checkin", label: "Check-In", icon: ClipboardCheck, badge: { kind: "count", value: 4 } },
+      { to: "/app/calendar", label: "Calendar", icon: Calendar },
+      { to: "/app/checkin", label: "Check-In", icon: ClipboardCheck },
       { to: "/app/consent", label: "Consent Forms", icon: Shield },
-      { to: "/app/clients", label: "Clients", icon: Users, badge: { kind: "count", value: 1842 } },
-      { to: "/app/services", label: "Services", icon: HeartPulse, badge: { kind: "count", value: 322 } },
+      { to: "/app/clients", label: "Clients", icon: Users },
+      { to: "/app/services", label: "Services", icon: HeartPulse },
       { to: "/app/staff", label: "Staff", icon: UserCog },
       { to: "/app/locations", label: "Locations", icon: MapPin },
-      { to: "/app/leads", label: "Leads", icon: Target, badge: { kind: "count", value: 17 } },
+      { to: "/app/leads", label: "Leads", icon: Target },
     ],
   },
   {
@@ -64,13 +64,13 @@ const NAV: NavGroup[] = [
   {
     section: "Growth",
     items: [
-      { to: "/app/inbox", label: "Inbox", icon: Inbox, badge: { kind: "count", value: 12 } },
-      { to: "/app/whatsapp", label: "WhatsApp", icon: Phone, badge: { kind: "pill", label: "NEW", tone: "new" } },
+      { to: "/app/inbox", label: "Inbox", icon: Inbox },
+      { to: "/app/whatsapp", label: "WhatsApp", icon: Phone },
       { to: "/app/marketing", label: "Campaigns", icon: Send },
-      { to: "/app/automations", label: "Automations", icon: Zap, badge: { kind: "count", value: 43 } },
+      { to: "/app/automations", label: "Automations", icon: Zap },
       { to: "/app/reviews", label: "Reviews", icon: Star },
       { to: "/app/referrals", label: "Referrals", icon: Share2 },
-      { to: "/app/tasks", label: "Tasks", icon: CheckSquare, badge: { kind: "count", value: 6 } },
+      { to: "/app/tasks", label: "Tasks", icon: CheckSquare },
       { to: "/app/email-log", label: "Email Log", icon: Bell },
     ],
   },
@@ -86,7 +86,7 @@ const NAV: NavGroup[] = [
   {
     section: "AI",
     items: [
-      { to: "/app/ai-optimizer", label: "Schedule Optimizer", icon: Brain, badge: { kind: "pill", label: "AI", tone: "new" } },
+      { to: "/app/ai-optimizer", label: "Schedule Optimizer", icon: Brain },
     ],
   },
   {
@@ -383,9 +383,8 @@ function Header({ onMenu }: { onMenu: () => void }) {
         Live
       </div>
 
-      <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
+      <Button variant="ghost" size="icon" aria-label="Notifications">
         <Bell className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
-        <span className="absolute end-2 top-2 h-1.5 w-1.5 rounded-full bg-primary glow-purple" />
       </Button>
 
       <Button className="gap-1.5 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
