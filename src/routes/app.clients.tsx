@@ -225,8 +225,8 @@ function ClientsPage() {
     };
 
     const result = editing
-      ? await supabase.from("clients").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id)
-      : await supabase.from("clients").insert(payload);
+      ? await supabase.from("clients").update(payload as any).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id)
+      : await supabase.from("clients").insert(payload as any);
 
     if (result.error) {
       toast.error(editing ? "Could not update client" : "Could not create client");
