@@ -22,6 +22,9 @@ interface AppointmentForm {
   status: Appointment["status"];
   price: string;
   notes: string;
+  collect_deposit: boolean;
+  deposit_amount: string;
+  deposit_method: string;
 }
 
 const statuses: Appointment["status"][] = ["scheduled", "confirmed", "checked_in", "completed", "no_show", "cancelled"];
@@ -34,6 +37,9 @@ const emptyForm: AppointmentForm = {
   status: "scheduled",
   price: "0",
   notes: "",
+  collect_deposit: false,
+  deposit_amount: "0",
+  deposit_method: "card",
 };
 
 function toDatetimeLocal(value: string | Date) {
