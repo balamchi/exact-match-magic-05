@@ -4,7 +4,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
   Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare,
-  Search, Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
+  Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
   HeartPulse, UserCog, Menu, Languages,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
