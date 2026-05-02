@@ -3,6 +3,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useSubscription } from "@/hooks/use-subscription";
 import { AppShell } from "@/components/app-shell";
 import { Paywall } from "@/components/paywall";
+import { OnboardingWizard, useOnboardingCheck } from "@/components/onboarding-wizard";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/app")({
@@ -16,8 +17,9 @@ function AppLayout() {
   const { user, loading, activeClinic } = useAuth();
   const { subscription, loading: subLoading, isActive } = useSubscription();
   const location = useLocation();
+  const { showOnboarding, setShowOnboarding, loading: onboardingLoading } = useOnboardingCheck();
 
-  if (loading) {
+  if (loading || onboardingLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex h-10 w-10 animate-pulse items-center justify-center rounded-lg bg-gradient-primary shadow-glow">
@@ -42,8 +44,12 @@ function AppLayout() {
     );
   }
 
+  // Show onboarding for brand-new clinics
+  if (showOnboarding) {
+    return <OnboardingWizard onComplete={() => setShowOnboarding(false)} />;
+  }
+
   // Paywall: only block when we have a subscription that's expired/inactive.
-  // Brand-new clinics with NO subscription row still see the app + trial banner CTA.
   const allowed = ALWAYS_ALLOWED.some((p) => location.pathname.startsWith(p));
   const shouldBlock = !subLoading && subscription && !isActive && !allowed;
 
