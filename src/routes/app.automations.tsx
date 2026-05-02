@@ -372,6 +372,20 @@ function AutomationsPage() {
         </div>
       </section>
 
+      {/* Visual Builder */}
+      <section className="rounded-2xl border border-border bg-card shadow-card p-5">
+        <div className="mb-4">
+          <h2 className="font-display text-lg font-semibold flex items-center gap-2">
+            <Zap className="h-5 w-5 text-primary" />
+            Visual Workflow Builder
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Drag-and-drop nodes to build complex automation sequences. Add triggers, delays, conditions, and actions.
+          </p>
+        </div>
+        <WorkflowBuilder nodes={builderNodes} onChange={setBuilderNodes} />
+      </section>
+
       {/* Workflow list */}
       <section className="rounded-2xl border border-border bg-card shadow-card">
         <div className="flex flex-col gap-3 border-b border-border p-4 md:flex-row md:items-center md:justify-between">
