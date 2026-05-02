@@ -303,52 +303,154 @@ export type Database = {
       }
       clients: {
         Row: {
+          address_line1: string | null
+          address_line2: string | null
           allergies: string[] | null
+          cancellation_count: number | null
+          city: string | null
           clinic_id: string
+          country: string | null
           created_at: string
+          current_medications: string | null
           date_of_birth: string | null
           email: string | null
+          email_consent: boolean | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relationship: string | null
           first_name: string
+          first_visit_date: string | null
+          gender: string | null
           id: string
           last_name: string | null
+          last_visit_date: string | null
+          lifetime_value_cents: number | null
+          marketing_consent: boolean | null
           medical_alerts: string | null
+          medical_conditions: string[] | null
           medications: string[] | null
+          no_show_count: number | null
           notes: string | null
+          notes_internal: string | null
           phone: string | null
+          photo_url: string | null
+          postal_code: string | null
+          preferred_language: string | null
+          preferred_name: string | null
+          preferred_provider_id: string | null
+          pregnancy_status: string | null
+          previous_treatments: string | null
+          pronouns: string | null
+          referred_by_client_id: string | null
+          skin_type: string | null
+          smoking_status: string | null
+          sms_consent: boolean | null
+          source: string | null
+          state_province: string | null
           tags: string[] | null
           updated_at: string
+          vip_status: boolean | null
+          visit_count: number | null
         }
         Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
           allergies?: string[] | null
+          cancellation_count?: number | null
+          city?: string | null
           clinic_id: string
+          country?: string | null
           created_at?: string
+          current_medications?: string | null
           date_of_birth?: string | null
           email?: string | null
+          email_consent?: boolean | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           first_name: string
+          first_visit_date?: string | null
+          gender?: string | null
           id?: string
           last_name?: string | null
+          last_visit_date?: string | null
+          lifetime_value_cents?: number | null
+          marketing_consent?: boolean | null
           medical_alerts?: string | null
+          medical_conditions?: string[] | null
           medications?: string[] | null
+          no_show_count?: number | null
           notes?: string | null
+          notes_internal?: string | null
           phone?: string | null
+          photo_url?: string | null
+          postal_code?: string | null
+          preferred_language?: string | null
+          preferred_name?: string | null
+          preferred_provider_id?: string | null
+          pregnancy_status?: string | null
+          previous_treatments?: string | null
+          pronouns?: string | null
+          referred_by_client_id?: string | null
+          skin_type?: string | null
+          smoking_status?: string | null
+          sms_consent?: boolean | null
+          source?: string | null
+          state_province?: string | null
           tags?: string[] | null
           updated_at?: string
+          vip_status?: boolean | null
+          visit_count?: number | null
         }
         Update: {
+          address_line1?: string | null
+          address_line2?: string | null
           allergies?: string[] | null
+          cancellation_count?: number | null
+          city?: string | null
           clinic_id?: string
+          country?: string | null
           created_at?: string
+          current_medications?: string | null
           date_of_birth?: string | null
           email?: string | null
+          email_consent?: boolean | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           first_name?: string
+          first_visit_date?: string | null
+          gender?: string | null
           id?: string
           last_name?: string | null
+          last_visit_date?: string | null
+          lifetime_value_cents?: number | null
+          marketing_consent?: boolean | null
           medical_alerts?: string | null
+          medical_conditions?: string[] | null
           medications?: string[] | null
+          no_show_count?: number | null
           notes?: string | null
+          notes_internal?: string | null
           phone?: string | null
+          photo_url?: string | null
+          postal_code?: string | null
+          preferred_language?: string | null
+          preferred_name?: string | null
+          preferred_provider_id?: string | null
+          pregnancy_status?: string | null
+          previous_treatments?: string | null
+          pronouns?: string | null
+          referred_by_client_id?: string | null
+          skin_type?: string | null
+          smoking_status?: string | null
+          sms_consent?: boolean | null
+          source?: string | null
+          state_province?: string | null
           tags?: string[] | null
           updated_at?: string
+          vip_status?: boolean | null
+          visit_count?: number | null
         }
         Relationships: [
           {
