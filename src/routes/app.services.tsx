@@ -292,7 +292,7 @@ function ServicesPage() {
               <Field label="Category" value={form.category} onChange={(v) => setForm({ ...form, category: v })} placeholder="Injectables, Skin, Wellness…" />
               <Field label="Duration (minutes)" type="number" required value={form.duration_minutes} onChange={(v) => setForm({ ...form, duration_minutes: v })} />
               <Field label={`Price (${currency})`} type="number" step="0.01" required value={form.price_cents} onChange={(v) => setForm({ ...form, price_cents: v })} />
-              <label className="flex items-center gap-2 md:col-span-2">
+              <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={form.active}
@@ -301,6 +301,18 @@ function ServicesPage() {
                 />
                 <span className="text-sm">Active and bookable</span>
               </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={form.deposit_required}
+                  onChange={(e) => setForm({ ...form, deposit_required: e.target.checked })}
+                  className="h-5 w-5 accent-primary"
+                />
+                <span className="text-sm">Require deposit</span>
+              </label>
+              {form.deposit_required && (
+                <Field label={`Deposit amount (${currency})`} type="number" step="0.01" value={form.deposit_cents} onChange={(v) => setForm({ ...form, deposit_cents: v })} />
+              )}
             </div>
             <div className="flex justify-end gap-2 border-t border-border p-5">
               <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
