@@ -14,9 +14,14 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as RefundsRouteImport } from './routes/refunds'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as LovableRouteImport } from './routes/lovable'
+import { Route as EmailRouteImport } from './routes/email'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as ApiRouteImport } from './routes/api'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as LovableEmailRouteImport } from './routes/lovable.email'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email.unsubscribe'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
@@ -54,13 +59,19 @@ import { Route as AppBookingRouteImport } from './routes/app.booking'
 import { Route as AppBeforeAfterRouteImport } from './routes/app.before-after'
 import { Route as AppAutomationsRouteImport } from './routes/app.automations'
 import { Route as AppAiRouteImport } from './routes/app.ai'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicRouteImport } from './routes/api.public'
+import { Route as LovableEmailTransactionalRouteImport } from './routes/lovable.email.transactional'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable.email.suppression'
+import { Route as LovableEmailQueueRouteImport } from './routes/lovable.email.queue'
+import { Route as LovableEmailAuthRouteImport } from './routes/lovable.email.auth'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppClientsClientIdRouteImport } from './routes/app.clients.$clientId'
 import { Route as ApiPublicBookingRouteImport } from './routes/api.public.booking'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable.email.transactional.send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable.email.transactional.preview'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable.email.queue.process'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable.email.auth.webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable.email.auth.preview'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -87,9 +98,29 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableRoute = LovableRouteImport.update({
+  id: '/lovable',
+  path: '/lovable',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailRoute = EmailRouteImport.update({
+  id: '/email',
+  path: '/email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRoute = ApiRouteImport.update({
+  id: '/api',
+  path: '/api',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -97,10 +128,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailRoute = LovableEmailRouteImport.update({
+  id: '/email',
+  path: '/email',
+  getParentRoute: () => LovableRoute,
+} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => EmailRoute,
 } as any)
 const BookSlugRoute = BookSlugRouteImport.update({
   id: '/book/$slug',
@@ -108,24 +144,24 @@ const BookSlugRoute = BookSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
-  id: '/auth/sign-up',
-  path: '/auth/sign-up',
-  getParentRoute: () => rootRouteImport,
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthSignInRoute = AuthSignInRouteImport.update({
-  id: '/auth/sign-in',
-  path: '/auth/sign-in',
-  getParentRoute: () => rootRouteImport,
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => rootRouteImport,
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
-  getParentRoute: () => rootRouteImport,
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AppTreatmentPlansRoute = AppTreatmentPlansRouteImport.update({
   id: '/treatment-plans',
@@ -287,10 +323,31 @@ const AppAiRoute = AppAiRouteImport.update({
   path: '/ai',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiPublicRoute = ApiPublicRouteImport.update({
+  id: '/public',
+  path: '/public',
+  getParentRoute: () => ApiRoute,
+} as any)
+const LovableEmailTransactionalRoute =
+  LovableEmailTransactionalRouteImport.update({
+    id: '/transactional',
+    path: '/transactional',
+    getParentRoute: () => LovableEmailRoute,
+  } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
+  id: '/suppression',
+  path: '/suppression',
+  getParentRoute: () => LovableEmailRoute,
+} as any)
+const LovableEmailQueueRoute = LovableEmailQueueRouteImport.update({
+  id: '/queue',
+  path: '/queue',
+  getParentRoute: () => LovableEmailRoute,
+} as any)
+const LovableEmailAuthRoute = LovableEmailAuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => LovableEmailRoute,
 } as any)
 const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   id: '/billing',
@@ -303,37 +360,52 @@ const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
   getParentRoute: () => AppClientsRoute,
 } as any)
 const ApiPublicBookingRoute = ApiPublicBookingRouteImport.update({
-  id: '/api/public/booking',
-  path: '/api/public/booking',
-  getParentRoute: () => rootRouteImport,
+  id: '/booking',
+  path: '/booking',
+  getParentRoute: () => ApiPublicRoute,
 } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
-    getParentRoute: () => rootRouteImport,
+    id: '/send',
+    path: '/send',
+    getParentRoute: () => LovableEmailTransactionalRoute,
   } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
+    id: '/preview',
+    path: '/preview',
+    getParentRoute: () => LovableEmailTransactionalRoute,
   } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
+    id: '/process',
+    path: '/process',
+    getParentRoute: () => LovableEmailQueueRoute,
   } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/webhook',
+  path: '/webhook',
+  getParentRoute: () => LovableEmailAuthRoute,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => LovableEmailAuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRouteWithChildren
+  '/email': typeof EmailRouteWithChildren
+  '/lovable': typeof LovableRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/api/public': typeof ApiPublicRouteWithChildren
   '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/before-after': typeof AppBeforeAfterRoute
@@ -372,22 +444,33 @@ export interface FileRoutesByFullPath {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/lovable/email': typeof LovableEmailRouteWithChildren
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
+  '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
+  '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRouteWithChildren
+  '/email': typeof EmailRouteWithChildren
+  '/lovable': typeof LovableRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/api/public': typeof ApiPublicRouteWithChildren
   '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/before-after': typeof AppBeforeAfterRoute
@@ -426,10 +509,16 @@ export interface FileRoutesByTo {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/lovable/email': typeof LovableEmailRouteWithChildren
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
+  '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
+  '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -437,12 +526,17 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api': typeof ApiRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRouteWithChildren
+  '/email': typeof EmailRouteWithChildren
+  '/lovable': typeof LovableRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refunds': typeof RefundsRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/api/public': typeof ApiPublicRouteWithChildren
   '/app/ai': typeof AppAiRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/before-after': typeof AppBeforeAfterRoute
@@ -481,10 +575,16 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/book/$slug': typeof BookSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/lovable/email': typeof LovableEmailRouteWithChildren
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
+  '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
+  '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -493,12 +593,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api'
     | '/app'
+    | '/auth'
+    | '/email'
+    | '/lovable'
     | '/pricing'
     | '/privacy'
     | '/refunds'
     | '/terms'
     | '/unsubscribe'
+    | '/api/public'
     | '/app/ai'
     | '/app/automations'
     | '/app/before-after'
@@ -537,22 +642,33 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/book/$slug'
     | '/email/unsubscribe'
+    | '/lovable/email'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
+    | '/lovable/email/auth'
+    | '/lovable/email/queue'
     | '/lovable/email/suppression'
+    | '/lovable/email/transactional'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api'
     | '/app'
+    | '/auth'
+    | '/email'
+    | '/lovable'
     | '/pricing'
     | '/privacy'
     | '/refunds'
     | '/terms'
     | '/unsubscribe'
+    | '/api/public'
     | '/app/ai'
     | '/app/automations'
     | '/app/before-after'
@@ -591,22 +707,33 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/book/$slug'
     | '/email/unsubscribe'
+    | '/lovable/email'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
+    | '/lovable/email/auth'
+    | '/lovable/email/queue'
     | '/lovable/email/suppression'
+    | '/lovable/email/transactional'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
+    | '/api'
     | '/app'
+    | '/auth'
+    | '/email'
+    | '/lovable'
     | '/pricing'
     | '/privacy'
     | '/refunds'
     | '/terms'
     | '/unsubscribe'
+    | '/api/public'
     | '/app/ai'
     | '/app/automations'
     | '/app/before-after'
@@ -645,10 +772,16 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/book/$slug'
     | '/email/unsubscribe'
+    | '/lovable/email'
     | '/api/public/booking'
     | '/app/clients/$clientId'
     | '/app/settings/billing'
+    | '/lovable/email/auth'
+    | '/lovable/email/queue'
     | '/lovable/email/suppression'
+    | '/lovable/email/transactional'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -656,23 +789,17 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiRoute: typeof ApiRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
+  EmailRoute: typeof EmailRouteWithChildren
+  LovableRoute: typeof LovableRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundsRoute: typeof RefundsRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
-  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
-  AuthSignInRoute: typeof AuthSignInRoute
-  AuthSignUpRoute: typeof AuthSignUpRoute
   BookSlugRoute: typeof BookSlugRoute
-  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
-  ApiPublicBookingRoute: typeof ApiPublicBookingRoute
-  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
-  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
-  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
-  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -712,11 +839,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable': {
+      id: '/lovable'
+      path: '/lovable'
+      fullPath: '/lovable'
+      preLoaderRoute: typeof LovableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email': {
+      id: '/email'
+      path: '/email'
+      fullPath: '/email'
+      preLoaderRoute: typeof EmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app': {
       id: '/app'
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api': {
+      id: '/api'
+      path: '/api'
+      fullPath: '/api'
+      preLoaderRoute: typeof ApiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -726,12 +881,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email': {
+      id: '/lovable/email'
+      path: '/email'
+      fullPath: '/lovable/email'
+      preLoaderRoute: typeof LovableEmailRouteImport
+      parentRoute: typeof LovableRoute
+    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
+      path: '/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EmailRoute
     }
     '/book/$slug': {
       id: '/book/$slug'
@@ -742,31 +904,31 @@ declare module '@tanstack/react-router' {
     }
     '/auth/sign-up': {
       id: '/auth/sign-up'
-      path: '/auth/sign-up'
+      path: '/sign-up'
       fullPath: '/auth/sign-up'
       preLoaderRoute: typeof AuthSignUpRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/auth/sign-in': {
       id: '/auth/sign-in'
-      path: '/auth/sign-in'
+      path: '/sign-in'
       fullPath: '/auth/sign-in'
       preLoaderRoute: typeof AuthSignInRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/auth/reset-password': {
       id: '/auth/reset-password'
-      path: '/auth/reset-password'
+      path: '/reset-password'
       fullPath: '/auth/reset-password'
       preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/auth/forgot-password': {
       id: '/auth/forgot-password'
-      path: '/auth/forgot-password'
+      path: '/forgot-password'
       fullPath: '/auth/forgot-password'
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/app/treatment-plans': {
       id: '/app/treatment-plans'
@@ -992,12 +1154,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAiRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/public': {
+      id: '/api/public'
+      path: '/public'
+      fullPath: '/api/public'
+      preLoaderRoute: typeof ApiPublicRouteImport
+      parentRoute: typeof ApiRoute
+    }
+    '/lovable/email/transactional': {
+      id: '/lovable/email/transactional'
+      path: '/transactional'
+      fullPath: '/lovable/email/transactional'
+      preLoaderRoute: typeof LovableEmailTransactionalRouteImport
+      parentRoute: typeof LovableEmailRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
+      path: '/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof LovableEmailRoute
+    }
+    '/lovable/email/queue': {
+      id: '/lovable/email/queue'
+      path: '/queue'
+      fullPath: '/lovable/email/queue'
+      preLoaderRoute: typeof LovableEmailQueueRouteImport
+      parentRoute: typeof LovableEmailRoute
+    }
+    '/lovable/email/auth': {
+      id: '/lovable/email/auth'
+      path: '/auth'
+      fullPath: '/lovable/email/auth'
+      preLoaderRoute: typeof LovableEmailAuthRouteImport
+      parentRoute: typeof LovableEmailRoute
     }
     '/app/settings/billing': {
       id: '/app/settings/billing'
@@ -1015,34 +1205,70 @@ declare module '@tanstack/react-router' {
     }
     '/api/public/booking': {
       id: '/api/public/booking'
-      path: '/api/public/booking'
+      path: '/booking'
       fullPath: '/api/public/booking'
       preLoaderRoute: typeof ApiPublicBookingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ApiPublicRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
+      path: '/send'
       fullPath: '/lovable/email/transactional/send'
       preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof LovableEmailTransactionalRoute
     }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
+      path: '/preview'
       fullPath: '/lovable/email/transactional/preview'
       preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof LovableEmailTransactionalRoute
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
+      path: '/process'
       fullPath: '/lovable/email/queue/process'
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof LovableEmailQueueRoute
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof LovableEmailAuthRoute
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof LovableEmailAuthRoute
     }
   }
 }
+
+interface ApiPublicRouteChildren {
+  ApiPublicBookingRoute: typeof ApiPublicBookingRoute
+}
+
+const ApiPublicRouteChildren: ApiPublicRouteChildren = {
+  ApiPublicBookingRoute: ApiPublicBookingRoute,
+}
+
+const ApiPublicRouteWithChildren = ApiPublicRoute._addFileChildren(
+  ApiPublicRouteChildren,
+)
+
+interface ApiRouteChildren {
+  ApiPublicRoute: typeof ApiPublicRouteWithChildren
+}
+
+const ApiRouteChildren: ApiRouteChildren = {
+  ApiPublicRoute: ApiPublicRouteWithChildren,
+}
+
+const ApiRouteWithChildren = ApiRoute._addFileChildren(ApiRouteChildren)
 
 interface AppClientsRouteChildren {
   AppClientsClientIdRoute: typeof AppClientsClientIdRoute
@@ -1140,25 +1366,115 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface AuthRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthSignInRoute: AuthSignInRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
+interface EmailRouteChildren {
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+}
+
+const EmailRouteChildren: EmailRouteChildren = {
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+}
+
+const EmailRouteWithChildren = EmailRoute._addFileChildren(EmailRouteChildren)
+
+interface LovableEmailAuthRouteChildren {
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
+}
+
+const LovableEmailAuthRouteChildren: LovableEmailAuthRouteChildren = {
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
+}
+
+const LovableEmailAuthRouteWithChildren =
+  LovableEmailAuthRoute._addFileChildren(LovableEmailAuthRouteChildren)
+
+interface LovableEmailQueueRouteChildren {
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+}
+
+const LovableEmailQueueRouteChildren: LovableEmailQueueRouteChildren = {
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+}
+
+const LovableEmailQueueRouteWithChildren =
+  LovableEmailQueueRoute._addFileChildren(LovableEmailQueueRouteChildren)
+
+interface LovableEmailTransactionalRouteChildren {
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
+}
+
+const LovableEmailTransactionalRouteChildren: LovableEmailTransactionalRouteChildren =
+  {
+    LovableEmailTransactionalPreviewRoute:
+      LovableEmailTransactionalPreviewRoute,
+    LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
+  }
+
+const LovableEmailTransactionalRouteWithChildren =
+  LovableEmailTransactionalRoute._addFileChildren(
+    LovableEmailTransactionalRouteChildren,
+  )
+
+interface LovableEmailRouteChildren {
+  LovableEmailAuthRoute: typeof LovableEmailAuthRouteWithChildren
+  LovableEmailQueueRoute: typeof LovableEmailQueueRouteWithChildren
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  LovableEmailTransactionalRoute: typeof LovableEmailTransactionalRouteWithChildren
+}
+
+const LovableEmailRouteChildren: LovableEmailRouteChildren = {
+  LovableEmailAuthRoute: LovableEmailAuthRouteWithChildren,
+  LovableEmailQueueRoute: LovableEmailQueueRouteWithChildren,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  LovableEmailTransactionalRoute: LovableEmailTransactionalRouteWithChildren,
+}
+
+const LovableEmailRouteWithChildren = LovableEmailRoute._addFileChildren(
+  LovableEmailRouteChildren,
+)
+
+interface LovableRouteChildren {
+  LovableEmailRoute: typeof LovableEmailRouteWithChildren
+}
+
+const LovableRouteChildren: LovableRouteChildren = {
+  LovableEmailRoute: LovableEmailRouteWithChildren,
+}
+
+const LovableRouteWithChildren =
+  LovableRoute._addFileChildren(LovableRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiRoute: ApiRouteWithChildren,
   AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
+  EmailRoute: EmailRouteWithChildren,
+  LovableRoute: LovableRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundsRoute: RefundsRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
-  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
-  AuthResetPasswordRoute: AuthResetPasswordRoute,
-  AuthSignInRoute: AuthSignInRoute,
-  AuthSignUpRoute: AuthSignUpRoute,
   BookSlugRoute: BookSlugRoute,
-  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
-  ApiPublicBookingRoute: ApiPublicBookingRoute,
-  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
-  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
-  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
-  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
