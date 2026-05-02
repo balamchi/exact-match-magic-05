@@ -170,7 +170,7 @@ function PosPage() {
     if (method !== "cash") {
       await new Promise((r) => setTimeout(r, 1200));
     }
-    const paymentMethod = method === "tap" ? "card" : method;
+    const paymentMethod = method === "tap" ? "card" : method === "bnpl" ? "bnpl" : method;
     const noteSummary =
       cart.map((c) => `${c.qty}× ${c.name}`).join(", ") +
       (notes ? ` — ${notes}` : "") +
