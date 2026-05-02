@@ -163,7 +163,7 @@ function ClientDetailPage() {
       </section>
 
       {/* Medical Alerts Banner */}
-      {(client.medical_alerts || (client.allergies as string[] | null)?.length || (client.medications as string[] | null)?.length) ? (
+      {(client.medical_alerts || (client.allergies as string[] | null)?.length || (client.medications as string[] | null)?.length || (clientAny.medical_conditions as string[] | null)?.length) ? (
         <section className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5 shadow-card">
           <div className="flex items-center gap-2 text-destructive mb-3">
             <ShieldAlert className="h-5 w-5" />
