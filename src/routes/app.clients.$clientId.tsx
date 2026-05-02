@@ -169,7 +169,19 @@ function ClientDetailPage() {
             <ShieldAlert className="h-5 w-5" />
             <h2 className="font-display text-lg font-semibold">Medical Alerts</h2>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {(clientAny.medical_conditions as string[] | null)?.length ? (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />Medical Conditions
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {(clientAny.medical_conditions as string[]).map((c: string) => (
+                    <span key={c} className="rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">{c}</span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             {client.medical_alerts && (
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
