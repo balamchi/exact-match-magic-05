@@ -183,13 +183,25 @@ function ReportsPage() {
   }, [inventory]);
   const inventoryValue = useMemo(() => inventory.reduce((s, i) => s + i.stock_quantity * i.unit_cost_cents, 0), [inventory]);
 
+  // Smart insights
+  const insights = useMemo(() => {
+    const items: string[] = [];
+    if (totalRevenue > 0) items.push(`Revenue this period: ${money(totalRevenue)} across ${completed.length} completed visits.`);
+    if (noShowRate > 10) items.push(`⚠ No-show rate is ${noShowRate}% — consider implementing deposit collection.`);
+    if (lowStock.length > 0) items.push(`📦 ${lowStock.length} inventory item${lowStock.length > 1 ? "s" : ""} below reorder threshold.`);
+    if (expiringSoon.length > 0) items.push(`⏰ ${expiringSoon.length} product${expiringSoon.length > 1 ? "s" : ""} expiring within 30 days.`);
+    if (retentionStats.rebookRate > 0 && retentionStats.rebookRate < 60) items.push(`📉 Rebook rate is ${retentionStats.rebookRate}%. Consider follow-up automations.`);
+    if (conversionRate > 0) items.push(`🎯 Lead conversion rate: ${conversionRate}% (${wonLeads} of ${leads.length} leads).`);
+    return items;
+  }, [totalRevenue, completed.length, noShowRate, lowStock.length, expiringSoon.length, retentionStats.rebookRate, conversionRate, wonLeads, leads.length]);
+
   return (
     <div className="space-y-6">
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Analytics</p>
           <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Reports</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">7 report categories across your clinic.</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">Insights into every part of your clinic.</p>
         </div>
         <div className="flex gap-1 rounded-lg border border-border bg-surface p-1">
           {RANGES.map((r) => (
@@ -199,6 +211,20 @@ function ReportsPage() {
           ))}
         </div>
       </section>
+
+      {/* Smart Insights */}
+      {insights.length > 0 && (
+        <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-card">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary">
+            <TrendingUp className="h-4 w-4" /> Smart Insights
+          </h2>
+          <ul className="space-y-1.5">
+            {insights.map((insight, i) => (
+              <li key={i} className="text-sm text-foreground/85">• {insight}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Category Tabs */}
       <div className="flex gap-1 overflow-x-auto rounded-lg border border-border bg-surface p-1 [scrollbar-width:none]">
