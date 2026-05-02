@@ -352,10 +352,6 @@ function WhatsAppPage() {
                 <Send className="h-4 w-4" /> {sending ? "Sending…" : "Send Test Message"}
               </Button>
             </div>
-          </div>
-              </p>
-            </div>
-          </div>
         </div>
       )}
 
