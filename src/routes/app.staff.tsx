@@ -12,6 +12,7 @@ import {
   Trash2,
   X,
   Calendar,
+  Briefcase,
   PowerOff,
   Power,
   Palette,
