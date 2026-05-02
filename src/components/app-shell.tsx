@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { GlobalSearch } from "@/components/global-search";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
