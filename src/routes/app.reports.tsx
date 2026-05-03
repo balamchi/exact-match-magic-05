@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  BarChart3, CalendarDays, DollarSign, Target, Users, TrendingUp, Award,
+  BarChart3, CalendarDays, DollarSign, Download, Target, Users, TrendingUp, Award,
   Boxes, UserCog, Repeat, Package,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
