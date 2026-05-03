@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles,
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
-  AlertTriangle, Pill, ShieldAlert, Crown, Ban, XCircle,
+  AlertTriangle, Pill, ShieldAlert, Crown, Ban, XCircle, Receipt, PenLine,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ function formatMoney(cents: number, currency = "CAD") {
   return new Intl.NumberFormat("en-CA", { style: "currency", currency, maximumFractionDigits: 0 }).format(cents / 100);
 }
 
-type Tab = "history" | "soap" | "injections" | "photos";
+type Tab = "history" | "soap" | "injections" | "photos" | "financial" | "consents";
 
 function ClientDetailPage() {
   const { clientId } = Route.useParams();
@@ -39,6 +39,8 @@ function ClientDetailPage() {
   const [soapNotes, setSoapNotes] = useState<SoapNote[]>([]);
   const [injections, setInjections] = useState<InjectionSite[]>([]);
   const [photos, setPhotos] = useState<BeforeAfter[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [signedConsents, setSignedConsents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("history");
 
@@ -47,12 +49,14 @@ function ClientDetailPage() {
     let cancelled = false;
     const load = async () => {
       setLoading(true);
-      const [clientRes, apptRes, soapRes, injRes, photoRes] = await Promise.all([
+      const [clientRes, apptRes, soapRes, injRes, photoRes, invRes, consentRes] = await Promise.all([
         supabase.from("clients").select("*").eq("id", clientId).eq("clinic_id", activeClinic.clinic_id).maybeSingle(),
         supabase.from("appointments").select("*, services(name, category), staff(display_name, color)").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("starts_at", { ascending: false }),
         supabase.from("soap_notes").select("*").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("visit_date", { ascending: false }),
         supabase.from("injection_sites").select("*").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("visit_date", { ascending: false }),
         supabase.from("before_after_photos").select("*").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("taken_on", { ascending: false }),
+        supabase.from("invoices").select("*").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("issued_on", { ascending: false }),
+        supabase.from("signed_consents").select("*").eq("clinic_id", activeClinic.clinic_id).eq("client_id", clientId).order("signed_at", { ascending: false }),
       ]);
       if (cancelled) return;
       if (clientRes.error) toast.error("Could not load client");
@@ -61,6 +65,8 @@ function ClientDetailPage() {
       setSoapNotes(soapRes.data ?? []);
       setInjections(injRes.data ?? []);
       setPhotos(photoRes.data ?? []);
+      setInvoices(invRes.data ?? []);
+      setSignedConsents(consentRes.data ?? []);
       setLoading(false);
     };
     load();
@@ -108,6 +114,8 @@ function ClientDetailPage() {
     { id: "soap", label: "SOAP Notes", icon: <FileText className="h-3.5 w-3.5" />, count: soapNotes.length },
     { id: "injections", label: "Injections", icon: <Syringe className="h-3.5 w-3.5" />, count: injections.length },
     { id: "photos", label: "Photos", icon: <Camera className="h-3.5 w-3.5" />, count: photos.length },
+    { id: "financial", label: "Financial", icon: <Receipt className="h-3.5 w-3.5" />, count: invoices.length },
+    { id: "consents", label: "Consents", icon: <PenLine className="h-3.5 w-3.5" />, count: signedConsents.length },
   ];
 
   return (
@@ -123,9 +131,7 @@ function ClientDetailPage() {
         <div className="bg-gradient-glow pointer-events-none absolute inset-0" />
         <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-primary text-xl font-semibold text-primary-foreground shadow-glow">
-              {initials}
-            </div>
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-primary text-xl font-semibold text-primary-foreground shadow-glow">{initials}</div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Client profile</p>
               <h1 className="mt-1 flex items-center gap-2 font-display text-3xl font-semibold tracking-tight">
@@ -144,20 +150,14 @@ function ClientDetailPage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button asChild variant="outline" className="gap-2">
-              <Link to="/app/clients" search={{ edit: client.id } as never}><Pencil className="h-4 w-4" /> Edit</Link>
-            </Button>
-            <Button asChild className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-              <Link to="/app/booking"><Sparkles className="h-4 w-4" /> Book visit</Link>
-            </Button>
+            <Button asChild variant="outline" className="gap-2"><Link to="/app/clients" search={{ edit: client.id } as never}><Pencil className="h-4 w-4" /> Edit</Link></Button>
+            <Button asChild className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Link to="/app/booking"><Sparkles className="h-4 w-4" /> Book visit</Link></Button>
           </div>
         </div>
         {(client.tags ?? []).length > 0 && (
           <div className="relative mt-5 flex flex-wrap items-center gap-1.5">
             <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-            {(client.tags ?? []).map((tag) => (
-              <span key={tag} className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{tag}</span>
-            ))}
+            {(client.tags ?? []).map((tag) => <span key={tag} className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">{tag}</span>)}
           </div>
         )}
       </section>
@@ -165,53 +165,27 @@ function ClientDetailPage() {
       {/* Medical Alerts Banner */}
       {(client.medical_alerts || (client.allergies as string[] | null)?.length || (client.medications as string[] | null)?.length || (clientAny.medical_conditions as string[] | null)?.length) ? (
         <section className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5 shadow-card">
-          <div className="flex items-center gap-2 text-destructive mb-3">
-            <ShieldAlert className="h-5 w-5" />
-            <h2 className="font-display text-lg font-semibold">Medical Alerts</h2>
-          </div>
+          <div className="flex items-center gap-2 text-destructive mb-3"><ShieldAlert className="h-5 w-5" /><h2 className="font-display text-lg font-semibold">Medical Alerts</h2></div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {(clientAny.medical_conditions as string[] | null)?.length ? (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
-                  <AlertTriangle className="inline h-3 w-3 mr-1" />Medical Conditions
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {(clientAny.medical_conditions as string[]).map((c: string) => (
-                    <span key={c} className="rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">{c}</span>
-                  ))}
-                </div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1"><AlertTriangle className="inline h-3 w-3 mr-1" />Medical Conditions</p>
+                <div className="flex flex-wrap gap-1">{(clientAny.medical_conditions as string[]).map((c: string) => <span key={c} className="rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">{c}</span>)}</div>
               </div>
             ) : null}
             {client.medical_alerts && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
-                  <AlertTriangle className="inline h-3 w-3 mr-1" />Conditions
-                </p>
-                <p className="text-sm text-foreground/85">{client.medical_alerts}</p>
-              </div>
+              <div><p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1"><AlertTriangle className="inline h-3 w-3 mr-1" />Conditions</p><p className="text-sm text-foreground/85">{client.medical_alerts}</p></div>
             )}
             {(client.allergies as string[] | null)?.length ? (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1">
-                  <AlertTriangle className="inline h-3 w-3 mr-1" />Allergies
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {(client.allergies as string[]).map((a) => (
-                    <span key={a} className="rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">{a}</span>
-                  ))}
-                </div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-destructive/80 mb-1"><AlertTriangle className="inline h-3 w-3 mr-1" />Allergies</p>
+                <div className="flex flex-wrap gap-1">{(client.allergies as string[]).map((a) => <span key={a} className="rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">{a}</span>)}</div>
               </div>
             ) : null}
             {(client.medications as string[] | null)?.length ? (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-amber-500/80 mb-1">
-                  <Pill className="inline h-3 w-3 mr-1" />Medications
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {(client.medications as string[]).map((m) => (
-                    <span key={m} className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-400">{m}</span>
-                  ))}
-                </div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-amber-500/80 mb-1"><Pill className="inline h-3 w-3 mr-1" />Medications</p>
+                <div className="flex flex-wrap gap-1">{(client.medications as string[]).map((m) => <span key={m} className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-400">{m}</span>)}</div>
               </div>
             ) : null}
           </div>
@@ -231,33 +205,20 @@ function ClientDetailPage() {
       {/* Tabbed content */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <section className="rounded-2xl border border-border bg-card shadow-card lg:col-span-2">
-          {/* Tabs */}
-          <div className="flex border-b border-border">
+          <div className="flex overflow-x-auto border-b border-border [scrollbar-width:none]">
             {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium transition ${
-                  activeTab === tab.id
-                    ? "border-b-2 border-primary text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-                {tab.count > 0 && (
-                  <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold">{tab.count}</span>
-                )}
+              <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)} className={`flex shrink-0 items-center gap-1.5 px-5 py-3.5 text-sm font-medium transition whitespace-nowrap ${activeTab === tab.id ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                {tab.icon} {tab.label}
+                {tab.count > 0 && <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold">{tab.count}</span>}
               </button>
             ))}
           </div>
-
-          {/* Tab content */}
           {activeTab === "history" && <AppointmentList appointments={appointments} currency={currency} />}
           {activeTab === "soap" && <SoapNotesList notes={soapNotes} />}
           {activeTab === "injections" && <InjectionsList injections={injections} />}
           {activeTab === "photos" && <PhotosList photos={photos} />}
+          {activeTab === "financial" && <FinancialTab invoices={invoices} appointments={appointments} currency={currency} />}
+          {activeTab === "consents" && <ConsentsTab consents={signedConsents} />}
         </section>
 
         {/* Sidebar */}
@@ -267,15 +228,12 @@ function ClientDetailPage() {
           <div className="mt-4 whitespace-pre-wrap rounded-xl border border-dashed border-border bg-surface/40 p-4 text-sm leading-relaxed text-foreground/85">
             {client.notes?.trim() || <span className="text-muted-foreground">No notes added yet.</span>}
           </div>
-
-          {/* Spending breakdown */}
           {stats.lifetimeValueCents > 0 && (
             <div className="mt-5">
               <h3 className="text-sm font-semibold">Spending by service</h3>
               <SpendingBreakdown appointments={appointments} currency={currency} />
             </div>
           )}
-
           <div className="mt-5 space-y-2 text-xs text-muted-foreground">
             <div className="flex justify-between"><span>Created</span><span>{new Date(client.created_at).toLocaleDateString()}</span></div>
             <div className="flex justify-between"><span>Last updated</span><span>{new Date(client.updated_at).toLocaleDateString()}</span></div>
@@ -333,12 +291,7 @@ function AppointmentList({ appointments, currency }: { appointments: Appointment
             <h3 className="truncate font-medium">{appt.services?.name ?? "Custom appointment"}</h3>
             <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span>{new Date(appt.starts_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
-              {appt.staff && (
-                <span className="inline-flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: appt.staff.color ?? "#a78bfa" }} />
-                  {appt.staff.display_name}
-                </span>
-              )}
+              {appt.staff && <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: appt.staff.color ?? "#a78bfa" }} />{appt.staff.display_name}</span>}
               <StatusPill status={appt.status} />
             </div>
           </div>
@@ -395,19 +348,10 @@ function InjectionsList({ injections }: { injections: InjectionSite[] }) {
     <ul className="divide-y divide-border">
       {injections.map((inj) => (
         <li key={inj.id} className="flex items-center gap-4 p-4 transition hover:bg-surface/60">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Syringe className="h-4 w-4" />
-          </div>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><Syringe className="h-4 w-4" /></div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{inj.product}</span>
-              <span className="text-xs text-muted-foreground">·</span>
-              <span className="text-xs text-muted-foreground">{inj.region}</span>
-            </div>
-            <div className="mt-0.5 text-xs text-muted-foreground">
-              {new Date(inj.visit_date).toLocaleDateString()} · {Number(inj.units)} units
-              {inj.notes && <span> · {inj.notes}</span>}
-            </div>
+            <div className="flex items-center gap-2"><span className="font-medium">{inj.product}</span><span className="text-xs text-muted-foreground">·</span><span className="text-xs text-muted-foreground">{inj.region}</span></div>
+            <div className="mt-0.5 text-xs text-muted-foreground">{new Date(inj.visit_date).toLocaleDateString()} · {Number(inj.units)} units{inj.notes && <span> · {inj.notes}</span>}</div>
           </div>
         </li>
       ))}
@@ -430,20 +374,85 @@ function PhotosList({ photos }: { photos: BeforeAfter[] }) {
       {photos.map((p) => (
         <div key={p.id} className="rounded-xl border border-border bg-surface/40 p-3">
           <div className="grid grid-cols-2 gap-2">
-            {p.before_url ? (
-              <img src={p.before_url} alt="Before" className="h-32 w-full rounded-lg object-cover" />
-            ) : (
-              <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No before</div>
-            )}
-            {p.after_url ? (
-              <img src={p.after_url} alt="After" className="h-32 w-full rounded-lg object-cover" />
-            ) : (
-              <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No after</div>
-            )}
+            {p.before_url ? <img src={p.before_url} alt="Before" className="h-32 w-full rounded-lg object-cover" /> : <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No before</div>}
+            {p.after_url ? <img src={p.after_url} alt="After" className="h-32 w-full rounded-lg object-cover" /> : <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No after</div>}
           </div>
-          <div className="mt-2 text-xs">
-            <span className="font-medium">{p.treatment ?? "Treatment"}</span>
-            <span className="text-muted-foreground"> · {new Date(p.taken_on).toLocaleDateString()}</span>
+          <div className="mt-2 text-xs"><span className="font-medium">{p.treatment ?? "Treatment"}</span><span className="text-muted-foreground"> · {new Date(p.taken_on).toLocaleDateString()}</span></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FinancialTab({ invoices, appointments, currency }: { invoices: any[]; appointments: Appointment[]; currency: string }) {
+  const completed = appointments.filter(a => a.status === "completed");
+  const totalSpent = completed.reduce((s, a) => s + (a.price_cents ?? 0), 0);
+  const totalInvoiced = invoices.reduce((s, inv) => s + (inv.total_cents ?? 0), 0);
+  const unpaid = invoices.filter(inv => inv.status === "draft" || inv.status === "sent");
+  const unpaidTotal = unpaid.reduce((s, inv) => s + (inv.total_cents ?? 0), 0);
+
+  return (
+    <div className="p-5 space-y-5">
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl border border-border bg-surface/40 p-4 text-center">
+          <div className="font-display text-2xl font-bold text-primary">{formatMoney(totalSpent, currency)}</div>
+          <div className="mt-1 text-xs text-muted-foreground">Total spent</div>
+        </div>
+        <div className="rounded-xl border border-border bg-surface/40 p-4 text-center">
+          <div className="font-display text-2xl font-bold">{formatMoney(totalInvoiced, currency)}</div>
+          <div className="mt-1 text-xs text-muted-foreground">Total invoiced</div>
+        </div>
+        <div className="rounded-xl border border-border bg-surface/40 p-4 text-center">
+          <div className="font-display text-2xl font-bold text-amber-400">{formatMoney(unpaidTotal, currency)}</div>
+          <div className="mt-1 text-xs text-muted-foreground">Outstanding</div>
+        </div>
+      </div>
+      {invoices.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <Receipt className="h-8 w-8 text-muted-foreground mb-2" />
+          <p className="text-sm text-muted-foreground">No invoices for this client yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold">Invoices</h3>
+          {invoices.map((inv: any) => (
+            <div key={inv.id} className="flex items-center justify-between rounded-xl border border-border bg-surface/40 p-3">
+              <div>
+                <p className="text-sm font-medium">{inv.invoice_number || "Draft"}</p>
+                <p className="text-[11px] text-muted-foreground">{new Date(inv.issued_on).toLocaleDateString()}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${inv.status === "paid" ? "bg-emerald-500/10 text-emerald-400" : inv.status === "overdue" ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}`}>{inv.status}</span>
+                <span className="font-medium text-sm">{formatMoney(inv.total_cents ?? 0, currency)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ConsentsTab({ consents }: { consents: any[] }) {
+  if (consents.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+        <PenLine className="h-8 w-8 text-muted-foreground mb-2" />
+        <h3 className="font-medium">No signed consents</h3>
+        <p className="mt-1 max-w-xs text-xs text-muted-foreground">Signed consent forms for this client will appear here.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="divide-y divide-border">
+      {consents.map((sc: any) => (
+        <div key={sc.id} className="p-4 transition hover:bg-surface/60">
+          <div className="flex items-center gap-4">
+            <img src={sc.signature_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />
+            <div className="min-w-0 flex-1">
+              <h4 className="font-medium">{sc.consent_title}</h4>
+              <p className="mt-0.5 text-xs text-muted-foreground">Signed {new Date(sc.signed_at).toLocaleString()}</p>
+            </div>
           </div>
         </div>
       ))}
@@ -454,31 +463,17 @@ function PhotosList({ photos }: { photos: BeforeAfter[] }) {
 function SpendingBreakdown({ appointments, currency }: { appointments: Appointment[]; currency: string }) {
   const breakdown = useMemo(() => {
     const map = new Map<string, number>();
-    for (const a of appointments) {
-      if (a.status !== "completed" || !a.price_cents) continue;
-      const name = a.services?.name ?? "Other";
-      map.set(name, (map.get(name) ?? 0) + a.price_cents);
-    }
-    return Array.from(map.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
+    for (const a of appointments) { if (a.status !== "completed" || !a.price_cents) continue; const name = a.services?.name ?? "Other"; map.set(name, (map.get(name) ?? 0) + a.price_cents); }
+    return Array.from(map.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5);
   }, [appointments]);
-
   if (breakdown.length === 0) return null;
-
   const max = breakdown[0][1];
-
   return (
     <div className="mt-3 space-y-2">
       {breakdown.map(([name, cents]) => (
         <div key={name}>
-          <div className="flex items-center justify-between text-xs">
-            <span className="truncate">{name}</span>
-            <span className="font-medium">{formatMoney(cents, currency)}</span>
-          </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full bg-primary" style={{ width: `${(cents / max) * 100}%` }} />
-          </div>
+          <div className="flex items-center justify-between text-xs"><span className="truncate">{name}</span><span className="font-medium">{formatMoney(cents, currency)}</span></div>
+          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${(cents / max) * 100}%` }} /></div>
         </div>
       ))}
     </div>

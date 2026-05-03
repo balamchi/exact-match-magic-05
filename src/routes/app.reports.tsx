@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  BarChart3, CalendarDays, DollarSign, Target, Users, TrendingUp, Award,
+  BarChart3, CalendarDays, DollarSign, Download, Target, Users, TrendingUp, Award,
   Boxes, UserCog, Repeat, Package,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -203,12 +204,20 @@ function ReportsPage() {
           <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Reports</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Insights into every part of your clinic.</p>
         </div>
-        <div className="flex gap-1 rounded-lg border border-border bg-surface p-1">
-          {RANGES.map((r) => (
-            <button key={r.id} onClick={() => setRange(r.id)} className={cn("rounded-md px-3 py-1.5 text-xs font-medium transition", range === r.id ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground")}>
-              {r.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <Button variant="outline" className="gap-2" onClick={() => {
+            const rows = [["Date","Revenue","Bookings"], ...revenueSeries.map(r => [r.date, String(r.revenue), String(r.bookings)])];
+            const csv = rows.map(r => r.join(",")).join("\n");
+            const blob = new Blob([csv], { type: "text/csv" });
+            const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `report_${tab}_${range}d.csv`; a.click();
+          }}><Download className="h-4 w-4" /> Export CSV</Button>
+          <div className="flex gap-1 rounded-lg border border-border bg-surface p-1">
+            {RANGES.map((r) => (
+              <button key={r.id} onClick={() => setRange(r.id)} className={cn("rounded-md px-3 py-1.5 text-xs font-medium transition", range === r.id ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground")}>
+                {r.label}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 

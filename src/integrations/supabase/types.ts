@@ -1587,6 +1587,48 @@ export type Database = {
           },
         ]
       }
+      signed_consents: {
+        Row: {
+          client_id: string | null
+          client_name: string
+          clinic_id: string
+          consent_body: string | null
+          consent_form_id: string
+          consent_title: string
+          created_at: string
+          id: string
+          signature_data: string
+          signed_at: string
+          updated_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          client_name: string
+          clinic_id: string
+          consent_body?: string | null
+          consent_form_id: string
+          consent_title: string
+          created_at?: string
+          id?: string
+          signature_data: string
+          signed_at?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          client_name?: string
+          clinic_id?: string
+          consent_body?: string | null
+          consent_form_id?: string
+          consent_title?: string
+          created_at?: string
+          id?: string
+          signature_data?: string
+          signed_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       soap_notes: {
         Row: {
           assessment: string | null
