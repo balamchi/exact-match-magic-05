@@ -86,11 +86,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <LocaleProvider>
-      <AuthProvider>
-        <Outlet />
-        <Toaster theme="dark" />
-      </AuthProvider>
-    </LocaleProvider>
+    <ThemeProvider>
+      <LocaleProvider>
+        <AuthProvider>
+          <Outlet />
+          <Toaster />
+        </AuthProvider>
+      </LocaleProvider>
+    </ThemeProvider>
   );
+}
 }
