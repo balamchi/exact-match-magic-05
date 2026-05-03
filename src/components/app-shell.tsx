@@ -171,6 +171,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
   const { user, activeClinic, memberships, setActiveClinicId, signOut } = useAuth();
+  const { theme, toggle: toggleTheme } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const initials = (user?.email ?? "?").slice(0, 2).toUpperCase();
 
