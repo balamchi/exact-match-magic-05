@@ -8,11 +8,12 @@ import {
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
-  Phone, BookOpen,
+  Phone, BookOpen, Sun, Moon,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useLocale, LOCALES } from "@/lib/locale-context";
+import { useTheme } from "@/lib/theme-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
@@ -170,6 +171,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
   const { user, activeClinic, memberships, setActiveClinicId, signOut } = useAuth();
+  const { theme, toggle: toggleTheme } = useTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const initials = (user?.email ?? "?").slice(0, 2).toUpperCase();
 
@@ -285,6 +287,7 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
 }
 
 function Header({ onMenu }: { onMenu: () => void }) {
+  const { theme, toggle: toggleTheme } = useTheme();
   const { locale, setLocale } = useLocale();
   const current = LOCALES.find((l) => l.code === locale);
   const { activeClinic } = useAuth();
@@ -382,6 +385,17 @@ function Header({ onMenu }: { onMenu: () => void }) {
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Theme toggle */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleTheme}
+        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        className="hidden sm:inline-flex"
+      >
+        {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </Button>
 
       {/* LIVE indicator */}
       <div
