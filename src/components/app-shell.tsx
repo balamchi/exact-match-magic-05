@@ -286,6 +286,7 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
 }
 
 function Header({ onMenu }: { onMenu: () => void }) {
+  const { theme, toggle: toggleTheme } = useTheme();
   const { locale, setLocale } = useLocale();
   const current = LOCALES.find((l) => l.code === locale);
   const { activeClinic } = useAuth();
