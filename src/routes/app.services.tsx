@@ -579,6 +579,27 @@ function ServicesPage() {
                 </FormField>
               </div>
 
+              {/* Location assignment */}
+              {locations.length > 1 && (
+                <div>
+                  <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">Available at locations</Label>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => setSelectedLocations(locations.map(l => l.id))}
+                      className={cn("rounded-full border px-3 py-1.5 text-xs font-medium transition",
+                        selectedLocations.length === locations.length ? "border-primary/60 bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground"
+                      )}>All Locations</button>
+                    {locations.map(l => (
+                      <button key={l.id} type="button" onClick={() => {
+                        setSelectedLocations(prev => prev.includes(l.id) ? prev.filter(x => x !== l.id) : [...prev.filter(x => x !== "all"), l.id]);
+                      }}
+                        className={cn("rounded-full border px-3 py-1.5 text-xs font-medium transition",
+                          selectedLocations.includes(l.id) && selectedLocations.length < locations.length ? "border-primary/60 bg-primary/15 text-primary" : selectedLocations.length === locations.length ? "border-border/40 text-muted-foreground" : "border-border text-muted-foreground hover:text-foreground"
+                        )}>{l.name}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Duration & timing */}
               <div className="grid gap-4 md:grid-cols-3">
                 <FormField label="Duration (min) *" error={errors.duration_minutes}>
