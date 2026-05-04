@@ -171,6 +171,7 @@ function ServicesPage() {
 
   const openEdit = (s: Service) => {
     setEditing(s);
+    setImageUrl(s.image_url ?? null);
     setForm({
       name: s.name,
       category: s.category ?? "",
