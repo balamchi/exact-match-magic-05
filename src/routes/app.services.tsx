@@ -417,6 +417,13 @@ function ServicesPage() {
               )}>{s}</button>
           ))}
         </div>
+        {locations.length > 1 && (
+          <select value={locationFilter} onChange={e => { setLocationFilter(e.target.value); setPage(0); }}
+            className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            <option value="all">All locations</option>
+            {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+        )}
       </section>
 
       {/* Bulk actions bar */}
