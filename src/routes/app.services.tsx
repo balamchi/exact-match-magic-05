@@ -444,6 +444,15 @@ function ServicesPage() {
                         }} className="accent-primary" />
                       </td>
                       <td className="p-3">
+                        {s.image_url ? (
+                          <img src={s.image_url} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                        ) : (
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Sparkles className="h-4 w-4" />
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-3">
                         <button onClick={() => openEdit(s)} className="text-left hover:text-primary transition">
                           <span className="font-medium">{s.name}</span>
                           {s.sub_category && <span className="ml-2 text-xs text-muted-foreground">{s.sub_category}</span>}
