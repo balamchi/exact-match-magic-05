@@ -252,9 +252,15 @@ function StaffPage() {
               <article key={row.id} className={cn("group relative overflow-hidden rounded-xl border border-border/60 bg-card/30 p-4 backdrop-blur transition hover:border-primary/40", !row.active && "opacity-60")}>
                 <div className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />
                 <div className="flex items-start gap-3">
-                  <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-background ring-2"
-                    style={{ background: color, boxShadow: `0 0 24px -4px ${color}80`, '--tw-ring-color': `${color}40` } as React.CSSProperties}>
-                    {initials(row.display_name)}
+                  <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold ring-2 overflow-hidden"
+                    style={{ '--tw-ring-color': `${color}40` } as React.CSSProperties}>
+                    {row.photo_url ? (
+                      <img src={row.photo_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-background" style={{ background: color }}>
+                        {initials(row.display_name)}
+                      </div>
+                    )}
                     {provider && <span className="absolute -bottom-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-background ring-2 ring-background" title="Provider"><Crown className="h-3 w-3 text-amber-300" /></span>}
                   </div>
                   <div className="min-w-0 flex-1">
