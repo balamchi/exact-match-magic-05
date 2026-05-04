@@ -107,14 +107,20 @@ function ServicesPage() {
   const [query, setQuery] = useState("");
   const [catFilter, setCatFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [locationFilter, setLocationFilter] = useState("all");
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  // Locations
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  const [serviceLocationMap, setServiceLocationMap] = useState<Record<string, string[]>>({});
 
   // Composer
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Service | null>(null);
   const [form, setForm] = useState<ServiceFormData>(defaultForm);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
