@@ -249,6 +249,7 @@ function ServicesPage() {
       treatment_area_tags: d.treatment_area_tags?.length ? d.treatment_area_tags : null,
       dosage_notes: d.dosage_notes || null,
       recommended_interval: d.recommended_interval || null,
+      image_url: imageUrl || null,
     };
     const result = editing
       ? await supabase.from("services").update(payload).eq("id", editing.id).eq("clinic_id", clinicId)
