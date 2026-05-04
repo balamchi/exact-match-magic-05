@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { PhotoUpload } from "@/components/photo-upload";
 
 export const Route = createFileRoute("/app/services")({ component: ServicesPage });
 
@@ -106,25 +107,41 @@ function ServicesPage() {
   const [query, setQuery] = useState("");
   const [catFilter, setCatFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [locationFilter, setLocationFilter] = useState("all");
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  // Locations
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  const [serviceLocationMap, setServiceLocationMap] = useState<Record<string, string[]>>({});
 
   // Composer
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Service | null>(null);
   const [form, setForm] = useState<ServiceFormData>(defaultForm);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     if (!clinicId) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("services").select("*")
-      .eq("clinic_id", clinicId)
-      .order("category").order("name");
-    if (error) toast.error("Could not load services");
-    else setServices((data ?? []) as Service[]);
+    const [svcRes, locRes, slRes] = await Promise.all([
+      supabase.from("services").select("*").eq("clinic_id", clinicId).order("category").order("name"),
+      supabase.from("locations").select("id, name").eq("clinic_id", clinicId).eq("active", true).order("name"),
+      supabase.from("service_locations").select("service_id, location_id"),
+    ]);
+    if (svcRes.error) toast.error("Could not load services");
+    else setServices((svcRes.data ?? []) as Service[]);
+    setLocations((locRes.data ?? []) as { id: string; name: string }[]);
+    // Build service → locations map
+    const map: Record<string, string[]> = {};
+    for (const row of (slRes.data ?? []) as { service_id: string; location_id: string }[]) {
+      if (!map[row.service_id]) map[row.service_id] = [];
+      map[row.service_id].push(row.location_id);
+    }
+    setServiceLocationMap(map);
     setLoading(false);
   }, [clinicId]);
 
@@ -142,10 +159,11 @@ function ServicesPage() {
     if (catFilter !== "all") list = list.filter(s => (s.category?.trim() || "Uncategorized") === catFilter);
     if (statusFilter === "active") list = list.filter(s => s.active);
     if (statusFilter === "inactive") list = list.filter(s => !s.active);
+    if (locationFilter !== "all") list = list.filter(s => serviceLocationMap[s.id]?.includes(locationFilter));
     const needle = query.trim().toLowerCase();
     if (needle) list = list.filter(s => s.name.toLowerCase().includes(needle) || (s.category ?? "").toLowerCase().includes(needle));
     return list;
-  }, [services, query, catFilter, statusFilter]);
+  }, [services, query, catFilter, statusFilter, locationFilter, serviceLocationMap]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
@@ -162,12 +180,15 @@ function ServicesPage() {
   const openCreate = () => {
     setEditing(null);
     setForm({ ...defaultForm });
+    setImageUrl(null);
+    setSelectedLocations(locations.map(l => l.id)); // default: all locations
     setErrors({});
     setOpen(true);
   };
 
   const openEdit = (s: Service) => {
     setEditing(s);
+    setImageUrl(s.image_url ?? null);
     setForm({
       name: s.name,
       category: s.category ?? "",
@@ -189,6 +210,7 @@ function ServicesPage() {
       dosage_notes: s.dosage_notes ?? "",
       recommended_interval: s.recommended_interval ?? "",
     });
+    setSelectedLocations(serviceLocationMap[s.id] ?? locations.map(l => l.id));
     setErrors({});
     setOpen(true);
   };
@@ -245,14 +267,25 @@ function ServicesPage() {
       treatment_area_tags: d.treatment_area_tags?.length ? d.treatment_area_tags : null,
       dosage_notes: d.dosage_notes || null,
       recommended_interval: d.recommended_interval || null,
+      image_url: imageUrl || null,
     };
     const result = editing
       ? await supabase.from("services").update(payload).eq("id", editing.id).eq("clinic_id", clinicId)
-      : await supabase.from("services").insert(payload);
+      : await supabase.from("services").insert(payload).select("id").single();
     if (result.error) toast.error(result.error.message);
     else {
+      // Save location assignments if multi-location
+      const serviceId = editing ? editing.id : (result.data as any)?.id;
+      if (serviceId && locations.length > 1) {
+        await supabase.from("service_locations").delete().eq("service_id", serviceId);
+        if (selectedLocations.length > 0) {
+          await supabase.from("service_locations").insert(
+            selectedLocations.map(lid => ({ service_id: serviceId, location_id: lid }))
+          );
+        }
+      }
       toast.success(editing ? "Service updated" : "Service created");
-      if (andAnother) { setForm({ ...defaultForm }); setEditing(null); }
+      if (andAnother) { setForm({ ...defaultForm }); setEditing(null); setImageUrl(null); setSelectedLocations(locations.map(l => l.id)); }
       else setOpen(false);
       load();
     }
@@ -384,6 +417,13 @@ function ServicesPage() {
               )}>{s}</button>
           ))}
         </div>
+        {locations.length > 1 && (
+          <select value={locationFilter} onChange={e => { setLocationFilter(e.target.value); setPage(0); }}
+            className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            <option value="all">All locations</option>
+            {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+        )}
       </section>
 
       {/* Bulk actions bar */}
@@ -418,6 +458,7 @@ function ServicesPage() {
                     <th className="p-3 w-10">
                       <input type="checkbox" checked={selected.size === paginated.length && paginated.length > 0} onChange={toggleSelectAll} className="accent-primary" />
                     </th>
+                    <th className="p-3 w-12"></th>
                     <th className="p-3">Name</th>
                     <th className="p-3">Category</th>
                     <th className="p-3">Duration</th>
@@ -436,6 +477,15 @@ function ServicesPage() {
                           next.has(s.id) ? next.delete(s.id) : next.add(s.id);
                           setSelected(next);
                         }} className="accent-primary" />
+                      </td>
+                      <td className="p-3">
+                        {s.image_url ? (
+                          <img src={s.image_url} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                        ) : (
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Sparkles className="h-4 w-4" />
+                          </div>
+                        )}
                       </td>
                       <td className="p-3">
                         <button onClick={() => openEdit(s)} className="text-left hover:text-primary transition">
@@ -529,6 +579,27 @@ function ServicesPage() {
                 </FormField>
               </div>
 
+              {/* Location assignment */}
+              {locations.length > 1 && (
+                <div>
+                  <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">Available at locations</Label>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => setSelectedLocations(locations.map(l => l.id))}
+                      className={cn("rounded-full border px-3 py-1.5 text-xs font-medium transition",
+                        selectedLocations.length === locations.length ? "border-primary/60 bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground"
+                      )}>All Locations</button>
+                    {locations.map(l => (
+                      <button key={l.id} type="button" onClick={() => {
+                        setSelectedLocations(prev => prev.includes(l.id) ? prev.filter(x => x !== l.id) : [...prev.filter(x => x !== "all"), l.id]);
+                      }}
+                        className={cn("rounded-full border px-3 py-1.5 text-xs font-medium transition",
+                          selectedLocations.includes(l.id) && selectedLocations.length < locations.length ? "border-primary/60 bg-primary/15 text-primary" : selectedLocations.length === locations.length ? "border-border/40 text-muted-foreground" : "border-border text-muted-foreground hover:text-foreground"
+                        )}>{l.name}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Duration & timing */}
               <div className="grid gap-4 md:grid-cols-3">
                 <FormField label="Duration (min) *" error={errors.duration_minutes}>
@@ -574,6 +645,23 @@ function ServicesPage() {
                   rows={3} maxLength={2000} placeholder="Describe this service for clients…"
                   className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
               </FormField>
+
+              {/* Service photo */}
+              {clinicId && (
+                <div>
+                  <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">Service photo</Label>
+                  <PhotoUpload
+                    bucket="service-images"
+                    currentUrl={imageUrl}
+                    onUploaded={setImageUrl}
+                    onRemoved={() => setImageUrl(null)}
+                    shape="square"
+                    size={96}
+                    clinicId={clinicId}
+                    hint="Upload service image (recommended 800×600)"
+                  />
+                </div>
+              )}
 
               {/* Clinical details */}
               <div className="grid gap-4 md:grid-cols-2">

@@ -1552,6 +1552,33 @@ export type Database = {
           },
         ]
       }
+      service_locations: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          location_id: string
+          price_override_cents: number | null
+          service_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          location_id: string
+          price_override_cents?: number | null
+          service_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          location_id?: string
+          price_override_cents?: number | null
+          service_id?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           active: boolean
@@ -1755,6 +1782,7 @@ export type Database = {
           id: string
           online_booking_visible: boolean
           phone: string | null
+          photo_url: string | null
           role: string
           title: string | null
           updated_at: string
@@ -1772,6 +1800,7 @@ export type Database = {
           id?: string
           online_booking_visible?: boolean
           phone?: string | null
+          photo_url?: string | null
           role?: string
           title?: string | null
           updated_at?: string
@@ -1789,6 +1818,7 @@ export type Database = {
           id?: string
           online_booking_visible?: boolean
           phone?: string | null
+          photo_url?: string | null
           role?: string
           title?: string | null
           updated_at?: string
@@ -1934,6 +1964,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      staff_locations: {
+        Row: {
+          created_at: string
+          id: string
+          location_id: string
+          primary_location: boolean
+          staff_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_id: string
+          primary_location?: boolean
+          staff_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_id?: string
+          primary_location?: boolean
+          staff_id?: string
+        }
+        Relationships: []
       }
       subscription_plans: {
         Row: {

@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-
+import { PhotoUpload } from "@/components/photo-upload";
 export const Route = createFileRoute("/app/staff")({ component: StaffPage });
 
 /* ── Types ────────────────────────────────────────────── */
@@ -26,6 +26,7 @@ interface StaffRow {
   display_name: string;
   title: string | null;
   color: string | null;
+  photo_url: string | null;
   active: boolean;
   user_id: string | null;
   bio: string | null;
@@ -251,9 +252,15 @@ function StaffPage() {
               <article key={row.id} className={cn("group relative overflow-hidden rounded-xl border border-border/60 bg-card/30 p-4 backdrop-blur transition hover:border-primary/40", !row.active && "opacity-60")}>
                 <div className="absolute inset-x-0 top-0 h-1" style={{ background: color }} />
                 <div className="flex items-start gap-3">
-                  <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-background ring-2"
-                    style={{ background: color, boxShadow: `0 0 24px -4px ${color}80`, '--tw-ring-color': `${color}40` } as React.CSSProperties}>
-                    {initials(row.display_name)}
+                  <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold ring-2 overflow-hidden"
+                    style={{ '--tw-ring-color': `${color}40` } as React.CSSProperties}>
+                    {row.photo_url ? (
+                      <img src={row.photo_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-background" style={{ background: color }}>
+                        {initials(row.display_name)}
+                      </div>
+                    )}
                     {provider && <span className="absolute -bottom-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-background ring-2 ring-background" title="Provider"><Crown className="h-3 w-3 text-amber-300" /></span>}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -332,6 +339,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
   const [displayName, setDisplayName] = useState(row?.display_name ?? "");
   const [title, setTitle] = useState(row?.title ?? "");
   const [color, setColor] = useState(row?.color ?? "#a78bfa");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(row?.photo_url ?? null);
   const [active, setActive] = useState(row?.active ?? true);
   const [bio, setBio] = useState(row?.bio ?? "");
   const [role, setRole] = useState(row?.role ?? "provider");
@@ -405,6 +413,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
         phone: parsed.data.phone || null,
         online_booking_visible: parsed.data.online_booking_visible,
         working_hours: workingHours,
+        photo_url: photoUrl || null,
       };
 
       if (editing && row) {
@@ -512,6 +521,25 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
         <div className="max-h-[60vh] overflow-y-auto p-5">
           {tab === "profile" && (
             <div className="space-y-5">
+              {/* Provider photo */}
+              <div className="flex justify-center">
+                <PhotoUpload
+                  bucket="staff-photos"
+                  currentUrl={photoUrl}
+                  onUploaded={setPhotoUrl}
+                  onRemoved={() => setPhotoUrl(null)}
+                  shape="circle"
+                  size={160}
+                  clinicId={clinicId}
+                  placeholder={
+                    <div className="flex h-full w-full items-center justify-center rounded-full text-3xl font-bold text-white"
+                      style={{ background: `linear-gradient(135deg, ${color}, #9333EA)` }}>
+                      {initials(displayName || "?")}
+                    </div>
+                  }
+                  hint="Provider photo for booking page"
+                />
+              </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField label="Display name *">
                   <Input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Dr. Sarah Chen" />
@@ -584,29 +612,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
           )}
 
           {tab === "services" && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">Select which services this staff member can perform.</p>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => setStaffServices(new Set(allServices.map(s => s.id)))}>Select all</Button>
-                <Button size="sm" variant="outline" onClick={() => setStaffServices(new Set())}>Clear all</Button>
-              </div>
-              <div className="grid gap-2 md:grid-cols-2">
-                {allServices.map(s => (
-                  <label key={s.id} className={cn("flex items-center gap-2.5 rounded-lg border px-3 py-2 text-sm cursor-pointer transition",
-                    staffServices.has(s.id) ? "border-primary/40 bg-primary/5" : "border-border/40"
-                  )}>
-                    <input type="checkbox" checked={staffServices.has(s.id)} onChange={() => {
-                      const next = new Set(staffServices);
-                      next.has(s.id) ? next.delete(s.id) : next.add(s.id);
-                      setStaffServices(next);
-                    }} className="accent-primary" />
-                    <span>{s.name}</span>
-                    {s.category && <Badge variant="outline" className="ml-auto text-[9px]">{s.category}</Badge>}
-                  </label>
-                ))}
-              </div>
-              {allServices.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No active services. Add services first.</p>}
-            </div>
+            <ServicesPicker allServices={allServices} staffServices={staffServices} setStaffServices={setStaffServices} />
           )}
 
           {tab === "schedule" && (
@@ -717,6 +723,118 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
             {saving ? "Saving…" : editing ? "Save changes" : "Add staff member"}
           </Button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Services Picker (grouped by category) ───────────── */
+
+function ServicesPicker({ allServices, staffServices, setStaffServices }: {
+  allServices: ServiceRow[];
+  staffServices: Set<string>;
+  setStaffServices: React.Dispatch<React.SetStateAction<Set<string>>>;
+}) {
+  const [svcSearch, setSvcSearch] = useState("");
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+
+  const grouped = useMemo(() => {
+    const q = svcSearch.trim().toLowerCase();
+    const filtered = q ? allServices.filter(s => s.name.toLowerCase().includes(q) || (s.category ?? "").toLowerCase().includes(q)) : allServices;
+    const map = new Map<string, ServiceRow[]>();
+    for (const s of filtered) {
+      const cat = s.category?.trim() || "Uncategorized";
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push(s);
+    }
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [allServices, svcSearch]);
+
+  const toggle = (id: string) => {
+    setStaffServices(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const selectCategory = (services: ServiceRow[]) => {
+    setStaffServices(prev => {
+      const next = new Set(prev);
+      services.forEach(s => next.add(s.id));
+      return next;
+    });
+  };
+
+  const toggleCollapse = (cat: string) => {
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      next.has(cat) ? next.delete(cat) : next.add(cat);
+      return next;
+    });
+  };
+
+  if (allServices.length === 0) {
+    return (
+      <div className="space-y-4">
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          No active services yet. <a href="/app/services" className="text-primary hover:underline">Add services first.</a>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input value={svcSearch} onChange={e => setSvcSearch(e.target.value)} placeholder="Search services…" className="pl-9" />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => setStaffServices(new Set(allServices.map(s => s.id)))}>Select all</Button>
+          <Button size="sm" variant="outline" onClick={() => setStaffServices(new Set())}>Clear all</Button>
+        </div>
+        <span className="text-xs text-muted-foreground">Selected: <strong className="text-foreground">{staffServices.size}</strong></span>
+      </div>
+
+      <div className="space-y-2">
+        {grouped.map(([cat, services]) => {
+          const isCollapsed = collapsed.has(cat);
+          const selectedInCat = services.filter(s => staffServices.has(s.id)).length;
+          return (
+            <div key={cat} className="rounded-lg border border-border/60 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleCollapse(cat)}
+                className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-medium hover:bg-surface/50 transition"
+              >
+                <span className="flex items-center gap-2">
+                  <span className={cn("transition-transform", isCollapsed ? "-rotate-90" : "rotate-0")}>▼</span>
+                  {cat} ({services.length})
+                  {selectedInCat > 0 && <Badge variant="default" className="text-[9px] ml-1">{selectedInCat}</Badge>}
+                </span>
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); selectCategory(services); }}
+                  className="text-[10px] text-primary hover:underline"
+                >Select all</button>
+              </button>
+              {!isCollapsed && (
+                <div className="border-t border-border/40 divide-y divide-border/20">
+                  {services.map(s => (
+                    <label key={s.id} className={cn("flex items-center gap-2.5 px-3 py-2 text-sm cursor-pointer transition hover:bg-surface/30",
+                      staffServices.has(s.id) && "bg-primary/5"
+                    )}>
+                      <input type="checkbox" checked={staffServices.has(s.id)} onChange={() => toggle(s.id)} className="accent-primary" />
+                      <span className="flex-1">{s.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
