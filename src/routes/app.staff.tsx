@@ -612,29 +612,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
           )}
 
           {tab === "services" && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">Select which services this staff member can perform.</p>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => setStaffServices(new Set(allServices.map(s => s.id)))}>Select all</Button>
-                <Button size="sm" variant="outline" onClick={() => setStaffServices(new Set())}>Clear all</Button>
-              </div>
-              <div className="grid gap-2 md:grid-cols-2">
-                {allServices.map(s => (
-                  <label key={s.id} className={cn("flex items-center gap-2.5 rounded-lg border px-3 py-2 text-sm cursor-pointer transition",
-                    staffServices.has(s.id) ? "border-primary/40 bg-primary/5" : "border-border/40"
-                  )}>
-                    <input type="checkbox" checked={staffServices.has(s.id)} onChange={() => {
-                      const next = new Set(staffServices);
-                      next.has(s.id) ? next.delete(s.id) : next.add(s.id);
-                      setStaffServices(next);
-                    }} className="accent-primary" />
-                    <span>{s.name}</span>
-                    {s.category && <Badge variant="outline" className="ml-auto text-[9px]">{s.category}</Badge>}
-                  </label>
-                ))}
-              </div>
-              {allServices.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No active services. Add services first.</p>}
-            </div>
+            <ServicesPicker allServices={allServices} staffServices={staffServices} setStaffServices={setStaffServices} />
           )}
 
           {tab === "schedule" && (
