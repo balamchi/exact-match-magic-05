@@ -164,6 +164,7 @@ function ServicesPage() {
   const openCreate = () => {
     setEditing(null);
     setForm({ ...defaultForm });
+    setImageUrl(null);
     setErrors({});
     setOpen(true);
   };
