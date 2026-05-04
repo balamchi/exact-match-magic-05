@@ -423,6 +423,7 @@ function ServicesPage() {
                     <th className="p-3 w-10">
                       <input type="checkbox" checked={selected.size === paginated.length && paginated.length > 0} onChange={toggleSelectAll} className="accent-primary" />
                     </th>
+                    <th className="p-3 w-12"></th>
                     <th className="p-3">Name</th>
                     <th className="p-3">Category</th>
                     <th className="p-3">Duration</th>
