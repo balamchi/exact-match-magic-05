@@ -728,6 +728,118 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
   );
 }
 
+/* ── Services Picker (grouped by category) ───────────── */
+
+function ServicesPicker({ allServices, staffServices, setStaffServices }: {
+  allServices: ServiceRow[];
+  staffServices: Set<string>;
+  setStaffServices: React.Dispatch<React.SetStateAction<Set<string>>>;
+}) {
+  const [svcSearch, setSvcSearch] = useState("");
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+
+  const grouped = useMemo(() => {
+    const q = svcSearch.trim().toLowerCase();
+    const filtered = q ? allServices.filter(s => s.name.toLowerCase().includes(q) || (s.category ?? "").toLowerCase().includes(q)) : allServices;
+    const map = new Map<string, ServiceRow[]>();
+    for (const s of filtered) {
+      const cat = s.category?.trim() || "Uncategorized";
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push(s);
+    }
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [allServices, svcSearch]);
+
+  const toggle = (id: string) => {
+    setStaffServices(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const selectCategory = (services: ServiceRow[]) => {
+    setStaffServices(prev => {
+      const next = new Set(prev);
+      services.forEach(s => next.add(s.id));
+      return next;
+    });
+  };
+
+  const toggleCollapse = (cat: string) => {
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      next.has(cat) ? next.delete(cat) : next.add(cat);
+      return next;
+    });
+  };
+
+  if (allServices.length === 0) {
+    return (
+      <div className="space-y-4">
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          No active services yet. <a href="/app/services" className="text-primary hover:underline">Add services first.</a>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input value={svcSearch} onChange={e => setSvcSearch(e.target.value)} placeholder="Search services…" className="pl-9" />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => setStaffServices(new Set(allServices.map(s => s.id)))}>Select all</Button>
+          <Button size="sm" variant="outline" onClick={() => setStaffServices(new Set())}>Clear all</Button>
+        </div>
+        <span className="text-xs text-muted-foreground">Selected: <strong className="text-foreground">{staffServices.size}</strong></span>
+      </div>
+
+      <div className="space-y-2">
+        {grouped.map(([cat, services]) => {
+          const isCollapsed = collapsed.has(cat);
+          const selectedInCat = services.filter(s => staffServices.has(s.id)).length;
+          return (
+            <div key={cat} className="rounded-lg border border-border/60 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleCollapse(cat)}
+                className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-medium hover:bg-surface/50 transition"
+              >
+                <span className="flex items-center gap-2">
+                  <span className={cn("transition-transform", isCollapsed ? "-rotate-90" : "rotate-0")}>▼</span>
+                  {cat} ({services.length})
+                  {selectedInCat > 0 && <Badge variant="default" className="text-[9px] ml-1">{selectedInCat}</Badge>}
+                </span>
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); selectCategory(services); }}
+                  className="text-[10px] text-primary hover:underline"
+                >Select all</button>
+              </button>
+              {!isCollapsed && (
+                <div className="border-t border-border/40 divide-y divide-border/20">
+                  {services.map(s => (
+                    <label key={s.id} className={cn("flex items-center gap-2.5 px-3 py-2 text-sm cursor-pointer transition hover:bg-surface/30",
+                      staffServices.has(s.id) && "bg-primary/5"
+                    )}>
+                      <input type="checkbox" checked={staffServices.has(s.id)} onChange={() => toggle(s.id)} className="accent-primary" />
+                      <span className="flex-1">{s.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ── Helpers ──────────────────────────────────────────── */
 
 function FormField({ label, children }: { label: string; children: React.ReactNode }) {
