@@ -127,12 +127,21 @@ function ServicesPage() {
   const load = useCallback(async () => {
     if (!clinicId) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("services").select("*")
-      .eq("clinic_id", clinicId)
-      .order("category").order("name");
-    if (error) toast.error("Could not load services");
-    else setServices((data ?? []) as Service[]);
+    const [svcRes, locRes, slRes] = await Promise.all([
+      supabase.from("services").select("*").eq("clinic_id", clinicId).order("category").order("name"),
+      supabase.from("locations").select("id, name").eq("clinic_id", clinicId).eq("active", true).order("name"),
+      supabase.from("service_locations").select("service_id, location_id"),
+    ]);
+    if (svcRes.error) toast.error("Could not load services");
+    else setServices((svcRes.data ?? []) as Service[]);
+    setLocations((locRes.data ?? []) as { id: string; name: string }[]);
+    // Build service → locations map
+    const map: Record<string, string[]> = {};
+    for (const row of (slRes.data ?? []) as { service_id: string; location_id: string }[]) {
+      if (!map[row.service_id]) map[row.service_id] = [];
+      map[row.service_id].push(row.location_id);
+    }
+    setServiceLocationMap(map);
     setLoading(false);
   }, [clinicId]);
 
