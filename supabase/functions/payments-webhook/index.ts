@@ -1,5 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { verifyWebhook, EventName, type PaddleEnv } from "../_shared/paddle.ts";
+import { verifyWebhook, WebhookAuthError, EventName, type PaddleEnv } from "../_shared/paddle.ts";
 
 let _supabase: any = null;
 function getSupabase(): any {
@@ -297,6 +297,10 @@ Deno.serve(async (req) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (e) {
+    if (e instanceof WebhookAuthError) {
+      console.error("Webhook auth error:", (e as Error).message);
+      return new Response("Unauthorized", { status: 401 });
+    }
     console.error("Webhook error:", e);
     return new Response("Webhook error", { status: 400 });
   }
