@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { PhotoUpload } from "@/components/photo-upload";
 
 export const Route = createFileRoute("/app/services")({ component: ServicesPage });
 
