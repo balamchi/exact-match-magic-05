@@ -339,6 +339,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
   const [displayName, setDisplayName] = useState(row?.display_name ?? "");
   const [title, setTitle] = useState(row?.title ?? "");
   const [color, setColor] = useState(row?.color ?? "#a78bfa");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(row?.photo_url ?? null);
   const [active, setActive] = useState(row?.active ?? true);
   const [bio, setBio] = useState(row?.bio ?? "");
   const [role, setRole] = useState(row?.role ?? "provider");
