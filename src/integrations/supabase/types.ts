@@ -301,6 +301,90 @@ export type Database = {
           },
         ]
       }
+      client_package_redemptions: {
+        Row: {
+          appointment_id: string | null
+          client_package_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          redeemed_at: string
+          service_id: string | null
+          staff_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          client_package_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          redeemed_at?: string
+          service_id?: string | null
+          staff_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          client_package_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          redeemed_at?: string
+          service_id?: string | null
+          staff_id?: string | null
+        }
+        Relationships: []
+      }
+      client_packages: {
+        Row: {
+          activated_at: string | null
+          client_id: string
+          clinic_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          package_id: string
+          paid_amount_cents: number
+          pos_order_id: string | null
+          purchased_at: string
+          sessions_used: number
+          status: string
+          total_sessions: number
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          client_id: string
+          clinic_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          package_id: string
+          paid_amount_cents?: number
+          pos_order_id?: string | null
+          purchased_at?: string
+          sessions_used?: number
+          status?: string
+          total_sessions: number
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          client_id?: string
+          clinic_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          package_id?: string
+          paid_amount_cents?: number
+          pos_order_id?: string | null
+          purchased_at?: string
+          sessions_used?: number
+          status?: string
+          total_sessions?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           address_line1: string | null
@@ -568,45 +652,138 @@ export type Database = {
           },
         ]
       }
+      coupon_locations: {
+        Row: {
+          coupon_id: string
+          created_at: string
+          id: string
+          location_id: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string
+          id?: string
+          location_id: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string
+          id?: string
+          location_id?: string
+        }
+        Relationships: []
+      }
+      coupon_usage: {
+        Row: {
+          client_id: string | null
+          coupon_id: string
+          created_at: string
+          discount_applied_cents: number
+          id: string
+          pos_order_id: string | null
+          used_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          coupon_id: string
+          created_at?: string
+          discount_applied_cents?: number
+          id?: string
+          pos_order_id?: string | null
+          used_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          coupon_id?: string
+          created_at?: string
+          discount_applied_cents?: number
+          id?: string
+          pos_order_id?: string | null
+          used_at?: string
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           active: boolean
+          applies_to_ids: string[] | null
+          applies_to_type: string | null
           clinic_id: string
           code: string
           created_at: string
+          description: string | null
           discount_type: string
           discount_value: number
           expires_at: string | null
+          first_time_only: boolean | null
           id: string
+          max_discount_cents: number | null
+          min_purchase_cents: number | null
+          name: string | null
+          per_client_limit: number | null
+          stackable: boolean | null
+          starts_at: string | null
           updated_at: string
           usage_limit: number | null
           used_count: number
+          valid_days: string[] | null
+          valid_end_time: string | null
+          valid_start_time: string | null
+          visible_to_clients: boolean | null
         }
         Insert: {
           active?: boolean
+          applies_to_ids?: string[] | null
+          applies_to_type?: string | null
           clinic_id: string
           code: string
           created_at?: string
+          description?: string | null
           discount_type?: string
           discount_value?: number
           expires_at?: string | null
+          first_time_only?: boolean | null
           id?: string
+          max_discount_cents?: number | null
+          min_purchase_cents?: number | null
+          name?: string | null
+          per_client_limit?: number | null
+          stackable?: boolean | null
+          starts_at?: string | null
           updated_at?: string
           usage_limit?: number | null
           used_count?: number
+          valid_days?: string[] | null
+          valid_end_time?: string | null
+          valid_start_time?: string | null
+          visible_to_clients?: boolean | null
         }
         Update: {
           active?: boolean
+          applies_to_ids?: string[] | null
+          applies_to_type?: string | null
           clinic_id?: string
           code?: string
           created_at?: string
+          description?: string | null
           discount_type?: string
           discount_value?: number
           expires_at?: string | null
+          first_time_only?: boolean | null
           id?: string
+          max_discount_cents?: number | null
+          min_purchase_cents?: number | null
+          name?: string | null
+          per_client_limit?: number | null
+          stackable?: boolean | null
+          starts_at?: string | null
           updated_at?: string
           usage_limit?: number | null
           used_count?: number
+          valid_days?: string[] | null
+          valid_end_time?: string | null
+          valid_start_time?: string | null
+          visible_to_clients?: boolean | null
         }
         Relationships: []
       }
@@ -764,47 +941,131 @@ export type Database = {
         }
         Relationships: []
       }
+      gift_card_locations: {
+        Row: {
+          created_at: string
+          gift_card_id: string
+          id: string
+          location_id: string
+        }
+        Insert: {
+          created_at?: string
+          gift_card_id: string
+          id?: string
+          location_id: string
+        }
+        Update: {
+          created_at?: string
+          gift_card_id?: string
+          id?: string
+          location_id?: string
+        }
+        Relationships: []
+      }
+      gift_card_transactions: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          gift_card_id: string
+          id: string
+          notes: string | null
+          pos_order_id: string | null
+          staff_id: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          gift_card_id: string
+          id?: string
+          notes?: string | null
+          pos_order_id?: string | null
+          staff_id?: string | null
+          transaction_type?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          gift_card_id?: string
+          id?: string
+          notes?: string | null
+          pos_order_id?: string | null
+          staff_id?: string | null
+          transaction_type?: string
+        }
+        Relationships: []
+      }
       gift_cards: {
         Row: {
           active: boolean
           balance_cents: number
+          card_image_url: string | null
           clinic_id: string
           code: string
           created_at: string
+          delivered_at: string | null
+          delivery_method: string | null
+          design_template: string | null
           expires_at: string | null
           id: string
           initial_value_cents: number
+          issued_by_staff_id: string | null
+          personal_message: string | null
           purchaser_name: string | null
           recipient_email: string | null
           recipient_name: string | null
+          scheduled_delivery_at: string | null
+          sender_email: string | null
+          sender_name: string | null
+          status: string | null
           updated_at: string
         }
         Insert: {
           active?: boolean
           balance_cents?: number
+          card_image_url?: string | null
           clinic_id: string
           code: string
           created_at?: string
+          delivered_at?: string | null
+          delivery_method?: string | null
+          design_template?: string | null
           expires_at?: string | null
           id?: string
           initial_value_cents?: number
+          issued_by_staff_id?: string | null
+          personal_message?: string | null
           purchaser_name?: string | null
           recipient_email?: string | null
           recipient_name?: string | null
+          scheduled_delivery_at?: string | null
+          sender_email?: string | null
+          sender_name?: string | null
+          status?: string | null
           updated_at?: string
         }
         Update: {
           active?: boolean
           balance_cents?: number
+          card_image_url?: string | null
           clinic_id?: string
           code?: string
           created_at?: string
+          delivered_at?: string | null
+          delivery_method?: string | null
+          design_template?: string | null
           expires_at?: string | null
           id?: string
           initial_value_cents?: number
+          issued_by_staff_id?: string | null
+          personal_message?: string | null
           purchaser_name?: string | null
           recipient_email?: string | null
           recipient_name?: string | null
+          scheduled_delivery_at?: string | null
+          sender_email?: string | null
+          sender_name?: string | null
+          status?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1294,42 +1555,108 @@ export type Database = {
           },
         ]
       }
+      package_locations: {
+        Row: {
+          created_at: string
+          id: string
+          location_id: string
+          package_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_id: string
+          package_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_id?: string
+          package_id?: string
+        }
+        Relationships: []
+      }
+      package_services: {
+        Row: {
+          created_at: string
+          id: string
+          package_id: string
+          service_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          package_id: string
+          service_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          package_id?: string
+          service_id?: string
+        }
+        Relationships: []
+      }
       packages: {
         Row: {
+          activation_policy: string | null
           active: boolean
           clinic_id: string
           created_at: string
           description: string | null
           expires_after_days: number | null
           id: string
+          image_url: string | null
+          member_only: boolean | null
           name: string
           price_cents: number
+          session_type: string | null
           sessions: number
+          tax_category: string | null
+          transferable: boolean | null
           updated_at: string
+          validity_days: number | null
+          validity_type: string | null
         }
         Insert: {
+          activation_policy?: string | null
           active?: boolean
           clinic_id: string
           created_at?: string
           description?: string | null
           expires_after_days?: number | null
           id?: string
+          image_url?: string | null
+          member_only?: boolean | null
           name: string
           price_cents?: number
+          session_type?: string | null
           sessions?: number
+          tax_category?: string | null
+          transferable?: boolean | null
           updated_at?: string
+          validity_days?: number | null
+          validity_type?: string | null
         }
         Update: {
+          activation_policy?: string | null
           active?: boolean
           clinic_id?: string
           created_at?: string
           description?: string | null
           expires_after_days?: number | null
           id?: string
+          image_url?: string | null
+          member_only?: boolean | null
           name?: string
           price_cents?: number
+          session_type?: string | null
           sessions?: number
+          tax_category?: string | null
+          transferable?: boolean | null
           updated_at?: string
+          validity_days?: number | null
+          validity_type?: string | null
         }
         Relationships: []
       }
