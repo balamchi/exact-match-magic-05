@@ -26,6 +26,7 @@ interface StaffRow {
   display_name: string;
   title: string | null;
   color: string | null;
+  photo_url: string | null;
   active: boolean;
   user_id: string | null;
   bio: string | null;
