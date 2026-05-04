@@ -159,10 +159,11 @@ function ServicesPage() {
     if (catFilter !== "all") list = list.filter(s => (s.category?.trim() || "Uncategorized") === catFilter);
     if (statusFilter === "active") list = list.filter(s => s.active);
     if (statusFilter === "inactive") list = list.filter(s => !s.active);
+    if (locationFilter !== "all") list = list.filter(s => serviceLocationMap[s.id]?.includes(locationFilter));
     const needle = query.trim().toLowerCase();
     if (needle) list = list.filter(s => s.name.toLowerCase().includes(needle) || (s.category ?? "").toLowerCase().includes(needle));
     return list;
-  }, [services, query, catFilter, statusFilter]);
+  }, [services, query, catFilter, statusFilter, locationFilter, serviceLocationMap]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
