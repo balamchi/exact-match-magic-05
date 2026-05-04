@@ -521,6 +521,25 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
         <div className="max-h-[60vh] overflow-y-auto p-5">
           {tab === "profile" && (
             <div className="space-y-5">
+              {/* Provider photo */}
+              <div className="flex justify-center">
+                <PhotoUpload
+                  bucket="staff-photos"
+                  currentUrl={photoUrl}
+                  onUploaded={setPhotoUrl}
+                  onRemoved={() => setPhotoUrl(null)}
+                  shape="circle"
+                  size={160}
+                  clinicId={clinicId}
+                  placeholder={
+                    <div className="flex h-full w-full items-center justify-center rounded-full text-3xl font-bold text-white"
+                      style={{ background: `linear-gradient(135deg, ${color}, #9333EA)` }}>
+                      {initials(displayName || "?")}
+                    </div>
+                  }
+                  hint="Provider photo for booking page"
+                />
+              </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField label="Display name *">
                   <Input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Dr. Sarah Chen" />
