@@ -210,6 +210,7 @@ function ServicesPage() {
       dosage_notes: s.dosage_notes ?? "",
       recommended_interval: s.recommended_interval ?? "",
     });
+    setSelectedLocations(serviceLocationMap[s.id] ?? locations.map(l => l.id));
     setErrors({});
     setOpen(true);
   };
