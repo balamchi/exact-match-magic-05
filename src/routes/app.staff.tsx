@@ -413,6 +413,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
         phone: parsed.data.phone || null,
         online_booking_visible: parsed.data.online_booking_visible,
         working_hours: workingHours,
+        photo_url: photoUrl || null,
       };
 
       if (editing && row) {
