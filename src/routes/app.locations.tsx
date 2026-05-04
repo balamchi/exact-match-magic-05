@@ -211,11 +211,11 @@ function LocationsPage() {
     if (editing) {
       const { error } = await supabase.from("locations").update(payload).eq("id", editing.id);
       if (error) toast.error(error.message);
-      else { toast.success("Location updated"); closeComposer(); }
+      else { toast.success("Location updated"); await load(); closeComposer(); }
     } else {
       const { error } = await supabase.from("locations").insert({ ...payload, clinic_id: clinicId });
       if (error) toast.error(error.message);
-      else { toast.success("Location added"); closeComposer(); }
+      else { toast.success("Location added successfully"); await load(); closeComposer(); }
     }
     setSubmitting(false);
   };
