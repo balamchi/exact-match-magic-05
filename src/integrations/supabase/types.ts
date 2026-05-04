@@ -1079,8 +1079,13 @@ export type Database = {
           clinic_id: string
           country: string | null
           created_at: string
+          email: string | null
           id: string
+          image_url: string | null
+          is_primary: boolean
           name: string
+          notes: string | null
+          operating_hours: Json | null
           phone: string | null
           postal_code: string | null
           region: string | null
@@ -1096,8 +1101,13 @@ export type Database = {
           clinic_id: string
           country?: string | null
           created_at?: string
+          email?: string | null
           id?: string
+          image_url?: string | null
+          is_primary?: boolean
           name: string
+          notes?: string | null
+          operating_hours?: Json | null
           phone?: string | null
           postal_code?: string | null
           region?: string | null
@@ -1113,8 +1123,13 @@ export type Database = {
           clinic_id?: string
           country?: string | null
           created_at?: string
+          email?: string | null
           id?: string
+          image_url?: string | null
+          is_primary?: boolean
           name?: string
+          notes?: string | null
+          operating_hours?: Json | null
           phone?: string | null
           postal_code?: string | null
           region?: string | null
@@ -1541,40 +1556,79 @@ export type Database = {
         Row: {
           active: boolean
           category: string | null
+          cleanup_time_minutes: number
           clinic_id: string
           created_at: string
           deposit_cents: number
           deposit_required: boolean
+          description: string | null
+          dosage_notes: string | null
           duration_minutes: number
           id: string
+          image_url: string | null
+          member_price_cents: number | null
           name: string
+          online_booking_enabled: boolean
+          post_treatment_aftercare: string | null
+          pre_treatment_instructions: string | null
+          prep_time_minutes: number
           price_cents: number
+          recommended_interval: string | null
+          sub_category: string | null
+          tax_category: string | null
+          treatment_area_tags: string[] | null
           updated_at: string
         }
         Insert: {
           active?: boolean
           category?: string | null
+          cleanup_time_minutes?: number
           clinic_id: string
           created_at?: string
           deposit_cents?: number
           deposit_required?: boolean
+          description?: string | null
+          dosage_notes?: string | null
           duration_minutes?: number
           id?: string
+          image_url?: string | null
+          member_price_cents?: number | null
           name: string
+          online_booking_enabled?: boolean
+          post_treatment_aftercare?: string | null
+          pre_treatment_instructions?: string | null
+          prep_time_minutes?: number
           price_cents?: number
+          recommended_interval?: string | null
+          sub_category?: string | null
+          tax_category?: string | null
+          treatment_area_tags?: string[] | null
           updated_at?: string
         }
         Update: {
           active?: boolean
           category?: string | null
+          cleanup_time_minutes?: number
           clinic_id?: string
           created_at?: string
           deposit_cents?: number
           deposit_required?: boolean
+          description?: string | null
+          dosage_notes?: string | null
           duration_minutes?: number
           id?: string
+          image_url?: string | null
+          member_price_cents?: number | null
           name?: string
+          online_booking_enabled?: boolean
+          post_treatment_aftercare?: string | null
+          pre_treatment_instructions?: string | null
+          prep_time_minutes?: number
           price_cents?: number
+          recommended_interval?: string | null
+          sub_category?: string | null
+          tax_category?: string | null
+          treatment_area_tags?: string[] | null
           updated_at?: string
         }
         Relationships: [
@@ -1692,36 +1746,54 @@ export type Database = {
       staff: {
         Row: {
           active: boolean
+          bio: string | null
           clinic_id: string
           color: string | null
           created_at: string
           display_name: string
+          email: string | null
           id: string
+          online_booking_visible: boolean
+          phone: string | null
+          role: string
           title: string | null
           updated_at: string
           user_id: string | null
+          working_hours: Json | null
         }
         Insert: {
           active?: boolean
+          bio?: string | null
           clinic_id: string
           color?: string | null
           created_at?: string
           display_name: string
+          email?: string | null
           id?: string
+          online_booking_visible?: boolean
+          phone?: string | null
+          role?: string
           title?: string | null
           updated_at?: string
           user_id?: string | null
+          working_hours?: Json | null
         }
         Update: {
           active?: boolean
+          bio?: string | null
           clinic_id?: string
           color?: string | null
           created_at?: string
           display_name?: string
+          email?: string | null
           id?: string
+          online_booking_visible?: boolean
+          phone?: string | null
+          role?: string
           title?: string | null
           updated_at?: string
           user_id?: string | null
+          working_hours?: Json | null
         }
         Relationships: [
           {
