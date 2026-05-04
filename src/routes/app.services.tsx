@@ -181,6 +181,7 @@ function ServicesPage() {
     setEditing(null);
     setForm({ ...defaultForm });
     setImageUrl(null);
+    setSelectedLocations(locations.map(l => l.id)); // default: all locations
     setErrors({});
     setOpen(true);
   };
