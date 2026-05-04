@@ -590,6 +590,23 @@ function ServicesPage() {
                   className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
               </FormField>
 
+              {/* Service photo */}
+              {clinicId && (
+                <div>
+                  <Label className="mb-1.5 block text-xs font-medium text-muted-foreground">Service photo</Label>
+                  <PhotoUpload
+                    bucket="service-images"
+                    currentUrl={imageUrl}
+                    onUploaded={setImageUrl}
+                    onRemoved={() => setImageUrl(null)}
+                    shape="square"
+                    size={96}
+                    clinicId={clinicId}
+                    hint="Upload service image (recommended 800×600)"
+                  />
+                </div>
+              )}
+
               {/* Clinical details */}
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField label="Pre-treatment instructions">
