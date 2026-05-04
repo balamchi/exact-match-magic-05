@@ -271,11 +271,21 @@ function ServicesPage() {
     };
     const result = editing
       ? await supabase.from("services").update(payload).eq("id", editing.id).eq("clinic_id", clinicId)
-      : await supabase.from("services").insert(payload);
+      : await supabase.from("services").insert(payload).select("id").single();
     if (result.error) toast.error(result.error.message);
     else {
+      // Save location assignments if multi-location
+      const serviceId = editing ? editing.id : (result.data as any)?.id;
+      if (serviceId && locations.length > 1) {
+        await supabase.from("service_locations").delete().eq("service_id", serviceId);
+        if (selectedLocations.length > 0) {
+          await supabase.from("service_locations").insert(
+            selectedLocations.map(lid => ({ service_id: serviceId, location_id: lid }))
+          );
+        }
+      }
       toast.success(editing ? "Service updated" : "Service created");
-      if (andAnother) { setForm({ ...defaultForm }); setEditing(null); }
+      if (andAnother) { setForm({ ...defaultForm }); setEditing(null); setImageUrl(null); setSelectedLocations(locations.map(l => l.id)); }
       else setOpen(false);
       load();
     }
