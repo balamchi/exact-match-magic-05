@@ -621,7 +621,7 @@ function PackagesPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>Package Image</Label>
-                    <PhotoUpload bucket="package-images" value={form.image_url} onChange={(url) => setForm({ ...form, image_url: url })} />
+                    <PhotoUpload bucket="package-images" currentUrl={form.image_url || null} onUploaded={(url: string) => setForm({ ...form, image_url: url })} onRemoved={() => setForm({ ...form, image_url: "" })} clinicId={clinicId ?? ""} />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
