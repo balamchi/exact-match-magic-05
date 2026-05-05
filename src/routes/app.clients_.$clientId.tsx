@@ -19,7 +19,7 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const Route = createFileRoute("/app/clients/$clientId")({
+export const Route = createFileRoute("/app/clients_/$clientId")({
   component: ClientDetailPage,
 });
 
