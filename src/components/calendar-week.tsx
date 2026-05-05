@@ -389,11 +389,11 @@ export function CalendarWeek() {
         location_id: draft.location_id || null,
         starts_at: new Date(draft.starts_at).toISOString(),
         ends_at: new Date(draft.ends_at).toISOString(),
-        status: draft.status,
+        status: draft.status as AppointmentStatus,
         price_cents: Math.round(Number(draft.price || 0) * 100),
         notes: draft.notes.trim() || null,
         internal_notes: draft.internal_notes.trim() || null,
-      } satisfies Parameters<typeof supabase.from<"appointments">>[0] extends string ? Record<string, never> : Record<string, unknown>;
+      };
       const res = editing
         ? await supabase.from("appointments").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id)
         : await supabase.from("appointments").insert(payload);
