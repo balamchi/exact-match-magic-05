@@ -63,12 +63,20 @@ export type Database = {
       }
       appointments: {
         Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          check_in_at: string | null
+          check_out_at: string | null
           client_id: string | null
           clinic_id: string
           created_at: string
+          created_by: string | null
           deposit_status: string | null
           ends_at: string
           id: string
+          internal_notes: string | null
+          location_id: string | null
+          no_show_at: string | null
           notes: string | null
           price_cents: number
           service_id: string | null
@@ -78,12 +86,20 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          check_in_at?: string | null
+          check_out_at?: string | null
           client_id?: string | null
           clinic_id: string
           created_at?: string
+          created_by?: string | null
           deposit_status?: string | null
           ends_at: string
           id?: string
+          internal_notes?: string | null
+          location_id?: string | null
+          no_show_at?: string | null
           notes?: string | null
           price_cents?: number
           service_id?: string | null
@@ -93,12 +109,20 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          check_in_at?: string | null
+          check_out_at?: string | null
           client_id?: string | null
           clinic_id?: string
           created_at?: string
+          created_by?: string | null
           deposit_status?: string | null
           ends_at?: string
           id?: string
+          internal_notes?: string | null
+          location_id?: string | null
+          no_show_at?: string | null
           notes?: string | null
           price_cents?: number
           service_id?: string | null
@@ -2395,6 +2419,30 @@ export type Database = {
           id?: string
           location_id?: string
           primary_location?: boolean
+          staff_id?: string
+        }
+        Relationships: []
+      }
+      staff_services: {
+        Row: {
+          clinic_id: string
+          created_at: string
+          id: string
+          service_id: string
+          staff_id: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          id?: string
+          service_id: string
+          staff_id: string
+        }
+        Update: {
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          service_id?: string
           staff_id?: string
         }
         Relationships: []
