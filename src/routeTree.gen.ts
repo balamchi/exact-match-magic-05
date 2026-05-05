@@ -83,7 +83,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable.em
 import { Route as LovableEmailQueueRouteImport } from './routes/lovable.email.queue'
 import { Route as LovableEmailAuthRouteImport } from './routes/lovable.email.auth'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
-import { Route as AppClientsClientIdRouteImport } from './routes/app.clients.$clientId'
+import { Route as AppClientsClientIdRouteImport } from './routes/app.clients_.$clientId'
 import { Route as ApiPublicBookingRouteImport } from './routes/api.public.booking'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable.email.transactional.send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable.email.transactional.preview'
@@ -464,9 +464,9 @@ const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   getParentRoute: () => AppSettingsRoute,
 } as any)
 const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
-  id: '/$clientId',
-  path: '/$clientId',
-  getParentRoute: () => AppClientsRoute,
+  id: '/clients_/$clientId',
+  path: '/clients/$clientId',
+  getParentRoute: () => AppRoute,
 } as any)
 const ApiPublicBookingRoute = ApiPublicBookingRouteImport.update({
   id: '/booking',
@@ -539,7 +539,7 @@ export interface FileRoutesByFullPath {
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
   '/app/checkin': typeof AppCheckinRoute
-  '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/clients': typeof AppClientsRoute
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -623,7 +623,7 @@ export interface FileRoutesByTo {
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
   '/app/checkin': typeof AppCheckinRoute
-  '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/clients': typeof AppClientsRoute
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -708,7 +708,7 @@ export interface FileRoutesById {
   '/app/booking': typeof AppBookingRoute
   '/app/calendar': typeof AppCalendarRoute
   '/app/checkin': typeof AppCheckinRoute
-  '/app/clients': typeof AppClientsRouteWithChildren
+  '/app/clients': typeof AppClientsRoute
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -747,7 +747,7 @@ export interface FileRoutesById {
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
-  '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/clients_/$clientId': typeof AppClientsClientIdRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
@@ -1001,7 +1001,7 @@ export interface FileRouteTypes {
     | '/lovable/email'
     | '/portal/$slug'
     | '/api/public/booking'
-    | '/app/clients/$clientId'
+    | '/app/clients_/$clientId'
     | '/app/settings/billing'
     | '/lovable/email/auth'
     | '/lovable/email/queue'
@@ -1562,12 +1562,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsBillingRouteImport
       parentRoute: typeof AppSettingsRoute
     }
-    '/app/clients/$clientId': {
-      id: '/app/clients/$clientId'
-      path: '/$clientId'
+    '/app/clients_/$clientId': {
+      id: '/app/clients_/$clientId'
+      path: '/clients/$clientId'
       fullPath: '/app/clients/$clientId'
       preLoaderRoute: typeof AppClientsClientIdRouteImport
-      parentRoute: typeof AppClientsRoute
+      parentRoute: typeof AppRoute
     }
     '/api/public/booking': {
       id: '/api/public/booking'
@@ -1643,18 +1643,6 @@ const ApiRouteChildren: ApiRouteChildren = {
 
 const ApiRouteWithChildren = ApiRoute._addFileChildren(ApiRouteChildren)
 
-interface AppClientsRouteChildren {
-  AppClientsClientIdRoute: typeof AppClientsClientIdRoute
-}
-
-const AppClientsRouteChildren: AppClientsRouteChildren = {
-  AppClientsClientIdRoute: AppClientsClientIdRoute,
-}
-
-const AppClientsRouteWithChildren = AppClientsRoute._addFileChildren(
-  AppClientsRouteChildren,
-)
-
 interface AppSettingsRouteChildren {
   AppSettingsBillingRoute: typeof AppSettingsBillingRoute
 }
@@ -1688,7 +1676,7 @@ interface AppRouteChildren {
   AppBookingRoute: typeof AppBookingRoute
   AppCalendarRoute: typeof AppCalendarRoute
   AppCheckinRoute: typeof AppCheckinRoute
-  AppClientsRoute: typeof AppClientsRouteWithChildren
+  AppClientsRoute: typeof AppClientsRoute
   AppConsentRoute: typeof AppConsentRoute
   AppCouponsRoute: typeof AppCouponsRoute
   AppDashboardRoute: typeof AppDashboardRoute
@@ -1718,6 +1706,7 @@ interface AppRouteChildren {
   AppTasksRoute: typeof AppTasksRoute
   AppTreatmentPlansRoute: typeof AppTreatmentPlansRoute
   AppWhatsappRoute: typeof AppWhatsappRoute
+  AppClientsClientIdRoute: typeof AppClientsClientIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -1729,7 +1718,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBookingRoute: AppBookingRoute,
   AppCalendarRoute: AppCalendarRoute,
   AppCheckinRoute: AppCheckinRoute,
-  AppClientsRoute: AppClientsRouteWithChildren,
+  AppClientsRoute: AppClientsRoute,
   AppConsentRoute: AppConsentRoute,
   AppCouponsRoute: AppCouponsRoute,
   AppDashboardRoute: AppDashboardRoute,
@@ -1759,6 +1748,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTasksRoute: AppTasksRoute,
   AppTreatmentPlansRoute: AppTreatmentPlansRoute,
   AppWhatsappRoute: AppWhatsappRoute,
+  AppClientsClientIdRoute: AppClientsClientIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -1888,3 +1878,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
