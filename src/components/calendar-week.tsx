@@ -381,7 +381,7 @@ export function CalendarWeek() {
     if (conflict && !overrideConflict) return toast.error(`Conflict with ${conflict.member} at ${conflict.time}. Override or pick a different time.`);
     setSaving(true);
     try {
-      const payload: Record<string, unknown> = {
+      const payload = {
         clinic_id: activeClinic.clinic_id,
         client_id: draft.client_id || null,
         service_id: draft.service_id || null,
@@ -393,10 +393,10 @@ export function CalendarWeek() {
         price_cents: Math.round(Number(draft.price || 0) * 100),
         notes: draft.notes.trim() || null,
         internal_notes: draft.internal_notes.trim() || null,
-      };
+      } satisfies Parameters<typeof supabase.from<"appointments">>[0] extends string ? Record<string, never> : Record<string, unknown>;
       const res = editing
         ? await supabase.from("appointments").update(payload).eq("id", editing.id).eq("clinic_id", activeClinic.clinic_id)
-        : await supabase.from("appointments").insert(payload as any);
+        : await supabase.from("appointments").insert(payload);
       if (res.error) {
         toast.error(res.error.message);
       } else {
