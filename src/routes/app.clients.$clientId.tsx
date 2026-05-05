@@ -60,7 +60,7 @@ function ClientDetailPage() {
     const load = async () => {
       setLoading(true);
       const cid = activeClinic.clinic_id;
-      const [clientRes, apptRes, soapRes, injRes, photoRes, invRes, consentRes, loyaltyRes, pkgRes] = await Promise.all([
+      const results = await Promise.allSettled([
         supabase.from("clients").select("*").eq("id", clientId).eq("clinic_id", cid).maybeSingle(),
         supabase.from("appointments").select("*, services(name, category), staff(display_name, color)").eq("clinic_id", cid).eq("client_id", clientId).order("starts_at", { ascending: false }),
         supabase.from("soap_notes").select("*").eq("clinic_id", cid).eq("client_id", clientId).order("visit_date", { ascending: false }),
@@ -72,16 +72,24 @@ function ClientDetailPage() {
         supabase.from("client_packages").select("*, package:packages(name)").eq("clinic_id", cid).eq("client_id", clientId).order("purchased_at", { ascending: false }),
       ]);
       if (cancelled) return;
-      if (clientRes.error) toast.error("Could not load client");
-      setClient(clientRes.data ?? null);
-      setAppointments((apptRes.data as Appointment[] | null) ?? []);
-      setSoapNotes(soapRes.data ?? []);
-      setInjections(injRes.data ?? []);
-      setPhotos(photoRes.data ?? []);
-      setInvoices(invRes.data ?? []);
-      setSignedConsents(consentRes.data ?? []);
-      setLoyaltyAccount(loyaltyRes.data ?? null);
-      setClientPackages((pkgRes.data ?? []) as any[]);
+
+      const unwrap = <T,>(r: PromiseSettledResult<{ data: T; error: any }>, label: string): T | null => {
+        if (r.status === "rejected") { console.error(`${label} query rejected:`, r.reason); return null; }
+        if (r.value.error) { console.error(`${label} query failed:`, r.value.error); return null; }
+        return r.value.data;
+      };
+
+      const clientData = unwrap(results[0], "Client");
+      if (!clientData) toast.error("Could not load client");
+      setClient(clientData ?? null);
+      setAppointments((unwrap(results[1], "Appointments") as Appointment[] | null) ?? []);
+      setSoapNotes(unwrap(results[2], "SOAP Notes") ?? []);
+      setInjections(unwrap(results[3], "Injections") ?? []);
+      setPhotos(unwrap(results[4], "Photos") ?? []);
+      setInvoices(unwrap(results[5], "Invoices") ?? []);
+      setSignedConsents(unwrap(results[6], "Consents") ?? []);
+      setLoyaltyAccount(unwrap(results[7], "Loyalty") ?? null);
+      setClientPackages((unwrap(results[8], "Packages") ?? []) as any[]);
       setLoading(false);
     };
     load();
