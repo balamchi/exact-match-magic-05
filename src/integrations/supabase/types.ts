@@ -138,6 +138,39 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          action: string
+          clinic_id: string
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          clinic_id: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          clinic_id?: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       automations: {
         Row: {
           action_type: string
@@ -580,37 +613,79 @@ export type Database = {
       }
       clinics: {
         Row: {
+          accent_color: string | null
+          bio: string | null
+          booking_rules: Json | null
+          communication_settings: Json | null
           created_at: string
           created_by: string
           currency: string
           deposit_amount_cents: number
+          email: string | null
           id: string
+          integration_settings: Json | null
+          logo_dark_url: string | null
+          logo_url: string | null
           name: string
+          notification_settings: Json | null
+          operating_hours: Json | null
+          phone: string | null
+          primary_color: string | null
           slug: string
+          tax_currency_settings: Json | null
           timezone: string
           updated_at: string
+          website: string | null
         }
         Insert: {
+          accent_color?: string | null
+          bio?: string | null
+          booking_rules?: Json | null
+          communication_settings?: Json | null
           created_at?: string
           created_by: string
           currency?: string
           deposit_amount_cents?: number
+          email?: string | null
           id?: string
+          integration_settings?: Json | null
+          logo_dark_url?: string | null
+          logo_url?: string | null
           name: string
+          notification_settings?: Json | null
+          operating_hours?: Json | null
+          phone?: string | null
+          primary_color?: string | null
           slug: string
+          tax_currency_settings?: Json | null
           timezone?: string
           updated_at?: string
+          website?: string | null
         }
         Update: {
+          accent_color?: string | null
+          bio?: string | null
+          booking_rules?: Json | null
+          communication_settings?: Json | null
           created_at?: string
           created_by?: string
           currency?: string
           deposit_amount_cents?: number
+          email?: string | null
           id?: string
+          integration_settings?: Json | null
+          logo_dark_url?: string | null
+          logo_url?: string | null
           name?: string
+          notification_settings?: Json | null
+          operating_hours?: Json | null
+          phone?: string | null
+          primary_color?: string | null
           slug?: string
+          tax_currency_settings?: Json | null
           timezone?: string
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
