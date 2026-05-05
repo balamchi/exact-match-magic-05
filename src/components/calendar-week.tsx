@@ -414,7 +414,7 @@ export function CalendarWeek() {
   /* ── Status transitions ── */
   const advanceStatus = async (appointment: Appointment, next: AppointmentStatus, reason?: string) => {
     if (!activeClinic) return;
-    const updates: Record<string, unknown> = { status: next };
+    const updates: Partial<Appointment> = { status: next };
     if (next === "checked_in") updates.check_in_at = new Date().toISOString();
     if (next === "completed") updates.check_out_at = new Date().toISOString();
     if (next === "no_show") updates.no_show_at = new Date().toISOString();
