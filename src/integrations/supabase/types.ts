@@ -648,6 +648,8 @@ export type Database = {
           accent_color: string | null
           bio: string | null
           booking_rules: Json | null
+          booking_widget_enabled: boolean | null
+          booking_widget_settings: Json | null
           communication_settings: Json | null
           created_at: string
           created_by: string
@@ -673,6 +675,8 @@ export type Database = {
           accent_color?: string | null
           bio?: string | null
           booking_rules?: Json | null
+          booking_widget_enabled?: boolean | null
+          booking_widget_settings?: Json | null
           communication_settings?: Json | null
           created_at?: string
           created_by: string
@@ -698,6 +702,8 @@ export type Database = {
           accent_color?: string | null
           bio?: string | null
           booking_rules?: Json | null
+          booking_widget_enabled?: boolean | null
+          booking_widget_settings?: Json | null
           communication_settings?: Json | null
           created_at?: string
           created_by?: string
@@ -2016,6 +2022,7 @@ export type Database = {
       services: {
         Row: {
           active: boolean
+          booking_description: string | null
           category: string | null
           cleanup_time_minutes: number
           clinic_id: string
@@ -2039,9 +2046,11 @@ export type Database = {
           tax_category: string | null
           treatment_area_tags: string[] | null
           updated_at: string
+          visible_online: boolean | null
         }
         Insert: {
           active?: boolean
+          booking_description?: string | null
           category?: string | null
           cleanup_time_minutes?: number
           clinic_id: string
@@ -2065,9 +2074,11 @@ export type Database = {
           tax_category?: string | null
           treatment_area_tags?: string[] | null
           updated_at?: string
+          visible_online?: boolean | null
         }
         Update: {
           active?: boolean
+          booking_description?: string | null
           category?: string | null
           cleanup_time_minutes?: number
           clinic_id?: string
@@ -2091,6 +2102,7 @@ export type Database = {
           tax_category?: string | null
           treatment_area_tags?: string[] | null
           updated_at?: string
+          visible_online?: boolean | null
         }
         Relationships: [
           {
@@ -2208,6 +2220,7 @@ export type Database = {
         Row: {
           active: boolean
           bio: string | null
+          booking_bio: string | null
           clinic_id: string
           color: string | null
           created_at: string
@@ -2221,11 +2234,13 @@ export type Database = {
           title: string | null
           updated_at: string
           user_id: string | null
+          visible_online: boolean | null
           working_hours: Json | null
         }
         Insert: {
           active?: boolean
           bio?: string | null
+          booking_bio?: string | null
           clinic_id: string
           color?: string | null
           created_at?: string
@@ -2239,11 +2254,13 @@ export type Database = {
           title?: string | null
           updated_at?: string
           user_id?: string | null
+          visible_online?: boolean | null
           working_hours?: Json | null
         }
         Update: {
           active?: boolean
           bio?: string | null
+          booking_bio?: string | null
           clinic_id?: string
           color?: string | null
           created_at?: string
@@ -2257,6 +2274,7 @@ export type Database = {
           title?: string | null
           updated_at?: string
           user_id?: string | null
+          visible_online?: boolean | null
           working_hours?: Json | null
         }
         Relationships: [
