@@ -34,7 +34,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalSlugRouteImport } from './routes/portal.$slug'
 import { Route as LovableEmailRouteImport } from './routes/lovable.email'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email.unsubscribe'
-import { Route as BookSlugRouteImport } from './routes/book.$slug'
+import { Route as BookClinicSlugRouteImport } from './routes/book.$clinicSlug'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -217,9 +217,9 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/unsubscribe',
   getParentRoute: () => EmailRoute,
 } as any)
-const BookSlugRoute = BookSlugRouteImport.update({
-  id: '/book/$slug',
-  path: '/book/$slug',
+const BookClinicSlugRoute = BookClinicSlugRouteImport.update({
+  id: '/book/$clinicSlug',
+  path: '/book/$clinicSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
@@ -573,7 +573,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
-  '/book/$slug': typeof BookSlugRoute
+  '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
@@ -657,7 +657,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
-  '/book/$slug': typeof BookSlugRoute
+  '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
@@ -742,7 +742,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
-  '/book/$slug': typeof BookSlugRoute
+  '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
@@ -828,7 +828,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
-    | '/book/$slug'
+    | '/book/$clinicSlug'
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
@@ -912,7 +912,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
-    | '/book/$slug'
+    | '/book/$clinicSlug'
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
@@ -996,7 +996,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
-    | '/book/$slug'
+    | '/book/$clinicSlug'
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
@@ -1038,7 +1038,7 @@ export interface RootRouteChildren {
   RoadmapRoute: typeof RoadmapRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
-  BookSlugRoute: typeof BookSlugRoute
+  BookClinicSlugRoute: typeof BookClinicSlugRoute
   PortalSlugRoute: typeof PortalSlugRoute
 }
 
@@ -1219,11 +1219,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof EmailRoute
     }
-    '/book/$slug': {
-      id: '/book/$slug'
-      path: '/book/$slug'
-      fullPath: '/book/$slug'
-      preLoaderRoute: typeof BookSlugRouteImport
+    '/book/$clinicSlug': {
+      id: '/book/$clinicSlug'
+      path: '/book/$clinicSlug'
+      fullPath: '/book/$clinicSlug'
+      preLoaderRoute: typeof BookClinicSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/sign-up': {
@@ -1872,7 +1872,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoadmapRoute: RoadmapRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
-  BookSlugRoute: BookSlugRoute,
+  BookClinicSlugRoute: BookClinicSlugRoute,
   PortalSlugRoute: PortalSlugRoute,
 }
 export const routeTree = rootRouteImport
