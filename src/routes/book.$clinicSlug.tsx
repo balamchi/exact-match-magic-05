@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Calendar, Clock, ChevronRight, ChevronLeft, Check, MapPin, Sparkles,
   User, Mail, Phone, MessageSquare, Search, Loader2, AlertCircle,
-  CalendarPlus, X,
+  CalendarPlus, X, ChevronDown, Star, Zap, Heart, Filter,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -127,6 +127,19 @@ function downloadICS(ics: string, filename: string) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Quick filter definitions                                          */
+/* ------------------------------------------------------------------ */
+
+type QuickFilter = "all" | "popular" | "quick" | "new_patient" | "wellness";
+
+const QUICK_FILTERS: { key: QuickFilter; label: string; icon: React.ReactNode }[] = [
+  { key: "all", label: "All", icon: <Filter className="h-3 w-3" /> },
+  { key: "popular", label: "Most Popular", icon: <Star className="h-3 w-3" /> },
+  { key: "quick", label: "Quick (<30 min)", icon: <Zap className="h-3 w-3" /> },
+  { key: "wellness", label: "Wellness", icon: <Heart className="h-3 w-3" /> },
+];
+
+/* ------------------------------------------------------------------ */
 /*  Main Component                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -147,8 +160,16 @@ function PublicBookingPage() {
   const [confirmationId, setConfirmationId] = useState("");
   const [slots, setSlots] = useState<string[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
-  // Honeypot
   const [honeypot, setHoneypot] = useState("");
+
+  // Category accordion state
+  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
+  // Popularity data: service_id → booking count (last 90 days)
+  const [popularity, setPopularity] = useState<Map<string, number>>(new Map());
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const currency = clinic?.currency ?? "CAD";
   const selectedService = useMemo(() => services.find((s) => s.id === state.serviceId), [services, state.serviceId]);
@@ -158,7 +179,6 @@ function PublicBookingPage() {
   const eligibleStaff = useMemo(() => {
     if (!state.serviceId) return staff;
     const linked = new Set(staffServices.filter((ss) => ss.service_id === state.serviceId).map((ss) => ss.staff_id));
-    // If no staff_services links exist, show all staff
     if (linked.size === 0) return staff;
     return staff.filter((s) => linked.has(s.id));
   }, [staff, staffServices, state.serviceId]);
@@ -188,8 +208,61 @@ function PublicBookingPage() {
     setServices(svcRes.data ?? []);
     setStaff(staffRes.data ?? []);
     setStaffServices(ssRes.data ?? []);
+
+    // Fetch popularity (booking counts from last 90 days)
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const { data: popData } = await supabase
+      .from("appointments")
+      .select("service_id")
+      .eq("clinic_id", c.id)
+      .gte("starts_at", ninetyDaysAgo.toISOString())
+      .not("status", "in", '("cancelled","no_show")');
+
+    const popMap = new Map<string, number>();
+    (popData ?? []).forEach((a) => {
+      if (a.service_id) popMap.set(a.service_id, (popMap.get(a.service_id) ?? 0) + 1);
+    });
+    setPopularity(popMap);
+
+    // Default expanded categories: top 2 by popularity
+    const svcList = svcRes.data ?? [];
+    const catPop = new Map<string, number>();
+    svcList.forEach((s) => {
+      const cat = s.category || "Other";
+      catPop.set(cat, (catPop.get(cat) ?? 0) + (popMap.get(s.id) ?? 0));
+    });
+    const sortedCats = [...catPop.entries()].sort((a, b) => b[1] - a[1]);
+    const defaultExpanded = new Set(sortedCats.slice(0, 2).map(([cat]) => cat));
+    // If fewer than 2 categories, expand all
+    if (sortedCats.length <= 2) sortedCats.forEach(([cat]) => defaultExpanded.add(cat));
+    setExpandedCats(defaultExpanded);
+
     setLoading(false);
   };
+
+  /* ---------- Top N popular service IDs ---------- */
+  const popularServiceIds = useMemo(() => {
+    const sorted = [...popularity.entries()].sort((a, b) => b[1] - a[1]);
+    return new Set(sorted.slice(0, 5).map(([id]) => id));
+  }, [popularity]);
+
+  // Per-category top 3
+  const popularPerCategory = useMemo(() => {
+    const catServices = new Map<string, { id: string; count: number }[]>();
+    services.forEach((s) => {
+      const cat = s.category || "Other";
+      const arr = catServices.get(cat) ?? [];
+      arr.push({ id: s.id, count: popularity.get(s.id) ?? 0 });
+      catServices.set(cat, arr);
+    });
+    const result = new Set<string>();
+    catServices.forEach((arr) => {
+      arr.sort((a, b) => b.count - a.count);
+      arr.slice(0, 3).filter((x) => x.count > 0).forEach((x) => result.add(x.id));
+    });
+    return result;
+  }, [services, popularity]);
 
   /* ---------- Fetch available slots ---------- */
   const fetchSlots = useCallback(async (date: string) => {
@@ -200,7 +273,6 @@ function PublicBookingPage() {
       ? [state.staffId]
       : eligibleStaff.map((s) => s.id);
 
-    // Fetch existing appointments for the date for all relevant staff
     const startOfDay = `${date}T00:00:00`;
     const endOfDay = `${date}T23:59:59`;
 
@@ -218,7 +290,6 @@ function PublicBookingPage() {
     const minAdvance = (settings.min_advance_hours ?? 1) * 60;
     const now = new Date();
 
-    // Operating hours — default 9-18
     const opHours = (clinic.operating_hours as Record<string, any>) ?? {};
     const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
     const dayName = dayNames[new Date(date + "T12:00:00").getDay()];
@@ -235,10 +306,8 @@ function PublicBookingPage() {
       const slotEnd = new Date(new Date(slotStart).getTime() + (duration + buffer) * 60000).toISOString();
       const slotStartDate = new Date(slotStart);
 
-      // min advance check
       if (slotStartDate.getTime() - now.getTime() < minAdvance * 60000) continue;
 
-      // Check if at least one staff member is free
       const hasAvailable = targetStaffIds.length === 0 || targetStaffIds.some((sid) => {
         return !appts.some((a) => {
           if (a.staff_id !== sid) return false;
@@ -248,9 +317,7 @@ function PublicBookingPage() {
         });
       });
 
-      if (hasAvailable) {
-        available.push(minutesToTime(t));
-      }
+      if (hasAvailable) available.push(minutesToTime(t));
     }
 
     setSlots(available);
@@ -326,13 +393,85 @@ function PublicBookingPage() {
   };
 
   const advance = () => {
-    // If "Any provider" chosen and step 1, skip to step 2
     if (step === 1 && !state.staffId) {
       setStep(2);
     } else {
       setStep((s) => Math.min(STEPS.length - 1, s + 1));
     }
   };
+
+  /* ---------- Category toggle ---------- */
+  const toggleCategory = (cat: string) => {
+    setExpandedCats((prev) => {
+      // On mobile, accordion behavior (only one open at a time)
+      if (isMobile) {
+        const next = new Set<string>();
+        if (!prev.has(cat)) next.add(cat);
+        return next;
+      }
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat); else next.add(cat);
+      return next;
+    });
+  };
+
+  /* ---------- Filtered + grouped services for Step 0 ---------- */
+  const { filteredGrouped, matchingCats } = useMemo(() => {
+    const needle = searchQuery.trim().toLowerCase();
+
+    let filtered = services;
+
+    // Quick filter
+    if (quickFilter === "popular") {
+      filtered = filtered.filter((s) => popularServiceIds.has(s.id));
+    } else if (quickFilter === "quick") {
+      filtered = filtered.filter((s) => s.duration_minutes < 30);
+    } else if (quickFilter === "wellness") {
+      filtered = filtered.filter((s) => {
+        const cat = (s.category ?? "").toLowerCase();
+        const name = s.name.toLowerCase();
+        return cat.includes("wellness") || cat.includes("iv") || name.includes("wellness") || name.includes("iv ");
+      });
+    }
+
+    // Search filter
+    if (needle) {
+      filtered = filtered.filter((s) =>
+        s.name.toLowerCase().includes(needle) ||
+        (s.category ?? "").toLowerCase().includes(needle) ||
+        ((s as any).booking_description ?? "").toLowerCase().includes(needle)
+      );
+    }
+
+    const grouped = filtered.reduce<Record<string, Service[]>>((acc, s) => {
+      const cat = s.category || "Other";
+      (acc[cat] ??= []).push(s);
+      return acc;
+    }, {});
+
+    // Sort categories by popularity
+    const catOrder = Object.keys(grouped).sort((a, b) => {
+      const aPop = grouped[a].reduce((sum, s) => sum + (popularity.get(s.id) ?? 0), 0);
+      const bPop = grouped[b].reduce((sum, s) => sum + (popularity.get(s.id) ?? 0), 0);
+      if (bPop !== aPop) return bPop - aPop;
+      return a.localeCompare(b);
+    });
+
+    const sorted: Record<string, Service[]> = {};
+    catOrder.forEach((c) => { sorted[c] = grouped[c]; });
+
+    return {
+      filteredGrouped: sorted,
+      matchingCats: new Set(catOrder),
+    };
+  }, [services, searchQuery, quickFilter, popularServiceIds, popularity]);
+
+  // Auto-expand categories when searching
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      setExpandedCats(new Set(matchingCats));
+    }
+  }, [searchQuery, matchingCats]);
 
   /* ---------- Loading / Not Found ---------- */
   if (loading) {
@@ -364,7 +503,6 @@ function PublicBookingPage() {
     );
   }
 
-  // Booking disabled
   if (clinic.booking_widget_enabled === false) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0A0A0B] px-4">
@@ -444,17 +582,6 @@ function PublicBookingPage() {
     );
   }
 
-  /* ---------- Categories for services ---------- */
-  const filteredServices = services.filter((s) =>
-    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (s.category ?? "").toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const grouped = filteredServices.reduce<Record<string, Service[]>>((acc, s) => {
-    const cat = s.category || "Other";
-    (acc[cat] ??= []).push(s);
-    return acc;
-  }, {});
-
   /* ---------- Date generation for step 3 ---------- */
   const maxDays = settings.max_advance_days ?? 90;
   const dates = Array.from({ length: Math.min(maxDays, 60) }, (_, i) => {
@@ -463,14 +590,13 @@ function PublicBookingPage() {
     return d.toISOString().slice(0, 10);
   });
 
-  // Group time slots
   const morningSlots = slots.filter((t) => parseInt(t) < 12);
   const afternoonSlots = slots.filter((t) => { const h = parseInt(t); return h >= 12 && h < 17; });
   const eveningSlots = slots.filter((t) => parseInt(t) >= 17);
 
   return (
     <BookingShell clinic={clinic}>
-      <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10">
+      <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10 pb-28">
         {/* Stepper */}
         <nav aria-label="Booking steps" className="mb-8">
           <ol className="flex items-center justify-between gap-1 text-xs">
@@ -499,7 +625,7 @@ function PublicBookingPage() {
           </ol>
         </nav>
 
-        <section className="rounded-2xl border border-neutral-800 bg-neutral-900/80 p-5 shadow-xl backdrop-blur sm:p-8 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+        <section ref={contentRef} className="rounded-2xl border border-neutral-800 bg-neutral-900/80 p-5 shadow-xl backdrop-blur sm:p-8 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
 
           {/* ======== STEP 0: Service ======== */}
           {step === 0 && (
@@ -508,8 +634,8 @@ function PublicBookingPage() {
               <p className="mt-1 text-sm text-neutral-400">{settings.welcome_message || "Select the service you'd like to book."}</p>
 
               {services.length > 4 && (
-                <div className="relative mt-5">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                <div className="relative mt-5 sticky top-0 z-10 bg-neutral-900/95 backdrop-blur-sm -mx-5 px-5 py-2 sm:-mx-8 sm:px-8 md:static md:mx-0 md:px-0 md:py-0 md:bg-transparent md:backdrop-blur-none">
+                  <Search className="pointer-events-none absolute left-8 sm:left-11 md:left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
                   <input
                     type="search"
                     value={searchQuery}
@@ -520,41 +646,101 @@ function PublicBookingPage() {
                 </div>
               )}
 
+              {/* Quick filter chips */}
+              <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                {QUICK_FILTERS.map((f) => (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => setQuickFilter(f.key)}
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all min-h-[36px] ${
+                      quickFilter === f.key
+                        ? "border-purple-500 bg-purple-500/15 text-purple-300"
+                        : "border-neutral-700 bg-neutral-800 text-neutral-400 hover:border-neutral-600"
+                    }`}
+                  >
+                    {f.icon}
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
               {services.length === 0 ? (
                 <p className="mt-8 text-center text-sm text-neutral-400">No services available online. Please call us directly.</p>
+              ) : Object.keys(filteredGrouped).length === 0 ? (
+                <div className="mt-8 text-center">
+                  <p className="text-sm text-neutral-400">No services match your search.</p>
+                  <button type="button" onClick={() => { setSearchQuery(""); setQuickFilter("all"); }} className="mt-2 text-xs text-purple-400 underline hover:text-purple-300">Clear filters</button>
+                </div>
               ) : (
-                <div className="mt-5 space-y-6">
-                  {Object.entries(grouped).map(([cat, items]) => (
-                    <div key={cat}>
-                      <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-neutral-500">{cat}</h3>
-                      <div className="space-y-2">
-                        {items.map((s) => {
-                          const active = state.serviceId === s.id;
-                          return (
-                            <button
-                              key={s.id}
-                              type="button"
-                              onClick={() => setState((prev) => ({ ...prev, serviceId: s.id, staffId: "", date: "", time: "" }))}
-                              className={`flex w-full items-start justify-between gap-4 rounded-xl border p-4 text-left transition-all ${
-                                active ? "border-purple-500 bg-purple-500/10 ring-2 ring-purple-500/30" : "border-neutral-800 bg-neutral-800/50 hover:border-purple-500/40 hover:bg-neutral-800"
-                              }`}
-                            >
-                              <div className="min-w-0">
-                                <div className="font-medium text-white">{s.name}</div>
-                                {(s as any).booking_description && <p className="mt-1 text-xs text-neutral-400 line-clamp-2">{(s as any).booking_description}</p>}
-                                <div className="mt-2 flex items-center gap-3 text-xs text-neutral-500">
-                                  <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{s.duration_minutes} min</span>
-                                </div>
-                              </div>
-                              {settings.show_prices !== false && (
-                                <div className="shrink-0 font-display text-lg font-semibold text-purple-400">{money(s.price_cents, currency)}</div>
-                              )}
-                            </button>
-                          );
-                        })}
+                <div className="mt-4 space-y-2">
+                  {Object.entries(filteredGrouped).map(([cat, items]) => {
+                    const isOpen = expandedCats.has(cat);
+                    return (
+                      <div key={cat} className="rounded-xl border border-neutral-800 overflow-hidden">
+                        {/* Category header */}
+                        <button
+                          type="button"
+                          onClick={() => toggleCategory(cat)}
+                          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-800/60"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-white">{cat}</span>
+                            <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[11px] text-neutral-400">{items.length}</span>
+                          </div>
+                          <ChevronDown className={`h-4 w-4 text-neutral-400 transition-transform duration-200 ${isOpen ? "rotate-0" : "-rotate-90"}`} />
+                        </button>
+
+                        {/* Collapsible content */}
+                        <div
+                          className="transition-all duration-200 ease-in-out overflow-hidden"
+                          style={{
+                            maxHeight: isOpen ? `${items.length * 120 + 20}px` : "0px",
+                            opacity: isOpen ? 1 : 0,
+                          }}
+                        >
+                          <div className="space-y-2 px-3 pb-3">
+                            {items.map((s) => {
+                              const active = state.serviceId === s.id;
+                              const isPopular = popularPerCategory.has(s.id);
+                              return (
+                                <button
+                                  key={s.id}
+                                  type="button"
+                                  onClick={() => setState((prev) => ({ ...prev, serviceId: s.id, staffId: "", date: "", time: "" }))}
+                                  className={`flex w-full items-start justify-between gap-3 rounded-xl border p-4 text-left transition-all min-h-[48px] ${
+                                    active ? "border-purple-500 bg-purple-500/10 ring-2 ring-purple-500/30" : "border-neutral-800 bg-neutral-800/30 hover:border-purple-500/40 hover:bg-neutral-800/60"
+                                  }`}
+                                >
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-semibold text-white text-[15px]">{s.name}</span>
+                                      {isPopular && (
+                                        <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                                          <Star className="h-2.5 w-2.5 fill-amber-400" /> Popular
+                                        </span>
+                                      )}
+                                      {active && <Check className="h-4 w-4 shrink-0 text-purple-400" />}
+                                    </div>
+                                    {(s as any).booking_description && (
+                                      <p className="mt-1 text-xs text-neutral-400 line-clamp-2">{(s as any).booking_description}</p>
+                                    )}
+                                    <div className="mt-2 flex items-center gap-3 text-xs text-neutral-500">
+                                      <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{s.duration_minutes} min</span>
+                                      {settings.show_prices !== false && (
+                                        <span className="font-medium text-purple-400">{money(s.price_cents, currency)}</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <ChevronRight className={`mt-1 h-4 w-4 shrink-0 transition-colors ${active ? "text-purple-400" : "text-neutral-600"}`} />
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -571,7 +757,7 @@ function PublicBookingPage() {
                 <button
                   type="button"
                   onClick={() => setState((s) => ({ ...s, staffId: "" }))}
-                  className={`rounded-xl border p-4 text-left transition-all ${
+                  className={`rounded-xl border p-4 text-left transition-all min-h-[48px] ${
                     state.staffId === "" ? "border-purple-500 bg-purple-500/10 ring-2 ring-purple-500/30" : "border-neutral-800 bg-neutral-800/50 hover:border-purple-500/40"
                   }`}
                 >
@@ -586,7 +772,7 @@ function PublicBookingPage() {
                       key={s.id}
                       type="button"
                       onClick={() => setState((prev) => ({ ...prev, staffId: s.id, date: "", time: "" }))}
-                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
+                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all min-h-[48px] ${
                         active ? "border-purple-500 bg-purple-500/10 ring-2 ring-purple-500/30" : "border-neutral-800 bg-neutral-800/50 hover:border-purple-500/40"
                       }`}
                     >
@@ -622,7 +808,6 @@ function PublicBookingPage() {
               <h2 className="mt-6 font-display text-2xl font-semibold text-white">Pick a date & time</h2>
               <p className="mt-1 text-sm text-neutral-400">Select your preferred appointment slot.</p>
 
-              {/* Date picker - horizontal scrollable */}
               <div className="mt-5">
                 <Label className="mb-2 block text-xs text-neutral-400">Date</Label>
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -635,7 +820,7 @@ function PublicBookingPage() {
                         key={d}
                         type="button"
                         onClick={() => { setState((s) => ({ ...s, date: d, time: "" })); }}
-                        className={`flex shrink-0 flex-col items-center rounded-xl border px-3 py-2.5 text-center transition-all min-w-[60px] ${
+                        className={`flex shrink-0 flex-col items-center rounded-xl border px-3 py-2.5 text-center transition-all min-w-[60px] min-h-[48px] ${
                           active ? "border-purple-500 bg-purple-600 text-white" : "border-neutral-700 bg-neutral-800 text-neutral-300 hover:border-purple-500/40"
                         }`}
                       >
@@ -649,7 +834,6 @@ function PublicBookingPage() {
                 </div>
               </div>
 
-              {/* Time slots */}
               {state.date && (
                 <div className="mt-5 animate-in fade-in-0 slide-in-from-bottom-1 duration-200">
                   {slotsLoading ? (
@@ -680,42 +864,42 @@ function PublicBookingPage() {
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="fn" className="text-neutral-300"><User className="mr-1 inline h-3.5 w-3.5" /> First name *</Label>
-                  <Input id="fn" value={state.firstName} onChange={(e) => setState((s) => ({ ...s, firstName: e.target.value }))} placeholder="Jane" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500" />
+                  <Input id="fn" value={state.firstName} onChange={(e) => setState((s) => ({ ...s, firstName: e.target.value }))} placeholder="Jane" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 min-h-[48px]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="ln" className="text-neutral-300">Last name *</Label>
-                  <Input id="ln" value={state.lastName} onChange={(e) => setState((s) => ({ ...s, lastName: e.target.value }))} placeholder="Smith" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500" />
+                  <Input id="ln" value={state.lastName} onChange={(e) => setState((s) => ({ ...s, lastName: e.target.value }))} placeholder="Smith" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 min-h-[48px]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="em" className="text-neutral-300"><Mail className="mr-1 inline h-3.5 w-3.5" /> Email *</Label>
-                  <Input id="em" type="email" value={state.email} onChange={(e) => setState((s) => ({ ...s, email: e.target.value }))} placeholder="jane@example.com" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500" />
+                  <Input id="em" type="email" value={state.email} onChange={(e) => setState((s) => ({ ...s, email: e.target.value }))} placeholder="jane@example.com" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 min-h-[48px]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="ph" className="text-neutral-300"><Phone className="mr-1 inline h-3.5 w-3.5" /> Phone *</Label>
-                  <Input id="ph" type="tel" value={state.phone} onChange={(e) => setState((s) => ({ ...s, phone: e.target.value }))} placeholder="+1 555 123 4567" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500" />
+                  <Input id="ph" type="tel" value={state.phone} onChange={(e) => setState((s) => ({ ...s, phone: e.target.value }))} placeholder="+1 555 123 4567" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 min-h-[48px]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="dob" className="text-neutral-300">Date of birth</Label>
-                  <Input id="dob" type="date" value={state.dob} onChange={(e) => setState((s) => ({ ...s, dob: e.target.value }))} className="bg-neutral-800 border-neutral-700 text-white" />
+                  <Input id="dob" type="date" value={state.dob} onChange={(e) => setState((s) => ({ ...s, dob: e.target.value }))} className="bg-neutral-800 border-neutral-700 text-white min-h-[48px]" />
                 </div>
                 <div className="sm:col-span-2 space-y-1.5">
                   <Label htmlFor="notes" className="text-neutral-300"><MessageSquare className="mr-1 inline h-3.5 w-3.5" /> Notes for the clinic</Label>
                   <Textarea id="notes" value={state.notes} onChange={(e) => setState((s) => ({ ...s, notes: e.target.value }))} rows={3} placeholder="Anything we should know?" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500" maxLength={1000} />
                 </div>
 
-                {/* Honeypot — invisible to humans */}
+                {/* Honeypot */}
                 <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true">
                   <label htmlFor="website">Website</label>
                   <input id="website" type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" />
                 </div>
 
                 <div className="sm:col-span-2 space-y-3 rounded-xl border border-neutral-700 bg-neutral-800/50 p-4">
-                  <label className="flex items-start gap-2.5 cursor-pointer">
-                    <input type="checkbox" checked={state.reminderConsent} onChange={(e) => setState((s) => ({ ...s, reminderConsent: e.target.checked }))} className="mt-0.5 h-4 w-4 accent-purple-500 rounded" />
+                  <label className="flex items-start gap-2.5 cursor-pointer min-h-[48px] items-center">
+                    <input type="checkbox" checked={state.reminderConsent} onChange={(e) => setState((s) => ({ ...s, reminderConsent: e.target.checked }))} className="mt-0.5 h-5 w-5 accent-purple-500 rounded" />
                     <span className="text-xs text-neutral-300">I agree to receive appointment reminders by email and SMS *</span>
                   </label>
-                  <label className="flex items-start gap-2.5 cursor-pointer">
-                    <input type="checkbox" checked={state.marketingConsent} onChange={(e) => setState((s) => ({ ...s, marketingConsent: e.target.checked }))} className="mt-0.5 h-4 w-4 accent-purple-500 rounded" />
+                  <label className="flex items-start gap-2.5 cursor-pointer min-h-[48px] items-center">
+                    <input type="checkbox" checked={state.marketingConsent} onChange={(e) => setState((s) => ({ ...s, marketingConsent: e.target.checked }))} className="mt-0.5 h-5 w-5 accent-purple-500 rounded" />
                     <span className="text-xs text-neutral-300">I'd like to receive promotional offers and clinic news</span>
                   </label>
                 </div>
@@ -748,15 +932,17 @@ function PublicBookingPage() {
               </p>
             </div>
           )}
+        </section>
 
-          {/* ======== Navigation ======== */}
-          <div className="mt-8 flex items-center justify-between gap-3 border-t border-neutral-700 pt-5">
+        {/* ======== STICKY BOTTOM NAV ======== */}
+        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-800 bg-[#0A0A0B]/95 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.5)] pb-[env(safe-area-inset-bottom)]">
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setStep((s) => Math.max(0, s - 1))}
               disabled={step === 0}
-              className="text-neutral-400 hover:text-white hover:bg-neutral-800"
+              className="text-neutral-400 hover:text-white hover:bg-neutral-800 min-h-[48px]"
             >
               <ChevronLeft className="mr-1 h-4 w-4" /> Back
             </Button>
@@ -766,7 +952,7 @@ function PublicBookingPage() {
                 type="button"
                 onClick={advance}
                 disabled={!canAdvance()}
-                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-600/20 hover:opacity-90 disabled:opacity-40 min-h-[48px] px-6"
+                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-600/20 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px] px-6"
               >
                 Continue <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
@@ -775,13 +961,13 @@ function PublicBookingPage() {
                 type="button"
                 onClick={submitBooking}
                 disabled={submitting}
-                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-600/20 hover:opacity-90 disabled:opacity-40 min-h-[48px] px-6"
+                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-600/20 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px] px-6"
               >
                 {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Booking…</> : "Confirm Booking"}
               </Button>
             )}
           </div>
-        </section>
+        </div>
 
         <p className="mt-8 text-center text-[11px] text-neutral-600">
           Powered by <Link to="/" className="font-medium text-neutral-500 hover:text-neutral-400">ClinicPro</Link>
