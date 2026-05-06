@@ -35,10 +35,12 @@ import { Route as PortalSlugRouteImport } from './routes/portal.$slug'
 import { Route as LovableEmailRouteImport } from './routes/lovable.email'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email.unsubscribe'
 import { Route as BookClinicSlugRouteImport } from './routes/book.$clinicSlug'
+import { Route as AuthVerifyRouteImport } from './routes/auth.verify'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AuthCheckEmailRouteImport } from './routes/auth.check-email'
 import { Route as AppWhatsappRouteImport } from './routes/app.whatsapp'
 import { Route as AppTreatmentPlansRouteImport } from './routes/app.treatment-plans'
 import { Route as AppTasksRouteImport } from './routes/app.tasks'
@@ -222,6 +224,11 @@ const BookClinicSlugRoute = BookClinicSlugRouteImport.update({
   path: '/book/$clinicSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthVerifyRoute = AuthVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
@@ -240,6 +247,11 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthCheckEmailRoute = AuthCheckEmailRouteImport.update({
+  id: '/check-email',
+  path: '/check-email',
   getParentRoute: () => AuthRoute,
 } as any)
 const AppWhatsappRoute = AppWhatsappRouteImport.update({
@@ -569,10 +581,12 @@ export interface FileRoutesByFullPath {
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/app/whatsapp': typeof AppWhatsappRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
@@ -653,10 +667,12 @@ export interface FileRoutesByTo {
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/app/whatsapp': typeof AppWhatsappRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
@@ -738,10 +754,12 @@ export interface FileRoutesById {
   '/app/tasks': typeof AppTasksRoute
   '/app/treatment-plans': typeof AppTreatmentPlansRoute
   '/app/whatsapp': typeof AppWhatsappRoute
+  '/auth/check-email': typeof AuthCheckEmailRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/auth/verify': typeof AuthVerifyRoute
   '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
@@ -824,10 +842,12 @@ export interface FileRouteTypes {
     | '/app/tasks'
     | '/app/treatment-plans'
     | '/app/whatsapp'
+    | '/auth/check-email'
     | '/auth/forgot-password'
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/auth/verify'
     | '/book/$clinicSlug'
     | '/email/unsubscribe'
     | '/lovable/email'
@@ -908,10 +928,12 @@ export interface FileRouteTypes {
     | '/app/tasks'
     | '/app/treatment-plans'
     | '/app/whatsapp'
+    | '/auth/check-email'
     | '/auth/forgot-password'
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/auth/verify'
     | '/book/$clinicSlug'
     | '/email/unsubscribe'
     | '/lovable/email'
@@ -992,10 +1014,12 @@ export interface FileRouteTypes {
     | '/app/tasks'
     | '/app/treatment-plans'
     | '/app/whatsapp'
+    | '/auth/check-email'
     | '/auth/forgot-password'
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/auth/verify'
     | '/book/$clinicSlug'
     | '/email/unsubscribe'
     | '/lovable/email'
@@ -1226,6 +1250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookClinicSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/verify': {
+      id: '/auth/verify'
+      path: '/verify'
+      fullPath: '/auth/verify'
+      preLoaderRoute: typeof AuthVerifyRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/auth/sign-up': {
       id: '/auth/sign-up'
       path: '/sign-up'
@@ -1252,6 +1283,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/auth/forgot-password'
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/check-email': {
+      id: '/auth/check-email'
+      path: '/check-email'
+      fullPath: '/auth/check-email'
+      preLoaderRoute: typeof AuthCheckEmailRouteImport
       parentRoute: typeof AuthRoute
     }
     '/app/whatsapp': {
@@ -1754,17 +1792,21 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AuthRouteChildren {
+  AuthCheckEmailRoute: typeof AuthCheckEmailRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
+  AuthVerifyRoute: typeof AuthVerifyRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthCheckEmailRoute: AuthCheckEmailRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignInRoute: AuthSignInRoute,
   AuthSignUpRoute: AuthSignUpRoute,
+  AuthVerifyRoute: AuthVerifyRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

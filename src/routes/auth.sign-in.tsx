@@ -16,6 +16,9 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [unverified, setUnverified] = useState(false);
+  const [resendBusy, setResendBusy] = useState(false);
+  const [resendDone, setResendDone] = useState(false);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/app/dashboard" });
@@ -23,15 +26,32 @@ function SignIn() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUnverified(false);
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
     if (error) {
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        setUnverified(true);
+        return;
+      }
       toast.error(error.message);
       return;
     }
     toast.success("Welcome back");
     navigate({ to: "/app/dashboard" });
+  };
+
+  const handleResendVerification = async () => {
+    if (!email || resendBusy) return;
+    setResendBusy(true);
+    await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/verify` },
+    });
+    setResendBusy(false);
+    setResendDone(true);
   };
 
   const handleGoogle = async () => {
@@ -116,6 +136,25 @@ function SignIn() {
               {busy ? "Signing in…" : "Sign in"}
             </button>
           </form>
+
+          {unverified && (
+            <div className="mt-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
+              <p className="text-xs text-yellow-200">
+                Please check your email and click the verification link first.
+              </p>
+              {!resendDone ? (
+                <button
+                  onClick={handleResendVerification}
+                  disabled={resendBusy}
+                  className="mt-2 text-xs font-medium text-primary hover:underline disabled:opacity-50"
+                >
+                  {resendBusy ? "Sending…" : "Resend verification email"}
+                </button>
+              ) : (
+                <p className="mt-2 text-xs text-green-400">Verification email sent! Check your inbox.</p>
+              )}
+            </div>
+          )}
 
           <p className="mt-5 text-center text-xs text-muted-foreground">
             New to ClinicPro?{" "}
