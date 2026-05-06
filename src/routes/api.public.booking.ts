@@ -202,16 +202,20 @@ export const Route = createFileRoute("/api/public/booking")({
           }
 
           // Create lead for tracking
-          await supabaseAdmin.from("leads").insert({
-            clinic_id: clinic.id,
-            name: `${data.firstName} ${data.lastName}`,
-            email: data.email,
-            phone: data.phone,
-            source: "online_booking",
-            stage: "won",
-            estimated_value_cents: service.price_cents,
-            notes: `Booked ${service.name} on ${data.date} at ${data.time} via public booking`,
-          }).catch(() => {});
+          try {
+            await supabaseAdmin.from("leads").insert({
+              clinic_id: clinic.id,
+              name: `${data.firstName} ${data.lastName}`,
+              email: data.email,
+              phone: data.phone,
+              source: "online_booking",
+              stage: "won",
+              estimated_value_cents: service.price_cents,
+              notes: `Booked ${service.name} on ${data.date} at ${data.time} via public booking`,
+            });
+          } catch {
+            // non-critical
+          }
 
           // Send confirmation email via transactional email system
           try {
@@ -236,22 +240,24 @@ export const Route = createFileRoute("/api/public/booking")({
               }).catch(() => {});
 
               // Enqueue email via RPC
-              await supabaseAdmin.rpc("enqueue_email", {
-                queue_name: "transactional_email_queue",
-                payload: {
-                  templateName: "booking-confirmation",
-                  recipientEmail: data.email,
-                  data: {
-                    clientName: data.firstName,
-                    clinicName: clinic.name,
-                    serviceName: service.name,
-                    preferredTime,
-                    staffName: staffName !== "First available" ? staffName : undefined,
+              try {
+                await supabaseAdmin.rpc("enqueue_email", {
+                  queue_name: "transactional_email_queue",
+                  payload: {
+                    templateName: "booking-confirmation",
+                    recipientEmail: data.email,
+                    data: {
+                      clientName: data.firstName,
+                      clinicName: clinic.name,
+                      serviceName: service.name,
+                      preferredTime,
+                      staffName: staffName !== "First available" ? staffName : undefined,
+                    },
                   },
-                },
-              }).catch((err: unknown) => {
-                console.error("Email enqueue failed:", err);
-              });
+                });
+              } catch (emailEnqueueErr) {
+                console.error("Email enqueue failed:", emailEnqueueErr);
+              }
             }
           } catch (emailErr) {
             console.error("Email send error:", emailErr);
