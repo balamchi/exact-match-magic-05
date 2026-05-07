@@ -46,7 +46,7 @@ const NAV: NavGroup[] = [
       { to: "/app/services", label: "Services", icon: HeartPulse },
       { to: "/app/staff", label: "Staff", icon: UserCog },
       { to: "/app/locations", label: "Locations", icon: MapPin },
-      { to: "/app/leads", label: "Leads", icon: Target },
+      { to: "/app/leads", label: "Leads", icon: Flame },
     ],
   },
   {
