@@ -411,6 +411,152 @@ export function CalendarWeek() {
     setSaving(false);
   };
 
+  /* ── Post-completion: auto-create review request ── */
+  const autoCreateReviewRequest = async (appointment: Appointment, clinicId: string) => {
+    try {
+      // Check if review_settings is enabled
+      const { data: rs } = await supabase
+        .from("review_settings")
+        .select("is_enabled, trigger_hours_after_appointment")
+        .eq("clinic_id", clinicId)
+        .maybeSingle();
+      if (!rs?.is_enabled) return;
+
+      // Check no existing review_request for this appointment
+      const { data: existing } = await supabase
+        .from("review_requests")
+        .select("id")
+        .eq("appointment_id", appointment.id)
+        .maybeSingle();
+      if (existing) return;
+
+      if (!appointment.client_id) return;
+
+      const scheduledAt = new Date(Date.now() + (rs.trigger_hours_after_appointment ?? 2) * 3600000).toISOString();
+      await supabase.from("review_requests").insert({
+        clinic_id: clinicId,
+        client_id: appointment.client_id,
+        appointment_id: appointment.id,
+        status: "pending",
+        scheduled_send_at: scheduledAt,
+        sent_via: "email",
+      });
+    } catch (err) {
+      console.error("Auto review request failed (non-critical):", err);
+    }
+  };
+
+  /* ── Post-completion: auto-unlock referral reward ── */
+  const autoUnlockReferralReward = async (appointment: Appointment, clinicId: string) => {
+    try {
+      if (!appointment.client_id) return;
+
+      // Count completed appointments for this client (including the one just completed)
+      const { count } = await supabase
+        .from("appointments")
+        .select("id", { count: "exact", head: true })
+        .eq("clinic_id", clinicId)
+        .eq("client_id", appointment.client_id)
+        .eq("status", "completed");
+
+      if (count !== 1) return; // Only trigger on FIRST completed appointment
+
+      // Check if this client was referred
+      const { data: referral } = await supabase
+        .from("referrals")
+        .select("id, referrer_client_id, referrer_code_id, referrer_name, status")
+        .eq("clinic_id", clinicId)
+        .eq("referee_client_id", appointment.client_id)
+        .in("status", ["invited", "signed_up"])
+        .maybeSingle();
+
+      if (!referral) return;
+
+      // Update referral status
+      await supabase.from("referrals").update({
+        status: "first_appointment_completed",
+        reward_unlocked_at: new Date().toISOString(),
+      }).eq("id", referral.id);
+
+      // Fetch referral settings
+      const { data: refSettings } = await supabase
+        .from("referral_settings")
+        .select("*")
+        .eq("clinic_id", clinicId)
+        .maybeSingle();
+
+      if (!refSettings?.is_enabled) return;
+
+      let rewardAmountCents = 0;
+      let notes = "";
+      switch (refSettings.reward_type) {
+        case "credit":
+          rewardAmountCents = refSettings.reward_value * 100;
+          notes = `$${refSettings.reward_value} credit reward`;
+          break;
+        case "percentage":
+          notes = `${refSettings.reward_value}% discount reward`;
+          break;
+        case "free_service":
+          if (refSettings.reward_service_id) {
+            const { data: svc } = await supabase.from("services").select("price_cents, name").eq("id", refSettings.reward_service_id).maybeSingle();
+            if (svc) { rewardAmountCents = svc.price_cents; notes = `Free service: ${svc.name}`; }
+          }
+          break;
+        default:
+          notes = refSettings.reward_description ?? "Custom reward";
+      }
+
+      // Insert reward for referrer
+      if (referral.referrer_client_id) {
+        await supabase.from("referral_rewards").insert({
+          clinic_id: clinicId,
+          referral_id: referral.id,
+          recipient_client_id: referral.referrer_client_id,
+          reward_type: refSettings.reward_type,
+          amount_cents: rewardAmountCents,
+          status: "available",
+          notes,
+        });
+      }
+
+      // Insert reward for referee if enabled
+      if (refSettings.referee_reward_enabled && appointment.client_id) {
+        let refNotes = "";
+        let refAmount = 0;
+        switch (refSettings.referee_reward_type) {
+          case "credit": refAmount = refSettings.referee_reward_value * 100; refNotes = `$${refSettings.referee_reward_value} welcome credit`; break;
+          case "percentage": refNotes = `${refSettings.referee_reward_value}% welcome discount`; break;
+          default: refNotes = "Welcome reward";
+        }
+        await supabase.from("referral_rewards").insert({
+          clinic_id: clinicId,
+          referral_id: referral.id,
+          recipient_client_id: appointment.client_id,
+          reward_type: refSettings.referee_reward_type,
+          amount_cents: refAmount,
+          status: "available",
+          notes: refNotes,
+        });
+      }
+
+      // Update referral code usage
+      if (referral.referrer_code_id) {
+        const { data: codeData } = await supabase.from("referral_codes").select("times_used, total_rewards_earned_cents").eq("id", referral.referrer_code_id).maybeSingle();
+        if (codeData) {
+          await supabase.from("referral_codes").update({
+            times_used: (codeData.times_used ?? 0) + 1,
+            total_rewards_earned_cents: (codeData.total_rewards_earned_cents ?? 0) + rewardAmountCents,
+          }).eq("id", referral.referrer_code_id);
+        }
+      }
+
+      toast.success(`🎉 Referral reward unlocked for ${referral.referrer_name}!`);
+    } catch (err) {
+      console.error("Referral reward unlock failed (non-critical):", err);
+    }
+  };
+
   /* ── Status transitions ── */
   const advanceStatus = async (appointment: Appointment, next: AppointmentStatus, reason?: string) => {
     if (!activeClinic) return;
@@ -432,6 +578,13 @@ export function CalendarWeek() {
       else {
         toast.success(`Marked ${STATUS_LABELS[next]}`);
         setOpen(false);
+
+        // Post-completion automation (non-blocking)
+        if (next === "completed") {
+          autoCreateReviewRequest(appointment, activeClinic.clinic_id);
+          autoUnlockReferralReward(appointment, activeClinic.clinic_id);
+        }
+
         await loadAll();
       }
     } catch (err) {
