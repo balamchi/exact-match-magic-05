@@ -52,6 +52,7 @@ function ClientDetailPage() {
   const [signedConsents, setSignedConsents] = useState<any[]>([]);
   const [loyaltyAccount, setLoyaltyAccount] = useState<any>(null);
   const [clientPackages, setClientPackages] = useState<any[]>([]);
+  const [treatmentPlans, setTreatmentPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
