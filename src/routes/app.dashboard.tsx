@@ -388,6 +388,14 @@ function Dashboard() {
         />
       </div>
 
+      {/* Lead Pipeline KPIs */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <MiniKpi label="Active Leads" value={stats?.activeLeads ?? 0} loading={loading} />
+        <MiniKpi label="New Leads (Week)" value={stats?.newLeadsWeek ?? 0} loading={loading} />
+        <MiniKpi label="Lead Conversion" value={`${stats?.leadConversionRate ?? 0}%`} loading={loading} />
+        <MiniKpi label="Top Lead Source" value={stats?.topLeadSource ?? "—"} loading={loading} />
+      </div>
+
       {/* Secondary KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <MiniKpi label="Avg Service Value" value={formatMoney(stats?.avgServiceValueCents ?? 0, currency)} loading={loading} />
