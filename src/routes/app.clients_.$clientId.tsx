@@ -513,8 +513,9 @@ function SoapNotesList({ notes }: { notes: SoapNote[] }) {
         <li key={note.id} className="p-4 transition hover:bg-surface/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{new Date(note.visit_date).toLocaleDateString()}</span>
-              {note.signed && <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-emerald-400">Signed</span>}
+              <span className="font-medium">{new Date(note.created_at).toLocaleDateString()}</span>
+              {note.status === "finalized" && <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-emerald-400">Finalized</span>}
+              {note.status === "amended" && <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-400">Amended</span>}
             </div>
           </div>
           <div className="mt-2 grid gap-2 text-sm">
