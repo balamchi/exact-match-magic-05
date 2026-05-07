@@ -135,6 +135,35 @@ function PublicReviewPage() {
     // Mark request completed
     await supabase.from("review_requests").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", request.id);
 
+    // Negative review alert — send email to clinic if rating <= 3
+    if (rating <= 3 && settings?.negative_feedback_alert_email) {
+      try {
+        // Lookup client name
+        const { data: clientData } = await supabase.from("clients").select("first_name, last_name").eq("id", request.client_id).maybeSingle();
+        const clientName = clientData ? [clientData.first_name, clientData.last_name].filter(Boolean).join(" ") : "Unknown";
+
+        // Enqueue alert email via RPC (same pattern as booking-confirmation)
+        await supabase.rpc("enqueue_email" as any, {
+          queue_name: "transactional_emails",
+          payload: {
+            templateName: "negative-review-alert",
+            recipientEmail: settings.negative_feedback_alert_email,
+            idempotencyKey: `neg-review-${insertedReview?.id}`,
+            data: {
+              clinicName: clinic?.name ?? "Your Clinic",
+              rating,
+              title: title.trim() || undefined,
+              body: body.trim() || undefined,
+              clientName,
+              submittedAt: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+            },
+          },
+        });
+      } catch (emailErr) {
+        console.error("Negative review alert email failed (non-critical):", emailErr);
+      }
+    }
+
     setStep("done");
     setSubmitting(false);
 
