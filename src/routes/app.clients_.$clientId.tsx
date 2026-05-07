@@ -6,7 +6,7 @@ import {
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
   AlertTriangle, Pill, ShieldAlert, Crown, Ban, XCircle, Receipt, PenLine,
   MoreHorizontal, UserPlus, CreditCard, MessageSquare, Gift, Star,
-  Heart, Award, Package, File, Send, Search, ArrowRight, Share2,
+  Heart, Award, Package, File, Send, Search, ArrowRight, Share2, ListChecks, Target,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
