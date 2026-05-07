@@ -426,6 +426,7 @@ function Dashboard() {
         <MiniKpi label="Avg Rating (30d)" value={stats?.avgRating30d != null ? `${stats.avgRating30d}★` : "—"} loading={loading} />
         <MiniKpi label="Active Referrals" value={stats?.activeReferrals ?? 0} loading={loading} />
         <MiniKpi label="Rewards Issued (30d)" value={formatMoney(stats?.rewardsIssuedCents30d ?? 0, currency)} loading={loading} />
+      </div>
 
       {/* Secondary KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
