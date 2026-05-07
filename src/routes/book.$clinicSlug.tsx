@@ -407,6 +407,26 @@ function PublicBookingPage() {
       }
 
       setConfirmationId(body.appointmentId?.slice(-6)?.toUpperCase() ?? "");
+
+      // Create referral record if referral code was used
+      if (refBanner && clinic) {
+        try {
+          await supabase.from("referrals").insert({
+            clinic_id: clinic.id,
+            referrer_client_id: refBanner.referrerClientId,
+            referrer_code_id: refBanner.codeId,
+            referrer_name: refBanner.name,
+            referred_name: `${state.firstName.trim()} ${state.lastName.trim()}`,
+            referred_email: state.email.trim(),
+            referee_phone: state.phone.trim(),
+            status: "signed_up",
+            notes: `Booked via booking widget with code ${refCode}`,
+          });
+        } catch (refErr) {
+          console.error("Referral creation failed (non-critical):", refErr);
+        }
+      }
+
       setSubmitted(true);
     } catch {
       toast.error("Network error. Please check your connection and try again.");
