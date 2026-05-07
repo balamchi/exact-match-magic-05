@@ -241,6 +241,41 @@ function PublicBookingPage() {
     if (sortedCats.length <= 2) sortedCats.forEach(([cat]) => defaultExpanded.add(cat));
     setExpandedCats(defaultExpanded);
 
+    // Check for referral code in URL
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("ref");
+      if (code && c) {
+        setRefCode(code);
+        const { data: codeData } = await supabase
+          .from("referral_codes")
+          .select("id, client_id, code")
+          .eq("code", code)
+          .eq("clinic_id", c.id)
+          .eq("is_active", true)
+          .maybeSingle();
+        if (codeData) {
+          const { data: referrer } = await supabase
+            .from("clients")
+            .select("first_name, last_name")
+            .eq("id", codeData.client_id)
+            .single();
+          const { data: refSettings } = await supabase
+            .from("referral_settings")
+            .select("reward_description")
+            .eq("clinic_id", c.id)
+            .maybeSingle();
+          const referrerName = referrer ? [referrer.first_name, referrer.last_name].filter(Boolean).join(" ") : "a friend";
+          setRefBanner({
+            name: referrerName,
+            description: refSettings?.reward_description ?? "a special reward",
+            codeId: codeData.id,
+            referrerClientId: codeData.client_id,
+          });
+        }
+      }
+    }
+
     setLoading(false);
   };
 
