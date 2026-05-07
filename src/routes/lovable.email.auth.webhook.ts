@@ -31,7 +31,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "exact-match-magic-05"
+const SITE_NAME = "ClinicPro"
 const SENDER_DOMAIN = "notify.clinicpro.io"
 const ROOT_DOMAIN = "clinicpro.io"
 const FROM_DOMAIN = "notify.clinicpro.io"
