@@ -420,6 +420,13 @@ function Dashboard() {
         <MiniKpi label="Top Lead Source" value={stats?.topLeadSource ?? "—"} loading={loading} />
       </div>
 
+      {/* Reviews & Referrals KPIs */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <MiniKpi label="Recent Reviews (7d)" value={stats?.recentReviews7d ?? 0} loading={loading} />
+        <MiniKpi label="Avg Rating (30d)" value={stats?.avgRating30d != null ? `${stats.avgRating30d}★` : "—"} loading={loading} />
+        <MiniKpi label="Active Referrals" value={stats?.activeReferrals ?? 0} loading={loading} />
+        <MiniKpi label="Rewards Issued (30d)" value={formatMoney(stats?.rewardsIssuedCents30d ?? 0, currency)} loading={loading} />
+
       {/* Secondary KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <MiniKpi label="Avg Service Value" value={formatMoney(stats?.avgServiceValueCents ?? 0, currency)} loading={loading} />
