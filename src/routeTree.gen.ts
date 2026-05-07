@@ -31,6 +31,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as ApiRouteImport } from './routes/api'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReviewsPublicTokenRouteImport } from './routes/reviews.$publicToken'
 import { Route as PortalSlugRouteImport } from './routes/portal.$slug'
 import { Route as LovableEmailRouteImport } from './routes/lovable.email'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email.unsubscribe'
@@ -80,11 +81,16 @@ import { Route as AppApiSettingsRouteImport } from './routes/app.api-settings'
 import { Route as AppAiOptimizerRouteImport } from './routes/app.ai-optimizer'
 import { Route as AppAiRouteImport } from './routes/app.ai'
 import { Route as ApiPublicRouteImport } from './routes/api.public'
+import { Route as AppReviewsIndexRouteImport } from './routes/app.reviews.index'
+import { Route as AppReferralsIndexRouteImport } from './routes/app.referrals.index'
+import { Route as ReferClinicSlugCodeRouteImport } from './routes/refer.$clinicSlug.$code'
 import { Route as LovableEmailTransactionalRouteImport } from './routes/lovable.email.transactional'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable.email.suppression'
 import { Route as LovableEmailQueueRouteImport } from './routes/lovable.email.queue'
 import { Route as LovableEmailAuthRouteImport } from './routes/lovable.email.auth'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
+import { Route as AppReviewsSettingsRouteImport } from './routes/app.reviews.settings'
+import { Route as AppReferralsSettingsRouteImport } from './routes/app.referrals.settings'
 import { Route as AppClientsClientIdRouteImport } from './routes/app.clients_.$clientId'
 import { Route as ApiPublicBookingRouteImport } from './routes/api.public.booking'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable.email.transactional.send'
@@ -202,6 +208,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewsPublicTokenRoute = ReviewsPublicTokenRouteImport.update({
+  id: '/reviews/$publicToken',
+  path: '/reviews/$publicToken',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalSlugRoute = PortalSlugRouteImport.update({
@@ -449,6 +460,21 @@ const ApiPublicRoute = ApiPublicRouteImport.update({
   path: '/public',
   getParentRoute: () => ApiRoute,
 } as any)
+const AppReviewsIndexRoute = AppReviewsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppReviewsRoute,
+} as any)
+const AppReferralsIndexRoute = AppReferralsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppReferralsRoute,
+} as any)
+const ReferClinicSlugCodeRoute = ReferClinicSlugCodeRouteImport.update({
+  id: '/refer/$clinicSlug/$code',
+  path: '/refer/$clinicSlug/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalRoute =
   LovableEmailTransactionalRouteImport.update({
     id: '/transactional',
@@ -474,6 +500,16 @@ const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
   getParentRoute: () => AppSettingsRoute,
+} as any)
+const AppReviewsSettingsRoute = AppReviewsSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppReviewsRoute,
+} as any)
+const AppReferralsSettingsRoute = AppReferralsSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppReferralsRoute,
 } as any)
 const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
   id: '/clients_/$clientId',
@@ -571,9 +607,9 @@ export interface FileRoutesByFullPath {
   '/app/pos': typeof AppPosRoute
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
-  '/app/referrals': typeof AppReferralsRoute
+  '/app/referrals': typeof AppReferralsRouteWithChildren
   '/app/reports': typeof AppReportsRoute
-  '/app/reviews': typeof AppReviewsRoute
+  '/app/reviews': typeof AppReviewsRouteWithChildren
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
@@ -591,13 +627,19 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
+  '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/referrals/settings': typeof AppReferralsSettingsRoute
+  '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
+  '/app/referrals/': typeof AppReferralsIndexRoute
+  '/app/reviews/': typeof AppReviewsIndexRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -657,9 +699,7 @@ export interface FileRoutesByTo {
   '/app/pos': typeof AppPosRoute
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
-  '/app/referrals': typeof AppReferralsRoute
   '/app/reports': typeof AppReportsRoute
-  '/app/reviews': typeof AppReviewsRoute
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
@@ -677,13 +717,19 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
+  '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/referrals/settings': typeof AppReferralsSettingsRoute
+  '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
+  '/app/referrals': typeof AppReferralsIndexRoute
+  '/app/reviews': typeof AppReviewsIndexRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -744,9 +790,9 @@ export interface FileRoutesById {
   '/app/pos': typeof AppPosRoute
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
-  '/app/referrals': typeof AppReferralsRoute
+  '/app/referrals': typeof AppReferralsRouteWithChildren
   '/app/reports': typeof AppReportsRoute
-  '/app/reviews': typeof AppReviewsRoute
+  '/app/reviews': typeof AppReviewsRouteWithChildren
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
@@ -764,13 +810,19 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
+  '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients_/$clientId': typeof AppClientsClientIdRoute
+  '/app/referrals/settings': typeof AppReferralsSettingsRoute
+  '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
+  '/app/referrals/': typeof AppReferralsIndexRoute
+  '/app/reviews/': typeof AppReviewsIndexRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -852,13 +904,19 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
+    | '/reviews/$publicToken'
     | '/api/public/booking'
     | '/app/clients/$clientId'
+    | '/app/referrals/settings'
+    | '/app/reviews/settings'
     | '/app/settings/billing'
     | '/lovable/email/auth'
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/refer/$clinicSlug/$code'
+    | '/app/referrals/'
+    | '/app/reviews/'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -918,9 +976,7 @@ export interface FileRouteTypes {
     | '/app/pos'
     | '/app/qa-checklist'
     | '/app/quickbooks'
-    | '/app/referrals'
     | '/app/reports'
-    | '/app/reviews'
     | '/app/services'
     | '/app/settings'
     | '/app/soap-notes'
@@ -938,13 +994,19 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
+    | '/reviews/$publicToken'
     | '/api/public/booking'
     | '/app/clients/$clientId'
+    | '/app/referrals/settings'
+    | '/app/reviews/settings'
     | '/app/settings/billing'
     | '/lovable/email/auth'
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/refer/$clinicSlug/$code'
+    | '/app/referrals'
+    | '/app/reviews'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1024,13 +1086,19 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
+    | '/reviews/$publicToken'
     | '/api/public/booking'
     | '/app/clients_/$clientId'
+    | '/app/referrals/settings'
+    | '/app/reviews/settings'
     | '/app/settings/billing'
     | '/lovable/email/auth'
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/refer/$clinicSlug/$code'
+    | '/app/referrals/'
+    | '/app/reviews/'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1064,6 +1132,8 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   BookClinicSlugRoute: typeof BookClinicSlugRoute
   PortalSlugRoute: typeof PortalSlugRoute
+  ReviewsPublicTokenRoute: typeof ReviewsPublicTokenRoute
+  ReferClinicSlugCodeRoute: typeof ReferClinicSlugCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1220,6 +1290,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reviews/$publicToken': {
+      id: '/reviews/$publicToken'
+      path: '/reviews/$publicToken'
+      fullPath: '/reviews/$publicToken'
+      preLoaderRoute: typeof ReviewsPublicTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal/$slug': {
@@ -1565,6 +1642,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRouteImport
       parentRoute: typeof ApiRoute
     }
+    '/app/reviews/': {
+      id: '/app/reviews/'
+      path: '/'
+      fullPath: '/app/reviews/'
+      preLoaderRoute: typeof AppReviewsIndexRouteImport
+      parentRoute: typeof AppReviewsRoute
+    }
+    '/app/referrals/': {
+      id: '/app/referrals/'
+      path: '/'
+      fullPath: '/app/referrals/'
+      preLoaderRoute: typeof AppReferralsIndexRouteImport
+      parentRoute: typeof AppReferralsRoute
+    }
+    '/refer/$clinicSlug/$code': {
+      id: '/refer/$clinicSlug/$code'
+      path: '/refer/$clinicSlug/$code'
+      fullPath: '/refer/$clinicSlug/$code'
+      preLoaderRoute: typeof ReferClinicSlugCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional': {
       id: '/lovable/email/transactional'
       path: '/transactional'
@@ -1599,6 +1697,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/settings/billing'
       preLoaderRoute: typeof AppSettingsBillingRouteImport
       parentRoute: typeof AppSettingsRoute
+    }
+    '/app/reviews/settings': {
+      id: '/app/reviews/settings'
+      path: '/settings'
+      fullPath: '/app/reviews/settings'
+      preLoaderRoute: typeof AppReviewsSettingsRouteImport
+      parentRoute: typeof AppReviewsRoute
+    }
+    '/app/referrals/settings': {
+      id: '/app/referrals/settings'
+      path: '/settings'
+      fullPath: '/app/referrals/settings'
+      preLoaderRoute: typeof AppReferralsSettingsRouteImport
+      parentRoute: typeof AppReferralsRoute
     }
     '/app/clients_/$clientId': {
       id: '/app/clients_/$clientId'
@@ -1681,6 +1793,34 @@ const ApiRouteChildren: ApiRouteChildren = {
 
 const ApiRouteWithChildren = ApiRoute._addFileChildren(ApiRouteChildren)
 
+interface AppReferralsRouteChildren {
+  AppReferralsSettingsRoute: typeof AppReferralsSettingsRoute
+  AppReferralsIndexRoute: typeof AppReferralsIndexRoute
+}
+
+const AppReferralsRouteChildren: AppReferralsRouteChildren = {
+  AppReferralsSettingsRoute: AppReferralsSettingsRoute,
+  AppReferralsIndexRoute: AppReferralsIndexRoute,
+}
+
+const AppReferralsRouteWithChildren = AppReferralsRoute._addFileChildren(
+  AppReferralsRouteChildren,
+)
+
+interface AppReviewsRouteChildren {
+  AppReviewsSettingsRoute: typeof AppReviewsSettingsRoute
+  AppReviewsIndexRoute: typeof AppReviewsIndexRoute
+}
+
+const AppReviewsRouteChildren: AppReviewsRouteChildren = {
+  AppReviewsSettingsRoute: AppReviewsSettingsRoute,
+  AppReviewsIndexRoute: AppReviewsIndexRoute,
+}
+
+const AppReviewsRouteWithChildren = AppReviewsRoute._addFileChildren(
+  AppReviewsRouteChildren,
+)
+
 interface AppSettingsRouteChildren {
   AppSettingsBillingRoute: typeof AppSettingsBillingRoute
 }
@@ -1734,9 +1874,9 @@ interface AppRouteChildren {
   AppPosRoute: typeof AppPosRoute
   AppQaChecklistRoute: typeof AppQaChecklistRoute
   AppQuickbooksRoute: typeof AppQuickbooksRoute
-  AppReferralsRoute: typeof AppReferralsRoute
+  AppReferralsRoute: typeof AppReferralsRouteWithChildren
   AppReportsRoute: typeof AppReportsRoute
-  AppReviewsRoute: typeof AppReviewsRoute
+  AppReviewsRoute: typeof AppReviewsRouteWithChildren
   AppServicesRoute: typeof AppServicesRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
   AppSoapNotesRoute: typeof AppSoapNotesRoute
@@ -1776,9 +1916,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppPosRoute: AppPosRoute,
   AppQaChecklistRoute: AppQaChecklistRoute,
   AppQuickbooksRoute: AppQuickbooksRoute,
-  AppReferralsRoute: AppReferralsRoute,
+  AppReferralsRoute: AppReferralsRouteWithChildren,
   AppReportsRoute: AppReportsRoute,
-  AppReviewsRoute: AppReviewsRoute,
+  AppReviewsRoute: AppReviewsRouteWithChildren,
   AppServicesRoute: AppServicesRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
   AppSoapNotesRoute: AppSoapNotesRoute,
@@ -1916,6 +2056,8 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   BookClinicSlugRoute: BookClinicSlugRoute,
   PortalSlugRoute: PortalSlugRoute,
+  ReviewsPublicTokenRoute: ReviewsPublicTokenRoute,
+  ReferClinicSlugCodeRoute: ReferClinicSlugCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

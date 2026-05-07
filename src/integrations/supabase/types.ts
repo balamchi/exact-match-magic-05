@@ -1988,16 +1988,148 @@ export type Database = {
           },
         ]
       }
+      referral_codes: {
+        Row: {
+          client_id: string
+          clinic_id: string
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          times_used: number
+          total_rewards_earned_cents: number
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          clinic_id: string
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          times_used?: number
+          total_rewards_earned_cents?: number
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          clinic_id?: string
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          times_used?: number
+          total_rewards_earned_cents?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          amount_cents: number
+          clinic_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          notes: string | null
+          recipient_client_id: string
+          redeemed_at: string | null
+          referral_id: string
+          reward_type: Database["public"]["Enums"]["reward_type"]
+          status: Database["public"]["Enums"]["reward_status"]
+        }
+        Insert: {
+          amount_cents?: number
+          clinic_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          recipient_client_id: string
+          redeemed_at?: string | null
+          referral_id: string
+          reward_type?: Database["public"]["Enums"]["reward_type"]
+          status?: Database["public"]["Enums"]["reward_status"]
+        }
+        Update: {
+          amount_cents?: number
+          clinic_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          recipient_client_id?: string
+          redeemed_at?: string | null
+          referral_id?: string
+          reward_type?: Database["public"]["Enums"]["reward_type"]
+          status?: Database["public"]["Enums"]["reward_status"]
+        }
+        Relationships: []
+      }
+      referral_settings: {
+        Row: {
+          clinic_id: string
+          created_at: string
+          id: string
+          is_enabled: boolean
+          referee_reward_enabled: boolean
+          referee_reward_type: Database["public"]["Enums"]["reward_type"]
+          referee_reward_value: number
+          reward_description: string | null
+          reward_service_id: string | null
+          reward_type: Database["public"]["Enums"]["reward_type"]
+          reward_value: number
+          terms_text: string | null
+          updated_at: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          referee_reward_enabled?: boolean
+          referee_reward_type?: Database["public"]["Enums"]["reward_type"]
+          referee_reward_value?: number
+          reward_description?: string | null
+          reward_service_id?: string | null
+          reward_type?: Database["public"]["Enums"]["reward_type"]
+          reward_value?: number
+          terms_text?: string | null
+          updated_at?: string
+        }
+        Update: {
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          referee_reward_enabled?: boolean
+          referee_reward_type?: Database["public"]["Enums"]["reward_type"]
+          referee_reward_value?: number
+          reward_description?: string | null
+          reward_service_id?: string | null
+          reward_type?: Database["public"]["Enums"]["reward_type"]
+          reward_value?: number
+          terms_text?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           clinic_id: string
           created_at: string
           id: string
           notes: string | null
+          referee_client_id: string | null
+          referee_phone: string | null
           referred_email: string | null
           referred_name: string
+          referrer_client_id: string | null
+          referrer_code_id: string | null
           referrer_name: string
           reward_cents: number
+          reward_redeemed_at: string | null
+          reward_unlocked_at: string | null
           status: string
           updated_at: string
         }
@@ -2006,10 +2138,16 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          referee_client_id?: string | null
+          referee_phone?: string | null
           referred_email?: string | null
           referred_name: string
+          referrer_client_id?: string | null
+          referrer_code_id?: string | null
           referrer_name: string
           reward_cents?: number
+          reward_redeemed_at?: string | null
+          reward_unlocked_at?: string | null
           status?: string
           updated_at?: string
         }
@@ -2018,10 +2156,16 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          referee_client_id?: string | null
+          referee_phone?: string | null
           referred_email?: string | null
           referred_name?: string
+          referrer_client_id?: string | null
+          referrer_code_id?: string | null
           referrer_name?: string
           reward_cents?: number
+          reward_redeemed_at?: string | null
+          reward_unlocked_at?: string | null
           status?: string
           updated_at?: string
         }
@@ -2035,38 +2179,188 @@ export type Database = {
           },
         ]
       }
-      reviews: {
+      review_requests: {
         Row: {
-          body: string | null
+          appointment_id: string | null
+          client_id: string
+          clinic_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          opened_at: string | null
+          public_token: string
+          reminder_sent_at: string | null
+          scheduled_send_at: string
+          sent_at: string | null
+          sent_via: Database["public"]["Enums"]["review_sent_via"]
+          status: Database["public"]["Enums"]["review_request_status"]
+        }
+        Insert: {
+          appointment_id?: string | null
+          client_id: string
+          clinic_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          opened_at?: string | null
+          public_token?: string
+          reminder_sent_at?: string | null
+          scheduled_send_at?: string
+          sent_at?: string | null
+          sent_via?: Database["public"]["Enums"]["review_sent_via"]
+          status?: Database["public"]["Enums"]["review_request_status"]
+        }
+        Update: {
+          appointment_id?: string | null
+          client_id?: string
+          clinic_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          opened_at?: string | null
+          public_token?: string
+          reminder_sent_at?: string | null
+          scheduled_send_at?: string
+          sent_at?: string | null
+          sent_via?: Database["public"]["Enums"]["review_sent_via"]
+          status?: Database["public"]["Enums"]["review_request_status"]
+        }
+        Relationships: []
+      }
+      review_responses: {
+        Row: {
           clinic_id: string
           created_at: string
           id: string
-          rating: number
-          responded: boolean
-          reviewer_name: string
-          source: string
+          posted_to_external: boolean
+          responded_by: string | null
+          response_text: string
+          review_id: string
           updated_at: string
         }
         Insert: {
-          body?: string | null
           clinic_id: string
           created_at?: string
           id?: string
-          rating?: number
-          responded?: boolean
-          reviewer_name: string
-          source?: string
+          posted_to_external?: boolean
+          responded_by?: string | null
+          response_text: string
+          review_id: string
           updated_at?: string
         }
         Update: {
-          body?: string | null
           clinic_id?: string
           created_at?: string
           id?: string
+          posted_to_external?: boolean
+          responded_by?: string | null
+          response_text?: string
+          review_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      review_settings: {
+        Row: {
+          clinic_id: string
+          created_at: string
+          google_business_url: string | null
+          id: string
+          internal_thank_you_message: string | null
+          is_enabled: boolean
+          negative_feedback_alert_email: string | null
+          smart_filter_enabled: boolean
+          trigger_hours_after_appointment: number
+          updated_at: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          google_business_url?: string | null
+          id?: string
+          internal_thank_you_message?: string | null
+          is_enabled?: boolean
+          negative_feedback_alert_email?: string | null
+          smart_filter_enabled?: boolean
+          trigger_hours_after_appointment?: number
+          updated_at?: string
+        }
+        Update: {
+          clinic_id?: string
+          created_at?: string
+          google_business_url?: string | null
+          id?: string
+          internal_thank_you_message?: string | null
+          is_enabled?: boolean
+          negative_feedback_alert_email?: string | null
+          smart_filter_enabled?: boolean
+          trigger_hours_after_appointment?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          appointment_id: string | null
+          body: string | null
+          client_id: string | null
+          clinic_id: string
+          created_at: string
+          external_review_id: string | null
+          external_url: string | null
+          id: string
+          is_published: boolean
+          is_responded: boolean
+          platform: string
+          posted_at: string | null
+          rating: number
+          request_id: string | null
+          responded: boolean
+          reviewer_name: string
+          source: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          body?: string | null
+          client_id?: string | null
+          clinic_id: string
+          created_at?: string
+          external_review_id?: string | null
+          external_url?: string | null
+          id?: string
+          is_published?: boolean
+          is_responded?: boolean
+          platform?: string
+          posted_at?: string | null
           rating?: number
+          request_id?: string | null
+          responded?: boolean
+          reviewer_name: string
+          source?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          body?: string | null
+          client_id?: string | null
+          clinic_id?: string
+          created_at?: string
+          external_review_id?: string | null
+          external_url?: string | null
+          id?: string
+          is_published?: boolean
+          is_responded?: boolean
+          platform?: string
+          posted_at?: string | null
+          rating?: number
+          request_id?: string | null
           responded?: boolean
           reviewer_name?: string
           source?: string
+          title?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2933,6 +3227,22 @@ export type Database = {
         | "consult_booked"
         | "won"
         | "lost"
+      referral_status:
+        | "invited"
+        | "signed_up"
+        | "first_appointment_completed"
+        | "rewarded"
+        | "expired"
+      review_platform: "internal" | "google" | "yelp" | "facebook" | "instagram"
+      review_request_status:
+        | "pending"
+        | "sent"
+        | "opened"
+        | "completed"
+        | "expired"
+      review_sent_via: "email" | "sms" | "both"
+      reward_status: "pending" | "available" | "redeemed" | "expired"
+      reward_type: "credit" | "percentage" | "free_service" | "custom"
       task_status: "todo" | "in_progress" | "done"
     }
     CompositeTypes: {
@@ -3093,6 +3403,24 @@ export const Constants = {
         "won",
         "lost",
       ],
+      referral_status: [
+        "invited",
+        "signed_up",
+        "first_appointment_completed",
+        "rewarded",
+        "expired",
+      ],
+      review_platform: ["internal", "google", "yelp", "facebook", "instagram"],
+      review_request_status: [
+        "pending",
+        "sent",
+        "opened",
+        "completed",
+        "expired",
+      ],
+      review_sent_via: ["email", "sms", "both"],
+      reward_status: ["pending", "available", "redeemed", "expired"],
+      reward_type: ["credit", "percentage", "free_service", "custom"],
       task_status: ["todo", "in_progress", "done"],
     },
   },
