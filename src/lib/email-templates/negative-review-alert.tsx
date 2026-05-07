@@ -30,7 +30,7 @@ const NegativeReviewAlertEmail = ({
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
-      ⚠️ {rating}★ review received at {clinicName ?? "your clinic"}
+      ⚠️ {String(rating)}★ review received at {clinicName ?? "your clinic"}
     </Preview>
     <Body style={main}>
       <Container style={container}>
