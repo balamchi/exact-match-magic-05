@@ -211,7 +211,7 @@ export const Route = createFileRoute("/api/public/booking")({
               name: `${data.firstName} ${data.lastName}`,
               email: data.email,
               phone: data.phone,
-              source: "booking_widget",
+              source: data.refCode ? "referral" : "booking_widget",
               stage: "treatment_booked",
               estimated_value_cents: service.price_cents,
               service_interest: data.serviceId,
