@@ -86,7 +86,7 @@ function PublicReviewPage() {
       // Fetch clinic info + settings
       const [clinicRes, settingsRes] = await Promise.all([
         supabase.from("clinics").select("name, logo_url, primary_color").eq("id", reqData.clinic_id).single(),
-        supabase.from("review_settings").select("smart_filter_enabled, google_business_url, internal_thank_you_message").eq("clinic_id", reqData.clinic_id).maybeSingle(),
+        supabase.from("review_settings").select("smart_filter_enabled, google_business_url, internal_thank_you_message, negative_feedback_alert_email").eq("clinic_id", reqData.clinic_id).maybeSingle(),
       ]);
 
       setClinic(clinicRes.data as ClinicData | null);
