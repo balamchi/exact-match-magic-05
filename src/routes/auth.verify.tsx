@@ -85,10 +85,16 @@ function Verify() {
           {status === "success" && (
             <>
               <CheckCircle2 className="mx-auto h-10 w-10 text-green-500" />
-              <h1 className="mt-4 font-display text-xl font-semibold">Email verified!</h1>
+              <h1 className="mt-4 font-display text-xl font-semibold">Welcome to ClinicPro!</h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Redirecting you to your dashboard…
+                Setting up your dashboard…
               </p>
+              <a
+                href="/app/dashboard"
+                className="mt-6 inline-flex h-10 items-center rounded-lg bg-gradient-primary px-6 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-90"
+              >
+                Continue to Dashboard
+              </a>
             </>
           )}
 
