@@ -65,15 +65,18 @@ function TreatmentPlansDashboard() {
   const handleCreate = async () => {
     if (!clinicId || !planName.trim() || !planClientId) return;
     setSaving(true);
+    // provider_id is required - use current user id
+    const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase.from("treatment_plans").insert({
       clinic_id: clinicId,
       client_id: planClientId,
+      provider_id: user?.id ?? "",
       service_id: planServiceId || null,
       name: planName.trim(),
       total_sessions_planned: planSessions,
       sessions_completed: 0,
       status: "draft",
-      notes: planNotes.trim() || null,
+      notes: planNotes.trim() || "",
     });
     if (error) toast.error("Failed to create plan"); else toast.success("Treatment plan created!");
     setSaving(false);
