@@ -170,6 +170,7 @@ function ClientDetailPage() {
     { id: "payments", label: "Payments", icon: <Receipt className="h-3.5 w-3.5" />, count: invoices.length },
     { id: "consents", label: "Consents", icon: <PenLine className="h-3.5 w-3.5" />, count: signedConsents.length },
     { id: "soap", label: "Notes", icon: <FileText className="h-3.5 w-3.5" />, count: soapNotes.length },
+    { id: "plans", label: "Plans", icon: <ListChecks className="h-3.5 w-3.5" />, count: treatmentPlans.length },
     { id: "reviews", label: "Reviews", icon: <Star className="h-3.5 w-3.5" /> },
     { id: "referrals", label: "Referrals", icon: <Gift className="h-3.5 w-3.5" /> },
     { id: "communication", label: "Comms", icon: <MessageSquare className="h-3.5 w-3.5" /> },
