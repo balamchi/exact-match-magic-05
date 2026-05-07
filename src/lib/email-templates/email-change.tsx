@@ -6,7 +6,6 @@ import {
   Container,
   Head,
   Heading,
-  Hr,
   Html,
   Link,
   Preview,
@@ -29,37 +28,43 @@ export const EmailChangeEmail = ({
   confirmationUrl,
 }: EmailChangeEmailProps) => (
   <Html lang="en" dir="ltr">
-    <Head />
+    <Head>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
+      `}</style>
+    </Head>
     <Preview>Confirm your email change for {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Section style={logoSection}>
-          <Text style={logoText}>✦ {siteName}</Text>
+        <Section style={header}>
+          <Text style={logoText}>✦ ClinicPro</Text>
+          <Text style={tagline}>Run a clinic, not software</Text>
         </Section>
-        <Hr style={divider} />
-        <Heading style={h1}>Confirm your email change</Heading>
-        <Text style={text}>
-          You requested to change your email address for {siteName} from{' '}
-          <Link href={`mailto:${oldEmail}`} style={link}>
-            {oldEmail}
-          </Link>{' '}
-          to{' '}
-          <Link href={`mailto:${newEmail}`} style={link}>
-            {newEmail}
-          </Link>
-          .
-        </Text>
-        <Section style={buttonSection}>
-          <Button style={button} href={confirmationUrl}>
-            Confirm Email Change
-          </Button>
+        <Section style={card}>
+          <Heading style={h1}>Confirm your email change</Heading>
+          <Text style={text}>
+            You requested to change your email address for {siteName} from{' '}
+            <Link href={`mailto:${oldEmail}`} style={link}>
+              {oldEmail}
+            </Link>{' '}
+            to{' '}
+            <Link href={`mailto:${newEmail}`} style={link}>
+              {newEmail}
+            </Link>
+            .
+          </Text>
+          <Section style={buttonSection}>
+            <Button style={button} href={confirmationUrl}>
+              Confirm Email Change
+            </Button>
+          </Section>
         </Section>
-        <Hr style={divider} />
-        <Text style={footer}>
-          If you didn't request this change, please secure your account
-          immediately.
-        </Text>
-        <Text style={footerBrand}>© {new Date().getFullYear()} {siteName}. All rights reserved.</Text>
+        <Section style={footerSection}>
+          <Text style={footerDismiss}>
+            If you didn't request this change, please secure your account immediately.
+          </Text>
+          <Text style={footer}>© 2026 ClinicPro · clinicpro.io</Text>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -68,25 +73,46 @@ export const EmailChangeEmail = ({
 export default EmailChangeEmail
 
 const main = {
-  backgroundColor: '#ffffff',
+  backgroundColor: '#0A0A0A',
   fontFamily: "'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif",
 }
-const container = { padding: '40px 30px', maxWidth: '560px', margin: '0 auto' }
-const logoSection = { textAlign: 'center' as const, marginBottom: '10px' }
-const logoText = { fontSize: '20px', fontWeight: '700' as const, color: '#9333EA', margin: '0' }
-const divider = { borderColor: '#eee', margin: '20px 0' }
-const h1 = { fontSize: '24px', fontWeight: '700' as const, color: '#0A0A0B', margin: '0 0 16px', lineHeight: '1.3' }
-const text = { fontSize: '15px', color: '#3c3c3c', lineHeight: '1.6', margin: '0 0 20px' }
-const link = { color: '#9333EA', textDecoration: 'underline' }
+const container = { padding: '40px 16px', maxWidth: '600px', margin: '0 auto' }
+const header = { textAlign: 'center' as const, padding: '0 0 24px' }
+const logoText = {
+  fontSize: '24px',
+  fontWeight: '700' as const,
+  fontFamily: "'Fraunces', Georgia, serif",
+  color: '#9333EA',
+  margin: '0 0 4px',
+}
+const tagline = { fontSize: '13px', color: '#888', margin: '0', fontStyle: 'italic' as const }
+const card = {
+  backgroundColor: '#1A1A1A',
+  borderRadius: '16px',
+  padding: '36px 32px',
+  border: '1px solid #2a2a2a',
+}
+const h1 = {
+  fontSize: '26px',
+  fontWeight: '700' as const,
+  fontFamily: "'Fraunces', Georgia, serif",
+  color: '#ffffff',
+  margin: '0 0 20px',
+  lineHeight: '1.3',
+}
+const text = { fontSize: '15px', color: '#d1d1d1', lineHeight: '1.65', margin: '0 0 18px' }
+const link = { color: '#D946EF', textDecoration: 'underline' }
 const buttonSection = { textAlign: 'center' as const, margin: '28px 0' }
 const button = {
+  background: 'linear-gradient(135deg, #9333EA, #D946EF)',
   backgroundColor: '#9333EA',
   color: '#ffffff',
   fontSize: '15px',
   fontWeight: '600' as const,
   borderRadius: '10px',
-  padding: '14px 28px',
+  padding: '14px 32px',
   textDecoration: 'none',
 }
-const footer = { fontSize: '13px', color: '#999', margin: '0 0 8px' }
-const footerBrand = { fontSize: '12px', color: '#bbb', margin: '0' }
+const footerSection = { textAlign: 'center' as const, padding: '24px 0 0' }
+const footerDismiss = { fontSize: '13px', color: '#666', margin: '0 0 12px' }
+const footer = { fontSize: '12px', color: '#555', margin: '0' }
