@@ -6,7 +6,7 @@ import {
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
   AlertTriangle, Pill, ShieldAlert, Crown, Ban, XCircle, Receipt, PenLine,
   MoreHorizontal, UserPlus, CreditCard, MessageSquare, Gift, Star,
-  Heart, Award, Package, File, Send, Search, ArrowRight, Share2,
+  Heart, Award, Package, File, Send, Search, ArrowRight, Share2, ListChecks, Target,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ function formatMoney(cents: number, currency = "CAD") {
   return new Intl.NumberFormat("en-CA", { style: "currency", currency, maximumFractionDigits: 0 }).format(cents / 100);
 }
 
-type Tab = "overview" | "appointments" | "treatments" | "photos" | "payments" | "consents" | "soap" | "communication" | "files" | "loyalty" | "reviews" | "referrals";
+type Tab = "overview" | "appointments" | "treatments" | "photos" | "payments" | "consents" | "soap" | "communication" | "files" | "loyalty" | "reviews" | "referrals" | "plans";
 
 function ClientDetailPage() {
   const { clientId } = Route.useParams();
@@ -52,6 +52,7 @@ function ClientDetailPage() {
   const [signedConsents, setSignedConsents] = useState<any[]>([]);
   const [loyaltyAccount, setLoyaltyAccount] = useState<any>(null);
   const [clientPackages, setClientPackages] = useState<any[]>([]);
+  const [treatmentPlans, setTreatmentPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
@@ -71,6 +72,7 @@ function ClientDetailPage() {
         supabase.from("consent_form_signatures").select("*, template:consent_form_templates(name)").eq("clinic_id", cid).eq("client_id", clientId).order("created_at", { ascending: false }),
         supabase.from("loyalty_accounts").select("*").eq("clinic_id", cid).eq("client_id", clientId).maybeSingle(),
         supabase.from("client_packages").select("*, package:packages(name)").eq("clinic_id", cid).eq("client_id", clientId).order("purchased_at", { ascending: false }),
+        supabase.from("treatment_plans").select("*, service:services(name)").eq("clinic_id", cid).eq("client_id", clientId).order("created_at", { ascending: false }),
       ]);
       if (cancelled) return;
 
@@ -91,6 +93,7 @@ function ClientDetailPage() {
       setSignedConsents(unwrap(results[6], "Consents") ?? []);
       setLoyaltyAccount(unwrap(results[7], "Loyalty") ?? null);
       setClientPackages((unwrap(results[8], "Packages") ?? []) as any[]);
+      setTreatmentPlans((unwrap(results[9], "Plans") ?? []) as any[]);
       setLoading(false);
     };
     load();
@@ -167,6 +170,7 @@ function ClientDetailPage() {
     { id: "payments", label: "Payments", icon: <Receipt className="h-3.5 w-3.5" />, count: invoices.length },
     { id: "consents", label: "Consents", icon: <PenLine className="h-3.5 w-3.5" />, count: signedConsents.length },
     { id: "soap", label: "Notes", icon: <FileText className="h-3.5 w-3.5" />, count: soapNotes.length },
+    { id: "plans", label: "Plans", icon: <ListChecks className="h-3.5 w-3.5" />, count: treatmentPlans.length },
     { id: "reviews", label: "Reviews", icon: <Star className="h-3.5 w-3.5" /> },
     { id: "referrals", label: "Referrals", icon: <Gift className="h-3.5 w-3.5" /> },
     { id: "communication", label: "Comms", icon: <MessageSquare className="h-3.5 w-3.5" /> },
@@ -332,6 +336,7 @@ function ClientDetailPage() {
           {activeTab === "payments" && <FinancialTab invoices={invoices} appointments={appointments} currency={currency} />}
           {activeTab === "consents" && <ConsentsTab consents={signedConsents} />}
           {activeTab === "soap" && <SoapNotesList notes={soapNotes} />}
+          {activeTab === "plans" && <TreatmentPlansTab plans={treatmentPlans} />}
           {activeTab === "communication" && <PlaceholderTab title="Communication" description="Message history will show SMS, email, and WhatsApp conversations." icon={<MessageSquare className="h-8 w-8" />} />}
           {activeTab === "files" && <PlaceholderTab title="Files" description="Upload and manage client documents — IDs, insurance, referrals." icon={<File className="h-8 w-8" />} />}
           {activeTab === "loyalty" && <LoyaltyTab loyalty={loyaltyAccount} packages={clientPackages} currency={currency} />}
@@ -642,14 +647,42 @@ function ConsentsTab({ consents }: { consents: any[] }) {
       {consents.map((sc: any) => (
         <div key={sc.id} className="p-4 transition hover:bg-surface/60">
           <div className="flex items-center gap-4">
-            {sc.signature_data && <img src={sc.signature_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />}
+            {sc.signature_canvas_data && <img src={sc.signature_canvas_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />}
             <div className="min-w-0 flex-1">
-              <h4 className="font-medium">{sc.consent_title}</h4>
-              <p className="mt-0.5 text-xs text-muted-foreground">Signed {new Date(sc.signed_at).toLocaleString()}</p>
+              <h4 className="font-medium">{sc.template?.name ?? "Consent Form"}</h4>
+              <p className="mt-0.5 text-xs text-muted-foreground capitalize">{sc.status} · {sc.signed_at ? `Signed ${new Date(sc.signed_at).toLocaleString()}` : `Sent ${new Date(sc.created_at).toLocaleDateString()}`}</p>
             </div>
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function TreatmentPlansTab({ plans }: { plans: any[] }) {
+  if (plans.length === 0) return <EmptyTab title="No treatment plans" description="Multi-session treatment plans for this client will appear here." icon={<ListChecks className="h-8 w-8" />} />;
+  return (
+    <div className="divide-y divide-border">
+      {plans.map((p: any) => {
+        const pct = p.total_sessions_planned > 0 ? Math.round((p.sessions_completed / p.total_sessions_planned) * 100) : 0;
+        return (
+          <div key={p.id} className="p-4 transition hover:bg-surface/60">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-medium">{p.name}</h4>
+                <p className="mt-0.5 text-xs text-muted-foreground">{p.service?.name ?? "No service"} · {p.sessions_completed}/{p.total_sessions_planned} sessions</p>
+              </div>
+              <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase",
+                p.status === "completed" ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" :
+                p.status === "in_progress" ? "border-primary/40 bg-primary/10 text-primary" :
+                "border-border text-muted-foreground")}>{p.status?.replace("_", " ")}</span>
+            </div>
+            <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+              <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -35,6 +35,7 @@ import { Route as ReviewsPublicTokenRouteImport } from './routes/reviews.$public
 import { Route as PortalSlugRouteImport } from './routes/portal.$slug'
 import { Route as LovableEmailRouteImport } from './routes/lovable.email'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email.unsubscribe'
+import { Route as ConsentPublicTokenRouteImport } from './routes/consent.$publicToken'
 import { Route as BookClinicSlugRouteImport } from './routes/book.$clinicSlug'
 import { Route as AuthVerifyRouteImport } from './routes/auth.verify'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
@@ -237,6 +238,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
   getParentRoute: () => EmailRoute,
+} as any)
+const ConsentPublicTokenRoute = ConsentPublicTokenRouteImport.update({
+  id: '/consent/$publicToken',
+  path: '/consent/$publicToken',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BookClinicSlugRoute = BookClinicSlugRouteImport.update({
   id: '/book/$clinicSlug',
@@ -678,6 +684,7 @@ export interface FileRoutesByFullPath {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/book/$clinicSlug': typeof BookClinicSlugRoute
+  '/consent/$publicToken': typeof ConsentPublicTokenRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
@@ -776,6 +783,7 @@ export interface FileRoutesByTo {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/book/$clinicSlug': typeof BookClinicSlugRoute
+  '/consent/$publicToken': typeof ConsentPublicTokenRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
@@ -874,6 +882,7 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/book/$clinicSlug': typeof BookClinicSlugRoute
+  '/consent/$publicToken': typeof ConsentPublicTokenRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
@@ -976,6 +985,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/auth/verify'
     | '/book/$clinicSlug'
+    | '/consent/$publicToken'
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
@@ -1074,6 +1084,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/auth/verify'
     | '/book/$clinicSlug'
+    | '/consent/$publicToken'
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
@@ -1171,6 +1182,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/auth/verify'
     | '/book/$clinicSlug'
+    | '/consent/$publicToken'
     | '/email/unsubscribe'
     | '/lovable/email'
     | '/portal/$slug'
@@ -1226,6 +1238,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   BookClinicSlugRoute: typeof BookClinicSlugRoute
+  ConsentPublicTokenRoute: typeof ConsentPublicTokenRoute
   PortalSlugRoute: typeof PortalSlugRoute
   ReviewsPublicTokenRoute: typeof ReviewsPublicTokenRoute
   ReferClinicSlugCodeRoute: typeof ReferClinicSlugCodeRoute
@@ -1414,6 +1427,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof EmailRoute
+    }
+    '/consent/$publicToken': {
+      id: '/consent/$publicToken'
+      path: '/consent/$publicToken'
+      fullPath: '/consent/$publicToken'
+      preLoaderRoute: typeof ConsentPublicTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/book/$clinicSlug': {
       id: '/book/$clinicSlug'
@@ -2265,6 +2285,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   BookClinicSlugRoute: BookClinicSlugRoute,
+  ConsentPublicTokenRoute: ConsentPublicTokenRoute,
   PortalSlugRoute: PortalSlugRoute,
   ReviewsPublicTokenRoute: ReviewsPublicTokenRoute,
   ReferClinicSlugCodeRoute: ReferClinicSlugCodeRoute,
