@@ -168,7 +168,7 @@ export const Route = createFileRoute("/api/public/booking")({
                 email_consent: data.reminderConsent ?? false,
                 marketing_consent: data.marketingConsent ?? false,
                 tags: ["online-booking"],
-                source: "online_booking",
+                source: data.refCode ? "referral" : "online_booking",
               })
               .select("id")
               .single();
