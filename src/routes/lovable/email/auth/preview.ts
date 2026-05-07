@@ -18,7 +18,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "exact-match-magic-05"
+const SITE_NAME = "ClinicPro"
 const ROOT_DOMAIN = "clinicpro.io"
 
 // Sample data for preview mode ONLY (not used in actual email sending).
