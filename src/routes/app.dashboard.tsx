@@ -108,7 +108,7 @@ function Dashboard() {
     const [
       todayList, yesterdayRes, monthRes, lastMonthRes, monthClientsRes, lastMonthClientsRes,
       inv, tasks, invItems, locRes, weekClientsRes,
-      recentApptsRes, birthdayRes,
+      recentApptsRes, birthdayRes, leadsRes,
     ] = await Promise.all([
       supabase.from("appointments")
         .select("id, starts_at, ends_at, status, price_cents, client:clients(first_name,last_name), service:services(name), staff:staff(display_name,color)")
@@ -153,6 +153,9 @@ function Dashboard() {
         .select("id, first_name, last_name, date_of_birth, vip_status")
         .eq("clinic_id", clinicId)
         .not("date_of_birth", "is", null),
+      supabase.from("leads")
+        .select("id, stage, source, created_at")
+        .eq("clinic_id", clinicId),
     ]);
 
     const todayRows = (todayList.data ?? []) as unknown as TodayAppt[];
