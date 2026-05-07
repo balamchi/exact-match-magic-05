@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { PhotoUpload } from "@/components/photo-upload";
+
 
 export const Route = createFileRoute("/app/clinical/treatment-plans/")({ component: TreatmentPlansDashboard });
 
