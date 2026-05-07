@@ -162,10 +162,13 @@ function PublicBookingPage() {
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [honeypot, setHoneypot] = useState("");
 
+  // Referral code support
+  const [refCode, setRefCode] = useState("");
+  const [refBanner, setRefBanner] = useState<{ name: string; description: string; codeId: string; referrerClientId: string } | null>(null);
+
   // Category accordion state
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
-  // Popularity data: service_id → booking count (last 90 days)
   const [popularity, setPopularity] = useState<Map<string, number>>(new Map());
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
