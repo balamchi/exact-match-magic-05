@@ -41,7 +41,6 @@ interface SoapNoteRow {
   created_at: string;
   updated_at: string;
   client?: { first_name: string; last_name: string | null } | null;
-  provider?: { display_name: string } | null;
   service?: { name: string } | null;
 }
 
