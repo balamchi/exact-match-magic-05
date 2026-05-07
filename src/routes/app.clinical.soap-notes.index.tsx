@@ -243,7 +243,6 @@ function SoapNotesDashboard() {
                       <div className="mt-1 flex items-center gap-3 text-[11px] text-muted-foreground">
                         <span className="inline-flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(note.created_at).toLocaleDateString()}</span>
                         {note.service && <span>· {(note.service as any).name}</span>}
-                        {note.service && <span>· {(note.service as any).name}</span>}
                       </div>
                       <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{note.assessment || note.subjective || "No content"}</p>
                     </div>
