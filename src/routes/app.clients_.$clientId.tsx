@@ -336,6 +336,7 @@ function ClientDetailPage() {
           {activeTab === "payments" && <FinancialTab invoices={invoices} appointments={appointments} currency={currency} />}
           {activeTab === "consents" && <ConsentsTab consents={signedConsents} />}
           {activeTab === "soap" && <SoapNotesList notes={soapNotes} />}
+          {activeTab === "plans" && <TreatmentPlansTab plans={treatmentPlans} />}
           {activeTab === "communication" && <PlaceholderTab title="Communication" description="Message history will show SMS, email, and WhatsApp conversations." icon={<MessageSquare className="h-8 w-8" />} />}
           {activeTab === "files" && <PlaceholderTab title="Files" description="Upload and manage client documents — IDs, insurance, referrals." icon={<File className="h-8 w-8" />} />}
           {activeTab === "loyalty" && <LoyaltyTab loyalty={loyaltyAccount} packages={clientPackages} currency={currency} />}
