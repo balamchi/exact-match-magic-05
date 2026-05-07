@@ -36,7 +36,7 @@ function formatMoney(cents: number, currency = "CAD") {
   return new Intl.NumberFormat("en-CA", { style: "currency", currency, maximumFractionDigits: 0 }).format(cents / 100);
 }
 
-type Tab = "overview" | "appointments" | "treatments" | "photos" | "payments" | "consents" | "soap" | "communication" | "files" | "loyalty";
+type Tab = "overview" | "appointments" | "treatments" | "photos" | "payments" | "consents" | "soap" | "communication" | "files" | "loyalty" | "reviews" | "referrals";
 
 function ClientDetailPage() {
   const { clientId } = Route.useParams();
@@ -166,6 +166,8 @@ function ClientDetailPage() {
     { id: "payments", label: "Payments", icon: <Receipt className="h-3.5 w-3.5" />, count: invoices.length },
     { id: "consents", label: "Consents", icon: <PenLine className="h-3.5 w-3.5" />, count: signedConsents.length },
     { id: "soap", label: "Notes", icon: <FileText className="h-3.5 w-3.5" />, count: soapNotes.length },
+    { id: "reviews", label: "Reviews", icon: <Star className="h-3.5 w-3.5" /> },
+    { id: "referrals", label: "Referrals", icon: <Gift className="h-3.5 w-3.5" /> },
     { id: "communication", label: "Comms", icon: <MessageSquare className="h-3.5 w-3.5" /> },
     { id: "files", label: "Files", icon: <File className="h-3.5 w-3.5" /> },
     { id: "loyalty", label: "Loyalty", icon: <Award className="h-3.5 w-3.5" /> },
@@ -332,6 +334,8 @@ function ClientDetailPage() {
           {activeTab === "communication" && <PlaceholderTab title="Communication" description="Message history will show SMS, email, and WhatsApp conversations." icon={<MessageSquare className="h-8 w-8" />} />}
           {activeTab === "files" && <PlaceholderTab title="Files" description="Upload and manage client documents — IDs, insurance, referrals." icon={<File className="h-8 w-8" />} />}
           {activeTab === "loyalty" && <LoyaltyTab loyalty={loyaltyAccount} packages={clientPackages} currency={currency} />}
+          {activeTab === "reviews" && <ReviewsTab clientId={clientId} clinicId={activeClinic?.clinic_id ?? ""} />}
+          {activeTab === "referrals" && <ReferralsTab clientId={clientId} clinicId={activeClinic?.clinic_id ?? ""} currency={currency} />}
         </section>
 
         {/* Sidebar */}

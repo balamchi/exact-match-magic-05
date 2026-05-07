@@ -38,6 +38,10 @@ interface Stats {
   newLeadsWeek: number;
   leadConversionRate: number;
   topLeadSource: string;
+  recentReviews7d: number;
+  avgRating30d: number | null;
+  activeReferrals: number;
+  rewardsIssuedCents30d: number;
 }
 
 interface TodayAppt {
@@ -105,10 +109,14 @@ function Dashboard() {
     const endOfLastMonth = startOfMonth;
     const startOfWeek = new Date(now.getTime() - (now.getDay() || 7) * 86400000).toISOString();
 
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000).toISOString();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000).toISOString();
+
     const [
       todayList, yesterdayRes, monthRes, lastMonthRes, monthClientsRes, lastMonthClientsRes,
       inv, tasks, invItems, locRes, weekClientsRes,
       recentApptsRes, birthdayRes, leadsRes,
+      reviews7dRes, reviews30dRes, activeReferralsRes, rewards30dRes,
     ] = await Promise.all([
       supabase.from("appointments")
         .select("id, starts_at, ends_at, status, price_cents, client:clients(first_name,last_name), service:services(name), staff:staff(display_name,color)")
@@ -156,6 +164,11 @@ function Dashboard() {
       supabase.from("leads")
         .select("id, stage, source, created_at")
         .eq("clinic_id", clinicId),
+      // Reviews & Referrals KPIs
+      supabase.from("reviews").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).gte("created_at", sevenDaysAgo),
+      supabase.from("reviews").select("rating").eq("clinic_id", clinicId).gte("created_at", thirtyDaysAgo),
+      supabase.from("referrals").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).not("status", "in", '("rewarded","expired")'),
+      supabase.from("referral_rewards").select("amount_cents").eq("clinic_id", clinicId).gte("created_at", thirtyDaysAgo),
     ]);
 
     const todayRows = (todayList.data ?? []) as unknown as TodayAppt[];
@@ -210,6 +223,13 @@ function Dashboard() {
     allLeads.forEach((l) => { const s = l.source || "other"; leadSourceCounts[s] = (leadSourceCounts[s] ?? 0) + 1; });
     const topLeadSource = Object.entries(leadSourceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
 
+    // Reviews & Referrals KPIs
+    const recentReviews7d = reviews7dRes.count ?? 0;
+    const reviews30dData = (reviews30dRes.data ?? []) as { rating: number }[];
+    const avgRating30d = reviews30dData.length > 0 ? Math.round((reviews30dData.reduce((s, r) => s + r.rating, 0) / reviews30dData.length) * 10) / 10 : null;
+    const activeReferrals = activeReferralsRes.count ?? 0;
+    const rewardsIssuedCents30d = ((rewards30dRes.data ?? []) as { amount_cents: number }[]).reduce((s, r) => s + (r.amount_cents ?? 0), 0);
+
     setStats({
       todayAppointments: todayRows.length,
       todayRevenueCents: todayRevenue,
@@ -231,6 +251,10 @@ function Dashboard() {
       newLeadsWeek,
       leadConversionRate,
       topLeadSource,
+      recentReviews7d,
+      avgRating30d,
+      activeReferrals,
+      rewardsIssuedCents30d,
     });
 
     setLowStock(invItemsData.filter((i) => i.stock_quantity <= i.reorder_threshold).slice(0, 5));
@@ -394,6 +418,14 @@ function Dashboard() {
         <MiniKpi label="New Leads (Week)" value={stats?.newLeadsWeek ?? 0} loading={loading} />
         <MiniKpi label="Lead Conversion" value={`${stats?.leadConversionRate ?? 0}%`} loading={loading} />
         <MiniKpi label="Top Lead Source" value={stats?.topLeadSource ?? "—"} loading={loading} />
+      </div>
+
+      {/* Reviews & Referrals KPIs */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <MiniKpi label="Recent Reviews (7d)" value={stats?.recentReviews7d ?? 0} loading={loading} />
+        <MiniKpi label="Avg Rating (30d)" value={stats?.avgRating30d != null ? `${stats.avgRating30d}★` : "—"} loading={loading} />
+        <MiniKpi label="Active Referrals" value={stats?.activeReferrals ?? 0} loading={loading} />
+        <MiniKpi label="Rewards Issued (30d)" value={formatMoney(stats?.rewardsIssuedCents30d ?? 0, currency)} loading={loading} />
       </div>
 
       {/* Secondary KPI Cards */}

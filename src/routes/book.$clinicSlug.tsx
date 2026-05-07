@@ -162,10 +162,13 @@ function PublicBookingPage() {
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [honeypot, setHoneypot] = useState("");
 
+  // Referral code support
+  const [refCode, setRefCode] = useState("");
+  const [refBanner, setRefBanner] = useState<{ name: string; description: string; codeId: string; referrerClientId: string } | null>(null);
+
   // Category accordion state
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
-  // Popularity data: service_id → booking count (last 90 days)
   const [popularity, setPopularity] = useState<Map<string, number>>(new Map());
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -237,6 +240,41 @@ function PublicBookingPage() {
     // If fewer than 2 categories, expand all
     if (sortedCats.length <= 2) sortedCats.forEach(([cat]) => defaultExpanded.add(cat));
     setExpandedCats(defaultExpanded);
+
+    // Check for referral code in URL
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("ref");
+      if (code && c) {
+        setRefCode(code);
+        const { data: codeData } = await supabase
+          .from("referral_codes")
+          .select("id, client_id, code")
+          .eq("code", code)
+          .eq("clinic_id", c.id)
+          .eq("is_active", true)
+          .maybeSingle();
+        if (codeData) {
+          const { data: referrer } = await supabase
+            .from("clients")
+            .select("first_name, last_name")
+            .eq("id", codeData.client_id)
+            .single();
+          const { data: refSettings } = await supabase
+            .from("referral_settings")
+            .select("reward_description")
+            .eq("clinic_id", c.id)
+            .maybeSingle();
+          const referrerName = referrer ? [referrer.first_name, referrer.last_name].filter(Boolean).join(" ") : "a friend";
+          setRefBanner({
+            name: referrerName,
+            description: refSettings?.reward_description ?? "a special reward",
+            codeId: codeData.id,
+            referrerClientId: codeData.client_id,
+          });
+        }
+      }
+    }
 
     setLoading(false);
   };
@@ -369,6 +407,26 @@ function PublicBookingPage() {
       }
 
       setConfirmationId(body.appointmentId?.slice(-6)?.toUpperCase() ?? "");
+
+      // Create referral record if referral code was used
+      if (refBanner && clinic) {
+        try {
+          await supabase.from("referrals").insert({
+            clinic_id: clinic.id,
+            referrer_client_id: refBanner.referrerClientId,
+            referrer_code_id: refBanner.codeId,
+            referrer_name: refBanner.name,
+            referred_name: `${state.firstName.trim()} ${state.lastName.trim()}`,
+            referred_email: state.email.trim(),
+            referee_phone: state.phone.trim(),
+            status: "signed_up",
+            notes: `Booked via booking widget with code ${refCode}`,
+          });
+        } catch (refErr) {
+          console.error("Referral creation failed (non-critical):", refErr);
+        }
+      }
+
       setSubmitted(true);
     } catch {
       toast.error("Network error. Please check your connection and try again.");
@@ -596,6 +654,14 @@ function PublicBookingPage() {
 
   return (
     <BookingShell clinic={clinic}>
+      {/* Referral banner */}
+      {refBanner && (
+        <div className="mx-auto max-w-2xl px-4 pt-4">
+          <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 px-4 py-3 text-sm text-purple-300">
+            🎁 You've been referred by <strong className="text-white">{refBanner.name}</strong>! Get <strong className="text-white">{refBanner.description}</strong> on your first visit.
+          </div>
+        </div>
+      )}
       <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10 pb-28">
         {/* Stepper */}
         <nav aria-label="Booking steps" className="mb-8">

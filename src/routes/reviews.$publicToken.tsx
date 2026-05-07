@@ -28,6 +28,7 @@ interface ReviewSettings {
   smart_filter_enabled: boolean;
   google_business_url: string | null;
   internal_thank_you_message: string | null;
+  negative_feedback_alert_email: string | null;
 }
 
 function PublicReviewPage() {
@@ -85,7 +86,7 @@ function PublicReviewPage() {
       // Fetch clinic info + settings
       const [clinicRes, settingsRes] = await Promise.all([
         supabase.from("clinics").select("name, logo_url, primary_color").eq("id", reqData.clinic_id).single(),
-        supabase.from("review_settings").select("smart_filter_enabled, google_business_url, internal_thank_you_message").eq("clinic_id", reqData.clinic_id).maybeSingle(),
+        supabase.from("review_settings").select("smart_filter_enabled, google_business_url, internal_thank_you_message, negative_feedback_alert_email").eq("clinic_id", reqData.clinic_id).maybeSingle(),
       ]);
 
       setClinic(clinicRes.data as ClinicData | null);
@@ -111,11 +112,11 @@ function PublicReviewPage() {
     if (!request || !rating) return;
     setSubmitting(true);
 
-    const { error: insertErr } = await supabase.from("reviews").insert({
+    const { data: insertedReview, error: insertErr } = await supabase.from("reviews").insert({
       clinic_id: request.clinic_id,
       client_id: request.client_id,
       request_id: request.id,
-      reviewer_name: "Client", // Will be resolved by client_id
+      reviewer_name: "Client",
       rating,
       title: title.trim() || null,
       body: body.trim() || null,
@@ -125,7 +126,7 @@ function PublicReviewPage() {
       is_responded: false,
       is_published: true,
       posted_at: new Date().toISOString(),
-    });
+    }).select("id").single();
 
     if (insertErr) {
       setSubmitting(false);
@@ -134,6 +135,35 @@ function PublicReviewPage() {
 
     // Mark request completed
     await supabase.from("review_requests").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", request.id);
+
+    // Negative review alert — send email to clinic if rating <= 3
+    if (rating <= 3 && settings?.negative_feedback_alert_email) {
+      try {
+        // Lookup client name
+        const { data: clientData } = await supabase.from("clients").select("first_name, last_name").eq("id", request.client_id).maybeSingle();
+        const clientName = clientData ? [clientData.first_name, clientData.last_name].filter(Boolean).join(" ") : "Unknown";
+
+        // Enqueue alert email via RPC (same pattern as booking-confirmation)
+        await supabase.rpc("enqueue_email" as any, {
+          queue_name: "transactional_emails",
+          payload: {
+            templateName: "negative-review-alert",
+            recipientEmail: settings.negative_feedback_alert_email,
+            idempotencyKey: `neg-review-${insertedReview?.id}`,
+            data: {
+              clinicName: clinic?.name ?? "Your Clinic",
+              rating,
+              title: title.trim() || undefined,
+              body: body.trim() || undefined,
+              clientName,
+              submittedAt: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
+            },
+          },
+        });
+      } catch (emailErr) {
+        console.error("Negative review alert email failed (non-critical):", emailErr);
+      }
+    }
 
     setStep("done");
     setSubmitting(false);
