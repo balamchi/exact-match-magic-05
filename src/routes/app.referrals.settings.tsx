@@ -75,11 +75,11 @@ function ReferralSettingsPage() {
     const payload = {
       clinic_id: clinicId,
       is_enabled: settings.is_enabled,
-      reward_type: settings.reward_type,
+      reward_type: settings.reward_type as "credit" | "percentage" | "free_service" | "custom",
       reward_value: settings.reward_value,
       reward_description: settings.reward_description || null,
       referee_reward_enabled: settings.referee_reward_enabled,
-      referee_reward_type: settings.referee_reward_type,
+      referee_reward_type: settings.referee_reward_type as "credit" | "percentage" | "free_service" | "custom",
       referee_reward_value: settings.referee_reward_value,
       terms_text: settings.terms_text || null,
     };

@@ -110,11 +110,11 @@ function PublicReferralPage() {
       reward_cents: 0,
     });
 
-    // Increment code usage
-    await supabase.rpc("increment_referral_code_usage" as any, { code_id: codeData.id }).catch(() => {
-      // If RPC doesn't exist, manually update
-      supabase.from("referral_codes").update({ times_used: 1 }).eq("id", codeData.id); // best effort
-    });
+    // Increment code usage (best effort)
+    try {
+      await supabase.from("referral_codes").update({ times_used: (codeData as any).times_used ? (codeData as any).times_used + 1 : 1 }).eq("id", codeData.id);
+    } catch {}
+
 
     setStep("done");
     setSubmitting(false);
