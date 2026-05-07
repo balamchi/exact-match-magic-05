@@ -111,11 +111,11 @@ function PublicReviewPage() {
     if (!request || !rating) return;
     setSubmitting(true);
 
-    const { error: insertErr } = await supabase.from("reviews").insert({
+    const { data: insertedReview, error: insertErr } = await supabase.from("reviews").insert({
       clinic_id: request.clinic_id,
       client_id: request.client_id,
       request_id: request.id,
-      reviewer_name: "Client", // Will be resolved by client_id
+      reviewer_name: "Client",
       rating,
       title: title.trim() || null,
       body: body.trim() || null,
@@ -125,7 +125,7 @@ function PublicReviewPage() {
       is_responded: false,
       is_published: true,
       posted_at: new Date().toISOString(),
-    });
+    }).select("id").single();
 
     if (insertErr) {
       setSubmitting(false);
