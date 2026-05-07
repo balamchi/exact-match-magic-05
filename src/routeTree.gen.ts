@@ -104,6 +104,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable.e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable.email.auth.webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable.email.auth.preview'
 import { Route as AppStaffHrStaffIdRouteImport } from './routes/app.staff.hr.$staffId'
+import { Route as AppClinicalSoapNotesNoteIdRouteImport } from './routes/app.clinical.soap-notes.$noteId'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -586,6 +587,12 @@ const AppStaffHrStaffIdRoute = AppStaffHrStaffIdRouteImport.update({
   path: '/hr/$staffId',
   getParentRoute: () => AppStaffRoute,
 } as any)
+const AppClinicalSoapNotesNoteIdRoute =
+  AppClinicalSoapNotesNoteIdRouteImport.update({
+    id: '/$noteId',
+    path: '/$noteId',
+    getParentRoute: () => AppClinicalSoapNotesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -676,6 +683,7 @@ export interface FileRoutesByFullPath {
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
+  '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -770,6 +778,7 @@ export interface FileRoutesByTo {
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals': typeof AppReferralsIndexRoute
   '/app/reviews': typeof AppReviewsIndexRoute
+  '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -868,6 +877,7 @@ export interface FileRoutesById {
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
+  '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -967,6 +977,7 @@ export interface FileRouteTypes {
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
     | '/app/reviews/'
+    | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1061,6 +1072,7 @@ export interface FileRouteTypes {
     | '/refer/$clinicSlug/$code'
     | '/app/referrals'
     | '/app/reviews'
+    | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1158,6 +1170,7 @@ export interface FileRouteTypes {
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
     | '/app/reviews/'
+    | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1863,6 +1876,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStaffHrStaffIdRouteImport
       parentRoute: typeof AppStaffRoute
     }
+    '/app/clinical/soap-notes/$noteId': {
+      id: '/app/clinical/soap-notes/$noteId'
+      path: '/$noteId'
+      fullPath: '/app/clinical/soap-notes/$noteId'
+      preLoaderRoute: typeof AppClinicalSoapNotesNoteIdRouteImport
+      parentRoute: typeof AppClinicalSoapNotesRoute
+    }
   }
 }
 
@@ -1889,10 +1909,12 @@ const ApiRouteChildren: ApiRouteChildren = {
 const ApiRouteWithChildren = ApiRoute._addFileChildren(ApiRouteChildren)
 
 interface AppClinicalSoapNotesRouteChildren {
+  AppClinicalSoapNotesNoteIdRoute: typeof AppClinicalSoapNotesNoteIdRoute
   AppClinicalSoapNotesIndexRoute: typeof AppClinicalSoapNotesIndexRoute
 }
 
 const AppClinicalSoapNotesRouteChildren: AppClinicalSoapNotesRouteChildren = {
+  AppClinicalSoapNotesNoteIdRoute: AppClinicalSoapNotesNoteIdRoute,
   AppClinicalSoapNotesIndexRoute: AppClinicalSoapNotesIndexRoute,
 }
 
