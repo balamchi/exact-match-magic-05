@@ -269,7 +269,7 @@ function TreatmentPlansDashboard() {
                         <CheckCircle2 className="h-3.5 w-3.5" /> Record Session
                       </Button>
                     )}
-                    {detail.status === "draft" && (
+                    {(detail.status === "proposed" || detail.status === "accepted") && (
                       <Button size="sm" variant="outline" onClick={() => updateStatus(detail.id, "in_progress")}>Start Plan</Button>
                     )}
                     {detail.status !== "cancelled" && detail.status !== "completed" && (
