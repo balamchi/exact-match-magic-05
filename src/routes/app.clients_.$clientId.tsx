@@ -686,10 +686,6 @@ function TreatmentPlansTab({ plans }: { plans: any[] }) {
     </div>
   );
 }
-      ))}
-    </div>
-  );
-}
 
 function LoyaltyTab({ loyalty, packages, currency }: { loyalty: any; packages: any[]; currency: string }) {
   return (
