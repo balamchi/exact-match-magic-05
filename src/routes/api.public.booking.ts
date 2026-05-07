@@ -17,6 +17,7 @@ const BookingSchema = z.object({
   reminderConsent: z.boolean().optional(),
   marketingConsent: z.boolean().optional(),
   honeypot: z.string().optional(),
+  refCode: z.string().max(50).nullable().optional(),
 });
 
 const CORS = {
