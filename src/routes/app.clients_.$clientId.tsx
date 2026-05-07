@@ -766,7 +766,7 @@ function ReviewsTab({ clientId, clinicId }: { clientId: string; clinicId: string
             <div className="flex">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`h-4 w-4 ${i < (r.rating ?? 0) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />)}</div>
             <span className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</span>
           </div>
-          {r.feedback && <p className="mt-2 text-sm text-foreground/80">{r.feedback}</p>}
+          {r.body && <p className="mt-2 text-sm text-foreground/80">{r.body}</p>}
         </div>
       ))}
     </div>
