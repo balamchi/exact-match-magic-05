@@ -1395,43 +1395,130 @@ export type Database = {
           },
         ]
       }
-      leads: {
+      lead_activities: {
+        Row: {
+          activity_type: Database["public"]["Enums"]["lead_activity_type"]
+          clinic_id: string
+          created_at: string
+          description: string | null
+          id: string
+          lead_id: string
+          metadata: Json | null
+          performed_by: string | null
+        }
+        Insert: {
+          activity_type?: Database["public"]["Enums"]["lead_activity_type"]
+          clinic_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          lead_id: string
+          metadata?: Json | null
+          performed_by?: string | null
+        }
+        Update: {
+          activity_type?: Database["public"]["Enums"]["lead_activity_type"]
+          clinic_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          lead_id?: string
+          metadata?: Json | null
+          performed_by?: string | null
+        }
+        Relationships: []
+      }
+      lead_sources_config: {
         Row: {
           clinic_id: string
           created_at: string
-          email: string | null
-          estimated_value_cents: number
+          display_name: string
           id: string
-          name: string
-          notes: string | null
-          phone: string | null
-          source: string | null
-          stage: Database["public"]["Enums"]["lead_stage"]
-          updated_at: string
+          is_active: boolean
+          source_key: string
         }
         Insert: {
           clinic_id: string
           created_at?: string
-          email?: string | null
-          estimated_value_cents?: number
+          display_name: string
           id?: string
-          name: string
-          notes?: string | null
-          phone?: string | null
-          source?: string | null
-          stage?: Database["public"]["Enums"]["lead_stage"]
-          updated_at?: string
+          is_active?: boolean
+          source_key: string
         }
         Update: {
           clinic_id?: string
           created_at?: string
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          source_key?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          assigned_to: string | null
+          clinic_id: string
+          converted_to_client_id: string | null
+          created_at: string
+          email: string | null
+          estimated_value_cents: number
+          first_name: string
+          id: string
+          last_contacted_at: string | null
+          last_name: string | null
+          lost_reason: string | null
+          name: string
+          next_follow_up_at: string | null
+          notes: string | null
+          phone: string | null
+          service_interest: string | null
+          source: string | null
+          source_details: string | null
+          stage: Database["public"]["Enums"]["lead_stage"]
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          clinic_id: string
+          converted_to_client_id?: string | null
+          created_at?: string
           email?: string | null
           estimated_value_cents?: number
+          first_name?: string
           id?: string
-          name?: string
+          last_contacted_at?: string | null
+          last_name?: string | null
+          lost_reason?: string | null
+          name: string
+          next_follow_up_at?: string | null
           notes?: string | null
           phone?: string | null
+          service_interest?: string | null
           source?: string | null
+          source_details?: string | null
+          stage?: Database["public"]["Enums"]["lead_stage"]
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          clinic_id?: string
+          converted_to_client_id?: string | null
+          created_at?: string
+          email?: string | null
+          estimated_value_cents?: number
+          first_name?: string
+          id?: string
+          last_contacted_at?: string | null
+          last_name?: string | null
+          lost_reason?: string | null
+          name?: string
+          next_follow_up_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          service_interest?: string | null
+          source?: string | null
+          source_details?: string | null
           stage?: Database["public"]["Enums"]["lead_stage"]
           updated_at?: string
         }
@@ -2826,10 +2913,23 @@ export type Database = {
         | "cancelled"
       clinic_role: "owner" | "admin" | "provider" | "front_desk"
       deposit_status: "pending" | "collected" | "refunded" | "forfeited"
+      lead_activity_type:
+        | "stage_change"
+        | "note"
+        | "call_made"
+        | "email_sent"
+        | "sms_sent"
+        | "meeting_booked"
+        | "appointment_booked"
+        | "converted"
+        | "follow_up_set"
       lead_stage:
         | "new"
         | "contacted"
         | "qualified"
+        | "consultation_booked"
+        | "treatment_booked"
+        | "converted"
         | "consult_booked"
         | "won"
         | "lost"
@@ -2971,10 +3071,24 @@ export const Constants = {
       ],
       clinic_role: ["owner", "admin", "provider", "front_desk"],
       deposit_status: ["pending", "collected", "refunded", "forfeited"],
+      lead_activity_type: [
+        "stage_change",
+        "note",
+        "call_made",
+        "email_sent",
+        "sms_sent",
+        "meeting_booked",
+        "appointment_booked",
+        "converted",
+        "follow_up_set",
+      ],
       lead_stage: [
         "new",
         "contacted",
         "qualified",
+        "consultation_booked",
+        "treatment_booked",
+        "converted",
         "consult_booked",
         "won",
         "lost",

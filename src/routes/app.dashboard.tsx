@@ -34,6 +34,10 @@ interface Stats {
   confirmedToday: number;
   checkedInToday: number;
   completedToday: number;
+  activeLeads: number;
+  newLeadsWeek: number;
+  leadConversionRate: number;
+  topLeadSource: string;
 }
 
 interface TodayAppt {
@@ -104,7 +108,7 @@ function Dashboard() {
     const [
       todayList, yesterdayRes, monthRes, lastMonthRes, monthClientsRes, lastMonthClientsRes,
       inv, tasks, invItems, locRes, weekClientsRes,
-      recentApptsRes, birthdayRes,
+      recentApptsRes, birthdayRes, leadsRes,
     ] = await Promise.all([
       supabase.from("appointments")
         .select("id, starts_at, ends_at, status, price_cents, client:clients(first_name,last_name), service:services(name), staff:staff(display_name,color)")
@@ -149,6 +153,9 @@ function Dashboard() {
         .select("id, first_name, last_name, date_of_birth, vip_status")
         .eq("clinic_id", clinicId)
         .not("date_of_birth", "is", null),
+      supabase.from("leads")
+        .select("id, stage, source, created_at")
+        .eq("clinic_id", clinicId),
     ]);
 
     const todayRows = (todayList.data ?? []) as unknown as TodayAppt[];
@@ -192,6 +199,17 @@ function Dashboard() {
     const invItemsData = invItems.data ?? [];
     const inventoryValueCents = invItemsData.reduce((s, i) => s + (i.stock_quantity * i.unit_cost_cents), 0);
 
+    // Leads
+    const allLeads = leadsRes.data ?? [];
+    const activeLeads = allLeads.filter((l) => l.stage !== "converted" && l.stage !== "lost" && l.stage !== "won").length;
+    const newLeadsWeek = allLeads.filter((l) => l.created_at >= startOfWeek).length;
+    const totalLeads = allLeads.length;
+    const convertedLeads = allLeads.filter((l) => l.stage === "converted" || l.stage === "won").length;
+    const leadConversionRate = totalLeads > 0 ? Math.round((convertedLeads / totalLeads) * 100) : 0;
+    const leadSourceCounts: Record<string, number> = {};
+    allLeads.forEach((l) => { const s = l.source || "other"; leadSourceCounts[s] = (leadSourceCounts[s] ?? 0) + 1; });
+    const topLeadSource = Object.entries(leadSourceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
+
     setStats({
       todayAppointments: todayRows.length,
       todayRevenueCents: todayRevenue,
@@ -209,6 +227,10 @@ function Dashboard() {
       confirmedToday,
       checkedInToday,
       completedToday,
+      activeLeads,
+      newLeadsWeek,
+      leadConversionRate,
+      topLeadSource,
     });
 
     setLowStock(invItemsData.filter((i) => i.stock_quantity <= i.reorder_threshold).slice(0, 5));
@@ -364,6 +386,14 @@ function Dashboard() {
           sub="This month vs last"
           loading={loading}
         />
+      </div>
+
+      {/* Lead Pipeline KPIs */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <MiniKpi label="Active Leads" value={stats?.activeLeads ?? 0} loading={loading} />
+        <MiniKpi label="New Leads (Week)" value={stats?.newLeadsWeek ?? 0} loading={loading} />
+        <MiniKpi label="Lead Conversion" value={`${stats?.leadConversionRate ?? 0}%`} loading={loading} />
+        <MiniKpi label="Top Lead Source" value={stats?.topLeadSource ?? "—"} loading={loading} />
       </div>
 
       {/* Secondary KPI Cards */}

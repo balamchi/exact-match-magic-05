@@ -201,20 +201,34 @@ export const Route = createFileRoute("/api/public/booking")({
             return new Response(JSON.stringify({ error: "Could not create appointment" }), { status: 500, headers: CORS });
           }
 
-          // Create lead for tracking
+          // Create lead for pipeline tracking
           try {
-            await supabaseAdmin.from("leads").insert({
+            const { data: leadRow } = await supabaseAdmin.from("leads").insert({
               clinic_id: clinic.id,
+              first_name: data.firstName,
+              last_name: data.lastName,
               name: `${data.firstName} ${data.lastName}`,
               email: data.email,
               phone: data.phone,
-              source: "online_booking",
-              stage: "won",
+              source: "booking_widget",
+              stage: "treatment_booked",
               estimated_value_cents: service.price_cents,
-              notes: `Booked ${service.name} on ${data.date} at ${data.time} via public booking`,
-            });
+              service_interest: data.serviceId,
+              notes: `Booked ${service.name} on ${data.date} at ${data.time} via public booking widget`,
+            }).select("id").single();
+
+            // Log activity on the lead
+            if (leadRow) {
+              await supabaseAdmin.from("lead_activities").insert({
+                lead_id: leadRow.id,
+                clinic_id: clinic.id,
+                activity_type: "appointment_booked",
+                description: `Booked ${service.name} for ${data.date} at ${data.time}`,
+                metadata: { appointment_id: appt.id, service_id: data.serviceId },
+              });
+            }
           } catch {
-            // non-critical
+            // non-critical — don't fail the booking
           }
 
           // Send confirmation email via transactional email system

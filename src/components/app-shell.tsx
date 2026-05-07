@@ -3,7 +3,7 @@ import { GlobalSearch } from "@/components/global-search";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
-  Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare,
+  Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare, Flame,
   Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
@@ -46,7 +46,7 @@ const NAV: NavGroup[] = [
       { to: "/app/services", label: "Services", icon: HeartPulse },
       { to: "/app/staff", label: "Staff", icon: UserCog },
       { to: "/app/locations", label: "Locations", icon: MapPin },
-      { to: "/app/leads", label: "Leads", icon: Target },
+      { to: "/app/leads", label: "Leads", icon: Flame },
     ],
   },
   {
