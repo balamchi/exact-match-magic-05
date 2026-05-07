@@ -38,6 +38,10 @@ interface Stats {
   newLeadsWeek: number;
   leadConversionRate: number;
   topLeadSource: string;
+  recentReviews7d: number;
+  avgRating30d: number | null;
+  activeReferrals: number;
+  rewardsIssuedCents30d: number;
 }
 
 interface TodayAppt {
