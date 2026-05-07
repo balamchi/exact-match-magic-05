@@ -28,6 +28,7 @@ interface ReviewSettings {
   smart_filter_enabled: boolean;
   google_business_url: string | null;
   internal_thank_you_message: string | null;
+  negative_feedback_alert_email: string | null;
 }
 
 function PublicReviewPage() {
