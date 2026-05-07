@@ -34,6 +34,10 @@ interface Stats {
   confirmedToday: number;
   checkedInToday: number;
   completedToday: number;
+  activeLeads: number;
+  newLeadsWeek: number;
+  leadConversionRate: number;
+  topLeadSource: string;
 }
 
 interface TodayAppt {
