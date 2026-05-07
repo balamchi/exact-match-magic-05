@@ -93,6 +93,7 @@ function ClientDetailPage() {
       setSignedConsents(unwrap(results[6], "Consents") ?? []);
       setLoyaltyAccount(unwrap(results[7], "Loyalty") ?? null);
       setClientPackages((unwrap(results[8], "Packages") ?? []) as any[]);
+      setTreatmentPlans((unwrap(results[9], "Plans") ?? []) as any[]);
       setLoading(false);
     };
     load();
