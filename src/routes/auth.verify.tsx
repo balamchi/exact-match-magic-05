@@ -47,7 +47,7 @@ function Verify() {
 
     verify();
     return () => { cancelled = true; };
-  }, [navigate, refreshMemberships]);
+  }, [refreshMemberships]);
 
   const handleResend = async () => {
     if (!resendEmail || resendBusy) return;
