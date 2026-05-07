@@ -199,6 +199,17 @@ function Dashboard() {
     const invItemsData = invItems.data ?? [];
     const inventoryValueCents = invItemsData.reduce((s, i) => s + (i.stock_quantity * i.unit_cost_cents), 0);
 
+    // Leads
+    const allLeads = leadsRes.data ?? [];
+    const activeLeads = allLeads.filter((l) => l.stage !== "converted" && l.stage !== "lost" && l.stage !== "won").length;
+    const newLeadsWeek = allLeads.filter((l) => l.created_at >= startOfWeek).length;
+    const totalLeads = allLeads.length;
+    const convertedLeads = allLeads.filter((l) => l.stage === "converted" || l.stage === "won").length;
+    const leadConversionRate = totalLeads > 0 ? Math.round((convertedLeads / totalLeads) * 100) : 0;
+    const leadSourceCounts: Record<string, number> = {};
+    allLeads.forEach((l) => { const s = l.source || "other"; leadSourceCounts[s] = (leadSourceCounts[s] ?? 0) + 1; });
+    const topLeadSource = Object.entries(leadSourceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
+
     setStats({
       todayAppointments: todayRows.length,
       todayRevenueCents: todayRevenue,
@@ -216,6 +227,10 @@ function Dashboard() {
       confirmedToday,
       checkedInToday,
       completedToday,
+      activeLeads,
+      newLeadsWeek,
+      leadConversionRate,
+      topLeadSource,
     });
 
     setLowStock(invItemsData.filter((i) => i.stock_quantity <= i.reorder_threshold).slice(0, 5));
