@@ -334,6 +334,8 @@ function ClientDetailPage() {
           {activeTab === "communication" && <PlaceholderTab title="Communication" description="Message history will show SMS, email, and WhatsApp conversations." icon={<MessageSquare className="h-8 w-8" />} />}
           {activeTab === "files" && <PlaceholderTab title="Files" description="Upload and manage client documents — IDs, insurance, referrals." icon={<File className="h-8 w-8" />} />}
           {activeTab === "loyalty" && <LoyaltyTab loyalty={loyaltyAccount} packages={clientPackages} currency={currency} />}
+          {activeTab === "reviews" && <ReviewsTab clientId={clientId} clinicId={activeClinic?.clinic_id ?? ""} />}
+          {activeTab === "referrals" && <ReferralsTab clientId={clientId} clinicId={activeClinic?.clinic_id ?? ""} currency={currency} />}
         </section>
 
         {/* Sidebar */}
