@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles,
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
   AlertTriangle, Pill, ShieldAlert, Crown, Ban, XCircle, Receipt, PenLine,
   MoreHorizontal, UserPlus, CreditCard, MessageSquare, Gift, Star,
-  Heart, Award, Package, File, Send, Search, ArrowRight,
+  Heart, Award, Package, File, Send, Search, ArrowRight, Share2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -738,6 +739,71 @@ function SpendingBreakdown({ appointments, currency }: { appointments: Appointme
         <div key={name}>
           <div className="flex items-center justify-between text-xs"><span className="truncate">{name}</span><span className="font-medium">{formatMoney(cents, currency)}</span></div>
           <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${(cents / max) * 100}%` }} /></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ReviewsTab({ clientId, clinicId }: { clientId: string; clinicId: string }) {
+  const { data: reviews, isLoading } = useQuery({
+    queryKey: ["client-reviews", clientId],
+    queryFn: async () => {
+      const { data } = await supabase.from("reviews").select("*").eq("clinic_id", clinicId).eq("client_id", clientId).order("created_at", { ascending: false });
+      return data ?? [];
+    },
+    enabled: !!clinicId,
+  });
+
+  if (isLoading) return <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">Loading reviews…</div>;
+  if (!reviews?.length) return <PlaceholderTab title="Reviews" description="No reviews from this client yet." icon={<Star className="h-8 w-8" />} />;
+
+  return (
+    <div className="space-y-3">
+      {reviews.map((r: any) => (
+        <div key={r.id} className="rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <div className="flex">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`h-4 w-4 ${i < (r.rating ?? 0) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />)}</div>
+            <span className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</span>
+          </div>
+          {r.body && <p className="mt-2 text-sm text-foreground/80">{r.body}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ReferralsTab({ clientId, clinicId, currency }: { clientId: string; clinicId: string; currency: string }) {
+  const { data: code, isLoading } = useQuery({
+    queryKey: ["client-referral", clientId],
+    queryFn: async () => {
+      const { data } = await supabase.from("referral_codes").select("*, referral_rewards(*)").eq("clinic_id", clinicId).eq("client_id", clientId).maybeSingle();
+      return data;
+    },
+    enabled: !!clinicId,
+  });
+
+  if (isLoading) return <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">Loading referrals…</div>;
+  if (!code) return <PlaceholderTab title="Referrals" description="No referral code assigned to this client." icon={<Share2 className="h-8 w-8" />} />;
+
+  const rewards = (code as any).referral_rewards ?? [];
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-border bg-card p-4">
+        <p className="text-xs text-muted-foreground">Referral Code</p>
+        <p className="mt-1 font-mono text-lg font-semibold">{code.code}</p>
+        <div className="mt-3 flex gap-4 text-sm text-muted-foreground">
+          <span>Uses: <strong className="text-foreground">{code.times_used ?? 0}</strong></span>
+          <span>Rewards: <strong className="text-foreground">{rewards.length}</strong></span>
+        </div>
+      </div>
+      {rewards.map((rw: any) => (
+        <div key={rw.id} className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium capitalize">{rw.reward_type?.replace("_", " ")}</p>
+            <p className="text-xs text-muted-foreground">{new Date(rw.created_at).toLocaleDateString()}</p>
+          </div>
+          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${rw.status === "redeemed" ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"}`}>{rw.status}</span>
         </div>
       ))}
     </div>
