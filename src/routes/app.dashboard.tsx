@@ -109,10 +109,14 @@ function Dashboard() {
     const endOfLastMonth = startOfMonth;
     const startOfWeek = new Date(now.getTime() - (now.getDay() || 7) * 86400000).toISOString();
 
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000).toISOString();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000).toISOString();
+
     const [
       todayList, yesterdayRes, monthRes, lastMonthRes, monthClientsRes, lastMonthClientsRes,
       inv, tasks, invItems, locRes, weekClientsRes,
       recentApptsRes, birthdayRes, leadsRes,
+      reviews7dRes, reviews30dRes, activeReferralsRes, rewards30dRes,
     ] = await Promise.all([
       supabase.from("appointments")
         .select("id, starts_at, ends_at, status, price_cents, client:clients(first_name,last_name), service:services(name), staff:staff(display_name,color)")
@@ -160,6 +164,11 @@ function Dashboard() {
       supabase.from("leads")
         .select("id, stage, source, created_at")
         .eq("clinic_id", clinicId),
+      // Reviews & Referrals KPIs
+      supabase.from("reviews").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).gte("created_at", sevenDaysAgo),
+      supabase.from("reviews").select("rating").eq("clinic_id", clinicId).gte("created_at", thirtyDaysAgo),
+      supabase.from("referrals").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).not("status", "in", '("rewarded","expired")'),
+      supabase.from("referral_rewards").select("amount_cents").eq("clinic_id", clinicId).gte("created_at", thirtyDaysAgo),
     ]);
 
     const todayRows = (todayList.data ?? []) as unknown as TodayAppt[];
