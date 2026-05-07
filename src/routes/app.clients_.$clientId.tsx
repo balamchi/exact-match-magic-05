@@ -749,7 +749,7 @@ function ReviewsTab({ clientId, clinicId }: { clientId: string; clinicId: string
   const { data: reviews, isLoading } = useQuery({
     queryKey: ["client-reviews", clientId],
     queryFn: async () => {
-      const { data } = await supabase.from("review_responses").select("*").eq("clinic_id", clinicId).eq("client_id", clientId).order("created_at", { ascending: false });
+      const { data } = await supabase.from("reviews").select("*").eq("clinic_id", clinicId).eq("client_id", clientId).order("created_at", { ascending: false });
       return data ?? [];
     },
     enabled: !!clinicId,
