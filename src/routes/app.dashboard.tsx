@@ -223,6 +223,13 @@ function Dashboard() {
     allLeads.forEach((l) => { const s = l.source || "other"; leadSourceCounts[s] = (leadSourceCounts[s] ?? 0) + 1; });
     const topLeadSource = Object.entries(leadSourceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
 
+    // Reviews & Referrals KPIs
+    const recentReviews7d = reviews7dRes.count ?? 0;
+    const reviews30dData = (reviews30dRes.data ?? []) as { rating: number }[];
+    const avgRating30d = reviews30dData.length > 0 ? Math.round((reviews30dData.reduce((s, r) => s + r.rating, 0) / reviews30dData.length) * 10) / 10 : null;
+    const activeReferrals = activeReferralsRes.count ?? 0;
+    const rewardsIssuedCents30d = ((rewards30dRes.data ?? []) as { amount_cents: number }[]).reduce((s, r) => s + (r.amount_cents ?? 0), 0);
+
     setStats({
       todayAppointments: todayRows.length,
       todayRevenueCents: todayRevenue,
@@ -244,6 +251,10 @@ function Dashboard() {
       newLeadsWeek,
       leadConversionRate,
       topLeadSource,
+      recentReviews7d,
+      avgRating30d,
+      activeReferrals,
+      rewardsIssuedCents30d,
     });
 
     setLowStock(invItemsData.filter((i) => i.stock_quantity <= i.reorder_threshold).slice(0, 5));
