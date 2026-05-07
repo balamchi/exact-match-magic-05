@@ -17,6 +17,7 @@ const BookingSchema = z.object({
   reminderConsent: z.boolean().optional(),
   marketingConsent: z.boolean().optional(),
   honeypot: z.string().optional(),
+  refCode: z.string().max(50).nullable().optional(),
 });
 
 const CORS = {
@@ -167,7 +168,7 @@ export const Route = createFileRoute("/api/public/booking")({
                 email_consent: data.reminderConsent ?? false,
                 marketing_consent: data.marketingConsent ?? false,
                 tags: ["online-booking"],
-                source: "online_booking",
+                source: data.refCode ? "referral" : "online_booking",
               })
               .select("id")
               .single();
@@ -210,7 +211,7 @@ export const Route = createFileRoute("/api/public/booking")({
               name: `${data.firstName} ${data.lastName}`,
               email: data.email,
               phone: data.phone,
-              source: "booking_widget",
+              source: data.refCode ? "referral" : "booking_widget",
               stage: "treatment_booked",
               estimated_value_cents: service.price_cents,
               service_interest: data.serviceId,
