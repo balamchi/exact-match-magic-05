@@ -64,11 +64,11 @@ function ClientDetailPage() {
       const results = await Promise.allSettled([
         supabase.from("clients").select("*").eq("id", clientId).eq("clinic_id", cid).maybeSingle(),
         supabase.from("appointments").select("*, services(name, category), staff(display_name, color)").eq("clinic_id", cid).eq("client_id", clientId).order("starts_at", { ascending: false }),
-        supabase.from("soap_notes").select("*").eq("clinic_id", cid).eq("client_id", clientId).order("visit_date", { ascending: false }),
+        supabase.from("soap_notes").select("*").eq("clinic_id", cid).eq("client_id", clientId).order("created_at", { ascending: false }),
         supabase.from("injection_sites").select("*").eq("clinic_id", cid).eq("client_id", clientId).order("visit_date", { ascending: false }),
         supabase.from("before_after_photos").select("*").eq("clinic_id", cid).eq("client_id", clientId).order("taken_on", { ascending: false }),
         supabase.from("invoices").select("*").eq("clinic_id", cid).eq("client_id", clientId).order("issued_on", { ascending: false }),
-        supabase.from("signed_consents").select("*").eq("clinic_id", cid).eq("client_id", clientId).order("signed_at", { ascending: false }),
+        supabase.from("consent_form_signatures").select("*, template:consent_form_templates(name)").eq("clinic_id", cid).eq("client_id", clientId).order("created_at", { ascending: false }),
         supabase.from("loyalty_accounts").select("*").eq("clinic_id", cid).eq("client_id", clientId).maybeSingle(),
         supabase.from("client_packages").select("*, package:packages(name)").eq("clinic_id", cid).eq("client_id", clientId).order("purchased_at", { ascending: false }),
       ]);
@@ -513,8 +513,9 @@ function SoapNotesList({ notes }: { notes: SoapNote[] }) {
         <li key={note.id} className="p-4 transition hover:bg-surface/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{new Date(note.visit_date).toLocaleDateString()}</span>
-              {note.signed && <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-emerald-400">Signed</span>}
+              <span className="font-medium">{new Date(note.created_at).toLocaleDateString()}</span>
+              {note.status === "finalized" && <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-emerald-400">Finalized</span>}
+              {note.status === "amended" && <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-400">Amended</span>}
             </div>
           </div>
           <div className="mt-2 grid gap-2 text-sm">

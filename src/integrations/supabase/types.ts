@@ -727,40 +727,267 @@ export type Database = {
         }
         Relationships: []
       }
-      consent_forms: {
+      consent_form_audit_log: {
         Row: {
-          active: boolean
-          body: string | null
+          action: Database["public"]["Enums"]["consent_audit_action"]
+          actor_id: string | null
+          actor_name: string
+          actor_type: Database["public"]["Enums"]["consent_actor_type"]
           clinic_id: string
           created_at: string
           id: string
-          title: string
-          updated_at: string
+          ip_address: string | null
+          metadata: Json | null
+          signature_id: string
+          user_agent: string | null
         }
         Insert: {
-          active?: boolean
-          body?: string | null
+          action: Database["public"]["Enums"]["consent_audit_action"]
+          actor_id?: string | null
+          actor_name?: string
+          actor_type?: Database["public"]["Enums"]["consent_actor_type"]
           clinic_id: string
           created_at?: string
           id?: string
-          title: string
-          updated_at?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          signature_id: string
+          user_agent?: string | null
         }
         Update: {
-          active?: boolean
-          body?: string | null
+          action?: Database["public"]["Enums"]["consent_audit_action"]
+          actor_id?: string | null
+          actor_name?: string
+          actor_type?: Database["public"]["Enums"]["consent_actor_type"]
           clinic_id?: string
           created_at?: string
           id?: string
-          title?: string
-          updated_at?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          signature_id?: string
+          user_agent?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "consent_forms_clinic_id_fkey"
+            foreignKeyName: "consent_form_audit_log_clinic_id_fkey"
             columns: ["clinic_id"]
             isOneToOne: false
             referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_form_audit_log_signature_id_fkey"
+            columns: ["signature_id"]
+            isOneToOne: false
+            referencedRelation: "consent_form_signatures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consent_form_signatures: {
+        Row: {
+          appointment_id: string | null
+          client_id: string
+          clinic_id: string
+          created_at: string
+          declined_reason: string | null
+          device_fingerprint: string | null
+          email_verified: boolean
+          expires_at: string | null
+          id: string
+          phone_verified: boolean
+          public_token: string
+          revocation_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          sent_at: string | null
+          service_id: string | null
+          signature_canvas_data: string | null
+          signature_checkbox_confirmed: boolean
+          signature_typed_name: string | null
+          signed_at: string | null
+          signed_html_snapshot: string
+          signer_geolocation: Json | null
+          signer_ip_address: string | null
+          signer_user_agent: string | null
+          status: Database["public"]["Enums"]["consent_signature_status"]
+          template_id: string
+          template_version: number
+          updated_at: string
+          viewed_at: string | null
+          witness_name: string | null
+          witness_relationship: string | null
+          witness_signature_data: string | null
+          witness_signed_at: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          client_id: string
+          clinic_id: string
+          created_at?: string
+          declined_reason?: string | null
+          device_fingerprint?: string | null
+          email_verified?: boolean
+          expires_at?: string | null
+          id?: string
+          phone_verified?: boolean
+          public_token?: string
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          sent_at?: string | null
+          service_id?: string | null
+          signature_canvas_data?: string | null
+          signature_checkbox_confirmed?: boolean
+          signature_typed_name?: string | null
+          signed_at?: string | null
+          signed_html_snapshot?: string
+          signer_geolocation?: Json | null
+          signer_ip_address?: string | null
+          signer_user_agent?: string | null
+          status?: Database["public"]["Enums"]["consent_signature_status"]
+          template_id: string
+          template_version?: number
+          updated_at?: string
+          viewed_at?: string | null
+          witness_name?: string | null
+          witness_relationship?: string | null
+          witness_signature_data?: string | null
+          witness_signed_at?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          client_id?: string
+          clinic_id?: string
+          created_at?: string
+          declined_reason?: string | null
+          device_fingerprint?: string | null
+          email_verified?: boolean
+          expires_at?: string | null
+          id?: string
+          phone_verified?: boolean
+          public_token?: string
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          sent_at?: string | null
+          service_id?: string | null
+          signature_canvas_data?: string | null
+          signature_checkbox_confirmed?: boolean
+          signature_typed_name?: string | null
+          signed_at?: string | null
+          signed_html_snapshot?: string
+          signer_geolocation?: Json | null
+          signer_ip_address?: string | null
+          signer_user_agent?: string | null
+          status?: Database["public"]["Enums"]["consent_signature_status"]
+          template_id?: string
+          template_version?: number
+          updated_at?: string
+          viewed_at?: string | null
+          witness_name?: string | null
+          witness_relationship?: string | null
+          witness_signature_data?: string | null
+          witness_signed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consent_form_signatures_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_form_signatures_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_form_signatures_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_form_signatures_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "clinic_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_form_signatures_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_form_signatures_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "consent_form_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consent_form_templates: {
+        Row: {
+          body_html: string
+          clinic_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_legal_template: boolean
+          name: string
+          requires_witness: boolean
+          service_id: string | null
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          body_html?: string
+          clinic_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_legal_template?: boolean
+          name: string
+          requires_witness?: boolean
+          service_id?: string | null
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          body_html?: string
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_legal_template?: boolean
+          name?: string
+          requires_witness?: boolean
+          service_id?: string | null
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consent_form_templates_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_form_templates_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -2561,50 +2788,148 @@ export type Database = {
         }
         Relationships: []
       }
-      soap_notes: {
+      soap_note_amendments: {
         Row: {
-          assessment: string | null
-          client_id: string | null
-          client_name: string
+          amended_at: string
+          amended_by: string
+          amendment_reason: string
           clinic_id: string
-          created_at: string
           id: string
-          objective: string | null
-          plan: string | null
-          signed: boolean
-          subjective: string | null
-          updated_at: string
-          visit_date: string
+          new_assessment: string
+          new_objective: string
+          new_plan: string
+          new_subjective: string
+          note_id: string
+          previous_assessment: string
+          previous_objective: string
+          previous_plan: string
+          previous_subjective: string
         }
         Insert: {
-          assessment?: string | null
-          client_id?: string | null
-          client_name: string
+          amended_at?: string
+          amended_by: string
+          amendment_reason: string
           clinic_id: string
-          created_at?: string
           id?: string
-          objective?: string | null
-          plan?: string | null
-          signed?: boolean
-          subjective?: string | null
-          updated_at?: string
-          visit_date?: string
+          new_assessment?: string
+          new_objective?: string
+          new_plan?: string
+          new_subjective?: string
+          note_id: string
+          previous_assessment?: string
+          previous_objective?: string
+          previous_plan?: string
+          previous_subjective?: string
         }
         Update: {
-          assessment?: string | null
-          client_id?: string | null
-          client_name?: string
+          amended_at?: string
+          amended_by?: string
+          amendment_reason?: string
           clinic_id?: string
-          created_at?: string
           id?: string
-          objective?: string | null
-          plan?: string | null
-          signed?: boolean
-          subjective?: string | null
-          updated_at?: string
-          visit_date?: string
+          new_assessment?: string
+          new_objective?: string
+          new_plan?: string
+          new_subjective?: string
+          note_id?: string
+          previous_assessment?: string
+          previous_objective?: string
+          previous_plan?: string
+          previous_subjective?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "soap_note_amendments_amended_by_fkey"
+            columns: ["amended_by"]
+            isOneToOne: false
+            referencedRelation: "clinic_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soap_note_amendments_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soap_note_amendments_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "soap_notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      soap_notes: {
+        Row: {
+          amendment_count: number
+          amendment_reason: string | null
+          appointment_id: string | null
+          assessment: string
+          client_id: string
+          clinic_id: string
+          created_at: string
+          finalized_at: string | null
+          finalized_by: string | null
+          id: string
+          objective: string
+          plan: string
+          provider_id: string
+          service_id: string | null
+          status: Database["public"]["Enums"]["soap_note_status"]
+          subjective: string
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amendment_count?: number
+          amendment_reason?: string | null
+          appointment_id?: string | null
+          assessment?: string
+          client_id: string
+          clinic_id: string
+          created_at?: string
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          objective?: string
+          plan?: string
+          provider_id: string
+          service_id?: string | null
+          status?: Database["public"]["Enums"]["soap_note_status"]
+          subjective?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amendment_count?: number
+          amendment_reason?: string | null
+          appointment_id?: string | null
+          assessment?: string
+          client_id?: string
+          clinic_id?: string
+          created_at?: string
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          objective?: string
+          plan?: string
+          provider_id?: string
+          service_id?: string | null
+          status?: Database["public"]["Enums"]["soap_note_status"]
+          subjective?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "soap_notes_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "soap_notes_client_id_fkey"
             columns: ["client_id"]
@@ -2617,6 +2942,94 @@ export type Database = {
             columns: ["clinic_id"]
             isOneToOne: false
             referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soap_notes_finalized_by_fkey"
+            columns: ["finalized_by"]
+            isOneToOne: false
+            referencedRelation: "clinic_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soap_notes_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "clinic_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soap_notes_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soap_notes_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "soap_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      soap_templates: {
+        Row: {
+          assessment_template: string
+          clinic_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+          objective_template: string
+          plan_template: string
+          service_id: string | null
+          subjective_template: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_template?: string
+          clinic_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+          objective_template?: string
+          plan_template?: string
+          service_id?: string | null
+          subjective_template?: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_template?: string
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+          objective_template?: string
+          plan_template?: string
+          service_id?: string | null
+          subjective_template?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "soap_templates_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "soap_templates_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -3096,41 +3509,262 @@ export type Database = {
           },
         ]
       }
-      treatment_plans: {
+      treatment_plan_photos: {
         Row: {
-          client_id: string | null
-          client_name: string
           clinic_id: string
           created_at: string
-          estimated_total_cents: number
-          goals: string | null
+          has_consent: boolean
           id: string
-          status: string
-          title: string
+          notes: string
+          photo_type: Database["public"]["Enums"]["photo_type"]
+          photo_url: string
+          plan_id: string
+          session_id: string | null
+          taken_at: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          has_consent?: boolean
+          id?: string
+          notes?: string
+          photo_type?: Database["public"]["Enums"]["photo_type"]
+          photo_url: string
+          plan_id: string
+          session_id?: string | null
+          taken_at?: string
+        }
+        Update: {
+          clinic_id?: string
+          created_at?: string
+          has_consent?: boolean
+          id?: string
+          notes?: string
+          photo_type?: Database["public"]["Enums"]["photo_type"]
+          photo_url?: string
+          plan_id?: string
+          session_id?: string | null
+          taken_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_plan_photos_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plan_photos_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "treatment_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plan_photos_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "treatment_plan_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treatment_plan_sessions: {
+        Row: {
+          after_photo_url: string | null
+          appointment_id: string | null
+          before_photo_url: string | null
+          clinic_id: string
+          completed_date: string | null
+          created_at: string
+          id: string
+          notes: string
+          plan_id: string
+          scheduled_date: string | null
+          session_number: number
+          session_price_cents: number
+          status: Database["public"]["Enums"]["plan_session_status"]
           updated_at: string
         }
         Insert: {
-          client_id?: string | null
-          client_name: string
+          after_photo_url?: string | null
+          appointment_id?: string | null
+          before_photo_url?: string | null
           clinic_id: string
+          completed_date?: string | null
           created_at?: string
-          estimated_total_cents?: number
-          goals?: string | null
           id?: string
-          status?: string
-          title: string
+          notes?: string
+          plan_id: string
+          scheduled_date?: string | null
+          session_number?: number
+          session_price_cents?: number
+          status?: Database["public"]["Enums"]["plan_session_status"]
           updated_at?: string
         }
         Update: {
-          client_id?: string | null
-          client_name?: string
+          after_photo_url?: string | null
+          appointment_id?: string | null
+          before_photo_url?: string | null
+          clinic_id?: string
+          completed_date?: string | null
+          created_at?: string
+          id?: string
+          notes?: string
+          plan_id?: string
+          scheduled_date?: string | null
+          session_number?: number
+          session_price_cents?: number
+          status?: Database["public"]["Enums"]["plan_session_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_plan_sessions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plan_sessions_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plan_sessions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "treatment_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treatment_plan_templates: {
+        Row: {
+          clinic_id: string
+          created_at: string
+          default_session_count: number
+          default_session_interval_days: number
+          description: string
+          id: string
+          is_active: boolean
+          name: string
+          service_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          default_session_count?: number
+          default_session_interval_days?: number
+          description?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          service_id?: string | null
+          updated_at?: string
+        }
+        Update: {
           clinic_id?: string
           created_at?: string
-          estimated_total_cents?: number
-          goals?: string | null
+          default_session_count?: number
+          default_session_interval_days?: number
+          description?: string
           id?: string
-          status?: string
-          title?: string
+          is_active?: boolean
+          name?: string
+          service_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_plan_templates_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plan_templates_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treatment_plans: {
+        Row: {
+          client_id: string
+          client_signed_at: string | null
+          clinic_id: string
+          created_at: string
+          description: string
+          end_date: string | null
+          goals: string
+          id: string
+          name: string
+          notes: string
+          paid_cents: number
+          provider_id: string
+          service_id: string | null
+          sessions_completed: number
+          signature_data: string | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["treatment_plan_status"]
+          template_id: string | null
+          total_price_cents: number
+          total_sessions_planned: number
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          client_signed_at?: string | null
+          clinic_id: string
+          created_at?: string
+          description?: string
+          end_date?: string | null
+          goals?: string
+          id?: string
+          name: string
+          notes?: string
+          paid_cents?: number
+          provider_id: string
+          service_id?: string | null
+          sessions_completed?: number
+          signature_data?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["treatment_plan_status"]
+          template_id?: string | null
+          total_price_cents?: number
+          total_sessions_planned?: number
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          client_signed_at?: string | null
+          clinic_id?: string
+          created_at?: string
+          description?: string
+          end_date?: string | null
+          goals?: string
+          id?: string
+          name?: string
+          notes?: string
+          paid_cents?: number
+          provider_id?: string
+          service_id?: string | null
+          sessions_completed?: number
+          signature_data?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["treatment_plan_status"]
+          template_id?: string | null
+          total_price_cents?: number
+          total_sessions_planned?: number
           updated_at?: string
         }
         Relationships: [
@@ -3146,6 +3780,27 @@ export type Database = {
             columns: ["clinic_id"]
             isOneToOne: false
             referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plans_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "clinic_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plans_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plans_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "treatment_plan_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -3196,6 +3851,10 @@ export type Database = {
           read_ct: number
         }[]
       }
+      seed_clinical_templates: {
+        Args: { p_clinic_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       appointment_status:
@@ -3206,6 +3865,25 @@ export type Database = {
         | "no_show"
         | "cancelled"
       clinic_role: "owner" | "admin" | "provider" | "front_desk"
+      consent_actor_type: "clinic_staff" | "client" | "witness" | "system"
+      consent_audit_action:
+        | "created"
+        | "sent"
+        | "opened"
+        | "viewed"
+        | "signed"
+        | "witness_signed"
+        | "declined"
+        | "revoked"
+        | "downloaded"
+      consent_signature_status:
+        | "draft"
+        | "sent"
+        | "viewed"
+        | "signed"
+        | "declined"
+        | "expired"
+        | "revoked"
       deposit_status: "pending" | "collected" | "refunded" | "forfeited"
       lead_activity_type:
         | "stage_change"
@@ -3227,6 +3905,8 @@ export type Database = {
         | "consult_booked"
         | "won"
         | "lost"
+      photo_type: "before" | "after" | "progress" | "other"
+      plan_session_status: "scheduled" | "completed" | "missed" | "cancelled"
       referral_status:
         | "invited"
         | "signed_up"
@@ -3243,7 +3923,14 @@ export type Database = {
       review_sent_via: "email" | "sms" | "both"
       reward_status: "pending" | "available" | "redeemed" | "expired"
       reward_type: "credit" | "percentage" | "free_service" | "custom"
+      soap_note_status: "draft" | "finalized" | "amended"
       task_status: "todo" | "in_progress" | "done"
+      treatment_plan_status:
+        | "proposed"
+        | "accepted"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3380,6 +4067,27 @@ export const Constants = {
         "cancelled",
       ],
       clinic_role: ["owner", "admin", "provider", "front_desk"],
+      consent_actor_type: ["clinic_staff", "client", "witness", "system"],
+      consent_audit_action: [
+        "created",
+        "sent",
+        "opened",
+        "viewed",
+        "signed",
+        "witness_signed",
+        "declined",
+        "revoked",
+        "downloaded",
+      ],
+      consent_signature_status: [
+        "draft",
+        "sent",
+        "viewed",
+        "signed",
+        "declined",
+        "expired",
+        "revoked",
+      ],
       deposit_status: ["pending", "collected", "refunded", "forfeited"],
       lead_activity_type: [
         "stage_change",
@@ -3403,6 +4111,8 @@ export const Constants = {
         "won",
         "lost",
       ],
+      photo_type: ["before", "after", "progress", "other"],
+      plan_session_status: ["scheduled", "completed", "missed", "cancelled"],
       referral_status: [
         "invited",
         "signed_up",
@@ -3421,7 +4131,15 @@ export const Constants = {
       review_sent_via: ["email", "sms", "both"],
       reward_status: ["pending", "available", "redeemed", "expired"],
       reward_type: ["credit", "percentage", "free_service", "custom"],
+      soap_note_status: ["draft", "finalized", "amended"],
       task_status: ["todo", "in_progress", "done"],
+      treatment_plan_status: [
+        "proposed",
+        "accepted",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
     },
   },
 } as const

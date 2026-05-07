@@ -175,7 +175,12 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       },
     ];
 
-    await supabase.from("consent_forms").insert(consentForms);
+    await supabase.from("consent_form_templates").insert(consentForms.map(cf => ({
+      clinic_id: cf.clinic_id,
+      name: cf.title,
+      body_html: cf.body,
+      is_active: cf.active,
+    })));
 
     // ── Automations ──
     const automations = [

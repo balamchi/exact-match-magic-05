@@ -78,10 +78,11 @@ const NAV: NavGroup[] = [
   {
     section: "Clinical",
     items: [
+      { to: "/app/clinical/soap-notes", label: "SOAP Notes", icon: Stethoscope },
+      { to: "/app/clinical/treatment-plans", label: "Treatment Plans", icon: ListChecks },
+      { to: "/app/clinical/consent-forms", label: "Consent Forms", icon: FileText },
       { to: "/app/injection-mapping", label: "Injection Mapping", icon: Syringe },
-      { to: "/app/treatment-plans", label: "Treatment Plans", icon: ListChecks },
       { to: "/app/before-after", label: "Before / After", icon: Images },
-      { to: "/app/soap-notes", label: "SOAP Notes", icon: Stethoscope },
     ],
   },
   {

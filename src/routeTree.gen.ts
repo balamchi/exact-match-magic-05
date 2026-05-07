@@ -71,6 +71,7 @@ import { Route as AppEmailLogRouteImport } from './routes/app.email-log'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppCouponsRouteImport } from './routes/app.coupons'
 import { Route as AppConsentRouteImport } from './routes/app.consent'
+import { Route as AppClinicalRouteImport } from './routes/app.clinical'
 import { Route as AppClientsRouteImport } from './routes/app.clients'
 import { Route as AppCheckinRouteImport } from './routes/app.checkin'
 import { Route as AppCalendarRouteImport } from './routes/app.calendar'
@@ -91,14 +92,21 @@ import { Route as LovableEmailAuthRouteImport } from './routes/lovable.email.aut
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppReviewsSettingsRouteImport } from './routes/app.reviews.settings'
 import { Route as AppReferralsSettingsRouteImport } from './routes/app.referrals.settings'
+import { Route as AppClinicalTreatmentPlansRouteImport } from './routes/app.clinical.treatment-plans'
+import { Route as AppClinicalSoapNotesRouteImport } from './routes/app.clinical.soap-notes'
+import { Route as AppClinicalConsentFormsRouteImport } from './routes/app.clinical.consent-forms'
 import { Route as AppClientsClientIdRouteImport } from './routes/app.clients_.$clientId'
 import { Route as ApiPublicBookingRouteImport } from './routes/api.public.booking'
+import { Route as AppClinicalTreatmentPlansIndexRouteImport } from './routes/app.clinical.treatment-plans.index'
+import { Route as AppClinicalSoapNotesIndexRouteImport } from './routes/app.clinical.soap-notes.index'
+import { Route as AppClinicalConsentFormsIndexRouteImport } from './routes/app.clinical.consent-forms.index'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable.email.transactional.send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable.email.transactional.preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable.email.queue.process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable.email.auth.webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable.email.auth.preview'
 import { Route as AppStaffHrStaffIdRouteImport } from './routes/app.staff.hr.$staffId'
+import { Route as AppClinicalSoapNotesNoteIdRouteImport } from './routes/app.clinical.soap-notes.$noteId'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -410,6 +418,11 @@ const AppConsentRoute = AppConsentRouteImport.update({
   path: '/consent',
   getParentRoute: () => AppRoute,
 } as any)
+const AppClinicalRoute = AppClinicalRouteImport.update({
+  id: '/clinical',
+  path: '/clinical',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppClientsRoute = AppClientsRouteImport.update({
   id: '/clients',
   path: '/clients',
@@ -511,6 +524,22 @@ const AppReferralsSettingsRoute = AppReferralsSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppReferralsRoute,
 } as any)
+const AppClinicalTreatmentPlansRoute =
+  AppClinicalTreatmentPlansRouteImport.update({
+    id: '/treatment-plans',
+    path: '/treatment-plans',
+    getParentRoute: () => AppClinicalRoute,
+  } as any)
+const AppClinicalSoapNotesRoute = AppClinicalSoapNotesRouteImport.update({
+  id: '/soap-notes',
+  path: '/soap-notes',
+  getParentRoute: () => AppClinicalRoute,
+} as any)
+const AppClinicalConsentFormsRoute = AppClinicalConsentFormsRouteImport.update({
+  id: '/consent-forms',
+  path: '/consent-forms',
+  getParentRoute: () => AppClinicalRoute,
+} as any)
 const AppClientsClientIdRoute = AppClientsClientIdRouteImport.update({
   id: '/clients_/$clientId',
   path: '/clients/$clientId',
@@ -521,6 +550,24 @@ const ApiPublicBookingRoute = ApiPublicBookingRouteImport.update({
   path: '/booking',
   getParentRoute: () => ApiPublicRoute,
 } as any)
+const AppClinicalTreatmentPlansIndexRoute =
+  AppClinicalTreatmentPlansIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppClinicalTreatmentPlansRoute,
+  } as any)
+const AppClinicalSoapNotesIndexRoute =
+  AppClinicalSoapNotesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppClinicalSoapNotesRoute,
+  } as any)
+const AppClinicalConsentFormsIndexRoute =
+  AppClinicalConsentFormsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppClinicalConsentFormsRoute,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/send',
@@ -554,6 +601,12 @@ const AppStaffHrStaffIdRoute = AppStaffHrStaffIdRouteImport.update({
   path: '/hr/$staffId',
   getParentRoute: () => AppStaffRoute,
 } as any)
+const AppClinicalSoapNotesNoteIdRoute =
+  AppClinicalSoapNotesNoteIdRouteImport.update({
+    id: '/$noteId',
+    path: '/$noteId',
+    getParentRoute: () => AppClinicalSoapNotesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -588,6 +641,7 @@ export interface FileRoutesByFullPath {
   '/app/calendar': typeof AppCalendarRoute
   '/app/checkin': typeof AppCheckinRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/clinical': typeof AppClinicalRouteWithChildren
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -630,6 +684,9 @@ export interface FileRoutesByFullPath {
   '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/clinical/consent-forms': typeof AppClinicalConsentFormsRouteWithChildren
+  '/app/clinical/soap-notes': typeof AppClinicalSoapNotesRouteWithChildren
+  '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansRouteWithChildren
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
   '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -640,12 +697,16 @@ export interface FileRoutesByFullPath {
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
+  '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/app/clinical/consent-forms/': typeof AppClinicalConsentFormsIndexRoute
+  '/app/clinical/soap-notes/': typeof AppClinicalSoapNotesIndexRoute
+  '/app/clinical/treatment-plans/': typeof AppClinicalTreatmentPlansIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -680,6 +741,7 @@ export interface FileRoutesByTo {
   '/app/calendar': typeof AppCalendarRoute
   '/app/checkin': typeof AppCheckinRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/clinical': typeof AppClinicalRouteWithChildren
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -730,12 +792,16 @@ export interface FileRoutesByTo {
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals': typeof AppReferralsIndexRoute
   '/app/reviews': typeof AppReviewsIndexRoute
+  '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/app/clinical/consent-forms': typeof AppClinicalConsentFormsIndexRoute
+  '/app/clinical/soap-notes': typeof AppClinicalSoapNotesIndexRoute
+  '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -771,6 +837,7 @@ export interface FileRoutesById {
   '/app/calendar': typeof AppCalendarRoute
   '/app/checkin': typeof AppCheckinRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/clinical': typeof AppClinicalRouteWithChildren
   '/app/consent': typeof AppConsentRoute
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
@@ -813,6 +880,9 @@ export interface FileRoutesById {
   '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients_/$clientId': typeof AppClientsClientIdRoute
+  '/app/clinical/consent-forms': typeof AppClinicalConsentFormsRouteWithChildren
+  '/app/clinical/soap-notes': typeof AppClinicalSoapNotesRouteWithChildren
+  '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansRouteWithChildren
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
   '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -823,12 +893,16 @@ export interface FileRoutesById {
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
+  '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/app/clinical/consent-forms/': typeof AppClinicalConsentFormsIndexRoute
+  '/app/clinical/soap-notes/': typeof AppClinicalSoapNotesIndexRoute
+  '/app/clinical/treatment-plans/': typeof AppClinicalTreatmentPlansIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -865,6 +939,7 @@ export interface FileRouteTypes {
     | '/app/calendar'
     | '/app/checkin'
     | '/app/clients'
+    | '/app/clinical'
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
@@ -907,6 +982,9 @@ export interface FileRouteTypes {
     | '/reviews/$publicToken'
     | '/api/public/booking'
     | '/app/clients/$clientId'
+    | '/app/clinical/consent-forms'
+    | '/app/clinical/soap-notes'
+    | '/app/clinical/treatment-plans'
     | '/app/referrals/settings'
     | '/app/reviews/settings'
     | '/app/settings/billing'
@@ -917,12 +995,16 @@ export interface FileRouteTypes {
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
     | '/app/reviews/'
+    | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/app/clinical/consent-forms/'
+    | '/app/clinical/soap-notes/'
+    | '/app/clinical/treatment-plans/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -957,6 +1039,7 @@ export interface FileRouteTypes {
     | '/app/calendar'
     | '/app/checkin'
     | '/app/clients'
+    | '/app/clinical'
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
@@ -1007,12 +1090,16 @@ export interface FileRouteTypes {
     | '/refer/$clinicSlug/$code'
     | '/app/referrals'
     | '/app/reviews'
+    | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/app/clinical/consent-forms'
+    | '/app/clinical/soap-notes'
+    | '/app/clinical/treatment-plans'
   id:
     | '__root__'
     | '/'
@@ -1047,6 +1134,7 @@ export interface FileRouteTypes {
     | '/app/calendar'
     | '/app/checkin'
     | '/app/clients'
+    | '/app/clinical'
     | '/app/consent'
     | '/app/coupons'
     | '/app/dashboard'
@@ -1089,6 +1177,9 @@ export interface FileRouteTypes {
     | '/reviews/$publicToken'
     | '/api/public/booking'
     | '/app/clients_/$clientId'
+    | '/app/clinical/consent-forms'
+    | '/app/clinical/soap-notes'
+    | '/app/clinical/treatment-plans'
     | '/app/referrals/settings'
     | '/app/reviews/settings'
     | '/app/settings/billing'
@@ -1099,12 +1190,16 @@ export interface FileRouteTypes {
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
     | '/app/reviews/'
+    | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/app/clinical/consent-forms/'
+    | '/app/clinical/soap-notes/'
+    | '/app/clinical/treatment-plans/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1572,6 +1667,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConsentRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/clinical': {
+      id: '/app/clinical'
+      path: '/clinical'
+      fullPath: '/app/clinical'
+      preLoaderRoute: typeof AppClinicalRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/clients': {
       id: '/app/clients'
       path: '/clients'
@@ -1712,6 +1814,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReferralsSettingsRouteImport
       parentRoute: typeof AppReferralsRoute
     }
+    '/app/clinical/treatment-plans': {
+      id: '/app/clinical/treatment-plans'
+      path: '/treatment-plans'
+      fullPath: '/app/clinical/treatment-plans'
+      preLoaderRoute: typeof AppClinicalTreatmentPlansRouteImport
+      parentRoute: typeof AppClinicalRoute
+    }
+    '/app/clinical/soap-notes': {
+      id: '/app/clinical/soap-notes'
+      path: '/soap-notes'
+      fullPath: '/app/clinical/soap-notes'
+      preLoaderRoute: typeof AppClinicalSoapNotesRouteImport
+      parentRoute: typeof AppClinicalRoute
+    }
+    '/app/clinical/consent-forms': {
+      id: '/app/clinical/consent-forms'
+      path: '/consent-forms'
+      fullPath: '/app/clinical/consent-forms'
+      preLoaderRoute: typeof AppClinicalConsentFormsRouteImport
+      parentRoute: typeof AppClinicalRoute
+    }
     '/app/clients_/$clientId': {
       id: '/app/clients_/$clientId'
       path: '/clients/$clientId'
@@ -1725,6 +1848,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/booking'
       preLoaderRoute: typeof ApiPublicBookingRouteImport
       parentRoute: typeof ApiPublicRoute
+    }
+    '/app/clinical/treatment-plans/': {
+      id: '/app/clinical/treatment-plans/'
+      path: '/'
+      fullPath: '/app/clinical/treatment-plans/'
+      preLoaderRoute: typeof AppClinicalTreatmentPlansIndexRouteImport
+      parentRoute: typeof AppClinicalTreatmentPlansRoute
+    }
+    '/app/clinical/soap-notes/': {
+      id: '/app/clinical/soap-notes/'
+      path: '/'
+      fullPath: '/app/clinical/soap-notes/'
+      preLoaderRoute: typeof AppClinicalSoapNotesIndexRouteImport
+      parentRoute: typeof AppClinicalSoapNotesRoute
+    }
+    '/app/clinical/consent-forms/': {
+      id: '/app/clinical/consent-forms/'
+      path: '/'
+      fullPath: '/app/clinical/consent-forms/'
+      preLoaderRoute: typeof AppClinicalConsentFormsIndexRouteImport
+      parentRoute: typeof AppClinicalConsentFormsRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -1768,6 +1912,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStaffHrStaffIdRouteImport
       parentRoute: typeof AppStaffRoute
     }
+    '/app/clinical/soap-notes/$noteId': {
+      id: '/app/clinical/soap-notes/$noteId'
+      path: '/$noteId'
+      fullPath: '/app/clinical/soap-notes/$noteId'
+      preLoaderRoute: typeof AppClinicalSoapNotesNoteIdRouteImport
+      parentRoute: typeof AppClinicalSoapNotesRoute
+    }
   }
 }
 
@@ -1792,6 +1943,63 @@ const ApiRouteChildren: ApiRouteChildren = {
 }
 
 const ApiRouteWithChildren = ApiRoute._addFileChildren(ApiRouteChildren)
+
+interface AppClinicalConsentFormsRouteChildren {
+  AppClinicalConsentFormsIndexRoute: typeof AppClinicalConsentFormsIndexRoute
+}
+
+const AppClinicalConsentFormsRouteChildren: AppClinicalConsentFormsRouteChildren =
+  {
+    AppClinicalConsentFormsIndexRoute: AppClinicalConsentFormsIndexRoute,
+  }
+
+const AppClinicalConsentFormsRouteWithChildren =
+  AppClinicalConsentFormsRoute._addFileChildren(
+    AppClinicalConsentFormsRouteChildren,
+  )
+
+interface AppClinicalSoapNotesRouteChildren {
+  AppClinicalSoapNotesNoteIdRoute: typeof AppClinicalSoapNotesNoteIdRoute
+  AppClinicalSoapNotesIndexRoute: typeof AppClinicalSoapNotesIndexRoute
+}
+
+const AppClinicalSoapNotesRouteChildren: AppClinicalSoapNotesRouteChildren = {
+  AppClinicalSoapNotesNoteIdRoute: AppClinicalSoapNotesNoteIdRoute,
+  AppClinicalSoapNotesIndexRoute: AppClinicalSoapNotesIndexRoute,
+}
+
+const AppClinicalSoapNotesRouteWithChildren =
+  AppClinicalSoapNotesRoute._addFileChildren(AppClinicalSoapNotesRouteChildren)
+
+interface AppClinicalTreatmentPlansRouteChildren {
+  AppClinicalTreatmentPlansIndexRoute: typeof AppClinicalTreatmentPlansIndexRoute
+}
+
+const AppClinicalTreatmentPlansRouteChildren: AppClinicalTreatmentPlansRouteChildren =
+  {
+    AppClinicalTreatmentPlansIndexRoute: AppClinicalTreatmentPlansIndexRoute,
+  }
+
+const AppClinicalTreatmentPlansRouteWithChildren =
+  AppClinicalTreatmentPlansRoute._addFileChildren(
+    AppClinicalTreatmentPlansRouteChildren,
+  )
+
+interface AppClinicalRouteChildren {
+  AppClinicalConsentFormsRoute: typeof AppClinicalConsentFormsRouteWithChildren
+  AppClinicalSoapNotesRoute: typeof AppClinicalSoapNotesRouteWithChildren
+  AppClinicalTreatmentPlansRoute: typeof AppClinicalTreatmentPlansRouteWithChildren
+}
+
+const AppClinicalRouteChildren: AppClinicalRouteChildren = {
+  AppClinicalConsentFormsRoute: AppClinicalConsentFormsRouteWithChildren,
+  AppClinicalSoapNotesRoute: AppClinicalSoapNotesRouteWithChildren,
+  AppClinicalTreatmentPlansRoute: AppClinicalTreatmentPlansRouteWithChildren,
+}
+
+const AppClinicalRouteWithChildren = AppClinicalRoute._addFileChildren(
+  AppClinicalRouteChildren,
+)
 
 interface AppReferralsRouteChildren {
   AppReferralsSettingsRoute: typeof AppReferralsSettingsRoute
@@ -1855,6 +2063,7 @@ interface AppRouteChildren {
   AppCalendarRoute: typeof AppCalendarRoute
   AppCheckinRoute: typeof AppCheckinRoute
   AppClientsRoute: typeof AppClientsRoute
+  AppClinicalRoute: typeof AppClinicalRouteWithChildren
   AppConsentRoute: typeof AppConsentRoute
   AppCouponsRoute: typeof AppCouponsRoute
   AppDashboardRoute: typeof AppDashboardRoute
@@ -1897,6 +2106,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCalendarRoute: AppCalendarRoute,
   AppCheckinRoute: AppCheckinRoute,
   AppClientsRoute: AppClientsRoute,
+  AppClinicalRoute: AppClinicalRouteWithChildren,
   AppConsentRoute: AppConsentRoute,
   AppCouponsRoute: AppCouponsRoute,
   AppDashboardRoute: AppDashboardRoute,
