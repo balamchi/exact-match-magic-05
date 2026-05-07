@@ -647,13 +647,45 @@ function ConsentsTab({ consents }: { consents: any[] }) {
       {consents.map((sc: any) => (
         <div key={sc.id} className="p-4 transition hover:bg-surface/60">
           <div className="flex items-center gap-4">
-            {sc.signature_data && <img src={sc.signature_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />}
+            {sc.signature_canvas_data && <img src={sc.signature_canvas_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />}
             <div className="min-w-0 flex-1">
-              <h4 className="font-medium">{sc.consent_title}</h4>
-              <p className="mt-0.5 text-xs text-muted-foreground">Signed {new Date(sc.signed_at).toLocaleString()}</p>
+              <h4 className="font-medium">{sc.template?.name ?? "Consent Form"}</h4>
+              <p className="mt-0.5 text-xs text-muted-foreground capitalize">{sc.status} · {sc.signed_at ? `Signed ${new Date(sc.signed_at).toLocaleString()}` : `Sent ${new Date(sc.created_at).toLocaleDateString()}`}</p>
             </div>
           </div>
         </div>
+      ))}
+    </div>
+  );
+}
+
+function TreatmentPlansTab({ plans }: { plans: any[] }) {
+  if (plans.length === 0) return <EmptyTab title="No treatment plans" description="Multi-session treatment plans for this client will appear here." icon={<ListChecks className="h-8 w-8" />} />;
+  return (
+    <div className="divide-y divide-border">
+      {plans.map((p: any) => {
+        const pct = p.total_sessions_planned > 0 ? Math.round((p.sessions_completed / p.total_sessions_planned) * 100) : 0;
+        return (
+          <div key={p.id} className="p-4 transition hover:bg-surface/60">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-medium">{p.name}</h4>
+                <p className="mt-0.5 text-xs text-muted-foreground">{p.service?.name ?? "No service"} · {p.sessions_completed}/{p.total_sessions_planned} sessions</p>
+              </div>
+              <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase",
+                p.status === "completed" ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" :
+                p.status === "in_progress" ? "border-primary/40 bg-primary/10 text-primary" :
+                "border-border text-muted-foreground")}>{p.status?.replace("_", " ")}</span>
+            </div>
+            <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+              <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
       ))}
     </div>
   );
