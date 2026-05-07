@@ -9,7 +9,6 @@ export const Route = createFileRoute("/auth/verify")({
 });
 
 function Verify() {
-  const navigate = useNavigate();
   const { refreshMemberships } = useAuth();
   const [status, setStatus] = useState<"loading" | "success" | "expired">("loading");
   const [resendEmail, setResendEmail] = useState("");
