@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Sparkles, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +9,6 @@ export const Route = createFileRoute("/auth/verify")({
 });
 
 function Verify() {
-  const navigate = useNavigate();
   const { refreshMemberships } = useAuth();
   const [status, setStatus] = useState<"loading" | "success" | "expired">("loading");
   const [resendEmail, setResendEmail] = useState("");
@@ -36,8 +35,10 @@ function Verify() {
         setStatus("success");
         await refreshMemberships();
         setTimeout(() => {
-          if (!cancelled) navigate({ to: "/app/dashboard" });
-        }, 2000);
+          if (!cancelled) {
+            window.location.href = "/app/dashboard";
+          }
+        }, 1500);
       } else {
         setStatus("expired");
         setResendEmail(data.user.email || "");
@@ -46,7 +47,7 @@ function Verify() {
 
     verify();
     return () => { cancelled = true; };
-  }, [navigate, refreshMemberships]);
+  }, [refreshMemberships]);
 
   const handleResend = async () => {
     if (!resendEmail || resendBusy) return;
@@ -83,10 +84,16 @@ function Verify() {
           {status === "success" && (
             <>
               <CheckCircle2 className="mx-auto h-10 w-10 text-green-500" />
-              <h1 className="mt-4 font-display text-xl font-semibold">Email verified!</h1>
+              <h1 className="mt-4 font-display text-xl font-semibold">Welcome to ClinicPro!</h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Redirecting you to your dashboard…
+                Setting up your dashboard…
               </p>
+              <a
+                href="/app/dashboard"
+                className="mt-6 inline-flex h-10 items-center rounded-lg bg-gradient-primary px-6 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-90"
+              >
+                Continue to Dashboard
+              </a>
             </>
           )}
 
