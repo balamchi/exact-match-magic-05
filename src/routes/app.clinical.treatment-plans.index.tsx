@@ -74,8 +74,7 @@ function TreatmentPlansDashboard() {
       service_id: planServiceId || null,
       name: planName.trim(),
       total_sessions_planned: planSessions,
-      sessions_completed: 0,
-      status: "draft",
+      status: "proposed",
       notes: planNotes.trim() || "",
     });
     if (error) toast.error("Failed to create plan"); else toast.success("Treatment plan created!");
