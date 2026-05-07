@@ -390,6 +390,7 @@ function PublicBookingPage() {
           reminderConsent: state.reminderConsent,
           marketingConsent: state.marketingConsent,
           honeypot,
+          refCode: refBanner ? refCode : null,
         }),
       });
 
