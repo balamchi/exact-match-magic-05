@@ -37,7 +37,7 @@ function formatMoney(cents: number, currency = "CAD") {
   return new Intl.NumberFormat("en-CA", { style: "currency", currency, maximumFractionDigits: 0 }).format(cents / 100);
 }
 
-type Tab = "overview" | "appointments" | "treatments" | "photos" | "payments" | "consents" | "soap" | "communication" | "files" | "loyalty" | "reviews" | "referrals";
+type Tab = "overview" | "appointments" | "treatments" | "photos" | "payments" | "consents" | "soap" | "communication" | "files" | "loyalty" | "reviews" | "referrals" | "plans";
 
 function ClientDetailPage() {
   const { clientId } = Route.useParams();
