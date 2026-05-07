@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles,
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
   AlertTriangle, Pill, ShieldAlert, Crown, Ban, XCircle, Receipt, PenLine,
   MoreHorizontal, UserPlus, CreditCard, MessageSquare, Gift, Star,
-  Heart, Award, Package, File, Send, Search, ArrowRight,
+  Heart, Award, Package, File, Send, Search, ArrowRight, Share2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
