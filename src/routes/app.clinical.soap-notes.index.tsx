@@ -78,7 +78,7 @@ function SoapNotesDashboard() {
     setLoading(true);
     const [notesRes, tmplRes, clientsRes] = await Promise.all([
       supabase.from("soap_notes")
-        .select("*, client:clients(first_name, last_name), provider:clinic_members!soap_notes_provider_id_fkey(display_name), service:services(name)")
+        .select("*, client:clients(first_name, last_name), service:services(name)")
         .eq("clinic_id", clinicId)
         .order("created_at", { ascending: false })
         .limit(200),
