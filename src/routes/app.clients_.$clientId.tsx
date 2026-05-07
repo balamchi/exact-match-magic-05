@@ -72,6 +72,7 @@ function ClientDetailPage() {
         supabase.from("consent_form_signatures").select("*, template:consent_form_templates(name)").eq("clinic_id", cid).eq("client_id", clientId).order("created_at", { ascending: false }),
         supabase.from("loyalty_accounts").select("*").eq("clinic_id", cid).eq("client_id", clientId).maybeSingle(),
         supabase.from("client_packages").select("*, package:packages(name)").eq("clinic_id", cid).eq("client_id", clientId).order("purchased_at", { ascending: false }),
+        supabase.from("treatment_plans").select("*, service:services(name)").eq("clinic_id", cid).eq("client_id", clientId).order("created_at", { ascending: false }),
       ]);
       if (cancelled) return;
 
