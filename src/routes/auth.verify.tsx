@@ -36,8 +36,10 @@ function Verify() {
         setStatus("success");
         await refreshMemberships();
         setTimeout(() => {
-          if (!cancelled) navigate({ to: "/app/dashboard" });
-        }, 2000);
+          if (!cancelled) {
+            window.location.href = "/app/dashboard";
+          }
+        }, 1500);
       } else {
         setStatus("expired");
         setResendEmail(data.user.email || "");
