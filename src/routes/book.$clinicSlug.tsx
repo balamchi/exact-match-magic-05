@@ -654,6 +654,14 @@ function PublicBookingPage() {
 
   return (
     <BookingShell clinic={clinic}>
+      {/* Referral banner */}
+      {refBanner && (
+        <div className="mx-auto max-w-2xl px-4 pt-4">
+          <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 px-4 py-3 text-sm text-purple-300">
+            🎁 You've been referred by <strong className="text-white">{refBanner.name}</strong>! Get <strong className="text-white">{refBanner.description}</strong> on your first visit.
+          </div>
+        </div>
+      )}
       <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10 pb-28">
         {/* Stepper */}
         <nav aria-label="Booking steps" className="mb-8">
