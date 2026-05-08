@@ -58,6 +58,105 @@ function ClientDetailPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
+  // Send consent dialog state
+  const [sendConsentOpen, setSendConsentOpen] = useState(false);
+  const [consentTemplates, setConsentTemplates] = useState<any[]>([]);
+  const [selectedConsentTemplate, setSelectedConsentTemplate] = useState("");
+  const [sendingConsent, setSendingConsent] = useState(false);
+
+  useEffect(() => {
+    if (!sendConsentOpen || !activeClinic) return;
+    supabase
+      .from("consent_form_templates")
+      .select("id, name, version, body_html, requires_witness")
+      .eq("clinic_id", activeClinic.clinic_id)
+      .eq("is_active", true)
+      .order("name")
+      .then(({ data }) => setConsentTemplates(data ?? []));
+  }, [sendConsentOpen, activeClinic?.clinic_id]);
+
+  const handleSendConsent = async () => {
+    if (!activeClinic || !selectedConsentTemplate || !client) return;
+    setSendingConsent(true);
+    const tmpl = consentTemplates.find(t => t.id === selectedConsentTemplate);
+    const cid = activeClinic.clinic_id;
+    try {
+      const { data: sigData, error } = await supabase.from("consent_form_signatures").insert({
+        clinic_id: cid,
+        template_id: selectedConsentTemplate,
+        template_version: tmpl?.version ?? 1,
+        client_id: client.id,
+        status: "sent",
+        sent_at: new Date().toISOString(),
+        signed_html_snapshot: tmpl?.body_html ?? "",
+        expires_at: new Date(Date.now() + 7 * 86400000).toISOString(),
+      }).select("id, public_token").single();
+      if (error) throw error;
+
+      if (client.email) {
+        const { data: clinic } = await supabase.from("clinics").select("name").eq("id", cid).single();
+        const { data: { session } } = await supabase.auth.getSession();
+        const sendRes = await fetch("/lovable/email/transactional/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
+          body: JSON.stringify({
+            templateName: "consent-request",
+            recipientEmail: client.email,
+            idempotencyKey: `consent-${sigData.id}`,
+            templateData: {
+              firstName: client.first_name ?? "there",
+              clinicName: clinic?.name ?? "Your Clinic",
+              templateName: tmpl?.name ?? "Consent Form",
+              publicToken: sigData.public_token,
+            },
+          }),
+        });
+        if (!sendRes.ok) {
+          const errText = await sendRes.text();
+          console.error("Email send failed:", errText);
+          toast.warning("Consent created but email failed. Link copied.");
+        } else {
+          await fetch("/lovable/email/queue/process", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          }).catch(() => {});
+          await supabase.from("consent_form_audit_log").insert({
+            signature_id: sigData.id,
+            clinic_id: cid,
+            action: "sent",
+            actor_type: "clinic_staff",
+            actor_name: "Staff",
+            metadata: { recipient_email: client.email },
+          });
+          toast.success(`Consent sent to ${client.email}`);
+        }
+      } else {
+        toast.warning("Client has no email. Link copied to clipboard.");
+      }
+
+      const url = `${window.location.origin}/consent/${sigData.public_token}`;
+      try { await navigator.clipboard.writeText(url); } catch {}
+
+      const { data: refreshed } = await supabase
+        .from("consent_form_signatures")
+        .select("*, template:consent_form_templates(name)")
+        .eq("clinic_id", cid).eq("client_id", client.id)
+        .order("created_at", { ascending: false });
+      setSignedConsents(refreshed ?? []);
+
+      setSendConsentOpen(false);
+      setSelectedConsentTemplate("");
+    } catch (err: any) {
+      console.error("Send consent error:", err);
+      toast.error(`Failed to send: ${err?.message ?? "Unknown error"}`);
+    } finally {
+      setSendingConsent(false);
+    }
+  };
+
   useEffect(() => {
     if (!activeClinic) return;
     let cancelled = false;
