@@ -136,6 +136,7 @@ function ConsentSignPage() {
       actor_type: "client",
       actor_name: [sig.client?.first_name, sig.client?.last_name].filter(Boolean).join(" ") || "Client",
       user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+      ip_address: signerIp,
     });
 
     setDone(true);
