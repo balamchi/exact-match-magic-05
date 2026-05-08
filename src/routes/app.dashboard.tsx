@@ -442,8 +442,8 @@ function Dashboard() {
       {/* Clinical KPIs */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <MiniKpi label="Pending Consents" value={stats?.pendingConsents ?? 0} loading={loading} />
-        <MiniKpi label="SOAP Notes (Today)" value={stats?.soapNotesToday ?? 0} loading={loading} />
-        <MiniKpi label="Active Treatment Plans" value={stats?.activeTreatmentPlans ?? 0} loading={loading} />
+        <MiniKpi label="SOAP Notes (24h)" value={stats?.soapNotesToday ?? 0} loading={loading} />
+        <MiniKpi label="Active Plans" value={stats?.activeTreatmentPlans ?? 0} loading={loading} />
       </div>
 
       {/* Secondary KPI Cards */}
