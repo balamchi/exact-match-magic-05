@@ -478,6 +478,57 @@ function ClientDetailPage() {
           </div>
         </section>
       </div>
+
+      {/* Send Consent Dialog */}
+      <Dialog open={sendConsentOpen} onOpenChange={setSendConsentOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send Consent Form</DialogTitle>
+            <DialogDescription>
+              Send a consent form to {client.first_name} {client.last_name ?? ""} for electronic signature.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="rounded-lg border border-primary/40 bg-primary/5 px-3 py-2.5">
+              <div className="text-sm font-medium">{client.first_name} {client.last_name ?? ""}</div>
+              <div className="text-xs text-muted-foreground">{client.email ?? "No email — only link will be available"}</div>
+            </div>
+            {!client.email && (
+              <div className="text-xs text-amber-400 bg-amber-500/10 rounded-lg px-3 py-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                <span>This client has no email. Only link will be copied to clipboard.</span>
+              </div>
+            )}
+            <div>
+              <Label>Select Consent Template</Label>
+              <select
+                value={selectedConsentTemplate}
+                onChange={(e) => setSelectedConsentTemplate(e.target.value)}
+                className="mt-1 h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30"
+              >
+                <option value="">Choose template…</option>
+                {consentTemplates.map(t => (
+                  <option key={t.id} value={t.id}>{t.name} (v{t.version})</option>
+                ))}
+              </select>
+              {consentTemplates.length === 0 && (
+                <p className="mt-1 text-xs text-muted-foreground">No active templates. Create one in Clinical → Consent Forms.</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setSendConsentOpen(false)} disabled={sendingConsent}>Cancel</Button>
+              <Button
+                onClick={handleSendConsent}
+                disabled={sendingConsent || !selectedConsentTemplate}
+                className="bg-gradient-primary text-primary-foreground gap-2"
+              >
+                <Send className="h-4 w-4" />
+                {sendingConsent ? "Sending…" : "Send Consent"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
