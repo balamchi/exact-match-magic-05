@@ -206,7 +206,7 @@ function InboxPage() {
       .on("postgres_changes",
         { event: "INSERT", schema: "public", table: "messages", filter: `clinic_id=eq.${clinicId}` },
         (payload: any) => {
-          if (payload.new?.conversation_id === selectedId) loadMessages(selectedId);
+          if (selectedId && payload.new?.conversation_id === selectedId) loadMessages(selectedId);
         })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
