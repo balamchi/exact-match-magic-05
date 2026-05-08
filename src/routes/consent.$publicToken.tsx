@@ -137,6 +137,7 @@ function ConsentSignPage() {
       signed_html_snapshot: sig.template?.body_html ?? sig.signed_html_snapshot,
       signer_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
       signer_ip_address: signerIp,
+      signer_geolocation: geolocation,
     }).eq("id", sig.id);
 
     if (err) {
