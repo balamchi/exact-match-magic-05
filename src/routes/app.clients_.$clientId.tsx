@@ -19,6 +19,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/app/clients_/$clientId")({
   component: ClientDetailPage,
@@ -55,6 +57,105 @@ function ClientDetailPage() {
   const [treatmentPlans, setTreatmentPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+
+  // Send consent dialog state
+  const [sendConsentOpen, setSendConsentOpen] = useState(false);
+  const [consentTemplates, setConsentTemplates] = useState<any[]>([]);
+  const [selectedConsentTemplate, setSelectedConsentTemplate] = useState("");
+  const [sendingConsent, setSendingConsent] = useState(false);
+
+  useEffect(() => {
+    if (!sendConsentOpen || !activeClinic) return;
+    supabase
+      .from("consent_form_templates")
+      .select("id, name, version, body_html, requires_witness")
+      .eq("clinic_id", activeClinic.clinic_id)
+      .eq("is_active", true)
+      .order("name")
+      .then(({ data }) => setConsentTemplates(data ?? []));
+  }, [sendConsentOpen, activeClinic?.clinic_id]);
+
+  const handleSendConsent = async () => {
+    if (!activeClinic || !selectedConsentTemplate || !client) return;
+    setSendingConsent(true);
+    const tmpl = consentTemplates.find(t => t.id === selectedConsentTemplate);
+    const cid = activeClinic.clinic_id;
+    try {
+      const { data: sigData, error } = await supabase.from("consent_form_signatures").insert({
+        clinic_id: cid,
+        template_id: selectedConsentTemplate,
+        template_version: tmpl?.version ?? 1,
+        client_id: client.id,
+        status: "sent",
+        sent_at: new Date().toISOString(),
+        signed_html_snapshot: tmpl?.body_html ?? "",
+        expires_at: new Date(Date.now() + 7 * 86400000).toISOString(),
+      }).select("id, public_token").single();
+      if (error) throw error;
+
+      if (client.email) {
+        const { data: clinic } = await supabase.from("clinics").select("name").eq("id", cid).single();
+        const { data: { session } } = await supabase.auth.getSession();
+        const sendRes = await fetch("/lovable/email/transactional/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
+          body: JSON.stringify({
+            templateName: "consent-request",
+            recipientEmail: client.email,
+            idempotencyKey: `consent-${sigData.id}`,
+            templateData: {
+              firstName: client.first_name ?? "there",
+              clinicName: clinic?.name ?? "Your Clinic",
+              templateName: tmpl?.name ?? "Consent Form",
+              publicToken: sigData.public_token,
+            },
+          }),
+        });
+        if (!sendRes.ok) {
+          const errText = await sendRes.text();
+          console.error("Email send failed:", errText);
+          toast.warning("Consent created but email failed. Link copied.");
+        } else {
+          await fetch("/lovable/email/queue/process", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          }).catch(() => {});
+          await supabase.from("consent_form_audit_log").insert({
+            signature_id: sigData.id,
+            clinic_id: cid,
+            action: "sent",
+            actor_type: "clinic_staff",
+            actor_name: "Staff",
+            metadata: { recipient_email: client.email },
+          });
+          toast.success(`Consent sent to ${client.email}`);
+        }
+      } else {
+        toast.warning("Client has no email. Link copied to clipboard.");
+      }
+
+      const url = `${window.location.origin}/consent/${sigData.public_token}`;
+      try { await navigator.clipboard.writeText(url); } catch {}
+
+      const { data: refreshed } = await supabase
+        .from("consent_form_signatures")
+        .select("*, template:consent_form_templates(name)")
+        .eq("clinic_id", cid).eq("client_id", client.id)
+        .order("created_at", { ascending: false });
+      setSignedConsents(refreshed ?? []);
+
+      setSendConsentOpen(false);
+      setSelectedConsentTemplate("");
+    } catch (err: any) {
+      console.error("Send consent error:", err);
+      toast.error(`Failed to send: ${err?.message ?? "Unknown error"}`);
+    } finally {
+      setSendingConsent(false);
+    }
+  };
 
   useEffect(() => {
     if (!activeClinic) return;
@@ -249,7 +350,7 @@ function ClientDetailPage() {
                 <DropdownMenuItem><Send className="mr-2 h-3.5 w-3.5" /> Send message</DropdownMenuItem>
                 <DropdownMenuItem><Gift className="mr-2 h-3.5 w-3.5" /> Apply gift card</DropdownMenuItem>
                 <DropdownMenuItem><CreditCard className="mr-2 h-3.5 w-3.5" /> Charge card</DropdownMenuItem>
-                <DropdownMenuItem><PenLine className="mr-2 h-3.5 w-3.5" /> Send consent form</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSendConsentOpen(true)}><PenLine className="mr-2 h-3.5 w-3.5" /> Send consent form</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem><Star className="mr-2 h-3.5 w-3.5" /> {client.vip_status ? "Remove VIP" : "Mark as VIP"}</DropdownMenuItem>
                 <DropdownMenuItem><Award className="mr-2 h-3.5 w-3.5" /> Add membership</DropdownMenuItem>
@@ -334,7 +435,7 @@ function ClientDetailPage() {
           {activeTab === "treatments" && <InjectionsList injections={injections} />}
           {activeTab === "photos" && <PhotosList photos={photos} />}
           {activeTab === "payments" && <FinancialTab invoices={invoices} appointments={appointments} currency={currency} />}
-          {activeTab === "consents" && <ConsentsTab consents={signedConsents} />}
+          {activeTab === "consents" && <ConsentsTab consents={signedConsents} onSend={() => setSendConsentOpen(true)} />}
           {activeTab === "soap" && <SoapNotesList notes={soapNotes} />}
           {activeTab === "plans" && <TreatmentPlansTab plans={treatmentPlans} />}
           {activeTab === "communication" && <PlaceholderTab title="Communication" description="Message history will show SMS, email, and WhatsApp conversations." icon={<MessageSquare className="h-8 w-8" />} />}
@@ -377,6 +478,57 @@ function ClientDetailPage() {
           </div>
         </section>
       </div>
+
+      {/* Send Consent Dialog */}
+      <Dialog open={sendConsentOpen} onOpenChange={setSendConsentOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send Consent Form</DialogTitle>
+            <DialogDescription>
+              Send a consent form to {client.first_name} {client.last_name ?? ""} for electronic signature.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="rounded-lg border border-primary/40 bg-primary/5 px-3 py-2.5">
+              <div className="text-sm font-medium">{client.first_name} {client.last_name ?? ""}</div>
+              <div className="text-xs text-muted-foreground">{client.email ?? "No email — only link will be available"}</div>
+            </div>
+            {!client.email && (
+              <div className="text-xs text-amber-400 bg-amber-500/10 rounded-lg px-3 py-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+                <span>This client has no email. Only link will be copied to clipboard.</span>
+              </div>
+            )}
+            <div>
+              <Label>Select Consent Template</Label>
+              <select
+                value={selectedConsentTemplate}
+                onChange={(e) => setSelectedConsentTemplate(e.target.value)}
+                className="mt-1 h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30"
+              >
+                <option value="">Choose template…</option>
+                {consentTemplates.map(t => (
+                  <option key={t.id} value={t.id}>{t.name} (v{t.version})</option>
+                ))}
+              </select>
+              {consentTemplates.length === 0 && (
+                <p className="mt-1 text-xs text-muted-foreground">No active templates. Create one in Clinical → Consent Forms.</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setSendConsentOpen(false)} disabled={sendingConsent}>Cancel</Button>
+              <Button
+                onClick={handleSendConsent}
+                disabled={sendingConsent || !selectedConsentTemplate}
+                className="bg-gradient-primary text-primary-foreground gap-2"
+              >
+                <Send className="h-4 w-4" />
+                {sendingConsent ? "Sending…" : "Send Consent"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -640,21 +792,32 @@ function FinancialTab({ invoices, appointments, currency }: { invoices: any[]; a
   );
 }
 
-function ConsentsTab({ consents }: { consents: any[] }) {
-  if (consents.length === 0) return <EmptyTab title="No signed consents" description="Signed consent forms for this client will appear here." icon={<PenLine className="h-8 w-8" />} />;
+function ConsentsTab({ consents, onSend }: { consents: any[]; onSend: () => void }) {
   return (
-    <div className="divide-y divide-border">
-      {consents.map((sc: any) => (
-        <div key={sc.id} className="p-4 transition hover:bg-surface/60">
-          <div className="flex items-center gap-4">
-            {sc.signature_canvas_data && <img src={sc.signature_canvas_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />}
-            <div className="min-w-0 flex-1">
-              <h4 className="font-medium">{sc.template?.name ?? "Consent Form"}</h4>
-              <p className="mt-0.5 text-xs text-muted-foreground capitalize">{sc.status} · {sc.signed_at ? `Signed ${new Date(sc.signed_at).toLocaleString()}` : `Sent ${new Date(sc.created_at).toLocaleDateString()}`}</p>
+    <div>
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <h3 className="text-sm font-semibold">Consent Forms</h3>
+        <Button size="sm" onClick={onSend} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+          <Send className="h-4 w-4" /> Send Consent
+        </Button>
+      </div>
+      {consents.length === 0 ? (
+        <div className="p-6"><EmptyTab title="No signed consents" description="Signed consent forms for this client will appear here." icon={<PenLine className="h-8 w-8" />} /></div>
+      ) : (
+        <div className="divide-y divide-border">
+          {consents.map((sc: any) => (
+            <div key={sc.id} className="p-4 transition hover:bg-surface/60">
+              <div className="flex items-center gap-4">
+                {sc.signature_canvas_data && <img src={sc.signature_canvas_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />}
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-medium">{sc.template?.name ?? "Consent Form"}</h4>
+                  <p className="mt-0.5 text-xs text-muted-foreground capitalize">{sc.status} · {sc.signed_at ? `Signed ${new Date(sc.signed_at).toLocaleString()}` : `Sent ${new Date(sc.created_at).toLocaleDateString()}`}</p>
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
