@@ -350,7 +350,7 @@ function ClientDetailPage() {
                 <DropdownMenuItem><Send className="mr-2 h-3.5 w-3.5" /> Send message</DropdownMenuItem>
                 <DropdownMenuItem><Gift className="mr-2 h-3.5 w-3.5" /> Apply gift card</DropdownMenuItem>
                 <DropdownMenuItem><CreditCard className="mr-2 h-3.5 w-3.5" /> Charge card</DropdownMenuItem>
-                <DropdownMenuItem><PenLine className="mr-2 h-3.5 w-3.5" /> Send consent form</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSendConsentOpen(true)}><PenLine className="mr-2 h-3.5 w-3.5" /> Send consent form</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem><Star className="mr-2 h-3.5 w-3.5" /> {client.vip_status ? "Remove VIP" : "Mark as VIP"}</DropdownMenuItem>
                 <DropdownMenuItem><Award className="mr-2 h-3.5 w-3.5" /> Add membership</DropdownMenuItem>
