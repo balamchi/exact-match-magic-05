@@ -741,21 +741,32 @@ function FinancialTab({ invoices, appointments, currency }: { invoices: any[]; a
   );
 }
 
-function ConsentsTab({ consents }: { consents: any[] }) {
-  if (consents.length === 0) return <EmptyTab title="No signed consents" description="Signed consent forms for this client will appear here." icon={<PenLine className="h-8 w-8" />} />;
+function ConsentsTab({ consents, onSend }: { consents: any[]; onSend: () => void }) {
   return (
-    <div className="divide-y divide-border">
-      {consents.map((sc: any) => (
-        <div key={sc.id} className="p-4 transition hover:bg-surface/60">
-          <div className="flex items-center gap-4">
-            {sc.signature_canvas_data && <img src={sc.signature_canvas_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />}
-            <div className="min-w-0 flex-1">
-              <h4 className="font-medium">{sc.template?.name ?? "Consent Form"}</h4>
-              <p className="mt-0.5 text-xs text-muted-foreground capitalize">{sc.status} · {sc.signed_at ? `Signed ${new Date(sc.signed_at).toLocaleString()}` : `Sent ${new Date(sc.created_at).toLocaleDateString()}`}</p>
+    <div>
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <h3 className="text-sm font-semibold">Consent Forms</h3>
+        <Button size="sm" onClick={onSend} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+          <Send className="h-4 w-4" /> Send Consent
+        </Button>
+      </div>
+      {consents.length === 0 ? (
+        <div className="p-6"><EmptyTab title="No signed consents" description="Signed consent forms for this client will appear here." icon={<PenLine className="h-8 w-8" />} /></div>
+      ) : (
+        <div className="divide-y divide-border">
+          {consents.map((sc: any) => (
+            <div key={sc.id} className="p-4 transition hover:bg-surface/60">
+              <div className="flex items-center gap-4">
+                {sc.signature_canvas_data && <img src={sc.signature_canvas_data} alt="Signature" className="h-14 w-28 rounded border border-border object-contain bg-white" />}
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-medium">{sc.template?.name ?? "Consent Form"}</h4>
+                  <p className="mt-0.5 text-xs text-muted-foreground capitalize">{sc.status} · {sc.signed_at ? `Signed ${new Date(sc.signed_at).toLocaleString()}` : `Sent ${new Date(sc.created_at).toLocaleDateString()}`}</p>
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
