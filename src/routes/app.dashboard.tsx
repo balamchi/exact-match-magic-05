@@ -4,7 +4,7 @@ import {
   CalendarDays, Users, DollarSign, Repeat, Sparkles, Activity, AlertTriangle,
   ArrowRight, Clock, Target, TrendingUp, RefreshCw, Plus, MessageSquare,
   ShoppingCart, UserPlus, FileWarning, Receipt, Package, Cake, Star,
-  ChevronDown, ArrowUp, ArrowDown, Filter,
+  ChevronDown, ArrowUp, ArrowDown, Filter, PenLine, FileText, ListChecks,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
