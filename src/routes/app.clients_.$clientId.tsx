@@ -1006,3 +1006,166 @@ function ReferralsTab({ clientId, clinicId, currency }: { clientId: string; clin
     </div>
   );
 }
+
+function CommunicationTab({ clientId, clinicId, client }: { clientId: string; clinicId: string; client: Client }) {
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [draft, setDraft] = useState("");
+  const [channel, setChannel] = useState<"sms" | "email" | "whatsapp">("sms");
+  const [sending, setSending] = useState(false);
+
+  const loadConvs = async () => {
+    if (!clinicId) return;
+    const { data } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("clinic_id", clinicId)
+      .eq("client_id", clientId)
+      .order("last_message_at", { ascending: false });
+    setConversations(data ?? []);
+    if (!selectedId && data?.length) setSelectedId(data[0].id);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadConvs(); /* eslint-disable-next-line */ }, [clinicId, clientId]);
+
+  useEffect(() => {
+    if (!selectedId) { setMessages([]); return; }
+    supabase.from("messages").select("*").eq("conversation_id", selectedId)
+      .order("created_at", { ascending: true })
+      .then(({ data }) => setMessages(data ?? []));
+    supabase.from("conversations").update({ unread_count: 0 }).eq("id", selectedId).then(() => {});
+  }, [selectedId]);
+
+  // Realtime
+  useEffect(() => {
+    if (!clinicId) return;
+    const ch = supabase.channel(`client-comms-${clientId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "conversations", filter: `client_id=eq.${clientId}` },
+        () => loadConvs())
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" },
+        (p: any) => { if (p.new.conversation_id === selectedId) setMessages((m) => [...m, p.new]); })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+    // eslint-disable-next-line
+  }, [clinicId, clientId, selectedId]);
+
+  const startNewConversation = async () => {
+    if (!clinicId) return;
+    const handle = channel === "email" ? client.email : client.phone;
+    if (!handle) {
+      toast.error(`Client has no ${channel === "email" ? "email" : "phone number"}`);
+      return;
+    }
+    const { data, error } = await supabase.from("conversations").insert({
+      clinic_id: clinicId, client_id: clientId, channel,
+      contact_name: `${client.first_name ?? ""} ${client.last_name ?? ""}`.trim() || handle,
+      contact_handle: handle, status: "open",
+      last_message_text: "", last_message_at: new Date().toISOString(),
+    }).select().single();
+    if (error) { toast.error(error.message); return; }
+    setSelectedId(data.id);
+    loadConvs();
+  };
+
+  const handleSend = async () => {
+    if (!selectedId || !draft.trim() || !clinicId) return;
+    setSending(true);
+    const conv = conversations.find((c) => c.id === selectedId);
+    const { error } = await supabase.from("messages").insert({
+      clinic_id: clinicId,
+      conversation_id: selectedId,
+      direction: "outbound",
+      channel: conv?.channel ?? "sms",
+      body: draft.trim(),
+      status: "sent",
+    });
+    setSending(false);
+    if (error) { toast.error(error.message); return; }
+    setDraft("");
+  };
+
+  if (loading) {
+    return <div className="space-y-2 p-4">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>;
+  }
+
+  return (
+    <div className="grid gap-4 md:grid-cols-[260px_1fr]">
+      <div className="space-y-2">
+        <div className="flex items-center gap-1.5 rounded-lg border border-border bg-surface p-1.5">
+          {(["sms", "email", "whatsapp"] as const).map((c) => (
+            <button key={c} onClick={() => setChannel(c)}
+              className={cn("flex-1 rounded-md px-2 py-1 text-[11px] font-medium capitalize transition",
+                channel === c ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}>
+              {c}
+            </button>
+          ))}
+        </div>
+        <Button size="sm" className="w-full gap-1.5" onClick={startNewConversation}>
+          <Send className="h-3.5 w-3.5" /> New {channel} conversation
+        </Button>
+        <div className="space-y-1">
+          {conversations.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
+              No conversations yet
+            </p>
+          ) : conversations.map((c) => (
+            <button key={c.id} onClick={() => setSelectedId(c.id)}
+              className={cn("w-full rounded-lg border p-2.5 text-left transition",
+                selectedId === c.id ? "border-primary/40 bg-primary/5" : "border-border bg-surface hover:border-primary/20")}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{c.channel}</span>
+                {c.unread_count > 0 && (
+                  <span className="rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold text-primary-foreground">
+                    {c.unread_count}
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 line-clamp-2 text-xs text-foreground/80">{c.last_message_text || "—"}</p>
+              <p className="mt-0.5 text-[10px] text-muted-foreground">{new Date(c.last_message_at).toLocaleString()}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex min-h-[400px] flex-col rounded-xl border border-border bg-surface">
+        {!selectedId ? (
+          <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">
+            Select or start a conversation
+          </div>
+        ) : (
+          <>
+            <div className="flex-1 space-y-2 overflow-y-auto p-4">
+              {messages.length === 0 ? (
+                <p className="py-8 text-center text-xs text-muted-foreground">No messages yet.</p>
+              ) : messages.map((m) => (
+                <div key={m.id} className={cn("flex", m.direction === "outbound" ? "justify-end" : "justify-start")}>
+                  <div className={cn("max-w-[75%] rounded-2xl px-3 py-2 text-sm",
+                    m.direction === "outbound" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground")}>
+                    <p className="whitespace-pre-wrap">{m.body}</p>
+                    <p className={cn("mt-1 text-[9px] uppercase tracking-wider",
+                      m.direction === "outbound" ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                      {new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · {m.status}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-border p-3">
+              <div className="flex gap-2">
+                <textarea value={draft} onChange={(e) => setDraft(e.target.value)}
+                  placeholder="Type a message..." rows={2}
+                  className="flex-1 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+                <Button onClick={handleSend} disabled={!draft.trim() || sending} className="self-end">
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
