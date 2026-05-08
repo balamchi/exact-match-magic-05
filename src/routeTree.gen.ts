@@ -93,6 +93,7 @@ import { Route as LovableEmailAuthRouteImport } from './routes/lovable.email.aut
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppReviewsSettingsRouteImport } from './routes/app.reviews.settings'
 import { Route as AppReferralsSettingsRouteImport } from './routes/app.referrals.settings'
+import { Route as AppCommunicationTemplatesRouteImport } from './routes/app.communication.templates'
 import { Route as AppClinicalTreatmentPlansRouteImport } from './routes/app.clinical.treatment-plans'
 import { Route as AppClinicalSoapNotesRouteImport } from './routes/app.clinical.soap-notes'
 import { Route as AppClinicalConsentFormsRouteImport } from './routes/app.clinical.consent-forms'
@@ -530,6 +531,12 @@ const AppReferralsSettingsRoute = AppReferralsSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppReferralsRoute,
 } as any)
+const AppCommunicationTemplatesRoute =
+  AppCommunicationTemplatesRouteImport.update({
+    id: '/communication/templates',
+    path: '/communication/templates',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppClinicalTreatmentPlansRoute =
   AppClinicalTreatmentPlansRouteImport.update({
     id: '/treatment-plans',
@@ -694,6 +701,7 @@ export interface FileRoutesByFullPath {
   '/app/clinical/consent-forms': typeof AppClinicalConsentFormsRouteWithChildren
   '/app/clinical/soap-notes': typeof AppClinicalSoapNotesRouteWithChildren
   '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansRouteWithChildren
+  '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
   '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -790,6 +798,7 @@ export interface FileRoutesByTo {
   '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
   '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -892,6 +901,7 @@ export interface FileRoutesById {
   '/app/clinical/consent-forms': typeof AppClinicalConsentFormsRouteWithChildren
   '/app/clinical/soap-notes': typeof AppClinicalSoapNotesRouteWithChildren
   '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansRouteWithChildren
+  '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
   '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
@@ -995,6 +1005,7 @@ export interface FileRouteTypes {
     | '/app/clinical/consent-forms'
     | '/app/clinical/soap-notes'
     | '/app/clinical/treatment-plans'
+    | '/app/communication/templates'
     | '/app/referrals/settings'
     | '/app/reviews/settings'
     | '/app/settings/billing'
@@ -1091,6 +1102,7 @@ export interface FileRouteTypes {
     | '/reviews/$publicToken'
     | '/api/public/booking'
     | '/app/clients/$clientId'
+    | '/app/communication/templates'
     | '/app/referrals/settings'
     | '/app/reviews/settings'
     | '/app/settings/billing'
@@ -1192,6 +1204,7 @@ export interface FileRouteTypes {
     | '/app/clinical/consent-forms'
     | '/app/clinical/soap-notes'
     | '/app/clinical/treatment-plans'
+    | '/app/communication/templates'
     | '/app/referrals/settings'
     | '/app/reviews/settings'
     | '/app/settings/billing'
@@ -1834,6 +1847,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReferralsSettingsRouteImport
       parentRoute: typeof AppReferralsRoute
     }
+    '/app/communication/templates': {
+      id: '/app/communication/templates'
+      path: '/communication/templates'
+      fullPath: '/app/communication/templates'
+      preLoaderRoute: typeof AppCommunicationTemplatesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/clinical/treatment-plans': {
       id: '/app/clinical/treatment-plans'
       path: '/treatment-plans'
@@ -2114,6 +2134,7 @@ interface AppRouteChildren {
   AppTreatmentPlansRoute: typeof AppTreatmentPlansRoute
   AppWhatsappRoute: typeof AppWhatsappRoute
   AppClientsClientIdRoute: typeof AppClientsClientIdRoute
+  AppCommunicationTemplatesRoute: typeof AppCommunicationTemplatesRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -2157,6 +2178,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTreatmentPlansRoute: AppTreatmentPlansRoute,
   AppWhatsappRoute: AppWhatsappRoute,
   AppClientsClientIdRoute: AppClientsClientIdRoute,
+  AppCommunicationTemplatesRoute: AppCommunicationTemplatesRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

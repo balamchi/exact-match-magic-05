@@ -8,9 +8,10 @@ import {
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
-  Phone, BookOpen, Sun, Moon,
+  Phone, BookOpen, Sun, Moon, MessageSquareText,
   type LucideIcon,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useLocale, LOCALES } from "@/lib/locale-context";
 import { useTheme } from "@/lib/theme-context";
