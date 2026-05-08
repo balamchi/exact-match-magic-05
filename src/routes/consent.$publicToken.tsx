@@ -98,6 +98,19 @@ function ConsentSignPage() {
     }
 
     setSubmitting(true);
+
+    // Capture IP address for legal audit trail (best-effort)
+    let signerIp: string | null = null;
+    try {
+      const ipRes = await fetch("https://api.ipify.org?format=json");
+      if (ipRes.ok) {
+        const ipData = await ipRes.json();
+        signerIp = ipData.ip ?? null;
+      }
+    } catch {
+      // Non-critical — proceed without IP
+    }
+
     const { error: err } = await supabase.from("consent_form_signatures").update({
       status: "signed",
       signed_at: new Date().toISOString(),
@@ -106,6 +119,7 @@ function ConsentSignPage() {
       signature_checkbox_confirmed: agreed,
       signed_html_snapshot: sig.template?.body_html ?? sig.signed_html_snapshot,
       signer_user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+      signer_ip_address: signerIp,
     }).eq("id", sig.id);
 
     if (err) {
