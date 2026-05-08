@@ -173,6 +173,12 @@ function ConsentFormsDashboard() {
           throw new Error(`Email API returned ${emailRes.status}`);
         }
 
+        // Trigger queue processor to deliver immediately
+        await fetch("/lovable/email/queue/process", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }).catch((err) => console.warn("Queue processor trigger failed (non-fatal):", err));
+
         await supabase.from("consent_form_audit_log").insert({
           signature_id: sigData.id,
           clinic_id: clinicId,
