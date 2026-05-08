@@ -435,7 +435,7 @@ function ClientDetailPage() {
           {activeTab === "treatments" && <InjectionsList injections={injections} />}
           {activeTab === "photos" && <PhotosList photos={photos} />}
           {activeTab === "payments" && <FinancialTab invoices={invoices} appointments={appointments} currency={currency} />}
-          {activeTab === "consents" && <ConsentsTab consents={signedConsents} onSend={() => setSendConsentOpen(true)} />}}
+          {activeTab === "consents" && <ConsentsTab consents={signedConsents} onSend={() => setSendConsentOpen(true)} />}
           {activeTab === "soap" && <SoapNotesList notes={soapNotes} />}
           {activeTab === "plans" && <TreatmentPlansTab plans={treatmentPlans} />}
           {activeTab === "communication" && <PlaceholderTab title="Communication" description="Message history will show SMS, email, and WhatsApp conversations." icon={<MessageSquare className="h-8 w-8" />} />}
