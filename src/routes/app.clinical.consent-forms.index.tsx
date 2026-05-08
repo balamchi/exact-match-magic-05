@@ -167,7 +167,7 @@ function ConsentFormsDashboard() {
           clinic_id: clinicId,
           action: "sent",
           actor_type: "clinic_staff",
-          actor_name: activeClinic?.user_name ?? "Staff",
+          actor_name: "Staff",
           metadata: { recipient_email: client.email },
         });
 
