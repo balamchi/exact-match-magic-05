@@ -327,21 +327,74 @@ function ConsentFormsDashboard() {
               </select>
             </div>
             <div>
-              <Label>Client</Label>
-              <input value={clientSearch} onChange={e => setClientSearch(e.target.value)} placeholder="Search clients…"
-                className="mt-1 h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30" />
-              <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-border">
-                {filteredClients.slice(0, 50).map(c => (
-                  <button key={c.id} type="button" onClick={() => setSendClientId(c.id)}
-                    className={cn("w-full text-left px-3 py-2 text-sm hover:bg-muted/50 transition flex items-center justify-between",
-                      sendClientId === c.id && "bg-primary/10 text-primary")}>
-                    <span>{c.first_name} {c.last_name ?? ""}</span>
-                    {c.email && <span className="text-xs text-muted-foreground truncate ml-2">{c.email}</span>}
+              <div className="flex items-center justify-between">
+                <Label>Client</Label>
+                {sendClientId && (
+                  <button type="button" onClick={() => { setSendClientId(""); setClientSearch(""); }}
+                    className="text-xs text-muted-foreground hover:text-foreground transition">
+                    Clear selection
                   </button>
-                ))}
-                {filteredClients.length === 0 && <div className="p-3 text-center text-xs text-muted-foreground">No clients found</div>}
+                )}
               </div>
+              {sendClientId ? (
+                <div className="mt-1 rounded-lg border border-primary/30 bg-primary/5 p-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">
+                      {clients.find(c => c.id === sendClientId)?.first_name} {clients.find(c => c.id === sendClientId)?.last_name ?? ""}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {clients.find(c => c.id === sendClientId)?.email ?? "No email"}
+                      {(clients.find(c => c.id === sendClientId) as any)?.phone && ` · ${(clients.find(c => c.id === sendClientId) as any).phone}`}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="relative mt-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input value={clientSearch} onChange={e => setClientSearch(e.target.value)}
+                      placeholder="Search by name, email, or phone…"
+                      className="h-10 w-full rounded-lg border border-input bg-surface pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30" />
+                  </div>
+                  {clientSearch && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {filteredClients.length} {filteredClients.length === 1 ? "match" : "matches"}
+                    </p>
+                  )}
+                  <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-border">
+                    {filteredClients.slice(0, 50).map(c => (
+                      <button key={c.id} type="button" onClick={() => { setSendClientId(c.id); setClientSearch(""); }}
+                        className={cn("w-full text-left px-3 py-2 text-sm hover:bg-muted/50 transition flex items-center justify-between border-b border-border/30 last:border-b-0",
+                          sendClientId === c.id && "bg-primary/10 text-primary")}>
+                        <div className="flex flex-col">
+                          <span>{c.first_name} {c.last_name ?? ""}</span>
+                          {c.email && <span className="text-xs text-muted-foreground">{c.email}</span>}
+                          {!c.email && (c as any).phone && <span className="text-xs text-muted-foreground">{(c as any).phone}</span>}
+                        </div>
+                        {!c.email && <span className="text-[10px] text-amber-500 font-medium">No email</span>}
+                      </button>
+                    ))}
+                    {filteredClients.length === 0 && clientSearch && (
+                      <div className="p-4 text-center">
+                        <p className="text-sm text-muted-foreground">No clients found</p>
+                        <p className="text-xs text-muted-foreground mt-1">Try a different name, email, or phone number</p>
+                      </div>
+                    )}
+                    {filteredClients.length === 0 && !clientSearch && clients.length === 0 && (
+                      <div className="p-4 text-center">
+                        <p className="text-sm text-muted-foreground">No clients yet</p>
+                        <p className="text-xs text-muted-foreground mt-1">Add clients first before sending consents</p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
+            {sendClientId && !clients.find(c => c.id === sendClientId)?.email && (
+              <p className="text-xs text-amber-500 flex items-center gap-1">
+                ⚠ Selected client has no email. Only link will be available.
+              </p>
+            )}
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setSendOpen(false)}>Cancel</Button>
               <Button onClick={handleSend} disabled={sending || !sendTemplateId || !sendClientId}
