@@ -141,8 +141,8 @@ Deno.serve(async (req) => {
       }),
       { status: 200, headers: CORS },
     );
-  } catch (err) {
+  } catch (err: any) {
     console.error("PDF generation error:", err);
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: CORS });
+    return new Response(JSON.stringify({ error: String(err), message: err?.message, stack: err?.stack }), { status: 500, headers: CORS });
   }
 });
