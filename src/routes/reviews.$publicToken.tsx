@@ -143,14 +143,15 @@ function PublicReviewPage() {
         const { data: clientData } = await supabase.from("clients").select("first_name, last_name").eq("id", request.client_id).maybeSingle();
         const clientName = clientData ? [clientData.first_name, clientData.last_name].filter(Boolean).join(" ") : "Unknown";
 
-        // Enqueue alert email via RPC (same pattern as booking-confirmation)
-        await supabase.rpc("enqueue_email" as any, {
-          queue_name: "transactional_emails",
-          payload: {
+        // Send alert email via Lovable transactional endpoint
+        const sendRes = await fetch("/lovable/email/transactional/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
             templateName: "negative-review-alert",
             recipientEmail: settings.negative_feedback_alert_email,
             idempotencyKey: `neg-review-${insertedReview?.id}`,
-            data: {
+            templateData: {
               clinicName: clinic?.name ?? "Your Clinic",
               rating,
               title: title.trim() || undefined,
@@ -158,8 +159,18 @@ function PublicReviewPage() {
               clientName,
               submittedAt: new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }),
             },
-          },
+          }),
         });
+        if (!sendRes.ok) {
+          const errText = await sendRes.text();
+          console.error("Negative review alert email failed:", sendRes.status, errText);
+        } else {
+          // Trigger queue processor
+          await fetch("/lovable/email/queue/process", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          }).catch((err) => console.warn("Queue processor trigger failed (non-fatal):", err));
+        }
       } catch (emailErr) {
         console.error("Negative review alert email failed (non-critical):", emailErr);
       }
