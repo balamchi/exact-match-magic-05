@@ -42,6 +42,9 @@ interface Stats {
   avgRating30d: number | null;
   activeReferrals: number;
   rewardsIssuedCents30d: number;
+  pendingConsents: number;
+  soapNotesToday: number;
+  activeTreatmentPlans: number;
 }
 
 interface TodayAppt {
