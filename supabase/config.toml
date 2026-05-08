@@ -2,3 +2,6 @@ project_id = "xdprzoqptuswfvpktats"
 
 [functions.payments-webhook]
 verify_jwt = false
+
+[functions.consent-generate-pdf]
+verify_jwt = false
