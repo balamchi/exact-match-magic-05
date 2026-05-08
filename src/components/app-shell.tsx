@@ -68,6 +68,7 @@ const NAV: NavGroup[] = [
     items: [
       { to: "/app/inbox", label: "Inbox", icon: Inbox },
       { to: "/app/whatsapp", label: "WhatsApp", icon: Phone },
+      { to: "/app/communication/templates", label: "Templates", icon: MessageSquareText },
       { to: "/app/marketing", label: "Campaigns", icon: Send },
       { to: "/app/automations", label: "Automations", icon: Zap },
       { to: "/app/reviews", label: "Reviews", icon: Star },
