@@ -147,20 +147,31 @@ function ConsentFormsDashboard() {
           .eq("id", clinicId)
           .single();
 
-        await supabase.rpc("enqueue_email" as any, {
-          queue_name: "transactional_emails",
-          payload: {
+        const { data: { session } } = await supabase.auth.getSession();
+        const emailRes = await fetch("/lovable/email/transactional/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
+          body: JSON.stringify({
             templateName: "consent-request",
             recipientEmail: client.email,
             idempotencyKey: `consent-${sigData.id}`,
-            data: {
+            templateData: {
               firstName: client.first_name ?? "there",
               clinicName: clinic?.name ?? "Your Clinic",
               templateName: tmpl?.name ?? "Consent Form",
               publicToken: sigData.public_token,
             },
-          },
+          }),
         });
+
+        if (!emailRes.ok) {
+          const errBody = await emailRes.text();
+          console.error("Email send failed:", emailRes.status, errBody);
+          throw new Error(`Email API returned ${emailRes.status}`);
+        }
 
         await supabase.from("consent_form_audit_log").insert({
           signature_id: sigData.id,
