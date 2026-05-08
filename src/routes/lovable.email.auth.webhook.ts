@@ -30,8 +30,10 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
   reauthentication: ReauthenticationEmail,
 }
 
+import { BRAND } from '@/lib/brand'
+
 // Configuration
-const SITE_NAME = "ClinicPro"
+const SITE_NAME = BRAND.displayName
 const SENDER_DOMAIN = "notify.clinicpro.io"
 const ROOT_DOMAIN = "clinicpro.io"
 const FROM_DOMAIN = "notify.clinicpro.io"

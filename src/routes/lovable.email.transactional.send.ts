@@ -4,8 +4,10 @@ import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { TEMPLATES } from '@/lib/email-templates/registry'
 
+import { BRAND } from '@/lib/brand'
+
 // Configuration baked in at scaffold time
-const SITE_NAME = "exact-match-magic-05"
+const SITE_NAME = BRAND.displayName
 // SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
 // It MUST match the subdomain delegated to Lovable's nameservers. NEVER use the root domain.
 const SENDER_DOMAIN = "notify.clinicpro.io"
