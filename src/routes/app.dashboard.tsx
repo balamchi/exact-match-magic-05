@@ -172,6 +172,10 @@ function Dashboard() {
       supabase.from("reviews").select("rating").eq("clinic_id", clinicId).gte("created_at", thirtyDaysAgo),
       supabase.from("referrals").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).not("status", "in", '("rewarded","expired")'),
       supabase.from("referral_rewards").select("amount_cents").eq("clinic_id", clinicId).gte("created_at", thirtyDaysAgo),
+      // Clinical KPIs
+      supabase.from("consent_form_signatures").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).in("status", ["sent", "viewed"]),
+      supabase.from("soap_notes").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).gte("created_at", new Date(now.getTime() - 24 * 3600000).toISOString()),
+      supabase.from("treatment_plans").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).eq("status", "in_progress"),
     ]);
 
     const todayRows = (todayList.data ?? []) as unknown as TodayAppt[];
