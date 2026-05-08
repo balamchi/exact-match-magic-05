@@ -26,14 +26,17 @@ type Sig = {
   witness_signed_at: string | null;
   witness_relationship: string | null;
   expires_at: string | null;
+  signer_ip_address?: string | null;
+  signer_user_agent?: string | null;
   template?: { name: string; body_html: string; requires_witness: boolean } | null;
-  client?: { first_name: string; last_name: string | null } | null;
-  clinic?: { name: string; logo_url: string | null; primary_color: string | null } | null;
 };
+
+type ClinicInfo = { name: string; logo_url: string | null; primary_color: string | null };
 
 function ConsentSignPage() {
   const { publicToken } = Route.useParams();
   const [sig, setSig] = useState<Sig | null>(null);
+  const [clinic, setClinic] = useState<ClinicInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [signatureData, setSignatureData] = useState<string | null>(null);
@@ -45,43 +48,87 @@ function ConsentSignPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    // Use service-role-free approach: query with anon key since we need a public RLS policy
-    // Actually, consent_form_signatures doesn't have anon read. We'll use a server function approach.
-    // For simplicity, we'll use a direct anon query. We need an RLS policy for public_token access.
-    // Since we can't add RLS now, let's use the supabase client with the token lookup.
-    const { data, error: err } = await supabase
-      .from("consent_form_signatures")
-      .select("*, template:consent_form_templates(name, body_html, requires_witness), client:clients(first_name, last_name)")
-      .eq("public_token", publicToken)
-      .maybeSingle();
+    setError(null);
 
-    if (err || !data) {
-      setError("This consent form link is invalid or has expired.");
+    try {
+      console.log("[Consent] Loading token:", publicToken);
+      const { data, error: err } = await supabase
+        .from("consent_form_signatures")
+        .select("*, template:consent_form_templates(name, body_html, requires_witness)")
+        .eq("public_token", publicToken)
+        .maybeSingle();
+
+      if (err) {
+        console.error("[Consent] Fetch error:", err, "Token:", publicToken);
+        setError("Unable to load consent form. Please contact the clinic.");
+        setLoading(false);
+        return;
+      }
+
+      if (!data) {
+        console.warn("[Consent] No signature for token:", publicToken);
+        setError("This consent form link is invalid or has expired.");
+        setLoading(false);
+        return;
+      }
+
+      console.log("[Consent] Loaded signature:", data.id, "status:", data.status);
+
+      if (data.expires_at && new Date(data.expires_at) < new Date()) {
+        setError("This consent form link has expired. Please contact the clinic for a new one.");
+        setLoading(false);
+        return;
+      }
+
+      if (data.status === "expired") {
+        setError("This consent form has expired. Please contact the clinic for a new one.");
+        setLoading(false);
+        return;
+      }
+
+      if (data.status === "signed") setDone(true);
+      if (data.status === "declined") setDeclined(true);
+
+      // Best-effort clinic info fetch (anon can read clinics with slug)
+      try {
+        const { data: c } = await supabase
+          .from("clinics")
+          .select("name, logo_url, primary_color")
+          .eq("id", data.clinic_id)
+          .maybeSingle();
+        if (c) setClinic(c as ClinicInfo);
+      } catch (e) {
+        console.warn("[Consent] Clinic fetch skipped:", e);
+      }
+
+      // Mark viewed if still in sent state
+      if (data.status === "sent") {
+        await supabase
+          .from("consent_form_signatures")
+          .update({ status: "viewed", viewed_at: new Date().toISOString() })
+          .eq("id", data.id);
+
+        try {
+          await supabase.from("consent_form_audit_log").insert({
+            signature_id: data.id,
+            clinic_id: data.clinic_id,
+            action: "viewed",
+            actor_type: "client",
+            actor_name: "Patient",
+            user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+          });
+        } catch (auditErr) {
+          console.warn("[Consent] Audit (viewed) failed:", auditErr);
+        }
+      }
+
+      setSig(data as any);
       setLoading(false);
-      return;
-    }
-
-    // Check expiry
-    if (data.expires_at && new Date(data.expires_at) < new Date()) {
-      setError("This consent form link has expired. Please contact the clinic for a new one.");
+    } catch (caughtErr) {
+      console.error("[Consent] Unexpected load error:", caughtErr);
+      setError("An unexpected error occurred. Please try again or contact the clinic.");
       setLoading(false);
-      return;
     }
-
-    if (data.status === "signed") {
-      setDone(true);
-    }
-    if (data.status === "declined") {
-      setDeclined(true);
-    }
-
-    // Mark as viewed if still sent
-    if (data.status === "sent") {
-      await supabase.from("consent_form_signatures").update({ status: "viewed", viewed_at: new Date().toISOString() }).eq("id", data.id);
-    }
-
-    setSig(data as any);
-    setLoading(false);
   }, [publicToken]);
 
   useEffect(() => { load(); }, [load]);
@@ -98,8 +145,8 @@ function ConsentSignPage() {
     }
 
     setSubmitting(true);
+    console.log("[Consent] Submitting signature for:", sig.id);
 
-    // Capture IP address for legal audit trail (best-effort)
     let signerIp: string | null = null;
     try {
       const ipRes = await fetch("https://api.ipify.org?format=json");
@@ -108,23 +155,19 @@ function ConsentSignPage() {
         signerIp = ipData.ip ?? null;
       }
     } catch {
-      // Non-critical — proceed without IP
+      // non-critical
     }
+    console.log("[Consent] IP captured:", signerIp);
 
-    // Capture geolocation (optional, best-effort)
     let geolocation: { lat: number; lng: number; accuracy: number } | null = null;
     if (typeof navigator !== "undefined" && navigator.geolocation) {
       try {
         const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
         });
-        geolocation = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          accuracy: pos.coords.accuracy,
-        };
+        geolocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy };
       } catch {
-        // User declined or unavailable — proceed without
+        // user declined
       }
     }
 
@@ -141,21 +184,25 @@ function ConsentSignPage() {
     }).eq("id", sig.id);
 
     if (err) {
+      console.error("[Consent] Sign update error:", err);
       toast.error("Failed to submit signature. Please try again.");
       setSubmitting(false);
       return;
     }
 
-    // Log audit
-    await supabase.from("consent_form_audit_log").insert({
-      signature_id: sig.id,
-      clinic_id: sig.clinic_id,
-      action: "signed",
-      actor_type: "client",
-      actor_name: [sig.client?.first_name, sig.client?.last_name].filter(Boolean).join(" ") || "Client",
-      user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
-      ip_address: signerIp,
-    });
+    try {
+      await supabase.from("consent_form_audit_log").insert({
+        signature_id: sig.id,
+        clinic_id: sig.clinic_id,
+        action: "signed",
+        actor_type: "client",
+        actor_name: typedName.trim() || "Patient",
+        user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+        ip_address: signerIp,
+      });
+    } catch (e) {
+      console.warn("[Consent] Audit (signed) failed:", e);
+    }
 
     setDone(true);
     setSubmitting(false);
@@ -169,32 +216,47 @@ function ConsentSignPage() {
       status: "declined",
       declined_reason: "Declined by client",
     }).eq("id", sig.id);
-    await supabase.from("consent_form_audit_log").insert({
-      signature_id: sig.id,
-      clinic_id: sig.clinic_id,
-      action: "declined",
-      actor_type: "client",
-      actor_name: [sig.client?.first_name, sig.client?.last_name].filter(Boolean).join(" ") || "Client",
-    });
+    try {
+      await supabase.from("consent_form_audit_log").insert({
+        signature_id: sig.id,
+        clinic_id: sig.clinic_id,
+        action: "declined",
+        actor_type: "client",
+        actor_name: "Patient",
+      });
+    } catch (e) {
+      console.warn("[Consent] Audit (declined) failed:", e);
+    }
     setDeclined(true);
     setSubmitting(false);
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading consent form…</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="inline-block w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="mt-4 text-sm text-muted-foreground">Loading consent form…</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-lg">
-          <AlertTriangle className="mx-auto h-10 w-10 text-amber-400" />
-          <h1 className="mt-4 font-display text-xl font-semibold">Consent Form Unavailable</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="max-w-md w-full">
+          <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-lg">
+            <div className="mx-auto w-16 h-16 rounded-full bg-orange-500/10 flex items-center justify-center mb-4">
+              <AlertTriangle className="h-8 w-8 text-orange-400" />
+            </div>
+            <h1 className="font-display text-xl font-semibold mb-2">Consent Form Unavailable</h1>
+            <p className="text-sm text-muted-foreground mb-6">{error}</p>
+            <p className="text-xs text-muted-foreground">
+              If you believe this is a mistake, please contact the clinic that sent you this link.
+            </p>
+          </div>
+          <p className="text-center text-xs text-muted-foreground mt-6">Powered by ✦ ClinicPro</p>
         </div>
       </div>
     );
@@ -202,11 +264,18 @@ function ConsentSignPage() {
 
   if (declined) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-lg">
-          <XCircle className="mx-auto h-10 w-10 text-red-400" />
-          <h1 className="mt-4 font-display text-xl font-semibold">Consent Declined</h1>
-          <p className="mt-2 text-sm text-muted-foreground">You have declined this consent form. Please contact the clinic if you need assistance.</p>
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="max-w-md w-full">
+          <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-lg">
+            <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <XCircle className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h1 className="font-display text-xl font-semibold mb-2">Consent Declined</h1>
+            <p className="text-sm text-muted-foreground">
+              You declined this consent form. Please contact the clinic if you have questions or need to revisit this.
+            </p>
+          </div>
+          <p className="text-center text-xs text-muted-foreground mt-6">Powered by ✦ ClinicPro</p>
         </div>
       </div>
     );
@@ -214,34 +283,44 @@ function ConsentSignPage() {
 
   if (done) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-lg">
-          <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-400" />
-          <h1 className="mt-4 font-display text-xl font-semibold">Consent Signed</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Thank you for signing. You may close this page.</p>
-          {sig?.signed_at && <p className="mt-1 text-xs text-muted-foreground">Signed on {new Date(sig.signed_at).toLocaleString()}</p>}
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="max-w-md w-full">
+          <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-lg">
+            <div className="mx-auto w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
+              <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+            </div>
+            <h1 className="font-display text-xl font-semibold mb-2">Consent Signed</h1>
+            <p className="text-sm text-muted-foreground mb-2">
+              Thank you. Your signature was received{sig?.signed_at ? ` on ${new Date(sig.signed_at).toLocaleDateString()}` : ""}.
+            </p>
+            <p className="text-xs text-muted-foreground mt-4">
+              A copy has been securely stored with the clinic. You may close this page.
+            </p>
+          </div>
+          <p className="text-center text-xs text-muted-foreground mt-6">Powered by ✦ ClinicPro</p>
         </div>
       </div>
     );
   }
 
-  const clientName = [sig?.client?.first_name, sig?.client?.last_name].filter(Boolean).join(" ");
   const templateName = sig?.template?.name ?? "Consent Form";
   const bodyHtml = sig?.template?.body_html ?? "";
 
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 py-8">
-        {/* Header */}
         <div className="mb-6 flex items-center gap-3">
-          <Shield className="h-8 w-8 text-primary" />
+          {clinic?.logo_url ? (
+            <img src={clinic.logo_url} alt={clinic.name} className="h-10 w-10 rounded-lg object-cover" />
+          ) : (
+            <Shield className="h-8 w-8 text-primary" />
+          )}
           <div>
             <h1 className="font-display text-2xl font-semibold">{templateName}</h1>
-            <p className="text-sm text-muted-foreground">For {clientName}</p>
+            {clinic?.name && <p className="text-sm text-muted-foreground">{clinic.name}</p>}
           </div>
         </div>
 
-        {/* Form Body */}
         <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
           <div
             className="prose prose-sm max-w-none dark:prose-invert [&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm [&_p]:text-sm [&_li]:text-sm"
@@ -249,7 +328,6 @@ function ConsentSignPage() {
           />
         </div>
 
-        {/* Signature Section */}
         <div className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-lg">
           <h2 className="font-display text-lg font-semibold flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary" /> Your Signature
