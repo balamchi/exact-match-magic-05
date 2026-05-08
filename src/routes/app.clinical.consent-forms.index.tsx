@@ -120,6 +120,7 @@ function ConsentFormsDashboard() {
     if (!clinicId || !sendTemplateId || !sendClientId) return;
     setSending(true);
     const tmpl = templates.find(t => t.id === sendTemplateId);
+    const client = clients.find(c => c.id === sendClientId);
     const { data: sigData, error } = await supabase.from("consent_form_signatures").insert({
       clinic_id: clinicId,
       template_id: sendTemplateId,
@@ -137,19 +138,68 @@ function ConsentFormsDashboard() {
       return;
     }
 
-    // Copy link
+    // Send email to client
+    if (client?.email) {
+      try {
+        const { data: clinic } = await supabase
+          .from("clinics")
+          .select("name")
+          .eq("id", clinicId)
+          .single();
+
+        await supabase.rpc("enqueue_email" as any, {
+          queue_name: "transactional_emails",
+          payload: {
+            templateName: "consent-request",
+            recipientEmail: client.email,
+            idempotencyKey: `consent-${sigData.id}`,
+            data: {
+              firstName: client.first_name ?? "there",
+              clinicName: clinic?.name ?? "Your Clinic",
+              templateName: tmpl?.name ?? "Consent Form",
+              publicToken: sigData.public_token,
+            },
+          },
+        });
+
+        await supabase.from("consent_form_audit_log").insert({
+          signature_id: sigData.id,
+          clinic_id: clinicId,
+          action: "sent",
+          actor_type: "clinic_staff",
+          actor_name: activeClinic?.user_name ?? "Staff",
+          metadata: { recipient_email: client.email },
+        });
+
+        toast.success(`Consent form sent to ${client.email}`);
+      } catch (emailErr) {
+        console.error("Email send failed:", emailErr);
+        toast.warning("Consent created but email failed. Link copied to clipboard.");
+      }
+    } else {
+      toast.warning("Client has no email. Link copied to clipboard.");
+    }
+
+    // Copy link as backup
     const url = `${window.location.origin}/consent/${sigData.public_token}`;
     try { await navigator.clipboard.writeText(url); } catch {}
-    toast.success("Consent form sent! Link copied to clipboard.");
+
     setSending(false);
     setSendOpen(false);
+    setSendTemplateId("");
+    setSendClientId("");
+    setClientSearch("");
     load();
   };
 
   const filteredClients = clients.filter(c => {
     if (!clientSearch.trim()) return true;
-    const name = `${c.first_name} ${c.last_name ?? ""}`.toLowerCase();
-    return name.includes(clientSearch.toLowerCase()) || c.email?.toLowerCase().includes(clientSearch.toLowerCase());
+    const term = clientSearch.toLowerCase().trim();
+    const fullName = `${c.first_name ?? ""} ${c.last_name ?? ""}`.toLowerCase();
+    const email = (c.email ?? "").toLowerCase();
+    const phone = ((c as any).phone ?? "").toLowerCase().replace(/[\s\-\(\)]/g, "");
+    const searchPhone = term.replace(/[\s\-\(\)]/g, "");
+    return fullName.includes(term) || email.includes(term) || phone.includes(searchPhone);
   });
 
   const copyLink = async (token: string) => {
