@@ -365,6 +365,7 @@ function ConsentFormsDashboard() {
                 </Button>
               )}
             </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
