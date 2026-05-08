@@ -363,9 +363,9 @@ function ConsentFormsDashboard() {
                         printWindow.onload = () => { setTimeout(() => printWindow.print(), 500); };
                       }
                       toast.success("PDF ready! Use browser's Save as PDF option.");
-                    } catch (err) {
-                      console.error(err);
-                      toast.error("Failed to generate PDF");
+                    } catch (err: any) {
+                      console.error("PDF error:", err);
+                      toast.error(`Failed: ${err?.message ?? "Unknown error"}`);
                     }
                   }}
                 >
