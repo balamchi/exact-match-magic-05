@@ -354,7 +354,7 @@ function ConsentFormsDashboard() {
                         clinic_id: viewSig.clinic_id,
                         action: "downloaded",
                         actor_type: "clinic_staff",
-                        actor_name: activeClinic?.user_name ?? "Staff",
+                        actor_name: "Staff",
                       });
                       const blob = new Blob([data.html], { type: "text/html" });
                       const url = URL.createObjectURL(blob);
