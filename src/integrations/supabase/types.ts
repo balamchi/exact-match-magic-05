@@ -992,6 +992,96 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          assigned_to: string | null
+          channel: Database["public"]["Enums"]["conversation_channel"]
+          client_id: string | null
+          clinic_id: string
+          contact_avatar_url: string | null
+          contact_handle: string
+          contact_name: string
+          created_at: string
+          id: string
+          is_pinned: boolean
+          is_starred: boolean
+          last_message_at: string
+          last_message_direction:
+            | Database["public"]["Enums"]["message_direction"]
+            | null
+          last_message_text: string | null
+          metadata: Json | null
+          snoozed_until: string | null
+          status: Database["public"]["Enums"]["conversation_status"]
+          tags: string[] | null
+          unread_count: number
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          channel: Database["public"]["Enums"]["conversation_channel"]
+          client_id?: string | null
+          clinic_id: string
+          contact_avatar_url?: string | null
+          contact_handle: string
+          contact_name: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          is_starred?: boolean
+          last_message_at?: string
+          last_message_direction?:
+            | Database["public"]["Enums"]["message_direction"]
+            | null
+          last_message_text?: string | null
+          metadata?: Json | null
+          snoozed_until?: string | null
+          status?: Database["public"]["Enums"]["conversation_status"]
+          tags?: string[] | null
+          unread_count?: number
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          channel?: Database["public"]["Enums"]["conversation_channel"]
+          client_id?: string | null
+          clinic_id?: string
+          contact_avatar_url?: string | null
+          contact_handle?: string
+          contact_name?: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean
+          is_starred?: boolean
+          last_message_at?: string
+          last_message_direction?:
+            | Database["public"]["Enums"]["message_direction"]
+            | null
+          last_message_text?: string | null
+          metadata?: Json | null
+          snoozed_until?: string | null
+          status?: Database["public"]["Enums"]["conversation_status"]
+          tags?: string[] | null
+          unread_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupon_locations: {
         Row: {
           coupon_id: string
@@ -1978,6 +2068,128 @@ export type Database = {
             columns: ["clinic_id"]
             isOneToOne: false
             referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_templates: {
+        Row: {
+          body: string
+          category: Database["public"]["Enums"]["template_category"]
+          channel: Database["public"]["Enums"]["conversation_channel"] | null
+          clinic_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          use_count: number
+          variables: Json | null
+        }
+        Insert: {
+          body: string
+          category?: Database["public"]["Enums"]["template_category"]
+          channel?: Database["public"]["Enums"]["conversation_channel"] | null
+          clinic_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          use_count?: number
+          variables?: Json | null
+        }
+        Update: {
+          body?: string
+          category?: Database["public"]["Enums"]["template_category"]
+          channel?: Database["public"]["Enums"]["conversation_channel"] | null
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          use_count?: number
+          variables?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_templates_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          channel: Database["public"]["Enums"]["conversation_channel"]
+          clinic_id: string
+          conversation_id: string
+          created_at: string
+          direction: Database["public"]["Enums"]["message_direction"]
+          external_id: string | null
+          failure_reason: string | null
+          id: string
+          media_urls: string[] | null
+          metadata: Json | null
+          provider: string | null
+          sent_by_name: string | null
+          sent_by_user_id: string | null
+          status: Database["public"]["Enums"]["message_status"]
+          status_updated_at: string | null
+        }
+        Insert: {
+          body: string
+          channel: Database["public"]["Enums"]["conversation_channel"]
+          clinic_id: string
+          conversation_id: string
+          created_at?: string
+          direction: Database["public"]["Enums"]["message_direction"]
+          external_id?: string | null
+          failure_reason?: string | null
+          id?: string
+          media_urls?: string[] | null
+          metadata?: Json | null
+          provider?: string | null
+          sent_by_name?: string | null
+          sent_by_user_id?: string | null
+          status?: Database["public"]["Enums"]["message_status"]
+          status_updated_at?: string | null
+        }
+        Update: {
+          body?: string
+          channel?: Database["public"]["Enums"]["conversation_channel"]
+          clinic_id?: string
+          conversation_id?: string
+          created_at?: string
+          direction?: Database["public"]["Enums"]["message_direction"]
+          external_id?: string | null
+          failure_reason?: string | null
+          id?: string
+          media_urls?: string[] | null
+          metadata?: Json | null
+          provider?: string | null
+          sent_by_name?: string | null
+          sent_by_user_id?: string | null
+          status?: Database["public"]["Enums"]["message_status"]
+          status_updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -3884,6 +4096,14 @@ export type Database = {
         | "declined"
         | "expired"
         | "revoked"
+      conversation_channel:
+        | "sms"
+        | "whatsapp"
+        | "email"
+        | "web"
+        | "instagram"
+        | "facebook"
+      conversation_status: "open" | "closed" | "snoozed" | "spam"
       deposit_status: "pending" | "collected" | "refunded" | "forfeited"
       lead_activity_type:
         | "stage_change"
@@ -3905,6 +4125,14 @@ export type Database = {
         | "consult_booked"
         | "won"
         | "lost"
+      message_direction: "inbound" | "outbound"
+      message_status:
+        | "queued"
+        | "sent"
+        | "delivered"
+        | "read"
+        | "failed"
+        | "received"
       photo_type: "before" | "after" | "progress" | "other"
       plan_session_status: "scheduled" | "completed" | "missed" | "cancelled"
       referral_status:
@@ -3925,6 +4153,15 @@ export type Database = {
       reward_type: "credit" | "percentage" | "free_service" | "custom"
       soap_note_status: "draft" | "finalized" | "amended"
       task_status: "todo" | "in_progress" | "done"
+      template_category:
+        | "appointment"
+        | "follow_up"
+        | "marketing"
+        | "support"
+        | "reminder"
+        | "review_request"
+        | "birthday"
+        | "general"
       treatment_plan_status:
         | "proposed"
         | "accepted"
@@ -4088,6 +4325,15 @@ export const Constants = {
         "expired",
         "revoked",
       ],
+      conversation_channel: [
+        "sms",
+        "whatsapp",
+        "email",
+        "web",
+        "instagram",
+        "facebook",
+      ],
+      conversation_status: ["open", "closed", "snoozed", "spam"],
       deposit_status: ["pending", "collected", "refunded", "forfeited"],
       lead_activity_type: [
         "stage_change",
@@ -4111,6 +4357,15 @@ export const Constants = {
         "won",
         "lost",
       ],
+      message_direction: ["inbound", "outbound"],
+      message_status: [
+        "queued",
+        "sent",
+        "delivered",
+        "read",
+        "failed",
+        "received",
+      ],
       photo_type: ["before", "after", "progress", "other"],
       plan_session_status: ["scheduled", "completed", "missed", "cancelled"],
       referral_status: [
@@ -4133,6 +4388,16 @@ export const Constants = {
       reward_type: ["credit", "percentage", "free_service", "custom"],
       soap_note_status: ["draft", "finalized", "amended"],
       task_status: ["todo", "in_progress", "done"],
+      template_category: [
+        "appointment",
+        "follow_up",
+        "marketing",
+        "support",
+        "reminder",
+        "review_request",
+        "birthday",
+        "general",
+      ],
       treatment_plan_status: [
         "proposed",
         "accepted",
