@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Search, ListChecks, Target, CheckCircle2, XCircle, Clock, Camera, ChevronRight } from "lucide-react";
+import { Plus, Search, ListChecks, Target, CheckCircle2, XCircle, Clock, Camera, ChevronRight, Upload, Trash2, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -104,6 +104,48 @@ function TreatmentPlansDashboard() {
     const status = next >= detail.total_sessions_planned ? "completed" : "in_progress";
     const { error } = await supabase.from("treatment_plans").update({ sessions_completed: next, status }).eq("id", detail.id);
     if (error) toast.error("Failed to record session"); else { toast.success(`Session ${next} recorded`); setDetail((d: any) => d ? { ...d, sessions_completed: next, status } : d); load(); }
+  };
+
+  const uploadPhoto = async (planId: string, photoType: "before" | "after" | "progress") => {
+    if (!clinicId) return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Photo must be less than 10MB");
+        return;
+      }
+      toast.info("Uploading…");
+      const ext = file.name.split(".").pop();
+      const filename = `${clinicId}/${planId}/${photoType}-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("treatment-photos").upload(filename, file);
+      if (uploadErr) {
+        toast.error("Upload failed: " + uploadErr.message);
+        return;
+      }
+      const { data: urlData } = await supabase.storage.from("treatment-photos").createSignedUrl(filename, 60 * 60 * 24 * 365);
+      const photoUrl = urlData?.signedUrl ?? filename;
+      const { error: insertErr } = await supabase.from("treatment_plan_photos").insert({
+        plan_id: planId,
+        clinic_id: clinicId,
+        photo_url: photoUrl,
+        photo_type: photoType,
+        taken_at: new Date().toISOString(),
+        has_consent: false,
+      });
+      if (insertErr) {
+        toast.error("Failed to save photo record");
+        return;
+      }
+      toast.success(`${photoType.charAt(0).toUpperCase() + photoType.slice(1)} photo uploaded`);
+      // Reload photos
+      const { data } = await supabase.from("treatment_plan_photos").select("*").eq("plan_id", planId).order("taken_at", { ascending: false });
+      setDetailPhotos(data ?? []);
+    };
+    input.click();
   };
 
   const filtered = plans.filter(p => {
@@ -287,18 +329,56 @@ function TreatmentPlansDashboard() {
 
                   {/* Photos */}
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5"><Camera className="h-3.5 w-3.5" /> Treatment Photos</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5"><Camera className="h-3.5 w-3.5" /> Treatment Photos</p>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" className="gap-1 text-xs h-7" onClick={() => uploadPhoto(detail.id, "before")}>
+                          <Upload className="h-3 w-3" /> Before
+                        </Button>
+                        <Button size="sm" variant="outline" className="gap-1 text-xs h-7" onClick={() => uploadPhoto(detail.id, "after")}>
+                          <Upload className="h-3 w-3" /> After
+                        </Button>
+                        <Button size="sm" variant="outline" className="gap-1 text-xs h-7" onClick={() => uploadPhoto(detail.id, "progress")}>
+                          <Upload className="h-3 w-3" /> Progress
+                        </Button>
+                      </div>
+                    </div>
                     {detailPhotos.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                         {detailPhotos.map((p: any) => (
-                          <div key={p.id} className="rounded-lg border border-border overflow-hidden">
-                            <img src={p.photo_url} alt={p.phase ?? "Photo"} className="w-full h-24 object-cover" />
-                            <div className="p-1.5 text-[10px] text-muted-foreground capitalize">{p.phase} · Session {p.session_number}</div>
+                          <div key={p.id} className="group relative rounded-lg border border-border overflow-hidden">
+                            <img src={p.photo_url} alt={p.photo_type ?? "Photo"} className="w-full h-28 object-cover" />
+                            <div className="absolute top-1 left-1">
+                              <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase",
+                                p.photo_type === "before" ? "bg-amber-500/80 text-white" :
+                                p.photo_type === "after" ? "bg-emerald-500/80 text-white" :
+                                "bg-sky-500/80 text-white")}>{p.photo_type}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                const path = p.photo_url.includes("treatment-photos/") ? p.photo_url.split("treatment-photos/").pop() : null;
+                                if (path) await supabase.storage.from("treatment-photos").remove([path]);
+                                await supabase.from("treatment_plan_photos").delete().eq("id", p.id);
+                                setDetailPhotos((prev) => prev.filter((x: any) => x.id !== p.id));
+                                toast.success("Photo deleted");
+                              }}
+                              className="absolute top-1 right-1 hidden group-hover:flex h-5 w-5 items-center justify-center rounded-full bg-red-500/80 text-white hover:bg-red-600"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                            <div className="p-1.5 text-[10px] text-muted-foreground">
+                              {p.taken_at ? new Date(p.taken_at).toLocaleDateString() : ""}
+                            </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-muted-foreground">No photos uploaded yet.</p>
+                      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center">
+                        <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
+                        <p className="mt-2 text-xs text-muted-foreground">No photos yet. Upload before/after photos to track progress.</p>
+                      </div>
                     )}
                   </div>
 

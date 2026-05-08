@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Search, Shield, FileText, Send, Eye, CheckCircle2, Clock, XCircle, Pencil, Trash2, Copy } from "lucide-react";
+import { Plus, Search, Shield, FileText, Send, Eye, CheckCircle2, Clock, XCircle, Pencil, Trash2, Copy, Download } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -337,6 +337,33 @@ function ConsentFormsDashboard() {
                 {viewSig.signed_at && <div><span className="text-muted-foreground">Signed:</span> <span className="font-medium">{new Date(viewSig.signed_at).toLocaleString()}</span></div>}
                 {viewSig.signer_ip_address && <div><span className="text-muted-foreground">IP:</span> <span className="font-mono font-medium">{viewSig.signer_ip_address}</span></div>}
               </div>
+              {viewSig.status === "signed" && (
+                <Button
+                  variant="outline"
+                  className="mt-4 gap-2"
+                  onClick={async () => {
+                    try {
+                      toast.info("Generating PDF…");
+                      const { data, error } = await supabase.functions.invoke("consent-generate-pdf", {
+                        body: { signatureId: viewSig.id },
+                      });
+                      if (error) throw error;
+                      const blob = new Blob([data.html], { type: "text/html" });
+                      const url = URL.createObjectURL(blob);
+                      const printWindow = window.open(url, "_blank");
+                      if (printWindow) {
+                        printWindow.onload = () => { setTimeout(() => printWindow.print(), 500); };
+                      }
+                      toast.success("PDF ready! Use browser's Save as PDF option.");
+                    } catch (err) {
+                      console.error(err);
+                      toast.error("Failed to generate PDF");
+                    }
+                  }}
+                >
+                  <Download className="h-4 w-4" /> Download PDF
+                </Button>
+              )}
             </div>
           )}
         </DialogContent>

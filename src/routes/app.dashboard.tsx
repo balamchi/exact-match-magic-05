@@ -4,7 +4,7 @@ import {
   CalendarDays, Users, DollarSign, Repeat, Sparkles, Activity, AlertTriangle,
   ArrowRight, Clock, Target, TrendingUp, RefreshCw, Plus, MessageSquare,
   ShoppingCart, UserPlus, FileWarning, Receipt, Package, Cake, Star,
-  ChevronDown, ArrowUp, ArrowDown, Filter,
+  ChevronDown, ArrowUp, ArrowDown, Filter, PenLine, FileText, ListChecks,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +42,9 @@ interface Stats {
   avgRating30d: number | null;
   activeReferrals: number;
   rewardsIssuedCents30d: number;
+  pendingConsents: number;
+  soapNotesToday: number;
+  activeTreatmentPlans: number;
 }
 
 interface TodayAppt {
@@ -117,6 +120,7 @@ function Dashboard() {
       inv, tasks, invItems, locRes, weekClientsRes,
       recentApptsRes, birthdayRes, leadsRes,
       reviews7dRes, reviews30dRes, activeReferralsRes, rewards30dRes,
+      pendingConsentsRes, soapNotesTodayRes, activePlansRes,
     ] = await Promise.all([
       supabase.from("appointments")
         .select("id, starts_at, ends_at, status, price_cents, client:clients(first_name,last_name), service:services(name), staff:staff(display_name,color)")
@@ -169,6 +173,10 @@ function Dashboard() {
       supabase.from("reviews").select("rating").eq("clinic_id", clinicId).gte("created_at", thirtyDaysAgo),
       supabase.from("referrals").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).not("status", "in", '("rewarded","expired")'),
       supabase.from("referral_rewards").select("amount_cents").eq("clinic_id", clinicId).gte("created_at", thirtyDaysAgo),
+      // Clinical KPIs
+      supabase.from("consent_form_signatures").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).in("status", ["sent", "viewed"]),
+      supabase.from("soap_notes").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).gte("created_at", new Date(now.getTime() - 24 * 3600000).toISOString()),
+      supabase.from("treatment_plans").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId).eq("status", "in_progress"),
     ]);
 
     const todayRows = (todayList.data ?? []) as unknown as TodayAppt[];
@@ -255,6 +263,9 @@ function Dashboard() {
       avgRating30d,
       activeReferrals,
       rewardsIssuedCents30d,
+      pendingConsents: pendingConsentsRes.count ?? 0,
+      soapNotesToday: soapNotesTodayRes.count ?? 0,
+      activeTreatmentPlans: activePlansRes.count ?? 0,
     });
 
     setLowStock(invItemsData.filter((i) => i.stock_quantity <= i.reorder_threshold).slice(0, 5));
@@ -426,6 +437,13 @@ function Dashboard() {
         <MiniKpi label="Avg Rating (30d)" value={stats?.avgRating30d != null ? `${stats.avgRating30d}★` : "—"} loading={loading} />
         <MiniKpi label="Active Referrals" value={stats?.activeReferrals ?? 0} loading={loading} />
         <MiniKpi label="Rewards Issued (30d)" value={formatMoney(stats?.rewardsIssuedCents30d ?? 0, currency)} loading={loading} />
+      </div>
+
+      {/* Clinical KPIs */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <MiniKpi label="Pending Consents" value={stats?.pendingConsents ?? 0} loading={loading} />
+        <MiniKpi label="SOAP Notes (Today)" value={stats?.soapNotesToday ?? 0} loading={loading} />
+        <MiniKpi label="Active Treatment Plans" value={stats?.activeTreatmentPlans ?? 0} loading={loading} />
       </div>
 
       {/* Secondary KPI Cards */}
