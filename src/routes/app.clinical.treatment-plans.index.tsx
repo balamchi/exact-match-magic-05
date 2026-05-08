@@ -106,6 +106,47 @@ function TreatmentPlansDashboard() {
     if (error) toast.error("Failed to record session"); else { toast.success(`Session ${next} recorded`); setDetail((d: any) => d ? { ...d, sessions_completed: next, status } : d); load(); }
   };
 
+  const uploadPhoto = async (planId: string, photoType: "before" | "after" | "progress") => {
+    if (!clinicId) return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Photo must be less than 10MB");
+        return;
+      }
+      toast.info("Uploading…");
+      const ext = file.name.split(".").pop();
+      const filename = `${clinicId}/${planId}/${photoType}-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from("treatment-photos").upload(filename, file);
+      if (uploadErr) {
+        toast.error("Upload failed: " + uploadErr.message);
+        return;
+      }
+      const { data: urlData } = await supabase.storage.from("treatment-photos").createSignedUrl(filename, 60 * 60 * 24 * 365);
+      const photoUrl = urlData?.signedUrl ?? filename;
+      const { error: insertErr } = await supabase.from("treatment_plan_photos").insert({
+        plan_id: planId,
+        clinic_id: clinicId,
+        photo_url: photoUrl,
+        photo_type: photoType,
+        taken_at: new Date().toISOString(),
+        has_consent: false,
+      });
+      if (insertErr) {
+        toast.error("Failed to save photo record");
+        return;
+      }
+      toast.success(`${photoType.charAt(0).toUpperCase() + photoType.slice(1)} photo uploaded`);
+      // Reload photos
+      const { data } = await supabase.from("treatment_plan_photos").select("*").eq("plan_id", planId).order("taken_at", { ascending: false });
+      setDetailPhotos(data ?? []);
+    };
+    input.click();
+
   const filtered = plans.filter(p => {
     if (!query.trim()) return true;
     const name = [p.client?.first_name, p.client?.last_name].filter(Boolean).join(" ").toLowerCase();
