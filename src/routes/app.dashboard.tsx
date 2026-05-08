@@ -120,6 +120,7 @@ function Dashboard() {
       inv, tasks, invItems, locRes, weekClientsRes,
       recentApptsRes, birthdayRes, leadsRes,
       reviews7dRes, reviews30dRes, activeReferralsRes, rewards30dRes,
+      pendingConsentsRes, soapNotesTodayRes, activePlansRes,
     ] = await Promise.all([
       supabase.from("appointments")
         .select("id, starts_at, ends_at, status, price_cents, client:clients(first_name,last_name), service:services(name), staff:staff(display_name,color)")
