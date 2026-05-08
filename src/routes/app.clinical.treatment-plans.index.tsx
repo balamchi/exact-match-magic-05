@@ -347,7 +347,7 @@ function TreatmentPlansDashboard() {
                       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                         {detailPhotos.map((p: any) => (
                           <div key={p.id} className="group relative rounded-lg border border-border overflow-hidden">
-                            <img src={p.photo_url} alt={p.photo_type ?? "Photo"} className="w-full h-28 object-cover" />
+                            <img src={p.photo_url} alt={p.photo_type ?? "Photo"} className="w-full h-28 object-cover cursor-pointer" onClick={() => window.open(p.photo_url, "_blank")} />
                             <div className="absolute top-1 left-1">
                               <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase",
                                 p.photo_type === "before" ? "bg-amber-500/80 text-white" :
