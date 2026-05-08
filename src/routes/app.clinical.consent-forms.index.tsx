@@ -348,6 +348,14 @@ function ConsentFormsDashboard() {
                         body: { signatureId: viewSig.id },
                       });
                       if (error) throw error;
+                      // Audit trail
+                      await supabase.from("consent_form_audit_log").insert({
+                        signature_id: viewSig.id,
+                        clinic_id: viewSig.clinic_id,
+                        action: "downloaded",
+                        actor_type: "clinic_staff",
+                        actor_name: "Staff",
+                      });
                       const blob = new Blob([data.html], { type: "text/html" });
                       const url = URL.createObjectURL(blob);
                       const printWindow = window.open(url, "_blank");
