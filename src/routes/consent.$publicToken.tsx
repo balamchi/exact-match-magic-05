@@ -111,6 +111,23 @@ function ConsentSignPage() {
       // Non-critical — proceed without IP
     }
 
+    // Capture geolocation (optional, best-effort)
+    let geolocation: { lat: number; lng: number; accuracy: number } | null = null;
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+        });
+        geolocation = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+        };
+      } catch {
+        // User declined or unavailable — proceed without
+      }
+    }
+
     const { error: err } = await supabase.from("consent_form_signatures").update({
       status: "signed",
       signed_at: new Date().toISOString(),
