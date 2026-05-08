@@ -59,7 +59,7 @@ function ConsentFormsDashboard() {
   // Load clients when send dialog opens
   useEffect(() => {
     if (!sendOpen || !clinicId) return;
-    supabase.from("clients").select("id, first_name, last_name, email").eq("clinic_id", clinicId).order("first_name").limit(500).then(({ data }) => setClients(data ?? []));
+    supabase.from("clients").select("id, first_name, last_name, email, phone").eq("clinic_id", clinicId).order("first_name").limit(500).then(({ data }) => setClients(data ?? []));
   }, [sendOpen, clinicId]);
 
   const pending = signatures.filter(s => s.status === "sent" || s.status === "viewed");
