@@ -287,18 +287,56 @@ function TreatmentPlansDashboard() {
 
                   {/* Photos */}
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5"><Camera className="h-3.5 w-3.5" /> Treatment Photos</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5"><Camera className="h-3.5 w-3.5" /> Treatment Photos</p>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" className="gap-1 text-xs h-7" onClick={() => uploadPhoto(detail.id, "before")}>
+                          <Upload className="h-3 w-3" /> Before
+                        </Button>
+                        <Button size="sm" variant="outline" className="gap-1 text-xs h-7" onClick={() => uploadPhoto(detail.id, "after")}>
+                          <Upload className="h-3 w-3" /> After
+                        </Button>
+                        <Button size="sm" variant="outline" className="gap-1 text-xs h-7" onClick={() => uploadPhoto(detail.id, "progress")}>
+                          <Upload className="h-3 w-3" /> Progress
+                        </Button>
+                      </div>
+                    </div>
                     {detailPhotos.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                         {detailPhotos.map((p: any) => (
-                          <div key={p.id} className="rounded-lg border border-border overflow-hidden">
-                            <img src={p.photo_url} alt={p.phase ?? "Photo"} className="w-full h-24 object-cover" />
-                            <div className="p-1.5 text-[10px] text-muted-foreground capitalize">{p.phase} · Session {p.session_number}</div>
+                          <div key={p.id} className="group relative rounded-lg border border-border overflow-hidden">
+                            <img src={p.photo_url} alt={p.photo_type ?? "Photo"} className="w-full h-28 object-cover" />
+                            <div className="absolute top-1 left-1">
+                              <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase",
+                                p.photo_type === "before" ? "bg-amber-500/80 text-white" :
+                                p.photo_type === "after" ? "bg-emerald-500/80 text-white" :
+                                "bg-sky-500/80 text-white")}>{p.photo_type}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                const path = p.photo_url.includes("treatment-photos/") ? p.photo_url.split("treatment-photos/").pop() : null;
+                                if (path) await supabase.storage.from("treatment-photos").remove([path]);
+                                await supabase.from("treatment_plan_photos").delete().eq("id", p.id);
+                                setDetailPhotos((prev) => prev.filter((x: any) => x.id !== p.id));
+                                toast.success("Photo deleted");
+                              }}
+                              className="absolute top-1 right-1 hidden group-hover:flex h-5 w-5 items-center justify-center rounded-full bg-red-500/80 text-white hover:bg-red-600"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                            <div className="p-1.5 text-[10px] text-muted-foreground">
+                              {p.taken_at ? new Date(p.taken_at).toLocaleDateString() : ""}
+                            </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-muted-foreground">No photos uploaded yet.</p>
+                      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center">
+                        <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
+                        <p className="mt-2 text-xs text-muted-foreground">No photos yet. Upload before/after photos to track progress.</p>
+                      </div>
                     )}
                   </div>
 
