@@ -263,6 +263,9 @@ function Dashboard() {
       avgRating30d,
       activeReferrals,
       rewardsIssuedCents30d,
+      pendingConsents: pendingConsentsRes.count ?? 0,
+      soapNotesToday: soapNotesTodayRes.count ?? 0,
+      activeTreatmentPlans: activePlansRes.count ?? 0,
     });
 
     setLowStock(invItemsData.filter((i) => i.stock_quantity <= i.reorder_threshold).slice(0, 5));
