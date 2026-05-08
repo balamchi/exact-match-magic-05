@@ -146,6 +146,7 @@ function TreatmentPlansDashboard() {
       setDetailPhotos(data ?? []);
     };
     input.click();
+  };
 
   const filtered = plans.filter(p => {
     if (!query.trim()) return true;
