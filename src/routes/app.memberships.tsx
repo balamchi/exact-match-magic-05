@@ -48,6 +48,12 @@ type MembershipRow = {
   monthly_price_cents: number;
   member_count: number;
   active: boolean;
+  billing_cadence: string | null;
+  trial_days: number | null;
+  square_plan_id: string | null;
+  square_plan_variation_id: string | null;
+  square_synced_at: string | null;
+  square_sync_error: string | null;
   created_at: string;
   updated_at: string;
 };
