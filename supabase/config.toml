@@ -1,7 +1,39 @@
 project_id = "xdprzoqptuswfvpktats"
 
+# Public-facing functions (called from unauthenticated pages / external services)
 [functions.payments-webhook]
 verify_jwt = false
 
 [functions.consent-generate-pdf]
 verify_jwt = false
+
+[functions.signup-rate-check]
+verify_jwt = false
+
+[functions.get-paddle-price]
+verify_jwt = false
+
+# Authenticated-only functions (default verify_jwt = true)
+[functions.start-trial]
+verify_jwt = true
+
+[functions.cancel-scheduled-change]
+verify_jwt = true
+
+[functions.change-plan]
+verify_jwt = true
+
+[functions.chat]
+verify_jwt = true
+
+[functions.customer-portal]
+verify_jwt = true
+
+[functions.referrals-trigger-reward]
+verify_jwt = true
+
+[functions.reviews-send-pending]
+verify_jwt = true
+
+[functions.send-sms]
+verify_jwt = true
