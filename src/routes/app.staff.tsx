@@ -504,7 +504,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
             <h2 className="font-display text-2xl font-semibold">{editing ? "Edit staff" : "Add staff member"}</h2>
             <p className="mt-0.5 text-sm text-muted-foreground">{editing ? "Update profile, schedule, and compensation details." : "Add a new team member to your clinic."}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}><X className="h-4 w-4" /></Button>
+          <Button aria-label="Action" variant="ghost" size="icon" onClick={onClose}><X className="h-4 w-4" /></Button>
         </div>
 
         {/* Tabs */}

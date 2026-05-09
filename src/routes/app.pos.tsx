@@ -316,18 +316,18 @@ function PosPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 rounded-md border border-border bg-background">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => adjust(idx, -1)}>
+                      <Button aria-label="Action" variant="ghost" size="icon" className="h-7 w-7" onClick={() => adjust(idx, -1)}>
                         <Minus className="h-3 w-3" />
                       </Button>
                       <span className="w-6 text-center font-mono text-sm tabular-nums">{line.qty}</span>
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => adjust(idx, 1)}>
+                      <Button aria-label="Action" variant="ghost" size="icon" className="h-7 w-7" onClick={() => adjust(idx, 1)}>
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
                     <div className="w-20 text-end font-mono text-sm font-semibold tabular-nums">
                       {formatCAD(line.unitCents * line.qty)}
                     </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => removeLine(idx)}>
+                    <Button aria-label="Action" variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground" onClick={() => removeLine(idx)}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </li>

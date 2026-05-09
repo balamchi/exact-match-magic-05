@@ -402,14 +402,14 @@ function MarketingPage() {
                       </Button>
                     )}
                     {(c.status === "scheduled" || c.status === "paused") && (
-                      <Button variant="ghost" size="icon" onClick={() => togglePause(c)} aria-label="Pause/resume">
+                      <Button aria-label="Action" variant="ghost" size="icon" onClick={() => togglePause(c)} aria-label="Pause/resume">
                         {c.status === "paused" ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
                       </Button>
                     )}
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(c)} aria-label="Edit">
+                    <Button aria-label="Action" variant="ghost" size="icon" onClick={() => openEdit(c)} aria-label="Edit">
                       <Edit3 className="h-4 w-4" />
                     </Button>
-                    <Button
+                    <Button aria-label="Action"
                       variant="ghost"
                       size="icon"
                       onClick={() => remove(c)}

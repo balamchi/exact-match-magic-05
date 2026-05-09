@@ -286,7 +286,7 @@ function InventoryPage() {
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit item" : "New item"}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Track stock, costs, and expiration.</p>
               </div>
-              <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)}>
+              <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => setOpen(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>

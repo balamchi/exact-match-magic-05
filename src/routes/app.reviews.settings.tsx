@@ -94,7 +94,7 @@ function ReviewSettings() {
     <div className="space-y-6">
       <header className="flex items-center gap-4">
         <Link to="/app/reviews">
-          <Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
+          <Button aria-label="Action" variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
         </Link>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Settings</p>
