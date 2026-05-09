@@ -44,6 +44,33 @@ export function ComingSoonBanner({
   );
 }
 
+export function Phase4Badge({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn(
+        "ml-2 inline-flex items-center rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-amber-300",
+        className
+      )}
+    >
+      Phase 4
+    </span>
+  );
+}
+
+export function SidebarPhase4Dot({ className }: { className?: string }) {
+  return (
+    <span
+      title="Coming in Phase 4"
+      className={cn(
+        "ms-auto inline-flex items-center justify-center rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-300",
+        className
+      )}
+    >
+      4
+    </span>
+  );
+}
+
 export function PhaseInlineNotice({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-200">

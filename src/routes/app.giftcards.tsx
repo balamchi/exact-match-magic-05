@@ -504,10 +504,10 @@ function GiftCardsPage() {
                   if (!detailCard.recipient_email) { toast.error("No email on file"); return; }
                   try {
                     await sendEmail({ data: { giftCardId: detailCard.id } });
-                    toast.success("Resend queued");
+                    toast.success("Email resent successfully");
                     await load();
                   } catch (e: any) {
-                    toast.error(`Send failed: ${e?.message ?? "unknown"}`);
+                    toast.error(`Resend failed: ${e?.message ?? "unknown"}`);
                   }
                 }} className="flex-1">
                   <Send className="mr-2 h-4 w-4" /> Resend
