@@ -178,23 +178,17 @@ export const enrollMember = createServerFn({ method: "POST" })
     }
 
     // Bump member_count on the membership for at-a-glance KPI
-    await supabaseAdmin.rpc("increment_member_count", { p_id: m.id }).then(
-      () => undefined,
-      async () => {
-        // Fallback: do a +1 update if the helper function isn't installed
-        const { data: cur } = await supabaseAdmin
-          .from("memberships")
-          .select("member_count")
-          .eq("id", m.id)
-          .maybeSingle();
-        if (cur) {
-          await supabaseAdmin
-            .from("memberships")
-            .update({ member_count: Number(cur.member_count ?? 0) + 1 })
-            .eq("id", m.id);
-        }
-      },
-    );
+    const { data: cur } = await supabaseAdmin
+      .from("memberships")
+      .select("member_count")
+      .eq("id", m.id)
+      .maybeSingle();
+    if (cur) {
+      await supabaseAdmin
+        .from("memberships")
+        .update({ member_count: Number(cur.member_count ?? 0) + 1 })
+        .eq("id", m.id);
+    }
 
     return { ok: true, square_subscription_id: sub.id, status: internalStatus };
   });
