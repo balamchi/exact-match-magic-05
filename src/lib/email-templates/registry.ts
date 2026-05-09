@@ -15,6 +15,7 @@ import { template as paymentFailed } from './payment-failed'
 import { template as reviewRequest } from './review-request'
 import { template as negativeReviewAlert } from './negative-review-alert'
 import { template as consentRequest } from './consent-request'
+import { template as directMessage } from './direct-message'
 
 /**
  * Template registry — maps template names to their React Email components.
@@ -26,4 +27,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'review-request': reviewRequest,
   'negative-review-alert': negativeReviewAlert,
   'consent-request': consentRequest,
+  'direct-message': directMessage,
 }
