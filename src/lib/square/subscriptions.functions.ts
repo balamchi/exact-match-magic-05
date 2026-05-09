@@ -55,15 +55,8 @@ export const enrollMember = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!roleRow) throw new Error("Not a member of this clinic.");
 
-    // Square connection
-    const { data: conn } = await supabaseAdmin
-      .from("clinic_square_connections")
-      .select("access_token, location_id, status")
-      .eq("clinic_id", m.clinic_id)
-      .maybeSingle();
-    if (!conn || conn.status !== "active") {
-      throw new Error("Square is not connected for this clinic.");
-    }
+    // Square connection (auto-refresh OAuth token if near expiry)
+    const conn = await getActiveSquareConnection(m.clinic_id);
     if (!conn.location_id) throw new Error("No Square location on the connected account.");
 
     const cfg = getSquareEnv();
