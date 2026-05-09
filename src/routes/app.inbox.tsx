@@ -117,6 +117,13 @@ function InboxPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showTemplates, setShowTemplates] = useState(false);
   const [client, setClient] = useState<any | null>(null);
+  const [clinicReplyEmail, setClinicReplyEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!clinicId) return;
+    supabase.from("clinics").select("reply_email").eq("id", clinicId).maybeSingle()
+      .then(({ data }) => setClinicReplyEmail((data as any)?.reply_email ?? null));
+  }, [clinicId]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Debounce search
@@ -385,6 +392,18 @@ function InboxPage() {
           </Button>
         </div>
       </div>
+
+      {!clinicReplyEmail && (
+        <div className="flex items-start gap-3 border-b border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-amber-200 sm:px-6">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div className="flex-1 text-xs leading-relaxed">
+            <p className="font-medium">Email replies will bounce</p>
+            <p className="text-amber-200/80">
+              Set your reply email in <Link to="/app/settings" className="underline underline-offset-2">Settings</Link> so client responses can reach you. Currently replies go to <code className="font-mono">noreply@notify.clinicpro.io</code> which doesn't exist.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 3-column layout */}
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[320px_1fr_300px]">
