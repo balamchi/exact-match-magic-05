@@ -567,6 +567,24 @@ function PlanCard({
                 Paused
               </Badge>
             )}
+            {row.square_plan_id && !row.square_sync_error && (
+              <Badge
+                variant="outline"
+                className="border-sky-500/40 bg-sky-500/10 text-[10px] font-medium uppercase tracking-wider text-sky-300"
+                title={row.square_synced_at ? `Synced ${new Date(row.square_synced_at).toLocaleString()}` : "Synced"}
+              >
+                <CheckCircle2 className="mr-1 h-3 w-3" /> Square
+              </Badge>
+            )}
+            {row.square_sync_error && (
+              <Badge
+                variant="outline"
+                className="border-rose-500/40 bg-rose-500/10 text-[10px] font-medium uppercase tracking-wider text-rose-300"
+                title={row.square_sync_error}
+              >
+                <AlertTriangle className="mr-1 h-3 w-3" /> Sync error
+              </Badge>
+            )}
           </div>
           {row.description && (
             <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
