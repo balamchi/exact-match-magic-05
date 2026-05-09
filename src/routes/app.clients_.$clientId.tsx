@@ -348,8 +348,8 @@ function ClientDetailPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setActiveTab("communication")}><Send className="mr-2 h-3.5 w-3.5" /> Send message</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toast.info("Gift card application coming in Phase 4")}><Gift className="mr-2 h-3.5 w-3.5" /> Apply gift card</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toast.info("Charge card coming in Phase 4")}><CreditCard className="mr-2 h-3.5 w-3.5" /> Charge card</DropdownMenuItem>
+                <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed"><Gift className="mr-2 h-3.5 w-3.5" /> Apply gift card<span className="ml-auto text-[9px] uppercase tracking-wider text-amber-400 font-semibold">Phase 4</span></DropdownMenuItem>
+                <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed"><CreditCard className="mr-2 h-3.5 w-3.5" /> Charge card<span className="ml-auto text-[9px] uppercase tracking-wider text-amber-400 font-semibold">Phase 4</span></DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSendConsentOpen(true)}><PenLine className="mr-2 h-3.5 w-3.5" /> Send consent form</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={async () => {
@@ -361,7 +361,7 @@ function ClientDetailPage() {
                   const { data: updated } = await supabase.from("clients").select("*").eq("id", clientId).single();
                   if (updated) setClient(updated as Client);
                 }}><Star className="mr-2 h-3.5 w-3.5" /> {client.vip_status ? "Remove VIP" : "Mark as VIP"}</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => toast.info("Memberships coming in Phase 4")}><Award className="mr-2 h-3.5 w-3.5" /> Add membership</DropdownMenuItem>
+                <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed"><Award className="mr-2 h-3.5 w-3.5" /> Add membership<span className="ml-auto text-[9px] uppercase tracking-wider text-amber-400 font-semibold">Phase 4</span></DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Phase4Badge, ComingSoonBanner } from "@/components/beta-badge";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/quickbooks")({ component: QuickBooksPage });
@@ -76,12 +77,16 @@ function QuickBooksPage() {
 
   return (
     <div className="space-y-6">
+      <ComingSoonBanner
+        title="QuickBooks Online sync — coming in Phase 4"
+        description="The mappings and toggles you configure now will run automatically once OAuth ships."
+      />
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
             <BookOpen className="h-3 w-3" /> Accounting
           </div>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">QuickBooks<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">QuickBooks<Phase4Badge /></h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Sync invoices, payments, and client records with QuickBooks Online for seamless accounting.
           </p>

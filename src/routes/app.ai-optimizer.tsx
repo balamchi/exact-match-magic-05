@@ -7,6 +7,7 @@ import {
   Brain, Clock, TrendingUp, Users, Calendar, Sparkles,
   ArrowRight, CheckCircle2, AlertTriangle, Lightbulb, BarChart3,
 } from "lucide-react";
+import { Phase4Badge, ComingSoonBanner } from "@/components/beta-badge";
 
 export const Route = createFileRoute("/app/ai-optimizer")({
   component: AiOptimizerPage,
@@ -112,12 +113,17 @@ function AiOptimizerPage() {
 
   return (
     <div className="space-y-8">
+      <ComingSoonBanner
+        title="AI Schedule Optimizer — coming in Phase 4"
+        description="The interface and analytics preview below are illustrative. Real recommendations and actions activate when Phase 4 ships."
+      />
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Brain className="h-7 w-7 text-primary" />
             AI Schedule Optimizer
+            <Phase4Badge />
           </h1>
           <p className="text-muted-foreground mt-1">
             AI-powered recommendations to maximize bookings, reduce gaps, and optimize staff schedules

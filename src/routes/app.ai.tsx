@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
+import { Phase4Badge, ComingSoonBanner } from "@/components/beta-badge";
 
 export const Route = createFileRoute("/app/ai")({ component: AiAssistantPage });
 
@@ -170,11 +171,17 @@ function AiAssistantPage() {
 
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col">
+      <div className="pb-3">
+        <ComingSoonBanner
+          title="AI Assistant — coming in Phase 4"
+          description="Chat is wired to a preview model. Custom assistants, fine-tuned prompts, and team sharing ship in Phase 4."
+        />
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">AI Assistant</p>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight">Chat<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight">Chat<Phase4Badge /></h1>
         </div>
         <div className="flex items-center gap-2">
           <select
