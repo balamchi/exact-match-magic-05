@@ -2441,6 +2441,8 @@ export type Database = {
           sort_order: number | null
           square_plan_id: string | null
           square_plan_variation_id: string | null
+          square_sync_error: string | null
+          square_synced_at: string | null
           trial_days: number | null
           updated_at: string
         }
@@ -2461,6 +2463,8 @@ export type Database = {
           sort_order?: number | null
           square_plan_id?: string | null
           square_plan_variation_id?: string | null
+          square_sync_error?: string | null
+          square_synced_at?: string | null
           trial_days?: number | null
           updated_at?: string
         }
@@ -2481,6 +2485,8 @@ export type Database = {
           sort_order?: number | null
           square_plan_id?: string | null
           square_plan_variation_id?: string | null
+          square_sync_error?: string | null
+          square_synced_at?: string | null
           trial_days?: number | null
           updated_at?: string
         }
