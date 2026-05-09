@@ -535,7 +535,7 @@ function PublicBookingPage() {
   /* ---------- Loading / Not Found ---------- */
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0B]">
+      <div className="min-h-screen bg-card">
         <div className="mx-auto max-w-2xl px-4 py-16">
           <Skeleton className="h-10 w-48 mx-auto mb-4" />
           <Skeleton className="h-6 w-64 mx-auto mb-12" />
@@ -547,12 +547,12 @@ function PublicBookingPage() {
 
   if (!clinic) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0A0A0B] px-4">
+      <div className="flex min-h-screen items-center justify-center bg-card px-4">
         <div className="max-w-md text-center">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 text-red-400">
             <AlertCircle className="h-8 w-8" />
           </div>
-          <h1 className="font-display text-3xl font-semibold text-white">Clinic not found</h1>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Clinic not found</h1>
           <p className="mt-3 text-sm text-neutral-400">
             We couldn't find a clinic with the link <span className="font-mono text-neutral-300">{clinicSlug}</span>.
           </p>
@@ -564,17 +564,17 @@ function PublicBookingPage() {
 
   if (clinic.booking_widget_enabled === false) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0A0A0B] px-4">
+      <div className="flex min-h-screen items-center justify-center bg-card px-4">
         <div className="max-w-md text-center">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400">
             <AlertCircle className="h-8 w-8" />
           </div>
-          <h1 className="font-display text-2xl font-semibold text-white">Online booking is not available</h1>
+          <h1 className="font-display text-2xl font-semibold text-foreground">Online booking is not available</h1>
           <p className="mt-3 text-sm text-neutral-400">
             {clinic.name} is not currently accepting online bookings.
           </p>
           {clinic.phone && (
-            <a href={`tel:${clinic.phone}`} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-purple-600 px-6 py-3 text-sm font-medium text-white hover:bg-purple-500">
+            <a href={`tel:${clinic.phone}`} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-purple-600 px-6 py-3 text-sm font-medium text-foreground hover:bg-purple-500">
               <Phone className="h-4 w-4" /> Call {clinic.phone}
             </a>
           )}
@@ -597,7 +597,7 @@ function PublicBookingPage() {
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-500/15 text-green-400 animate-in zoom-in-50 duration-500">
             <Check className="h-10 w-10" strokeWidth={3} />
           </div>
-          <h1 className="mt-6 font-display text-3xl font-semibold text-white">You're booked!</h1>
+          <h1 className="mt-6 font-display text-3xl font-semibold text-foreground">You're booked!</h1>
           <p className="mt-2 text-sm text-neutral-400">
             {(settings.thank_you_message) || "Thank you! We'll see you soon."}
           </p>
@@ -613,10 +613,10 @@ function PublicBookingPage() {
           </div>
 
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <a href={gCalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-xs font-medium text-white hover:bg-neutral-700">
+            <a href={gCalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-xs font-medium text-foreground hover:bg-neutral-700">
               <CalendarPlus className="h-4 w-4" /> Google Calendar
             </a>
-            <button onClick={() => downloadICS(ics, "appointment.ics")} className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-xs font-medium text-white hover:bg-neutral-700">
+            <button onClick={() => downloadICS(ics, "appointment.ics")} className="inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-xs font-medium text-foreground hover:bg-neutral-700">
               <CalendarPlus className="h-4 w-4" /> Apple / Outlook
             </button>
           </div>
@@ -633,7 +633,7 @@ function PublicBookingPage() {
             </p>
           )}
 
-          <Button onClick={() => { setState(INITIAL); setStep(0); setSubmitted(false); }} className="mt-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white hover:opacity-90">
+          <Button onClick={() => { setState(INITIAL); setStep(0); setSubmitted(false); }} className="mt-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-foreground hover:opacity-90">
             Book Another Appointment
           </Button>
         </div>
@@ -659,7 +659,7 @@ function PublicBookingPage() {
       {refBanner && (
         <div className="mx-auto max-w-2xl px-4 pt-4">
           <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 px-4 py-3 text-sm text-purple-300">
-            🎁 You've been referred by <strong className="text-white">{refBanner.name}</strong>! Get <strong className="text-white">{refBanner.description}</strong> on your first visit.
+            🎁 You've been referred by <strong className="text-foreground">{refBanner.name}</strong>! Get <strong className="text-foreground">{refBanner.description}</strong> on your first visit.
           </div>
         </div>
       )}
@@ -677,14 +677,14 @@ function PublicBookingPage() {
                     disabled={i > step}
                     onClick={() => i < step && setStep(i)}
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-semibold transition-all ${
-                      done ? "border-purple-500 bg-purple-600 text-white"
+                      done ? "border-purple-500 bg-purple-600 text-foreground"
                         : active ? "border-purple-500 bg-purple-500/15 text-purple-400"
                           : "border-neutral-700 bg-neutral-800 text-neutral-500"
                     }`}
                   >
                     {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
                   </button>
-                  <span className={`hidden sm:inline truncate ${active ? "font-medium text-white" : "text-neutral-500"}`}>{label}</span>
+                  <span className={`hidden sm:inline truncate ${active ? "font-medium text-foreground" : "text-neutral-500"}`}>{label}</span>
                   {i < STEPS.length - 1 && <div className={`ml-1 hidden h-px flex-1 sm:block ${done ? "bg-purple-600" : "bg-neutral-700"}`} />}
                 </li>
               );
@@ -697,7 +697,7 @@ function PublicBookingPage() {
           {/* ======== STEP 0: Service ======== */}
           {step === 0 && (
             <div>
-              <h2 className="font-display text-2xl font-semibold text-white">Choose a treatment</h2>
+              <h2 className="font-display text-2xl font-semibold text-foreground">Choose a treatment</h2>
               <p className="mt-1 text-sm text-neutral-400">{settings.welcome_message || "Select the service you'd like to book."}</p>
 
               {services.length > 4 && (
@@ -708,7 +708,7 @@ function PublicBookingPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search services…"
-                    className="h-11 w-full rounded-xl border border-neutral-700 bg-neutral-800 pl-10 pr-3 text-sm text-white placeholder:text-neutral-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                    className="h-11 w-full rounded-xl border border-neutral-700 bg-neutral-800 pl-10 pr-3 text-sm text-foreground placeholder:text-neutral-500 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                   />
                 </div>
               )}
@@ -752,7 +752,7 @@ function PublicBookingPage() {
                           className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-800/60"
                         >
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-white">{cat}</span>
+                            <span className="text-sm font-semibold text-foreground">{cat}</span>
                             <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[11px] text-neutral-400">{items.length}</span>
                           </div>
                           <ChevronDown className={`h-4 w-4 text-neutral-400 transition-transform duration-200 ${isOpen ? "rotate-0" : "-rotate-90"}`} />
@@ -781,7 +781,7 @@ function PublicBookingPage() {
                                 >
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-2">
-                                      <span className="font-semibold text-white text-[15px]">{s.name}</span>
+                                      <span className="font-semibold text-foreground text-[15px]">{s.name}</span>
                                       {isPopular && (
                                         <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
                                           <Star className="h-2.5 w-2.5 fill-amber-400" /> Popular
@@ -817,7 +817,7 @@ function PublicBookingPage() {
           {step === 1 && (
             <div>
               <ServiceSummary service={selectedService!} settings={settings} currency={currency} />
-              <h2 className="mt-6 font-display text-2xl font-semibold text-white">Choose a provider</h2>
+              <h2 className="mt-6 font-display text-2xl font-semibold text-foreground">Choose a provider</h2>
               <p className="mt-1 text-sm text-neutral-400">Or let us assign the first available.</p>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -828,7 +828,7 @@ function PublicBookingPage() {
                     state.staffId === "" ? "border-purple-500 bg-purple-500/10 ring-2 ring-purple-500/30" : "border-neutral-800 bg-neutral-800/50 hover:border-purple-500/40"
                   }`}
                 >
-                  <div className="font-medium text-white">Any available</div>
+                  <div className="font-medium text-foreground">Any available</div>
                   <div className="mt-1 text-xs text-neutral-400">First available provider</div>
                 </button>
 
@@ -846,12 +846,12 @@ function PublicBookingPage() {
                       {settings.show_provider_photos !== false && s.photo_url ? (
                         <img src={s.photo_url} alt={s.display_name} className="h-12 w-12 rounded-full object-cover" loading="lazy" />
                       ) : (
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style={{ background: s.color ?? "#9333EA" }}>
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-foreground" style={{ background: s.color ?? "#9333EA" }}>
                           {s.display_name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="font-medium text-white">{s.display_name}</div>
+                        <div className="font-medium text-foreground">{s.display_name}</div>
                         {s.title && <div className="text-xs text-neutral-400">{s.title}</div>}
                         {settings.show_provider_bios !== false && (s as any).booking_bio && (
                           <p className="mt-1 text-xs text-neutral-500 line-clamp-2">{(s as any).booking_bio}</p>
@@ -872,7 +872,7 @@ function PublicBookingPage() {
           {step === 2 && (
             <div>
               <ServiceSummary service={selectedService!} settings={settings} currency={currency} staff={selectedStaff} />
-              <h2 className="mt-6 font-display text-2xl font-semibold text-white">Pick a date & time</h2>
+              <h2 className="mt-6 font-display text-2xl font-semibold text-foreground">Pick a date & time</h2>
               <p className="mt-1 text-sm text-neutral-400">Select your preferred appointment slot.</p>
 
               <div className="mt-5">
@@ -888,7 +888,7 @@ function PublicBookingPage() {
                         type="button"
                         onClick={() => { setState((s) => ({ ...s, date: d, time: "" })); }}
                         className={`flex shrink-0 flex-col items-center rounded-xl border px-3 py-2.5 text-center transition-all min-w-[60px] min-h-[48px] ${
-                          active ? "border-purple-500 bg-purple-600 text-white" : "border-neutral-700 bg-neutral-800 text-neutral-300 hover:border-purple-500/40"
+                          active ? "border-purple-500 bg-purple-600 text-foreground" : "border-neutral-700 bg-neutral-800 text-neutral-300 hover:border-purple-500/40"
                         }`}
                       >
                         <span className="text-[10px] uppercase">{dt.toLocaleDateString("en-US", { weekday: "short" })}</span>
@@ -925,33 +925,33 @@ function PublicBookingPage() {
           {step === 3 && (
             <div>
               <ServiceSummary service={selectedService!} settings={settings} currency={currency} staff={selectedStaff} date={state.date} time={state.time} />
-              <h2 className="mt-6 font-display text-2xl font-semibold text-white">Your details</h2>
+              <h2 className="mt-6 font-display text-2xl font-semibold text-foreground">Your details</h2>
               <p className="mt-1 text-sm text-neutral-400">So we can confirm your appointment.</p>
 
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="fn" className="text-neutral-300"><User className="mr-1 inline h-3.5 w-3.5" /> First name *</Label>
-                  <Input id="fn" value={state.firstName} onChange={(e) => setState((s) => ({ ...s, firstName: e.target.value }))} placeholder="Jane" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 min-h-[48px]" />
+                  <Input id="fn" value={state.firstName} onChange={(e) => setState((s) => ({ ...s, firstName: e.target.value }))} placeholder="Jane" className="bg-neutral-800 border-neutral-700 text-foreground placeholder:text-neutral-500 min-h-[48px]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="ln" className="text-neutral-300">Last name *</Label>
-                  <Input id="ln" value={state.lastName} onChange={(e) => setState((s) => ({ ...s, lastName: e.target.value }))} placeholder="Smith" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 min-h-[48px]" />
+                  <Input id="ln" value={state.lastName} onChange={(e) => setState((s) => ({ ...s, lastName: e.target.value }))} placeholder="Smith" className="bg-neutral-800 border-neutral-700 text-foreground placeholder:text-neutral-500 min-h-[48px]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="em" className="text-neutral-300"><Mail className="mr-1 inline h-3.5 w-3.5" /> Email *</Label>
-                  <Input id="em" type="email" value={state.email} onChange={(e) => setState((s) => ({ ...s, email: e.target.value }))} placeholder="jane@example.com" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 min-h-[48px]" />
+                  <Input id="em" type="email" value={state.email} onChange={(e) => setState((s) => ({ ...s, email: e.target.value }))} placeholder="jane@example.com" className="bg-neutral-800 border-neutral-700 text-foreground placeholder:text-neutral-500 min-h-[48px]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="ph" className="text-neutral-300"><Phone className="mr-1 inline h-3.5 w-3.5" /> Phone *</Label>
-                  <Input id="ph" type="tel" value={state.phone} onChange={(e) => setState((s) => ({ ...s, phone: e.target.value }))} placeholder="+1 555 123 4567" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 min-h-[48px]" />
+                  <Input id="ph" type="tel" value={state.phone} onChange={(e) => setState((s) => ({ ...s, phone: e.target.value }))} placeholder="+1 555 123 4567" className="bg-neutral-800 border-neutral-700 text-foreground placeholder:text-neutral-500 min-h-[48px]" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="dob" className="text-neutral-300">Date of birth</Label>
-                  <Input id="dob" type="date" value={state.dob} onChange={(e) => setState((s) => ({ ...s, dob: e.target.value }))} className="bg-neutral-800 border-neutral-700 text-white min-h-[48px]" />
+                  <Input id="dob" type="date" value={state.dob} onChange={(e) => setState((s) => ({ ...s, dob: e.target.value }))} className="bg-neutral-800 border-neutral-700 text-foreground min-h-[48px]" />
                 </div>
                 <div className="sm:col-span-2 space-y-1.5">
                   <Label htmlFor="notes" className="text-neutral-300"><MessageSquare className="mr-1 inline h-3.5 w-3.5" /> Notes for the clinic</Label>
-                  <Textarea id="notes" value={state.notes} onChange={(e) => setState((s) => ({ ...s, notes: e.target.value }))} rows={3} placeholder="Anything we should know?" className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500" maxLength={1000} />
+                  <Textarea id="notes" value={state.notes} onChange={(e) => setState((s) => ({ ...s, notes: e.target.value }))} rows={3} placeholder="Anything we should know?" className="bg-neutral-800 border-neutral-700 text-foreground placeholder:text-neutral-500" maxLength={1000} />
                 </div>
 
                 {/* Honeypot */}
@@ -977,7 +977,7 @@ function PublicBookingPage() {
           {/* ======== STEP 4: Confirm ======== */}
           {step === 4 && (
             <div>
-              <h2 className="font-display text-2xl font-semibold text-white">Review & confirm</h2>
+              <h2 className="font-display text-2xl font-semibold text-foreground">Review & confirm</h2>
               <p className="mt-1 text-sm text-neutral-400">Double-check everything before booking.</p>
 
               <dl className="mt-6 space-y-3 rounded-xl border border-neutral-700 bg-neutral-800/50 p-5 text-sm">
@@ -1002,14 +1002,14 @@ function PublicBookingPage() {
         </section>
 
         {/* ======== STICKY BOTTOM NAV ======== */}
-        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-800 bg-[#0A0A0B]/95 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.5)] pb-[env(safe-area-inset-bottom)]">
+        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-neutral-800 bg-card/95 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.5)] pb-[env(safe-area-inset-bottom)]">
           <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setStep((s) => Math.max(0, s - 1))}
               disabled={step === 0}
-              className="text-neutral-400 hover:text-white hover:bg-neutral-800 min-h-[48px]"
+              className="text-neutral-400 hover:text-foreground hover:bg-neutral-800 min-h-[48px]"
             >
               <ChevronLeft className="mr-1 h-4 w-4" /> Back
             </Button>
@@ -1019,7 +1019,7 @@ function PublicBookingPage() {
                 type="button"
                 onClick={advance}
                 disabled={!canAdvance()}
-                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-600/20 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px] px-6"
+                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-foreground shadow-lg shadow-purple-600/20 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px] px-6"
               >
                 Continue <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
@@ -1028,7 +1028,7 @@ function PublicBookingPage() {
                 type="button"
                 onClick={submitBooking}
                 disabled={submitting}
-                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-lg shadow-purple-600/20 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px] px-6"
+                className="bg-gradient-to-r from-purple-600 to-fuchsia-600 text-foreground shadow-lg shadow-purple-600/20 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px] px-6"
               >
                 {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Booking…</> : "Confirm Booking"}
               </Button>
@@ -1050,7 +1050,7 @@ function PublicBookingPage() {
 
 function BookingShell({ clinic, children }: { clinic: Clinic; children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#0A0A0B]">
+    <div className="min-h-screen bg-card">
       <header className="border-b border-neutral-800/80">
         <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 py-4">
           {clinic.logo_url ? (
@@ -1061,7 +1061,7 @@ function BookingShell({ clinic, children }: { clinic: Clinic; children: React.Re
             </div>
           )}
           <div className="min-w-0">
-            <div className="font-display text-lg font-semibold text-white truncate">{clinic.name}</div>
+            <div className="font-display text-lg font-semibold text-foreground truncate">{clinic.name}</div>
             {clinic.bio && <p className="text-xs text-neutral-400 truncate">{clinic.bio}</p>}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-neutral-500">
               {clinic.phone && <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{clinic.phone}</span>}
@@ -1080,7 +1080,7 @@ function ServiceSummary({ service, settings, currency, staff, date, time }: { se
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl border border-neutral-700 bg-neutral-800/50 px-4 py-2.5 text-xs text-neutral-300">
       <Sparkles className="h-3.5 w-3.5 text-purple-400" />
-      <span className="font-medium text-white">{service.name}</span>
+      <span className="font-medium text-foreground">{service.name}</span>
       <span className="text-neutral-500">·</span>
       <span>{service.duration_minutes} min</span>
       {settings.show_prices !== false && <><span className="text-neutral-500">·</span><span className="text-purple-400">{money(service.price_cents, currency)}</span></>}
@@ -1102,7 +1102,7 @@ function TimeGroup({ label, slots, selected, duration, onSelect }: { label: stri
             onClick={() => onSelect(t)}
             className={`rounded-lg border px-2 py-2.5 text-sm transition-all min-h-[48px] ${
               selected === t
-                ? "border-purple-500 bg-purple-600 text-white"
+                ? "border-purple-500 bg-purple-600 text-foreground"
                 : "border-neutral-700 bg-neutral-800 text-neutral-300 hover:border-purple-500/40"
             }`}
           >
@@ -1118,7 +1118,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 text-sm">
       <dt className="text-neutral-400">{label}</dt>
-      <dd className="text-right font-medium text-white">{value}</dd>
+      <dd className="text-right font-medium text-foreground">{value}</dd>
     </div>
   );
 }
@@ -1128,7 +1128,7 @@ function Row({ icon, label, sub }: { icon: React.ReactNode; label: string; sub?:
     <div className="flex items-center gap-3 py-2 border-b border-neutral-800 last:border-0">
       {icon}
       <div>
-        <div className="text-sm font-medium text-white">{label}</div>
+        <div className="text-sm font-medium text-foreground">{label}</div>
         {sub && <div className="text-xs text-neutral-400">{sub}</div>}
       </div>
     </div>

@@ -17,7 +17,7 @@ function AboutPage() {
       <div className="space-y-8">
         <div className="flex flex-col items-center sm:flex-row sm:items-start gap-8">
           <div className="flex h-32 w-32 flex-shrink-0 items-center justify-center rounded-full [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-            <span className="font-display text-4xl font-bold text-white">SB</span>
+            <span className="font-display text-4xl font-bold text-foreground">SB</span>
           </div>
           <div>
             <h2 className="text-2xl font-bold text-foreground">Shahab Balamchi</h2>

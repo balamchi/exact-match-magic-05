@@ -17,8 +17,11 @@ import {
   Star,
   X,
   ChevronDown,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useTheme } from "@/lib/theme-context";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -73,13 +76,13 @@ function Mark({ size = 32 }: { size?: number }) {
 
 /* ------------------------------ Buttons ------------------------------ */
 const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-[18px] py-[10px] text-sm font-semibold text-white transition shadow-[0_4px_20px_-4px_rgba(147,51,234,0.5)] hover:shadow-[0_6px_24px_-4px_rgba(147,51,234,0.7)] hover:-translate-y-px [background:linear-gradient(135deg,#9333EA,#7E22CE)] hover:[background:linear-gradient(135deg,#A855F7,#9333EA)]";
+  "inline-flex items-center justify-center gap-2 rounded-xl px-[18px] py-[10px] text-sm font-semibold text-foreground transition shadow-[0_4px_20px_-4px_rgba(147,51,234,0.5)] hover:shadow-[0_6px_24px_-4px_rgba(147,51,234,0.7)] hover:-translate-y-px [background:linear-gradient(135deg,#9333EA,#7E22CE)] hover:[background:linear-gradient(135deg,#A855F7,#9333EA)]";
 const btnPrimaryLg =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-white transition shadow-[0_4px_20px_-4px_rgba(147,51,234,0.5)] hover:shadow-[0_6px_24px_-4px_rgba(147,51,234,0.7)] hover:-translate-y-px [background:linear-gradient(135deg,#9333EA,#7E22CE)] hover:[background:linear-gradient(135deg,#A855F7,#9333EA)]";
+  "inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-foreground transition shadow-[0_4px_20px_-4px_rgba(147,51,234,0.5)] hover:shadow-[0_6px_24px_-4px_rgba(147,51,234,0.7)] hover:-translate-y-px [background:linear-gradient(135deg,#9333EA,#7E22CE)] hover:[background:linear-gradient(135deg,#A855F7,#9333EA)]";
 const btnSecondary =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white/[0.05] px-6 py-3.5 text-[15px] font-semibold text-foreground transition hover:bg-white/[0.08]";
+  "inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-foreground/[0.05] px-6 py-3.5 text-[15px] font-semibold text-foreground transition hover:bg-foreground/[0.08]";
 const btnGhost =
-  "inline-flex items-center justify-center rounded-xl px-[18px] py-[10px] text-sm font-medium text-muted-foreground transition hover:bg-white/[0.05] hover:text-foreground";
+  "inline-flex items-center justify-center rounded-xl px-[18px] py-[10px] text-sm font-medium text-muted-foreground transition hover:bg-foreground/[0.05] hover:text-foreground";
 
 /* ------------------------------ Data ------------------------------ */
 const PAINS = [
@@ -135,6 +138,7 @@ const CLINIC_NAMES = ["Roda Clinic", "Lavista Cosmetic", "Dr. Ariana Aesthetics"
 /* ------------------------------ Page ------------------------------ */
 function Landing() {
   const { user, loading } = useAuth();
+  const { theme, toggle } = useTheme();
   const ctaHref = !loading && user ? "/app/dashboard" : "/auth/sign-up";
   const [demoOpen, setDemoOpen] = useState(false);
   const [pricingInterval, setPricingInterval] = useState<"monthly" | "annual">("monthly");
@@ -154,7 +158,7 @@ function Landing() {
       />
 
       {/* NAV */}
-      <nav className="sticky top-0 z-50 border-b border-border/60 bg-black/70 backdrop-blur-xl backdrop-saturate-150">
+      <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-5 py-[18px] sm:px-8">
           <Link to="/" className="flex items-center gap-2.5">
             <Mark />
@@ -166,6 +170,14 @@ function Landing() {
             <a href="#pricing" className="text-sm font-medium text-muted-foreground transition hover:text-foreground">Pricing</a>
           </div>
           <div className="hidden items-center gap-2 md:flex">
+            <button
+              type="button"
+              onClick={toggle}
+              aria-label="Toggle theme"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-foreground/5 hover:text-foreground"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
             {!loading && user ? (
               <Link to="/app/dashboard" className={btnPrimary}>Open dashboard <ArrowRight className="h-4 w-4" /></Link>
             ) : (
@@ -190,7 +202,7 @@ function Landing() {
         </div>
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="border-t border-border/60 bg-black/95 px-5 pb-6 pt-4 md:hidden">
+          <div className="border-t border-border/60 bg-background/95 px-5 pb-6 pt-4 md:hidden">
             <div className="flex flex-col gap-3">
               <a href="#features" onClick={() => setMobileMenuOpen(false)} className="py-2 text-sm font-medium text-muted-foreground">Features</a>
               <a href="#vs" onClick={() => setMobileMenuOpen(false)} className="py-2 text-sm font-medium text-muted-foreground">Compare</a>
@@ -257,8 +269,8 @@ function Landing() {
               className="pointer-events-none absolute -inset-24 -z-10"
               style={{ background: "radial-gradient(ellipse at center, rgba(147,51,234,0.2), transparent 60%)" }}
             />
-            <div className="overflow-hidden rounded-[22px] bg-[#08080A]">
-              <div className="flex items-center gap-2 border-b border-border/60 bg-[#0A0A0B] px-5 py-3.5">
+            <div className="overflow-hidden rounded-[22px] bg-card">
+              <div className="flex items-center gap-2 border-b border-border/60 bg-card px-5 py-3.5">
                 <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
                 <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
                 <span className="h-3 w-3 rounded-full bg-[#28c940]" />
@@ -272,7 +284,7 @@ function Landing() {
                 <div className="col-span-2 rounded-2xl border border-primary/30 p-5 sm:col-span-4 [background:linear-gradient(135deg,rgba(217,70,239,0.1),rgba(147,51,234,0.05))]">
                   <div className="flex items-start gap-4">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[10px] [background:linear-gradient(135deg,#D946EF,#9333EA)]">
-                      <Sparkles className="h-5 w-5 text-white" />
+                      <Sparkles className="h-5 w-5 text-foreground" />
                     </div>
                     <div className="text-start">
                       <div className="font-display text-lg font-bold">AI Insights</div>
@@ -326,7 +338,7 @@ function Landing() {
                 { num: "73", lab: "Consent forms ready" },
                 { num: "$4,200", lab: "Avg recovered/mo via AI" },
               ].map((s) => (
-                <div key={s.lab} className="rounded-xl border border-border/60 bg-white/[0.02] p-4">
+                <div key={s.lab} className="rounded-xl border border-border/60 bg-foreground/[0.03] p-4">
                   <div className="font-display text-[28px] font-bold text-[oklch(0.7_0.22_300)]">{s.num}</div>
                   <div className="mt-1 text-[11px] text-muted-foreground">{s.lab}</div>
                 </div>
@@ -356,7 +368,7 @@ function Landing() {
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="flex flex-col items-center lg:items-start">
             <div className="flex h-[200px] w-[200px] items-center justify-center rounded-full [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-              <span className="font-display text-6xl font-bold text-white">SB</span>
+              <span className="font-display text-6xl font-bold text-foreground">SB</span>
             </div>
             <h3 className="mt-6 font-display text-2xl font-bold">Shahab Balamchi</h3>
             <p className="mt-1 text-sm text-muted-foreground">Founder & CEO · Divan Digital Corp</p>
@@ -377,7 +389,7 @@ function Landing() {
           {TESTIMONIALS.map((t) => (
             <div
               key={t.author}
-              className="group rounded-2xl border border-primary/20 bg-black p-8 transition hover:border-primary/40 hover:shadow-[0_0_30px_-10px_rgba(147,51,234,0.3)]"
+              className="group rounded-2xl border border-primary/20 bg-background p-8 transition hover:border-primary/40 hover:shadow-[0_0_30px_-10px_rgba(147,51,234,0.3)]"
             >
               <div className="flex gap-0.5">
                 {Array.from({ length: t.stars }).map((_, i) => (
@@ -387,7 +399,7 @@ function Landing() {
               <p className="mt-4 text-sm leading-relaxed text-zinc-300">"{t.quote}"</p>
               <div className="mt-6 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-                  <span className="text-xs font-bold text-white">{t.initials}</span>
+                  <span className="text-xs font-bold text-foreground">{t.initials}</span>
                 </div>
                 <div>
                   <div className="text-sm font-semibold">{t.author}</div>
@@ -442,7 +454,7 @@ function Landing() {
               <thead>
                 <tr>
                   {["Feature","Mindbody","Boulevard","Fresha","Vagaro"].map((h) => (
-                    <th key={h} className="border-b border-border/60 bg-white/[0.02] px-5 py-[18px] text-start text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">{h}</th>
+                    <th key={h} className="border-b border-border/60 bg-foreground/[0.03] px-5 py-[18px] text-start text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">{h}</th>
                   ))}
                   <th className="border-b border-border/60 bg-primary/[0.08] px-5 py-[18px] text-start text-xs font-semibold uppercase tracking-[0.1em] text-[oklch(0.7_0.22_300)]">ClinicPro</th>
                 </tr>
@@ -492,11 +504,11 @@ function Landing() {
         {/* Founding member banner */}
         <div className="mb-12 overflow-hidden rounded-2xl p-px [background:linear-gradient(135deg,#9333EA,#D946EF)]">
           <div className="rounded-[15px] px-8 py-6 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
-            <div className="font-display text-xl font-bold text-white sm:text-2xl">🔒 Founding Member Pricing — Locked Forever</div>
+            <div className="font-display text-xl font-bold text-foreground sm:text-2xl">🔒 Founding Member Pricing — Locked Forever</div>
             <p className="mt-2 text-sm text-zinc-200">
               First 100 clinics get <strong>$49/$149/$349</strong> per month locked in for life. No price increases, ever.
             </p>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-white">
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-foreground/10 px-4 py-1.5 text-sm font-semibold text-foreground">
               <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
               95 / 100 spots remaining
             </div>
@@ -541,7 +553,7 @@ function Landing() {
                 }
               >
                 {p.featured && (
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-white [background:linear-gradient(135deg,#9333EA,#D946EF)]">
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-foreground [background:linear-gradient(135deg,#9333EA,#D946EF)]">
                     Most Popular
                   </div>
                 )}
@@ -666,12 +678,12 @@ function Landing() {
       {demoOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setDemoOpen(false)}>
           <div className="relative w-full max-w-lg rounded-3xl border border-border bg-surface p-8 text-center" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setDemoOpen(false)} className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-white/10">
+            <button onClick={() => setDemoOpen(false)} className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-foreground/10">
               <X className="h-5 w-5" />
             </button>
             <div className="mb-6 flex justify-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-                <Sparkles className="h-8 w-8 text-white" />
+                <Sparkles className="h-8 w-8 text-foreground" />
               </div>
             </div>
             <h3 className="font-display text-2xl font-bold">Demo video coming soon</h3>
