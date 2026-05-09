@@ -20,11 +20,6 @@ const EnrollInput = z.object({
   card_source_id: z.string().min(4).max(2048), // Square Web Payments nonce (cnon:*)
 });
 
-const sqHeaders = (token: string) => ({
-  Authorization: `Bearer ${token}`,
-  "Content-Type": "application/json",
-  "Square-Version": SQUARE_API_VERSION,
-});
 
 export const enrollMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
