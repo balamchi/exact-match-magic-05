@@ -16,6 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { useServerFn } from "@tanstack/react-start";
+import { sendGiftCardEmail } from "@/lib/email/giftcard.functions";
 
 export const Route = createFileRoute("/app/giftcards")({ component: GiftCardsPage });
 
@@ -79,6 +81,7 @@ const emptyForm: FormState = {
 function GiftCardsPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id ?? null;
+  const sendEmail = useServerFn(sendGiftCardEmail);
   const [rows, setRows] = useState<GiftCardRow[]>([]);
   const [locations, setLocations] = useState<LocationRow[]>([]);
   const [gcLocationMap, setGcLocationMap] = useState<Record<string, string[]>>({});
@@ -230,7 +233,18 @@ function GiftCardsPage() {
       }
     }
 
-    toast.success(editing ? "Gift card updated" : "Gift card issued");
+    // Auto-send delivery email when issuing a new card with email delivery
+    if (!editing && gcId && form.delivery_method === "email" && form.recipient_email) {
+      try {
+        await sendEmail({ data: { giftCardId: gcId } });
+        toast.success("Gift card issued and email sent");
+      } catch (e: any) {
+        toast.success("Gift card issued");
+        toast.error(`Email send failed: ${e?.message ?? "unknown"}`);
+      }
+    } else {
+      toast.success(editing ? "Gift card updated" : "Gift card issued");
+    }
     setSubmitting(false);
     closeComposer();
     await load();
@@ -486,7 +500,16 @@ function GiftCardsPage() {
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => { if (detailCard.recipient_email) { toast.success("Resend queued"); } else { toast.error("No email on file"); } }} className="flex-1">
+                <Button variant="outline" onClick={async () => {
+                  if (!detailCard.recipient_email) { toast.error("No email on file"); return; }
+                  try {
+                    await sendEmail({ data: { giftCardId: detailCard.id } });
+                    toast.success("Resend queued");
+                    await load();
+                  } catch (e: any) {
+                    toast.error(`Send failed: ${e?.message ?? "unknown"}`);
+                  }
+                }} className="flex-1">
                   <Send className="mr-2 h-4 w-4" /> Resend
                 </Button>
               </div>

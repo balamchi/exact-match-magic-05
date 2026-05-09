@@ -171,7 +171,7 @@ export function ResourceModule({ title, eyebrow, description, table, icon, field
               {loading ? <tr><td colSpan={columns.length + 1} className="px-4 py-10 text-center text-muted-foreground">Loading…</td></tr> : filtered.length === 0 ? <tr><td colSpan={columns.length + 1} className="px-4 py-14 text-center text-muted-foreground">No records yet.</td></tr> : filtered.map((row) => (
                 <tr key={String(row.id)} className="transition hover:bg-surface/60">
                   {columns.map((column) => <td key={column} className="px-4 py-3">{displayValue(row[column], fields.find((field) => field.key === column)?.type)}</td>)}
-                  <td className="px-4 py-3 text-right"><Button aria-label="Action" variant="ghost" size="icon" onClick={() => openEdit(row)}><Edit3 className="h-4 w-4" /></Button><Button aria-label="Action" variant="ghost" size="icon" onClick={() => remove(row)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button></td>
+                  <td className="px-4 py-3 text-right"><Button variant="ghost" size="icon" onClick={() => openEdit(row)}><Edit3 className="h-4 w-4" /></Button><Button aria-label="Action" variant="ghost" size="icon" onClick={() => remove(row)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button></td>
                 </tr>
               ))}
             </tbody>

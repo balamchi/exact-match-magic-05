@@ -529,9 +529,9 @@ function ServicesPage() {
                       </td>
                       <td className="p-3">
                         <div className="flex justify-end gap-1">
-                          <Button aria-label="Action" variant="ghost" size="icon" onClick={() => openEdit(s)} aria-label="Edit"><Edit3 className="h-3.5 w-3.5" /></Button>
-                          <Button aria-label="Action" variant="ghost" size="icon" onClick={() => duplicate(s)} aria-label="Duplicate"><Copy className="h-3.5 w-3.5" /></Button>
-                          <Button aria-label="Action" variant="ghost" size="icon" onClick={() => remove(s)} aria-label="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => openEdit(s)} aria-label="Edit"><Edit3 className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => duplicate(s)} aria-label="Duplicate"><Copy className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => remove(s)} aria-label="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
                         </div>
                       </td>
                     </tr>

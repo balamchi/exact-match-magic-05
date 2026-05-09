@@ -472,13 +472,13 @@ function PackagesPage() {
                         <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total package</div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button aria-label="Action" size="icon" variant="ghost" onClick={() => openSell(row)} title="Sell to client" aria-label="Sell to client"><ShoppingBag className="h-4 w-4" /></Button>
-                        <Button aria-label="Action" size="icon" variant="ghost" onClick={() => openEdit(row)} title="Edit" aria-label="Edit"><Pencil className="h-4 w-4" /></Button>
-                        <Button aria-label="Action" size="icon" variant="ghost" onClick={() => duplicate(row)} title="Duplicate" aria-label="Duplicate"><Copy className="h-4 w-4" /></Button>
-                        <Button aria-label="Action" size="icon" variant="ghost" onClick={() => togglePackage(row)} title={row.active ? "Pause" : "Activate"} aria-label={row.active ? "Pause" : "Activate"}>
+                        <Button size="icon" variant="ghost" onClick={() => openSell(row)} title="Sell to client" aria-label="Sell to client"><ShoppingBag className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" onClick={() => openEdit(row)} title="Edit" aria-label="Edit"><Pencil className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" onClick={() => duplicate(row)} title="Duplicate" aria-label="Duplicate"><Copy className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" onClick={() => togglePackage(row)} title={row.active ? "Pause" : "Activate"} aria-label={row.active ? "Pause" : "Activate"}>
                           {row.active ? <PauseCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                         </Button>
-                        <Button aria-label="Action" size="icon" variant="ghost" onClick={() => remove(row)} title="Delete" aria-label="Delete" className="text-muted-foreground hover:text-rose-300">
+                        <Button size="icon" variant="ghost" onClick={() => remove(row)} title="Delete" aria-label="Delete" className="text-muted-foreground hover:text-rose-300">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
