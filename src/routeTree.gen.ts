@@ -110,6 +110,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable.em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable.email.auth.preview'
 import { Route as AppStaffHrStaffIdRouteImport } from './routes/app.staff.hr.$staffId'
 import { Route as AppClinicalSoapNotesNoteIdRouteImport } from './routes/app.clinical.soap-notes.$noteId'
+import { Route as ApiPublicSquareWebhookRouteImport } from './routes/api.public.square.webhook'
 import { Route as ApiPublicSquareStartRouteImport } from './routes/api.public.square.start'
 import { Route as ApiPublicSquareCallbackRouteImport } from './routes/api.public.square.callback'
 
@@ -628,6 +629,11 @@ const AppClinicalSoapNotesNoteIdRoute =
     path: '/$noteId',
     getParentRoute: () => AppClinicalSoapNotesRoute,
   } as any)
+const ApiPublicSquareWebhookRoute = ApiPublicSquareWebhookRouteImport.update({
+  id: '/square/webhook',
+  path: '/square/webhook',
+  getParentRoute: () => ApiPublicRoute,
+} as any)
 const ApiPublicSquareStartRoute = ApiPublicSquareStartRouteImport.update({
   id: '/square/start',
   path: '/square/start',
@@ -733,6 +739,7 @@ export interface FileRoutesByFullPath {
   '/app/reviews/': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
+  '/api/public/square/webhook': typeof ApiPublicSquareWebhookRoute
   '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -833,6 +840,7 @@ export interface FileRoutesByTo {
   '/app/reviews': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
+  '/api/public/square/webhook': typeof ApiPublicSquareWebhookRoute
   '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -939,6 +947,7 @@ export interface FileRoutesById {
   '/app/reviews/': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
+  '/api/public/square/webhook': typeof ApiPublicSquareWebhookRoute
   '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -1046,6 +1055,7 @@ export interface FileRouteTypes {
     | '/app/reviews/'
     | '/api/public/square/callback'
     | '/api/public/square/start'
+    | '/api/public/square/webhook'
     | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
@@ -1146,6 +1156,7 @@ export interface FileRouteTypes {
     | '/app/reviews'
     | '/api/public/square/callback'
     | '/api/public/square/start'
+    | '/api/public/square/webhook'
     | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
@@ -1251,6 +1262,7 @@ export interface FileRouteTypes {
     | '/app/reviews/'
     | '/api/public/square/callback'
     | '/api/public/square/start'
+    | '/api/public/square/webhook'
     | '/app/clinical/soap-notes/$noteId'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
@@ -2002,6 +2014,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClinicalSoapNotesNoteIdRouteImport
       parentRoute: typeof AppClinicalSoapNotesRoute
     }
+    '/api/public/square/webhook': {
+      id: '/api/public/square/webhook'
+      path: '/square/webhook'
+      fullPath: '/api/public/square/webhook'
+      preLoaderRoute: typeof ApiPublicSquareWebhookRouteImport
+      parentRoute: typeof ApiPublicRoute
+    }
     '/api/public/square/start': {
       id: '/api/public/square/start'
       path: '/square/start'
@@ -2023,12 +2042,14 @@ interface ApiPublicRouteChildren {
   ApiPublicBookingRoute: typeof ApiPublicBookingRoute
   ApiPublicSquareCallbackRoute: typeof ApiPublicSquareCallbackRoute
   ApiPublicSquareStartRoute: typeof ApiPublicSquareStartRoute
+  ApiPublicSquareWebhookRoute: typeof ApiPublicSquareWebhookRoute
 }
 
 const ApiPublicRouteChildren: ApiPublicRouteChildren = {
   ApiPublicBookingRoute: ApiPublicBookingRoute,
   ApiPublicSquareCallbackRoute: ApiPublicSquareCallbackRoute,
   ApiPublicSquareStartRoute: ApiPublicSquareStartRoute,
+  ApiPublicSquareWebhookRoute: ApiPublicSquareWebhookRoute,
 }
 
 const ApiPublicRouteWithChildren = ApiPublicRoute._addFileChildren(
