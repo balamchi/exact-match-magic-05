@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+
 import {
   ArrowLeft, CalendarDays, Mail, Phone, Tag, Pencil, Sparkles,
   Clock, DollarSign, Activity, FileText, Syringe, Camera,
@@ -347,13 +347,21 @@ function ClientDetailPage() {
                 <Button variant="outline" size="sm"><MoreHorizontal className="h-4 w-4" /></Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem><Send className="mr-2 h-3.5 w-3.5" /> Send message</DropdownMenuItem>
-                <DropdownMenuItem><Gift className="mr-2 h-3.5 w-3.5" /> Apply gift card</DropdownMenuItem>
-                <DropdownMenuItem><CreditCard className="mr-2 h-3.5 w-3.5" /> Charge card</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("communication")}><Send className="mr-2 h-3.5 w-3.5" /> Send message</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toast.info("Gift card application coming in Phase 4")}><Gift className="mr-2 h-3.5 w-3.5" /> Apply gift card</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toast.info("Charge card coming in Phase 4")}><CreditCard className="mr-2 h-3.5 w-3.5" /> Charge card</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSendConsentOpen(true)}><PenLine className="mr-2 h-3.5 w-3.5" /> Send consent form</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem><Star className="mr-2 h-3.5 w-3.5" /> {client.vip_status ? "Remove VIP" : "Mark as VIP"}</DropdownMenuItem>
-                <DropdownMenuItem><Award className="mr-2 h-3.5 w-3.5" /> Add membership</DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => {
+                  if (!client) return;
+                  const newStatus = !client.vip_status;
+                  const { error } = await supabase.from("clients").update({ vip_status: newStatus }).eq("id", clientId);
+                  if (error) { toast.error("Failed to update VIP status"); return; }
+                  toast.success(newStatus ? "Marked as VIP" : "VIP status removed");
+                  const { data: updated } = await supabase.from("clients").select("*").eq("id", clientId).single();
+                  if (updated) setClient(updated as Client);
+                }}><Star className="mr-2 h-3.5 w-3.5" /> {client.vip_status ? "Remove VIP" : "Mark as VIP"}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => toast.info("Memberships coming in Phase 4")}><Award className="mr-2 h-3.5 w-3.5" /> Add membership</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -943,29 +951,39 @@ function SpendingBreakdown({ appointments, currency }: { appointments: Appointme
 }
 
 function ReviewsTab({ clientId, clinicId, clientName }: { clientId: string; clinicId: string; clientName?: string }) {
-  const { data: reviews, isLoading } = useQuery({
-    queryKey: ["client-reviews", clientId, clientName],
-    queryFn: async () => {
-      const { data: byId } = await supabase
-        .from("reviews")
-        .select("*")
-        .eq("clinic_id", clinicId)
-        .eq("client_id", clientId)
-        .order("created_at", { ascending: false });
-      if (byId && byId.length > 0) return byId;
-      if (clientName) {
-        const { data: byName } = await supabase
-          .from("reviews")
-          .select("*")
-          .eq("clinic_id", clinicId)
-          .ilike("reviewer_name", clientName)
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!clinicId || !clientId) { setIsLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      setIsLoading(true);
+      try {
+        const { data: byId } = await supabase
+          .from("reviews").select("*")
+          .eq("clinic_id", clinicId).eq("client_id", clientId)
           .order("created_at", { ascending: false });
-        return byName ?? [];
+        if (cancelled) return;
+        if (byId && byId.length > 0) { setReviews(byId); return; }
+        if (clientName) {
+          const { data: byName } = await supabase
+            .from("reviews").select("*")
+            .eq("clinic_id", clinicId).ilike("reviewer_name", clientName)
+            .order("created_at", { ascending: false });
+          if (!cancelled) setReviews(byName ?? []);
+        } else {
+          setReviews([]);
+        }
+      } catch (err) {
+        console.error("[ReviewsTab] Load failed:", err);
+        if (!cancelled) setReviews([]);
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-      return [];
-    },
-    enabled: !!clinicId,
-  });
+    })();
+    return () => { cancelled = true; };
+  }, [clinicId, clientId, clientName]);
 
   if (isLoading) return <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">Loading reviews…</div>;
   if (!reviews?.length) return <PlaceholderTab title="Reviews" description="No reviews from this client yet." icon={<Star className="h-8 w-8" />} />;
@@ -986,25 +1004,35 @@ function ReviewsTab({ clientId, clinicId, clientName }: { clientId: string; clin
 }
 
 function ReferralsTab({ clientId, clinicId, currency }: { clientId: string; clinicId: string; currency: string }) {
-  const { data: code, isLoading } = useQuery({
-    queryKey: ["client-referral", clientId],
-    queryFn: async () => {
-      const { data: codeData } = await supabase
-        .from("referral_codes")
-        .select("*")
-        .eq("clinic_id", clinicId)
-        .eq("client_id", clientId)
-        .maybeSingle();
-      if (!codeData) return null;
-      const { data: rewards } = await supabase
-        .from("referral_rewards")
-        .select("*")
-        .eq("referral_id", codeData.id)
-        .order("created_at", { ascending: false });
-      return { ...codeData, referral_rewards: rewards ?? [] };
-    },
-    enabled: !!clinicId,
-  });
+  const [code, setCode] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!clinicId || !clientId) { setIsLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      setIsLoading(true);
+      try {
+        const { data: codeData } = await supabase
+          .from("referral_codes").select("*")
+          .eq("clinic_id", clinicId).eq("client_id", clientId)
+          .maybeSingle();
+        if (cancelled) return;
+        if (!codeData) { setCode(null); return; }
+        const { data: rewards } = await supabase
+          .from("referral_rewards").select("*")
+          .eq("referral_id", codeData.id)
+          .order("created_at", { ascending: false });
+        if (!cancelled) setCode({ ...codeData, referral_rewards: rewards ?? [] });
+      } catch (err) {
+        console.error("[ReferralsTab] Load failed:", err);
+        if (!cancelled) setCode(null);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [clinicId, clientId]);
 
   if (isLoading) return <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">Loading referrals…</div>;
   if (!code) return <PlaceholderTab title="Referrals" description="No referral code assigned to this client." icon={<Share2 className="h-8 w-8" />} />;
@@ -1124,6 +1152,9 @@ function CommunicationTab({ clientId, clinicId, client }: { clientId: string; cl
     try {
       if (conv.channel === "email" && conv.contact_handle) {
         const { data: { session } } = await supabase.auth.getSession();
+        const { data: clinic } = await supabase
+          .from("clinics").select("name, reply_email, contact_phone")
+          .eq("id", clinicId).maybeSingle();
         const sendRes = await fetch("/lovable/email/transactional/send", {
           method: "POST",
           headers: {
@@ -1134,10 +1165,13 @@ function CommunicationTab({ clientId, clinicId, client }: { clientId: string; cl
             templateName: "direct-message",
             recipientEmail: conv.contact_handle,
             idempotencyKey: `msg-${msgData.id}`,
+            replyTo: (clinic as any)?.reply_email ?? null,
             templateData: {
               firstName: client.first_name ?? "there",
               messageBody: body,
-              clinicName: "ClinicPro",
+              clinicName: (clinic as any)?.name ?? "Your Clinic",
+              replyTo: (clinic as any)?.reply_email ?? null,
+              clinicPhone: (clinic as any)?.contact_phone ?? null,
             },
           }),
         });

@@ -306,6 +306,9 @@ function InboxPage() {
     try {
       if (selected.channel === "email" && selected.contact_handle) {
         const { data: { session } } = await supabase.auth.getSession();
+        const { data: clinic } = await supabase
+          .from("clinics").select("name, reply_email, contact_phone")
+          .eq("id", clinicId).maybeSingle();
         const sendRes = await fetch("/lovable/email/transactional/send", {
           method: "POST",
           headers: {
@@ -316,10 +319,13 @@ function InboxPage() {
             templateName: "direct-message",
             recipientEmail: selected.contact_handle,
             idempotencyKey: `msg-${data.id}`,
+            replyTo: (clinic as any)?.reply_email ?? null,
             templateData: {
               firstName: selected.contact_name?.split(" ")[0] ?? "there",
               messageBody: body,
-              clinicName: "ClinicPro",
+              clinicName: (clinic as any)?.name ?? "Your Clinic",
+              replyTo: (clinic as any)?.reply_email ?? null,
+              clinicPhone: (clinic as any)?.contact_phone ?? null,
             },
           }),
         });
