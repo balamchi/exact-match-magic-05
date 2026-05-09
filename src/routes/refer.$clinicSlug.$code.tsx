@@ -132,7 +132,7 @@ function PublicReferralPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <div className="max-w-md text-center">
-          <Share2 className="mx-auto h-12 w-12 text-muted-foreground/50" />
+          <Share2 className="mx-auto h-12 w-12 text-muted-foreground" />
           <p className="mt-4 text-lg font-semibold">{error}</p>
         </div>
       </div>

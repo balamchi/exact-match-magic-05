@@ -244,7 +244,7 @@ function TasksPage() {
                           )}
                         >
                           <div className="flex items-start gap-2">
-                            <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/60 opacity-0 transition group-hover:opacity-100" />
+                            <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
                             <div className="min-w-0 flex-1">
                               <div className={cn("text-sm font-medium", task.status === "done" && "text-muted-foreground line-through")}>
                                 {task.title}

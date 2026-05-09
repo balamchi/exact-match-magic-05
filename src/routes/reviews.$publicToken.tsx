@@ -196,7 +196,7 @@ function PublicReviewPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <div className="max-w-md text-center">
-          <Star className="mx-auto h-12 w-12 text-muted-foreground/50" />
+          <Star className="mx-auto h-12 w-12 text-muted-foreground" />
           <p className="mt-4 text-lg font-semibold">{error}</p>
         </div>
       </div>

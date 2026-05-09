@@ -372,7 +372,7 @@ function MembershipsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-card/20 px-6 py-16 text-center">
-          <BadgeCheck className="mb-3 h-8 w-8 text-muted-foreground/60" />
+          <BadgeCheck className="mb-3 h-8 w-8 text-muted-foreground" />
           <p className="text-sm font-medium">No plans match your filter</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Try clearing search or switching to another view.
@@ -591,7 +591,7 @@ function PlanCard({
             </li>
           ))}
           {benefitsList.length > 3 && (
-            <li className="pl-3 text-[10.5px] text-muted-foreground/70">
+            <li className="pl-3 text-[10.5px] text-muted-foreground">
               + {benefitsList.length - 3} more
             </li>
           )}

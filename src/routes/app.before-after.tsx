@@ -632,7 +632,7 @@ function PhotoTile({ url, label }: { url: string | null; label: string }) {
       {url ? (
         <img src={url} alt={label} className="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-muted-foreground/50">
+        <div className="flex h-full w-full items-center justify-center text-muted-foreground">
           <ImageOff className="h-8 w-8" />
         </div>
       )}
@@ -652,7 +652,7 @@ function LightboxPanel({ url, label }: { url: string | null; label: string }) {
       {url ? (
         <img src={url} alt={label} className="h-[70vh] w-full object-contain" />
       ) : (
-        <div className="flex h-[70vh] w-full items-center justify-center text-muted-foreground/50">
+        <div className="flex h-[70vh] w-full items-center justify-center text-muted-foreground">
           <ImageOff className="h-12 w-12" />
         </div>
       )}

@@ -486,7 +486,7 @@ function InjectionMappingPage() {
                   <Legend swatch="bg-pink-500" label="Filler" />
                   <Legend swatch="bg-amber-500" label="Biostimulator" />
                 </div>
-                <p className="text-[10px] text-muted-foreground/70">
+                <p className="text-[10px] text-muted-foreground">
                   Click any zone to log a dose · Hover to preview
                 </p>
               </div>
@@ -495,7 +495,7 @@ function InjectionMappingPage() {
             {/* View label */}
             {(view === "body-front" || view === "body-back") && (
               <div className="px-4 pb-1 pt-2 text-center">
-                <span className="text-[11px] font-medium tracking-wide text-muted-foreground/70">
+                <span className="text-[11px] font-medium tracking-wide text-muted-foreground">
                   {view === "body-front" ? "Front view — anterior anatomy" : "Back view — posterior anatomy"}
                 </span>
               </div>
@@ -1302,7 +1302,7 @@ function RecentActivityStrip({ sites }: { sites: Site[] }) {
         <h3 className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
           Recent activity
         </h3>
-        <span className="text-[10px] text-muted-foreground/70">Last {recent.length}</span>
+        <span className="text-[10px] text-muted-foreground">Last {recent.length}</span>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1">
         {recent.map((s) => {
@@ -1314,13 +1314,13 @@ function RecentActivityStrip({ sites }: { sites: Site[] }) {
             >
               <span className={cn("h-1.5 w-1.5 rounded-full", tone.bg)} />
               <span className="text-muted-foreground">{fmtTime(s.updated_at)}</span>
-              <span className="text-muted-foreground/50">·</span>
+              <span className="text-muted-foreground">·</span>
               <span className="font-medium text-foreground">{s.region}</span>
-              <span className="text-muted-foreground/50">·</span>
+              <span className="text-muted-foreground">·</span>
               <span className="text-muted-foreground">
                 {s.product} {s.units}u
               </span>
-              <span className="text-muted-foreground/50">·</span>
+              <span className="text-muted-foreground">·</span>
               <span className="text-muted-foreground/80">{s.client_name}</span>
             </div>
           );

@@ -225,7 +225,7 @@ function Landing() {
       {/* HERO */}
       <section className="relative z-10 px-5 pb-20 pt-[120px] sm:px-8 max-md:pt-16 max-md:pb-10">
         <div className="mx-auto max-w-[980px] text-center">
-          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold text-[oklch(0.7_0.22_300)]">
+          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold text-primary">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-glow opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-glow" />
@@ -324,7 +324,7 @@ function Landing() {
           </div>
 
           <div className="rounded-3xl border border-primary/30 p-10 lg:sticky lg:top-24 [background:linear-gradient(135deg,rgba(147,51,234,0.08),rgba(217,70,239,0.04))]">
-            <div className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[oklch(0.7_0.22_300)]">ClinicPro fixes this</div>
+            <div className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">ClinicPro fixes this</div>
             <h3 className="font-display text-3xl font-bold leading-[1.1] tracking-tight">
               One platform. Pre-loaded. Profitable from day one.
             </h3>
@@ -339,7 +339,7 @@ function Landing() {
                 { num: "$4,200", lab: "Avg recovered/mo via AI" },
               ].map((s) => (
                 <div key={s.lab} className="rounded-xl border border-border/60 bg-foreground/[0.03] p-4">
-                  <div className="font-display text-[28px] font-bold text-[oklch(0.7_0.22_300)]">{s.num}</div>
+                  <div className="font-display text-[28px] font-bold text-primary">{s.num}</div>
                   <div className="mt-1 text-[11px] text-muted-foreground">{s.lab}</div>
                 </div>
               ))}
@@ -356,10 +356,10 @@ function Landing() {
 
         {/* Logo strip */}
         <div className="mb-16">
-          <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/60">Join clinics from</p>
+          <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Join clinics from</p>
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
             {CLINIC_NAMES.map((name) => (
-              <span key={name} className="text-sm font-semibold text-muted-foreground/50">{name}</span>
+              <span key={name} className="text-sm font-semibold text-muted-foreground">{name}</span>
             ))}
           </div>
         </div>
@@ -428,12 +428,12 @@ function Landing() {
                 className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
                 style={{ background: "radial-gradient(circle at 100% 0%, rgba(147,51,234,0.08), transparent 50%)" }}
               />
-              <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-primary/30 bg-primary/15 text-[oklch(0.7_0.22_300)]">
+              <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-primary/30 bg-primary/15 text-primary">
                 <f.icon className="h-6 w-6" />
               </div>
               <h3 className="font-display text-[22px] font-bold leading-tight">{f.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
-              <div className="mt-4 border-t border-border/60 pt-4 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground/70">
+              <div className="mt-4 border-t border-border/60 pt-4 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
                 {f.meta}
               </div>
             </div>
@@ -456,7 +456,7 @@ function Landing() {
                   {["Feature","Mindbody","Boulevard","Fresha","Vagaro"].map((h) => (
                     <th key={h} className="border-b border-border/60 bg-foreground/[0.03] px-5 py-[18px] text-start text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">{h}</th>
                   ))}
-                  <th className="border-b border-border/60 bg-primary/[0.08] px-5 py-[18px] text-start text-xs font-semibold uppercase tracking-[0.1em] text-[oklch(0.7_0.22_300)]">ClinicPro</th>
+                  <th className="border-b border-border/60 bg-primary/[0.08] px-5 py-[18px] text-start text-xs font-semibold uppercase tracking-[0.1em] text-primary">ClinicPro</th>
                 </tr>
               </thead>
               <tbody>
@@ -481,12 +481,12 @@ function Landing() {
             <div key={r.feature} className="rounded-2xl border border-border/60 bg-surface p-5">
               <div className="mb-3 font-semibold text-foreground">{r.feature}</div>
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Mindbody</span><span className={r.mbT === "no" ? "text-muted-foreground/50" : ""}>{r.mb}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Boulevard</span><span className={r.bdT === "no" ? "text-muted-foreground/50" : ""}>{r.bd}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Fresha</span><span className={r.frT === "no" ? "text-muted-foreground/50" : ""}>{r.fr}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Vagaro</span><span className={r.vgT === "no" ? "text-muted-foreground/50" : ""}>{r.vg}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Mindbody</span><span className={r.mbT === "no" ? "text-muted-foreground" : ""}>{r.mb}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Boulevard</span><span className={r.bdT === "no" ? "text-muted-foreground" : ""}>{r.bd}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Fresha</span><span className={r.frT === "no" ? "text-muted-foreground" : ""}>{r.fr}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Vagaro</span><span className={r.vgT === "no" ? "text-muted-foreground" : ""}>{r.vg}</span></div>
                 <div className="flex justify-between border-t border-border/60 pt-2">
-                  <span className="font-semibold text-[oklch(0.7_0.22_300)]">ClinicPro</span>
+                  <span className="font-semibold text-primary">ClinicPro</span>
                   <span className="font-bold text-success">{r.us}</span>
                 </div>
               </div>
@@ -563,7 +563,7 @@ function Landing() {
                   <span className="font-display text-[48px] font-bold leading-none">{displayPrice}</span>
                   <span className="text-sm text-muted-foreground">{p.per}</span>
                 </div>
-                <div className="mt-1 text-xs text-muted-foreground/70">
+                <div className="mt-1 text-xs text-muted-foreground">
                   {p.name === "Enterprise" ? "Talk to sales for pricing" : (
                     pricingInterval === "annual"
                       ? `Billed ${p.annualTotal} yearly`
@@ -756,7 +756,7 @@ function Section({ id, children }: { id?: string; children: React.ReactNode }) {
 }
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-4 inline-block text-xs font-bold uppercase tracking-[0.2em] text-[oklch(0.7_0.22_300)]">
+    <div className="mb-4 inline-block text-xs font-bold uppercase tracking-[0.2em] text-primary">
       {children}
     </div>
   );
@@ -775,7 +775,7 @@ function SectionSub({ children }: { children: React.ReactNode }) {
 function MockStat({ icon: Icon, num, label, trend }: { icon: typeof Calendar; num: string; label: string; trend: string }) {
   return (
     <div className="rounded-2xl border border-border/60 bg-surface p-5 text-start">
-      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-[10px] border border-primary/30 bg-primary/15 text-[oklch(0.7_0.22_300)]">
+      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-[10px] border border-primary/30 bg-primary/15 text-primary">
         <Icon className="h-[18px] w-[18px]" />
       </div>
       <div className="font-display text-[28px] font-bold">{num}</div>
@@ -788,8 +788,8 @@ function MockStat({ icon: Icon, num, label, trend }: { icon: typeof Calendar; nu
 function CompCell({ value, tone }: { value: string; tone?: "yes"|"no"|"meh"|"plain" }) {
   const cls =
     tone === "yes" ? "font-bold text-success" :
-    tone === "no" ? "text-muted-foreground/70" :
-    tone === "meh" ? "text-muted-foreground/70" :
+    tone === "no" ? "text-muted-foreground" :
+    tone === "meh" ? "text-muted-foreground" :
     "text-foreground";
   return <td className={`border-b border-border/60 px-5 py-[18px] ${cls}`}>{value}</td>;
 }
@@ -798,7 +798,7 @@ function FooterCol({ title, items, open, onToggle }: { title: string; items: { l
   return (
     <div>
       <button onClick={onToggle} className="flex w-full items-center justify-between md:pointer-events-none">
-        <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/70">{title}</h4>
+        <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">{title}</h4>
         <ChevronDown className={`h-4 w-4 text-muted-foreground transition md:hidden ${open ? "rotate-180" : ""}`} />
       </button>
       <ul className={`space-y-2.5 ${open ? "block" : "hidden md:block"}`}>

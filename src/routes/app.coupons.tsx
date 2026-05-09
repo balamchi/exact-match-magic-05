@@ -375,7 +375,7 @@ function CouponsPage() {
           {TEMPLATES.map((t) => (
             <button key={t.code} onClick={() => openCreate(t)}
               className="rounded-lg border border-border/60 bg-background/40 px-3 py-1.5 text-xs font-medium text-foreground/80 transition hover:border-primary/40 hover:text-primary">
-              {t.code} <span className="ml-1 text-muted-foreground/60">· {t.hint}</span>
+              {t.code} <span className="ml-1 text-muted-foreground">· {t.hint}</span>
             </button>
           ))}
         </div>
@@ -477,7 +477,7 @@ function CouponsPage() {
                       <div className="h-1.5 overflow-hidden rounded-full bg-background/60">
                         <div className="h-full rounded-full bg-gradient-to-r from-primary to-primary/60 transition-all" style={{ width: `${usagePct}%` }} />
                       </div>
-                    ) : <div className="text-xs text-muted-foreground/70">No usage cap</div>}
+                    ) : <div className="text-xs text-muted-foreground">No usage cap</div>}
                   </div>
 
                   <div className="flex flex-wrap gap-2 pt-1">

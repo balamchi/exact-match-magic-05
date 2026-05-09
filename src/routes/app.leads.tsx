@@ -454,7 +454,7 @@ function LeadsPage() {
                             dragging === lead.id && "opacity-40"
                           )}>
                           <div className="flex items-start gap-2">
-                            <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/60 opacity-0 transition group-hover:opacity-100" />
+                            <GripVertical className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
                             <div className="min-w-0 flex-1">
                               <div className="truncate text-sm font-medium">
                                 {lead.first_name ?? ""} {lead.last_name ?? ""}
@@ -688,7 +688,7 @@ function KpiCard({ icon: Icon, label, value, sub }: { icon: any; label: string; 
       </div>
       <div className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
-      {sub && <div className="text-[10px] text-muted-foreground/70">{sub}</div>}
+      {sub && <div className="text-[10px] text-muted-foreground">{sub}</div>}
     </div>
   );
 }

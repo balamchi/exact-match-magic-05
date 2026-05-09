@@ -511,17 +511,17 @@ function ReportsPage() {
                 <div className="rounded-xl border border-border bg-surface/40 p-5 text-center">
                   <div className="font-display text-3xl sm:text-4xl font-bold text-primary">{retentionStats.rebookRate}%</div>
                   <div className="mt-1 text-sm text-muted-foreground">Rebook rate</div>
-                  <div className="mt-0.5 text-[10px] text-muted-foreground/70">Clients with 2+ visits</div>
+                  <div className="mt-0.5 text-[10px] text-muted-foreground">Clients with 2+ visits</div>
                 </div>
                 <div className="rounded-xl border border-border bg-surface/40 p-5 text-center">
                   <div className="font-display text-3xl sm:text-4xl font-bold">{retentionStats.uniqueClients}</div>
                   <div className="mt-1 text-sm text-muted-foreground">Unique clients</div>
-                  <div className="mt-0.5 text-[10px] text-muted-foreground/70">In this period</div>
+                  <div className="mt-0.5 text-[10px] text-muted-foreground">In this period</div>
                 </div>
                 <div className="rounded-xl border border-border bg-surface/40 p-5 text-center">
                   <div className="font-display text-3xl sm:text-4xl font-bold text-emerald-400">{retentionStats.repeatClients}</div>
                   <div className="mt-1 text-sm text-muted-foreground">Repeat clients</div>
-                  <div className="mt-0.5 text-[10px] text-muted-foreground/70">2+ visits in period</div>
+                  <div className="mt-0.5 text-[10px] text-muted-foreground">2+ visits in period</div>
                 </div>
               </div>
             </ChartCard>
@@ -557,7 +557,7 @@ function Metric({ label, value, icon, hint }: { label: string; value: string; ic
       <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">{icon}</div>
       <div className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
-      {hint && <div className="mt-0.5 text-[10px] text-muted-foreground/70">{hint}</div>}
+      {hint && <div className="mt-0.5 text-[10px] text-muted-foreground">{hint}</div>}
     </div>
   );
 }
