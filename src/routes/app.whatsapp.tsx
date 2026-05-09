@@ -149,7 +149,7 @@ function WhatsAppPage() {
             <MessageCircle className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h1 className="font-display text-xl font-semibold tracking-tight">WhatsApp Business</h1>
+            <h1 className="font-display text-xl font-semibold tracking-tight">WhatsApp Business<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
             <p className="text-[11px] text-muted-foreground">
               {stats.open} open · {stats.unread} unread · {stats.total} total
             </p>
