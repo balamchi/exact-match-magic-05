@@ -384,7 +384,7 @@ function InjectionMappingPage() {
           <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
             <Syringe className="h-3 w-3" /> Clinical
           </span>
-          <h1 className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Injection Mapping</h1>
+          <h1 className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Injection Mapping<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {clientFilter && sessionMeta
               ? `${clientFilter} · Session ${sessionMeta.number} · ${new Date(sessionDate!).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`

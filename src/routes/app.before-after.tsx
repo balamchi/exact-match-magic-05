@@ -268,7 +268,7 @@ function BeforeAfterPage() {
             <Camera className="h-3.5 w-3.5" />
             Photo library
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Before &amp; After</h1>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Before &amp; After<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
           <p className="max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">
             Capture transformation stories with consent baked in. Use these comparisons in consults, marketing, and
             clinical reviews.
