@@ -17,8 +17,11 @@ import {
   Star,
   X,
   ChevronDown,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useTheme } from "@/lib/theme-context";
 
 export const Route = createFileRoute("/")({
   component: Landing,
