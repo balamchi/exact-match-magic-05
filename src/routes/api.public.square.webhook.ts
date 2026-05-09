@@ -29,7 +29,12 @@ const SUB_STATUS_MAP: Record<string, string> = {
 async function handleSubscriptionUpdated(sub: any) {
   if (!sub?.id) return;
   const status = SUB_STATUS_MAP[sub.status ?? ""] ?? "active";
-  const update: Record<string, unknown> = {
+  const update: {
+    status: string;
+    next_billing_at: string | null;
+    updated_at: string;
+    canceled_at?: string;
+  } = {
     status,
     next_billing_at: sub.charged_through_date ? `${sub.charged_through_date}T00:00:00Z` : null,
     updated_at: new Date().toISOString(),
