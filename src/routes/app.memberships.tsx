@@ -17,11 +17,16 @@ import {
   Play,
   Copy as CopyIcon,
   X,
+  RefreshCw,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { syncPlanToSquare } from "@/lib/square/plans.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,6 +48,12 @@ type MembershipRow = {
   monthly_price_cents: number;
   member_count: number;
   active: boolean;
+  billing_cadence: string | null;
+  trial_days: number | null;
+  square_plan_id: string | null;
+  square_plan_variation_id: string | null;
+  square_synced_at: string | null;
+  square_sync_error: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -244,6 +255,20 @@ function MembershipsPage() {
     else toast.success(`${tier.name} added`);
   };
 
+  const syncFn = useServerFn(syncPlanToSquare);
+  const [syncingId, setSyncingId] = useState<string | null>(null);
+  const syncToSquare = async (row: MembershipRow) => {
+    setSyncingId(row.id);
+    try {
+      await syncFn({ data: { membership_id: row.id } });
+      toast.success(`${row.name} synced to Square`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Sync failed");
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
   return (
     <div className="space-y-7 pb-12">
       {/* Header */}
@@ -389,6 +414,8 @@ function MembershipsPage() {
               onTogglePause={() => togglePause(row)}
               onDuplicate={() => duplicate(row)}
               onDelete={() => remove(row)}
+              onSync={() => syncToSquare(row)}
+              syncing={syncingId === row.id}
             />
           ))}
         </section>
@@ -492,6 +519,8 @@ function PlanCard({
   onTogglePause,
   onDuplicate,
   onDelete,
+  onSync,
+  syncing,
 }: {
   row: MembershipRow;
   mrrTotal: number;
@@ -499,6 +528,8 @@ function PlanCard({
   onTogglePause: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onSync: () => void;
+  syncing: boolean;
 }) {
   const planMrr =
     Number(row.monthly_price_cents ?? 0) * Number(row.member_count ?? 0);
@@ -534,6 +565,24 @@ function PlanCard({
                 className="border-border/60 bg-muted/30 text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Paused
+              </Badge>
+            )}
+            {row.square_plan_id && !row.square_sync_error && (
+              <Badge
+                variant="outline"
+                className="border-sky-500/40 bg-sky-500/10 text-[10px] font-medium uppercase tracking-wider text-sky-300"
+                title={row.square_synced_at ? `Synced ${new Date(row.square_synced_at).toLocaleString()}` : "Synced"}
+              >
+                <CheckCircle2 className="mr-1 h-3 w-3" /> Square
+              </Badge>
+            )}
+            {row.square_sync_error && (
+              <Badge
+                variant="outline"
+                className="border-rose-500/40 bg-rose-500/10 text-[10px] font-medium uppercase tracking-wider text-rose-300"
+                title={row.square_sync_error}
+              >
+                <AlertTriangle className="mr-1 h-3 w-3" /> Sync error
               </Badge>
             )}
           </div>
@@ -621,6 +670,11 @@ function PlanCard({
             }
           />
           <IconBtn
+            label={syncing ? "Syncing…" : row.square_plan_id ? "Re-sync to Square" : "Sync to Square"}
+            onClick={onSync}
+            icon={<RefreshCw className={cn("h-3.5 w-3.5", syncing && "animate-spin")} />}
+          />
+          <IconBtn
             label="Duplicate"
             onClick={onDuplicate}
             icon={<CopyIcon className="h-3.5 w-3.5" />}
@@ -664,6 +718,7 @@ function IconBtn({
 }
 
 /* ─────────── Composer modal ─────────── */
+const CADENCES = ["WEEKLY", "MONTHLY", "QUARTERLY", "ANNUAL"] as const;
 const schema = z.object({
   name: z.string().min(1, "Name required").max(160),
   description: z.string().max(500).optional().nullable(),
@@ -671,6 +726,8 @@ const schema = z.object({
   monthly_price_cents: z.number().int().min(0),
   member_count: z.number().int().min(0),
   active: z.boolean(),
+  billing_cadence: z.enum(CADENCES),
+  trial_days: z.number().int().min(0).max(90),
 });
 
 function ComposerModal({
@@ -691,6 +748,10 @@ function ComposerModal({
     row ? row.member_count.toString() : "0"
   );
   const [active, setActive] = useState(row?.active ?? true);
+  const [cadence, setCadence] = useState<(typeof CADENCES)[number]>(
+    ((row?.billing_cadence as (typeof CADENCES)[number]) ?? "MONTHLY")
+  );
+  const [trialDays, setTrialDays] = useState((row?.trial_days ?? 0).toString());
   const [busy, setBusy] = useState(false);
 
   const submit = async (e: FormEvent) => {
@@ -703,6 +764,8 @@ function ComposerModal({
       monthly_price_cents: Math.round((parseFloat(priceDollars) || 0) * 100),
       member_count: parseInt(memberCount) || 0,
       active,
+      billing_cadence: cadence,
+      trial_days: parseInt(trialDays) || 0,
     });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Check the form");
@@ -818,6 +881,41 @@ function ComposerModal({
                 value={memberCount}
                 onChange={(e) => setMemberCount(e.target.value)}
               />
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="m-cadence">Billing cadence</Label>
+              <select
+                id="m-cadence"
+                value={cadence}
+                onChange={(e) => setCadence(e.target.value as (typeof CADENCES)[number])}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {CADENCES.map((c) => (
+                  <option key={c} value={c}>
+                    {c.charAt(0) + c.slice(1).toLowerCase()}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10.5px] text-muted-foreground">
+                How often Square will charge each member.
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="m-trial">Trial days (free)</Label>
+              <Input
+                id="m-trial"
+                type="number"
+                min="0"
+                max="90"
+                value={trialDays}
+                onChange={(e) => setTrialDays(e.target.value)}
+              />
+              <p className="text-[10.5px] text-muted-foreground">
+                0–90 days before billing starts.
+              </p>
             </div>
           </div>
 
