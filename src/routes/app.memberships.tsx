@@ -884,6 +884,41 @@ function ComposerModal({
             </div>
           </div>
 
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="m-cadence">Billing cadence</Label>
+              <select
+                id="m-cadence"
+                value={cadence}
+                onChange={(e) => setCadence(e.target.value as (typeof CADENCES)[number])}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {CADENCES.map((c) => (
+                  <option key={c} value={c}>
+                    {c.charAt(0) + c.slice(1).toLowerCase()}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10.5px] text-muted-foreground">
+                How often Square will charge each member.
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="m-trial">Trial days (free)</Label>
+              <Input
+                id="m-trial"
+                type="number"
+                min="0"
+                max="90"
+                value={trialDays}
+                onChange={(e) => setTrialDays(e.target.value)}
+              />
+              <p className="text-[10.5px] text-muted-foreground">
+                0–90 days before billing starts.
+              </p>
+            </div>
+          </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="m-benefits">Benefits (one per line)</Label>
             <Textarea
