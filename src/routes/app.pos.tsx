@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { BetaBadge } from "@/components/beta-badge";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   CreditCard,

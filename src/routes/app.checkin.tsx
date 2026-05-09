@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { BetaBadge } from "@/components/beta-badge";
 import { useEffect, useMemo, useState } from "react";
 import {
   ClipboardCheck,
