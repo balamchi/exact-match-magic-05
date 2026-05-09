@@ -718,6 +718,7 @@ function IconBtn({
 }
 
 /* ─────────── Composer modal ─────────── */
+const CADENCES = ["WEEKLY", "MONTHLY", "QUARTERLY", "ANNUAL"] as const;
 const schema = z.object({
   name: z.string().min(1, "Name required").max(160),
   description: z.string().max(500).optional().nullable(),
@@ -725,6 +726,8 @@ const schema = z.object({
   monthly_price_cents: z.number().int().min(0),
   member_count: z.number().int().min(0),
   active: z.boolean(),
+  billing_cadence: z.enum(CADENCES),
+  trial_days: z.number().int().min(0).max(90),
 });
 
 function ComposerModal({
@@ -745,6 +748,10 @@ function ComposerModal({
     row ? row.member_count.toString() : "0"
   );
   const [active, setActive] = useState(row?.active ?? true);
+  const [cadence, setCadence] = useState<(typeof CADENCES)[number]>(
+    ((row?.billing_cadence as (typeof CADENCES)[number]) ?? "MONTHLY")
+  );
+  const [trialDays, setTrialDays] = useState((row?.trial_days ?? 0).toString());
   const [busy, setBusy] = useState(false);
 
   const submit = async (e: FormEvent) => {
@@ -757,6 +764,8 @@ function ComposerModal({
       monthly_price_cents: Math.round((parseFloat(priceDollars) || 0) * 100),
       member_count: parseInt(memberCount) || 0,
       active,
+      billing_cadence: cadence,
+      trial_days: parseInt(trialDays) || 0,
     });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Check the form");
