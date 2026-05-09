@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { SquareConnectionCard } from "@/components/square-connection-card";
 
 export const Route = createFileRoute("/app/settings")({ component: SettingsPage });
 
