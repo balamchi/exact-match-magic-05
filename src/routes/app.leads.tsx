@@ -501,7 +501,7 @@ function LeadsPage() {
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit Lead" : "New Lead"}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Capture and track a potential client.</p>
               </div>
-              <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
+              <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
             </div>
             <div className="grid gap-4 p-5 md:grid-cols-2">
               <Field label="First Name" required value={draft.first_name} onChange={(v) => setDraft({ ...draft, first_name: v })} />
@@ -579,7 +579,7 @@ function LeadsPage() {
                   {detailLead.phone && <span>· {detailLead.phone}</span>}
                 </div>
               </div>
-              <Button type="button" variant="ghost" size="icon" onClick={() => setDetailLead(null)}><X className="h-4 w-4" /></Button>
+              <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => setDetailLead(null)}><X className="h-4 w-4" /></Button>
             </div>
 
             {/* Quick Actions */}
@@ -788,7 +788,7 @@ function CsvImportModal({ clinicId, onClose, onDone }: { clinicId: string; onClo
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
         <div className="flex items-center justify-between border-b border-border p-5">
           <h2 className="font-display text-xl font-semibold">Import Leads from CSV</h2>
-          <Button variant="ghost" size="icon" onClick={onClose}><X className="h-4 w-4" /></Button>
+          <Button aria-label="Action" variant="ghost" size="icon" onClick={onClose}><X className="h-4 w-4" /></Button>
         </div>
         <div className="space-y-4 p-5">
           {!result ? (

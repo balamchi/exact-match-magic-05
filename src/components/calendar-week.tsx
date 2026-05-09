@@ -658,13 +658,13 @@ export function CalendarWeek() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label="Previous week">
+          <Button aria-label="Action" variant="outline" size="icon" onClick={() => setWeekStart(addDays(weekStart, -7))} aria-label="Previous week">
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button variant="outline" onClick={() => setWeekStart(startOfWeekMon(new Date()))} className="gap-2">
             <CalendarDays className="h-4 w-4" /> Today
           </Button>
-          <Button variant="outline" size="icon" onClick={() => setWeekStart(addDays(weekStart, 7))} aria-label="Next week">
+          <Button aria-label="Action" variant="outline" size="icon" onClick={() => setWeekStart(addDays(weekStart, 7))} aria-label="Next week">
             <ChevronRight className="h-4 w-4" />
           </Button>
 
@@ -1030,7 +1030,7 @@ export function CalendarWeek() {
                     : "Fill in the details below"}
                 </p>
               </div>
-              <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close">
+              <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close">
                 <X className="h-4 w-4" />
               </Button>
             </div>

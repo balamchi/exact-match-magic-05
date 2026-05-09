@@ -102,7 +102,7 @@ export function PhotoUpload({
             "absolute inset-0 flex items-center justify-center gap-1.5 bg-black/60 opacity-0 transition group-hover:opacity-100",
             isCircle ? "rounded-full" : "rounded-xl",
           )}>
-            <Button
+            <Button aria-label="Action"
               type="button"
               size="icon"
               variant="ghost"
@@ -111,7 +111,7 @@ export function PhotoUpload({
             >
               <Camera className="h-4 w-4" />
             </Button>
-            <Button
+            <Button aria-label="Action"
               type="button"
               size="icon"
               variant="ghost"

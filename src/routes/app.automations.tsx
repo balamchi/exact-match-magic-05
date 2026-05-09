@@ -478,10 +478,10 @@ function AutomationsPage() {
                   </Button>
 
                   <div className="flex justify-end gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(a)} aria-label="Edit">
+                    <Button aria-label="Action" variant="ghost" size="icon" onClick={() => openEdit(a)} aria-label="Edit">
                       <Edit3 className="h-4 w-4" />
                     </Button>
-                    <Button
+                    <Button aria-label="Action"
                       variant="ghost"
                       size="icon"
                       onClick={() => remove(a)}

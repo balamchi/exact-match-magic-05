@@ -344,7 +344,7 @@ function LocationsPage() {
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit location" : "Add a location"}</h2>
                 <p className="mt-0.5 text-sm text-muted-foreground">{editing ? "Update site details and operating info." : "Bring a new clinic site online."}</p>
               </div>
-              <Button type="button" variant="ghost" size="icon" onClick={closeComposer}><X className="h-4 w-4" /></Button>
+              <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={closeComposer}><X className="h-4 w-4" /></Button>
             </div>
 
             <div className="max-h-[65vh] overflow-y-auto p-5 space-y-6">

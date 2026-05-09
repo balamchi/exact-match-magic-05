@@ -529,9 +529,9 @@ function ServicesPage() {
                       </td>
                       <td className="p-3">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(s)} aria-label="Edit"><Edit3 className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => duplicate(s)} aria-label="Duplicate"><Copy className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => remove(s)} aria-label="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
+                          <Button aria-label="Action" variant="ghost" size="icon" onClick={() => openEdit(s)} aria-label="Edit"><Edit3 className="h-3.5 w-3.5" /></Button>
+                          <Button aria-label="Action" variant="ghost" size="icon" onClick={() => duplicate(s)} aria-label="Duplicate"><Copy className="h-3.5 w-3.5" /></Button>
+                          <Button aria-label="Action" variant="ghost" size="icon" onClick={() => remove(s)} aria-label="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
                         </div>
                       </td>
                     </tr>
@@ -567,8 +567,8 @@ function ServicesPage() {
               <div className="flex items-center justify-between border-t border-border/60 px-4 py-3">
                 <span className="text-xs text-muted-foreground">Page {safePage + 1} of {totalPages} · {filtered.length} services</span>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" disabled={safePage === 0} onClick={() => setPage(p => p - 1)}><ChevronLeft className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" disabled={safePage >= totalPages - 1} onClick={() => setPage(p => p + 1)}><ChevronRight className="h-4 w-4" /></Button>
+                  <Button aria-label="Action" variant="ghost" size="icon" disabled={safePage === 0} onClick={() => setPage(p => p - 1)}><ChevronLeft className="h-4 w-4" /></Button>
+                  <Button aria-label="Action" variant="ghost" size="icon" disabled={safePage >= totalPages - 1} onClick={() => setPage(p => p + 1)}><ChevronRight className="h-4 w-4" /></Button>
                 </div>
               </div>
             )}
@@ -585,7 +585,7 @@ function ServicesPage() {
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit service" : "New service"}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Define what gets booked, how long it takes, and what it costs.</p>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
+              <Button aria-label="Action" variant="ghost" size="icon" onClick={() => setOpen(false)}><X className="h-4 w-4" /></Button>
             </div>
 
             <div className="max-h-[65vh] overflow-y-auto p-5 space-y-6">
