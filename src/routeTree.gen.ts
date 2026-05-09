@@ -68,6 +68,7 @@ import { Route as AppInjectionMappingRouteImport } from './routes/app.injection-
 import { Route as AppInboxRouteImport } from './routes/app.inbox'
 import { Route as AppHelpRouteImport } from './routes/app.help'
 import { Route as AppGiftcardsRouteImport } from './routes/app.giftcards'
+import { Route as AppFeatureStatusRouteImport } from './routes/app.feature-status'
 import { Route as AppEmailLogRouteImport } from './routes/app.email-log'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppCouponsRouteImport } from './routes/app.coupons'
@@ -405,6 +406,11 @@ const AppGiftcardsRoute = AppGiftcardsRouteImport.update({
   path: '/giftcards',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFeatureStatusRoute = AppFeatureStatusRouteImport.update({
+  id: '/feature-status',
+  path: '/feature-status',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEmailLogRoute = AppEmailLogRouteImport.update({
   id: '/email-log',
   path: '/email-log',
@@ -659,6 +665,7 @@ export interface FileRoutesByFullPath {
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
+  '/app/feature-status': typeof AppFeatureStatusRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
@@ -761,6 +768,7 @@ export interface FileRoutesByTo {
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
+  '/app/feature-status': typeof AppFeatureStatusRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
@@ -859,6 +867,7 @@ export interface FileRoutesById {
   '/app/coupons': typeof AppCouponsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/email-log': typeof AppEmailLogRoute
+  '/app/feature-status': typeof AppFeatureStatusRoute
   '/app/giftcards': typeof AppGiftcardsRoute
   '/app/help': typeof AppHelpRoute
   '/app/inbox': typeof AppInboxRoute
@@ -963,6 +972,7 @@ export interface FileRouteTypes {
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/email-log'
+    | '/app/feature-status'
     | '/app/giftcards'
     | '/app/help'
     | '/app/inbox'
@@ -1065,6 +1075,7 @@ export interface FileRouteTypes {
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/email-log'
+    | '/app/feature-status'
     | '/app/giftcards'
     | '/app/help'
     | '/app/inbox'
@@ -1162,6 +1173,7 @@ export interface FileRouteTypes {
     | '/app/coupons'
     | '/app/dashboard'
     | '/app/email-log'
+    | '/app/feature-status'
     | '/app/giftcards'
     | '/app/help'
     | '/app/inbox'
@@ -1672,6 +1684,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppGiftcardsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/feature-status': {
+      id: '/app/feature-status'
+      path: '/feature-status'
+      fullPath: '/app/feature-status'
+      preLoaderRoute: typeof AppFeatureStatusRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/email-log': {
       id: '/app/email-log'
       path: '/email-log'
@@ -2108,6 +2127,7 @@ interface AppRouteChildren {
   AppCouponsRoute: typeof AppCouponsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppEmailLogRoute: typeof AppEmailLogRoute
+  AppFeatureStatusRoute: typeof AppFeatureStatusRoute
   AppGiftcardsRoute: typeof AppGiftcardsRoute
   AppHelpRoute: typeof AppHelpRoute
   AppInboxRoute: typeof AppInboxRoute
@@ -2152,6 +2172,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCouponsRoute: AppCouponsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppEmailLogRoute: AppEmailLogRoute,
+  AppFeatureStatusRoute: AppFeatureStatusRoute,
   AppGiftcardsRoute: AppGiftcardsRoute,
   AppHelpRoute: AppHelpRoute,
   AppInboxRoute: AppInboxRoute,

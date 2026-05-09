@@ -1,4 +1,5 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { BetaBadge } from "@/components/beta-badge";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus, Search, CheckSquare, X, GripVertical, Calendar as CalendarIcon, Clock } from "lucide-react";
 import { toast } from "sonner";
@@ -160,7 +161,7 @@ function TasksPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Team work</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Tasks</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Tasks<BetaBadge /></h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Drag to update status. Overdue items are flagged automatically.</p>
         </div>
         <Button onClick={() => openCreate("todo")} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">

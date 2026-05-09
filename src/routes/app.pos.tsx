@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { BetaBadge } from "@/components/beta-badge";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   CreditCard,
@@ -213,6 +214,7 @@ function PosPage() {
             <span className="ms-2 bg-gradient-to-r from-primary to-fuchsia-400 bg-clip-text italic text-transparent">
               Get paid.
             </span>
+            <BetaBadge />
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Add services, packages, or retail. Take card, tap, or cash. Receipts and totals sync instantly.

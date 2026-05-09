@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ComingSoonBanner } from "@/components/beta-badge";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -163,6 +164,13 @@ function WhatsAppPage() {
             <RefreshCw className="h-3.5 w-3.5" />
           </Button>
         </div>
+      </div>
+
+      <div className="px-4 pt-3 sm:px-6">
+        <ComingSoonBanner
+          title="WhatsApp Business API — coming in Phase 4"
+          description="Compose and view conversations now; outbound delivery activates once your WABA number is approved. We'll queue messages and send them automatically when live."
+        />
       </div>
 
       {/* KPI strip */}
