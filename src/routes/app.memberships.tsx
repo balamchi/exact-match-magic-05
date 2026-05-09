@@ -667,15 +667,34 @@ function PlanCard({
       )}
 
       <footer className="mt-4 flex items-center justify-between gap-1.5 border-t border-border/60 pt-3">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={onEdit}
-          className="h-8 px-2 text-xs"
-        >
-          <Edit3 className="mr-1 h-3.5 w-3.5" />
-          Edit
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onEdit}
+            className="h-8 px-2 text-xs"
+          >
+            <Edit3 className="mr-1 h-3.5 w-3.5" />
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEnroll}
+            disabled={!row.square_plan_variation_id || !row.active}
+            title={
+              !row.square_plan_variation_id
+                ? "Sync this plan to Square first"
+                : !row.active
+                  ? "Plan is paused"
+                  : "Enroll a member"
+            }
+            className="h-8 px-2 text-xs"
+          >
+            <UserPlus className="mr-1 h-3.5 w-3.5" />
+            Enroll
+          </Button>
+        </div>
         <div className="flex items-center gap-0.5">
           <IconBtn
             label={row.active ? "Pause" : "Resume"}
