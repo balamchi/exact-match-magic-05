@@ -651,6 +651,7 @@ export type Database = {
           booking_widget_enabled: boolean | null
           booking_widget_settings: Json | null
           communication_settings: Json | null
+          contact_phone: string | null
           created_at: string
           created_by: string
           currency: string
@@ -665,6 +666,7 @@ export type Database = {
           operating_hours: Json | null
           phone: string | null
           primary_color: string | null
+          reply_email: string | null
           slug: string
           tax_currency_settings: Json | null
           timezone: string
@@ -678,6 +680,7 @@ export type Database = {
           booking_widget_enabled?: boolean | null
           booking_widget_settings?: Json | null
           communication_settings?: Json | null
+          contact_phone?: string | null
           created_at?: string
           created_by: string
           currency?: string
@@ -692,6 +695,7 @@ export type Database = {
           operating_hours?: Json | null
           phone?: string | null
           primary_color?: string | null
+          reply_email?: string | null
           slug: string
           tax_currency_settings?: Json | null
           timezone?: string
@@ -705,6 +709,7 @@ export type Database = {
           booking_widget_enabled?: boolean | null
           booking_widget_settings?: Json | null
           communication_settings?: Json | null
+          contact_phone?: string | null
           created_at?: string
           created_by?: string
           currency?: string
@@ -719,6 +724,7 @@ export type Database = {
           operating_hours?: Json | null
           phone?: string | null
           primary_color?: string | null
+          reply_email?: string | null
           slug?: string
           tax_currency_settings?: Json | null
           timezone?: string

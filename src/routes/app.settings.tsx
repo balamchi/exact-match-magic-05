@@ -90,6 +90,8 @@ function SettingsPage() {
       currency: clinicData.currency,
       phone: clinicData.phone,
       email: clinicData.email,
+      reply_email: clinicData.reply_email,
+      contact_phone: clinicData.contact_phone,
       website: clinicData.website,
       bio: clinicData.bio,
       operating_hours: clinicData.operating_hours,
@@ -217,6 +219,14 @@ function SettingsPage() {
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>{TIMEZONES.map((tz) => <SelectItem key={tz} value={tz}>{tz}</SelectItem>)}</SelectContent>
                   </Select>
+                </FormField>
+                <FormField label="Reply email" className="md:col-span-2">
+                  <Input value={clinicData.reply_email ?? ""} onChange={(e) => updateField("reply_email", e.target.value)} placeholder="hello@yourclinic.com" disabled={!isOwnerOrAdmin} />
+                  <p className="text-[10px] text-muted-foreground mt-1">When clients reply to messages from your clinic, replies are delivered here. Without this, replies will bounce.</p>
+                </FormField>
+                <FormField label="Contact phone (public)" className="md:col-span-2">
+                  <Input value={clinicData.contact_phone ?? ""} onChange={(e) => updateField("contact_phone", e.target.value)} placeholder="+1 (416) 555-0100" disabled={!isOwnerOrAdmin} />
+                  <p className="text-[10px] text-muted-foreground mt-1">Phone number shown to clients in outgoing messages and emails.</p>
                 </FormField>
                 <FormField label="About / Bio" className="md:col-span-2">
                   <Textarea value={clinicData.bio ?? ""} onChange={(e) => updateField("bio", e.target.value)} placeholder="Tell clients about your clinic..." rows={3} disabled={!isOwnerOrAdmin} />

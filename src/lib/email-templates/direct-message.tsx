@@ -17,6 +17,8 @@ interface DirectMessageProps {
   clinicName?: string;
   messageBody?: string;
   siteUrl?: string;
+  replyTo?: string | null;
+  clinicPhone?: string | null;
 }
 
 const DirectMessageEmail = ({
@@ -24,6 +26,8 @@ const DirectMessageEmail = ({
   clinicName = "Your Clinic",
   messageBody = "",
   siteUrl = "https://clinicpro.io",
+  replyTo = null,
+  clinicPhone = null,
 }: DirectMessageProps) => (
   <Html lang="en" dir="ltr">
     <Head />
@@ -40,9 +44,15 @@ const DirectMessageEmail = ({
           <Text style={messageText}>{messageBody}</Text>
         </Section>
 
-        <Text style={smallText}>
-          Reply to this email to respond directly to {clinicName}.
-        </Text>
+        {replyTo ? (
+          <Text style={smallText}>
+            Reply to this email to respond directly to {clinicName}.
+          </Text>
+        ) : (
+          <Text style={smallText}>
+            To respond, please contact {clinicName}{clinicPhone ? ` at ${clinicPhone}` : " directly"}.
+          </Text>
+        )}
 
         <Text style={footer}>
           Powered by ✦ {SITE_NAME} · {siteUrl.replace("https://", "")}
@@ -63,6 +73,8 @@ export const template = {
     messageBody:
       "Hi Sarah! Just wanted to check in and see how you're feeling after Tuesday's appointment. Let me know if you have any questions!",
     siteUrl: "https://clinicpro.io",
+    replyTo: "hello@auroraaesthetics.com",
+    clinicPhone: "+1 (416) 555-0100",
   },
 } satisfies TemplateEntry;
 
