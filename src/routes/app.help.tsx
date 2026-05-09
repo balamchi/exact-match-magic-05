@@ -143,7 +143,7 @@ function HelpCenterPage() {
       <div className="space-y-3">
         {filtered.length === 0 ? (
           <div className="rounded-xl border border-border/60 bg-card/20 py-12 text-center">
-            <HelpCircle className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50" />
+            <HelpCircle className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">No results found. Try different keywords.</p>
           </div>
         ) : (

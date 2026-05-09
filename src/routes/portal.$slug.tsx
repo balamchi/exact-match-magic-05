@@ -223,7 +223,7 @@ function ClientPortal() {
           <div className="space-y-3">
             {upcoming.length === 0 ? (
               <div className="rounded-xl border border-border/60 bg-card/20 py-12 text-center">
-                <Calendar className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50" />
+                <Calendar className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">No upcoming appointments</p>
                 <Link to="/book/$slug" params={{ slug }}>
                   <Button size="sm" className="mt-3">
@@ -241,7 +241,7 @@ function ClientPortal() {
           <div className="space-y-3">
             {past.length === 0 ? (
               <div className="rounded-xl border border-border/60 bg-card/20 py-12 text-center">
-                <Clock className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50" />
+                <Clock className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">No past appointments</p>
               </div>
             ) : (

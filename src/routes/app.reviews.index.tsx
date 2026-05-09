@@ -253,7 +253,7 @@ function ReviewsDashboard() {
             <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">Loading…</div>
           ) : filtered.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center gap-2 text-center">
-              <Star className="h-8 w-8 text-muted-foreground/50" />
+              <Star className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium">No reviews match these filters</p>
               <p className="text-xs text-muted-foreground">Try clearing filters or request reviews from recent clients.</p>
             </div>
@@ -287,7 +287,7 @@ function ReviewsDashboard() {
                         </div>
                         {r.title && <p className="mt-0.5 text-xs font-medium text-foreground/80">{r.title}</p>}
                         <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{r.body || "No comment"}</p>
-                        <div className="mt-2 flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground/70">
+                        <div className="mt-2 flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
                           <span>{new Date(r.posted_at || r.created_at).toLocaleDateString()}</span>
                           {!r.is_published && <span className="text-amber-400">Hidden</span>}
                           {(r.is_responded || r.responded) ? (
@@ -309,7 +309,7 @@ function ReviewsDashboard() {
         <div className="rounded-2xl border border-border bg-card shadow-card">
           {!selected ? (
             <div className="flex h-full flex-col items-center justify-center gap-2 p-10 text-center">
-              <MessageCircle className="h-8 w-8 text-muted-foreground/50" />
+              <MessageCircle className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">Select a review to read and reply.</p>
             </div>
           ) : (

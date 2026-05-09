@@ -190,7 +190,7 @@ function InvoicesPage() {
             <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">Loading…</div>
           ) : filtered.length === 0 ? (
             <div className="flex h-64 flex-col items-center justify-center gap-2 text-center">
-              <FileText className="h-8 w-8 text-muted-foreground/50" />
+              <FileText className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium">No invoices match</p>
               <p className="text-xs text-muted-foreground">Create your first invoice to start tracking receivables.</p>
             </div>
@@ -257,7 +257,7 @@ function InvoicesPage() {
         <div className="rounded-2xl border border-border bg-card shadow-card">
           {!selected ? (
             <div className="flex h-full flex-col items-center justify-center gap-2 p-10 text-center">
-              <FileText className="h-8 w-8 text-muted-foreground/50" />
+              <FileText className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">Select an invoice to view details.</p>
             </div>
           ) : (
@@ -347,7 +347,7 @@ function Kpi({ icon, label, value, hint, accent }: { icon: React.ReactNode; labe
       <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", colors[accent])}>{icon}</div>
       <div className="mt-4 font-display text-2xl font-semibold tracking-tight tabular-nums">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
-      {hint && <div className="mt-0.5 text-[10px] text-muted-foreground/70">{hint}</div>}
+      {hint && <div className="mt-0.5 text-[10px] text-muted-foreground">{hint}</div>}
     </div>
   );
 }

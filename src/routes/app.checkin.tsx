@@ -479,7 +479,7 @@ function KpiCard({
 function TimeCell({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline gap-1.5">
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
       <span className="font-mono text-foreground/90">{value}</span>

@@ -277,7 +277,7 @@ function ReferralsDashboard() {
             <div className="space-y-2 p-4">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-lg bg-muted/30" />)}</div>
           ) : filteredRows.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-              <Share2 className="h-8 w-8 text-muted-foreground/50" />
+              <Share2 className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium">No referrals yet</p>
               <p className="text-xs text-muted-foreground">Log your first referral to start tracking.</p>
             </div>

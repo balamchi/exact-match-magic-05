@@ -766,7 +766,7 @@ function KpiCard({ label, value, sub, icon, accent }: { label: string; value: st
       </div>
       <div className="mt-3 font-display text-2xl font-semibold tabular-nums">{value}</div>
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="text-[10px] text-muted-foreground/60">{sub}</div>
+      <div className="text-[10px] text-muted-foreground">{sub}</div>
     </Card>
   );
 }
