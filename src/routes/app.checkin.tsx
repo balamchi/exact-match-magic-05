@@ -206,7 +206,7 @@ function CheckinPage() {
             Front desk
           </div>
           <h1 className="mt-2 font-display text-2xl sm:text-3xl font-semibold text-foreground">
-            Live waitlist
+            Live waitlist<BetaBadge />
           </h1>
           <p className="mt-1 max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">
             Track who has arrived, who's seated, and who's been seen. Updates in real time across
