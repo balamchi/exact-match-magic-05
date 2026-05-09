@@ -100,6 +100,7 @@ const NAV: NavGroup[] = [
       { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
       { to: "/app/quickbooks", label: "QuickBooks", icon: BookOpen },
       { to: "/app/api-settings", label: "API & Webhooks", icon: Globe },
+      { to: "/app/feature-status", label: "Feature status", icon: Sparkles },
     ],
   },
 ];

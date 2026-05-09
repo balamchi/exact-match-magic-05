@@ -52,9 +52,8 @@ function QuickBooksPage() {
   ];
 
   const handleConnect = () => {
-    setConnected(true);
-    toast.success("QuickBooks Online connected!", {
-      description: "Your accounts are now linked for automated syncing.",
+    toast.info("QuickBooks Online OAuth ships in Phase 4.", {
+      description: "We'll wire your accounts the moment the integration goes live.",
     });
   };
 
@@ -65,24 +64,14 @@ function QuickBooksPage() {
   };
 
   const syncEntity = async (id: string) => {
-    setSyncing(id);
-    await new Promise((r) => setTimeout(r, 2000));
-    setEntities((prev) =>
-      prev.map((e) =>
-        e.id === id
-          ? { ...e, lastSync: new Date().toISOString(), count: e.count + Math.floor(Math.random() * 15) + 1 }
-          : e
-      )
-    );
+    toast.info(`${entities.find((e) => e.id === id)?.name} sync activates in Phase 4.`, {
+      description: "Mappings you configure now will run automatically once OAuth is live.",
+    });
     setSyncing(null);
-    toast.success(`${entities.find((e) => e.id === id)?.name} synced successfully`);
   };
 
   const syncAll = async () => {
-    const enabled = entities.filter((e) => e.enabled);
-    for (const e of enabled) {
-      await syncEntity(e.id);
-    }
+    toast.info("Bulk sync runs after Phase 4 OAuth ships.");
   };
 
   return (
