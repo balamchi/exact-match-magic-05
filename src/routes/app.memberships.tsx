@@ -414,6 +414,8 @@ function MembershipsPage() {
               onTogglePause={() => togglePause(row)}
               onDuplicate={() => duplicate(row)}
               onDelete={() => remove(row)}
+              onSync={() => syncToSquare(row)}
+              syncing={syncingId === row.id}
             />
           ))}
         </section>
