@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { SquareConnectionCard } from "@/components/square-connection-card";
 
 export const Route = createFileRoute("/app/settings")({ component: SettingsPage });
 
@@ -37,7 +38,11 @@ interface AuditRow { id: string; action: string; entity_type: string | null; det
 function SettingsPage() {
   const { activeClinic, user, memberships, refreshMemberships, signOut } = useAuth();
   const isOwnerOrAdmin = activeClinic?.role === "owner" || activeClinic?.role === "admin";
-  const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
+  const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
+    if (typeof window === "undefined") return "profile";
+    const t = new URLSearchParams(window.location.search).get("tab") as SettingsTab | null;
+    return t && ["profile","branding","booking","notifications","communication","tax","integrations","team","audit"].includes(t) ? t : "profile";
+  });
 
   // Clinic data
   const [clinicData, setClinicData] = useState<any>(null);
@@ -373,16 +378,23 @@ function SettingsPage() {
           )}
 
           {activeTab === "integrations" && (
-            <SettingsSection title="Integrations" description="Connect third-party services to your clinic.">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <IntegrationCard name="Twilio SMS" description="Send SMS reminders and notifications." status="not_connected" />
-                <IntegrationCard name="Lovable AI" description="AI-powered insights and automation." status="connected" />
-                <IntegrationCard name="Google Calendar" description="Sync appointments with Google Calendar." status="not_connected" />
-                <IntegrationCard name="QuickBooks" description="Sync invoices and payments." status="not_connected" />
-                <IntegrationCard name="Stripe Connect" description="Accept client payments online." status="not_connected" />
-                <IntegrationCard name="Zapier" description="Connect with 5,000+ apps." status="not_connected" />
-              </div>
-            </SettingsSection>
+            <div className="space-y-6">
+              <SettingsSection
+                title="Payment Integration"
+                description="Connect Square to power membership recurring billing, plans, and invoices."
+              >
+                <SquareConnectionCard clinicId={activeClinic!.clinic_id} />
+              </SettingsSection>
+              <SettingsSection title="Other Integrations" description="Connect third-party services to your clinic.">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <IntegrationCard name="Twilio SMS" description="Send SMS reminders and notifications." status="not_connected" />
+                  <IntegrationCard name="Lovable AI" description="AI-powered insights and automation." status="connected" />
+                  <IntegrationCard name="Google Calendar" description="Sync appointments with Google Calendar." status="not_connected" />
+                  <IntegrationCard name="QuickBooks" description="Sync invoices and payments." status="not_connected" />
+                  <IntegrationCard name="Zapier" description="Connect with 5,000+ apps." status="not_connected" />
+                </div>
+              </SettingsSection>
+            </div>
           )}
 
           {activeTab === "team" && (

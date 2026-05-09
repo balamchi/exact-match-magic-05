@@ -495,6 +495,7 @@ export type Database = {
           smoking_status: string | null
           sms_consent: boolean | null
           source: string | null
+          square_customer_id: string | null
           state_province: string | null
           tags: string[] | null
           updated_at: string
@@ -545,6 +546,7 @@ export type Database = {
           smoking_status?: string | null
           sms_consent?: boolean | null
           source?: string | null
+          square_customer_id?: string | null
           state_province?: string | null
           tags?: string[] | null
           updated_at?: string
@@ -595,6 +597,7 @@ export type Database = {
           smoking_status?: string | null
           sms_consent?: boolean | null
           source?: string | null
+          square_customer_id?: string | null
           state_province?: string | null
           tags?: string[] | null
           updated_at?: string
@@ -638,6 +641,74 @@ export type Database = {
             foreignKeyName: "clinic_members_clinic_id_fkey"
             columns: ["clinic_id"]
             isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clinic_square_connections: {
+        Row: {
+          access_token: string
+          business_name: string | null
+          clinic_id: string
+          connected_at: string | null
+          connected_by: string | null
+          country: string | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          last_refreshed_at: string | null
+          location_id: string | null
+          merchant_id: string
+          refresh_token: string
+          status: string | null
+          token_expires_at: string
+          updated_at: string | null
+          webhook_signature_key: string | null
+        }
+        Insert: {
+          access_token: string
+          business_name?: string | null
+          clinic_id: string
+          connected_at?: string | null
+          connected_by?: string | null
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          last_refreshed_at?: string | null
+          location_id?: string | null
+          merchant_id: string
+          refresh_token: string
+          status?: string | null
+          token_expires_at: string
+          updated_at?: string | null
+          webhook_signature_key?: string | null
+        }
+        Update: {
+          access_token?: string
+          business_name?: string | null
+          clinic_id?: string
+          connected_at?: string | null
+          connected_by?: string | null
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          last_refreshed_at?: string | null
+          location_id?: string | null
+          merchant_id?: string
+          refresh_token?: string
+          status?: string | null
+          token_expires_at?: string
+          updated_at?: string | null
+          webhook_signature_key?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinic_square_connections_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: true
             referencedRelation: "clinics"
             referencedColumns: ["id"]
           },
@@ -2031,41 +2102,386 @@ export type Database = {
         }
         Relationships: []
       }
+      membership_benefits: {
+        Row: {
+          active: boolean | null
+          benefit_type: string
+          cents_value: number | null
+          clinic_id: string
+          created_at: string | null
+          description: string
+          id: string
+          membership_id: string
+          percent_value: number | null
+          quantity_per_period: number | null
+          reset_period: string | null
+          service_id: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          benefit_type: string
+          cents_value?: number | null
+          clinic_id: string
+          created_at?: string | null
+          description: string
+          id?: string
+          membership_id: string
+          percent_value?: number | null
+          quantity_per_period?: number | null
+          reset_period?: string | null
+          service_id?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          benefit_type?: string
+          cents_value?: number | null
+          clinic_id?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          membership_id?: string
+          percent_value?: number | null
+          quantity_per_period?: number | null
+          reset_period?: string | null
+          service_id?: string | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_benefits_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_benefits_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_benefits_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      membership_charges: {
+        Row: {
+          amount_cents: number
+          charged_at: string | null
+          clinic_id: string
+          created_at: string | null
+          currency: string | null
+          failure_reason: string | null
+          id: string
+          square_invoice_id: string | null
+          square_payment_id: string | null
+          status: string
+          subscription_id: string
+        }
+        Insert: {
+          amount_cents: number
+          charged_at?: string | null
+          clinic_id: string
+          created_at?: string | null
+          currency?: string | null
+          failure_reason?: string | null
+          id?: string
+          square_invoice_id?: string | null
+          square_payment_id?: string | null
+          status: string
+          subscription_id: string
+        }
+        Update: {
+          amount_cents?: number
+          charged_at?: string | null
+          clinic_id?: string
+          created_at?: string | null
+          currency?: string | null
+          failure_reason?: string | null
+          id?: string
+          square_invoice_id?: string | null
+          square_payment_id?: string | null
+          status?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_charges_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_charges_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "membership_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      membership_redemptions: {
+        Row: {
+          appointment_id: string | null
+          benefit_id: string
+          client_id: string
+          clinic_id: string
+          created_at: string | null
+          discount_cents: number | null
+          id: string
+          invoice_id: string | null
+          notes: string | null
+          period_key: string
+          redeemed_at: string | null
+          subscription_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          benefit_id: string
+          client_id: string
+          clinic_id: string
+          created_at?: string | null
+          discount_cents?: number | null
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          period_key: string
+          redeemed_at?: string | null
+          subscription_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          benefit_id?: string
+          client_id?: string
+          clinic_id?: string
+          created_at?: string | null
+          discount_cents?: number | null
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          period_key?: string
+          redeemed_at?: string | null
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_redemptions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_redemptions_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "membership_benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_redemptions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_redemptions_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_redemptions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_redemptions_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "membership_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      membership_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          canceled_at: string | null
+          canceled_reason: string | null
+          client_id: string
+          clinic_id: string
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          ended_at: string | null
+          failed_charge_count: number | null
+          id: string
+          last_charge_at: string | null
+          last_charge_status: string | null
+          membership_id: string
+          next_billing_at: string | null
+          notes: string | null
+          pause_reason: string | null
+          pause_resumes_at: string | null
+          paused_at: string | null
+          square_card_id: string | null
+          square_customer_id: string | null
+          square_subscription_id: string | null
+          started_at: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          canceled_reason?: string | null
+          client_id: string
+          clinic_id: string
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          ended_at?: string | null
+          failed_charge_count?: number | null
+          id?: string
+          last_charge_at?: string | null
+          last_charge_status?: string | null
+          membership_id: string
+          next_billing_at?: string | null
+          notes?: string | null
+          pause_reason?: string | null
+          pause_resumes_at?: string | null
+          paused_at?: string | null
+          square_card_id?: string | null
+          square_customer_id?: string | null
+          square_subscription_id?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          canceled_reason?: string | null
+          client_id?: string
+          clinic_id?: string
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          ended_at?: string | null
+          failed_charge_count?: number | null
+          id?: string
+          last_charge_at?: string | null
+          last_charge_status?: string | null
+          membership_id?: string
+          next_billing_at?: string | null
+          notes?: string | null
+          pause_reason?: string | null
+          pause_resumes_at?: string | null
+          paused_at?: string | null
+          square_card_id?: string | null
+          square_customer_id?: string | null
+          square_subscription_id?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_subscriptions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_subscriptions_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "membership_subscriptions_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memberships: {
         Row: {
           active: boolean
           benefits: string | null
+          billing_cadence: string | null
           clinic_id: string
+          color_hex: string | null
+          commitment_months: number | null
           created_at: string
           description: string | null
           id: string
           member_count: number
           monthly_price_cents: number
           name: string
+          public_signup_enabled: boolean | null
+          sort_order: number | null
+          square_plan_id: string | null
+          square_plan_variation_id: string | null
+          trial_days: number | null
           updated_at: string
         }
         Insert: {
           active?: boolean
           benefits?: string | null
+          billing_cadence?: string | null
           clinic_id: string
+          color_hex?: string | null
+          commitment_months?: number | null
           created_at?: string
           description?: string | null
           id?: string
           member_count?: number
           monthly_price_cents?: number
           name: string
+          public_signup_enabled?: boolean | null
+          sort_order?: number | null
+          square_plan_id?: string | null
+          square_plan_variation_id?: string | null
+          trial_days?: number | null
           updated_at?: string
         }
         Update: {
           active?: boolean
           benefits?: string | null
+          billing_cadence?: string | null
           clinic_id?: string
+          color_hex?: string | null
+          commitment_months?: number | null
           created_at?: string
           description?: string | null
           id?: string
           member_count?: number
           monthly_price_cents?: number
           name?: string
+          public_signup_enabled?: boolean | null
+          sort_order?: number | null
+          square_plan_id?: string | null
+          square_plan_variation_id?: string | null
+          trial_days?: number | null
           updated_at?: string
         }
         Relationships: [
