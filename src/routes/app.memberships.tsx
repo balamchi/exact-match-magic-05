@@ -670,6 +670,11 @@ function PlanCard({
             }
           />
           <IconBtn
+            label={syncing ? "Syncing…" : row.square_plan_id ? "Re-sync to Square" : "Sync to Square"}
+            onClick={onSync}
+            icon={<RefreshCw className={cn("h-3.5 w-3.5", syncing && "animate-spin")} />}
+          />
+          <IconBtn
             label="Duplicate"
             onClick={onDuplicate}
             icon={<CopyIcon className="h-3.5 w-3.5" />}
