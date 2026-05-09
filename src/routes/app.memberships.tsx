@@ -537,6 +537,7 @@ function PlanCard({
   onDuplicate,
   onDelete,
   onSync,
+  onEnroll,
   syncing,
 }: {
   row: MembershipRow;
@@ -546,6 +547,7 @@ function PlanCard({
   onDuplicate: () => void;
   onDelete: () => void;
   onSync: () => void;
+  onEnroll: () => void;
   syncing: boolean;
 }) {
   const planMrr =
