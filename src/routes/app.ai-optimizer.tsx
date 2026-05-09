@@ -7,6 +7,7 @@ import {
   Brain, Clock, TrendingUp, Users, Calendar, Sparkles,
   ArrowRight, CheckCircle2, AlertTriangle, Lightbulb, BarChart3,
 } from "lucide-react";
+import { Phase4Badge, ComingSoonBanner } from "@/components/beta-badge";
 
 export const Route = createFileRoute("/app/ai-optimizer")({
   component: AiOptimizerPage,
