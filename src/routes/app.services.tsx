@@ -375,7 +375,7 @@ function ServicesPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-[10.5px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <HeartPulse className="h-3.5 w-3.5 text-primary" /> Service menu
           </div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Services</h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Services</h1>
           <p className="max-w-xl text-sm text-muted-foreground">Build your bookable treatment menu — categories, durations, pricing, and clinical details.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -579,7 +579,7 @@ function ServicesPage() {
       {/* ── Composer Modal ──────────────────────────── */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-4 pt-[5vh] backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-2xl border border-border bg-card shadow-elevated">
+          <div className="w-full max-w-[95vw] sm:max-w-3xl rounded-2xl border border-border bg-card shadow-elevated">
             <div className="flex items-start justify-between border-b border-border p-5">
               <div>
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit service" : "New service"}</h2>

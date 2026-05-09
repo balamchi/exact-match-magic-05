@@ -174,7 +174,7 @@ function AiAssistantPage() {
       <div className="flex items-center justify-between pb-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">AI Assistant</p>
-          <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight">Chat</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight">Chat</h1>
         </div>
         <div className="flex items-center gap-2">
           <select

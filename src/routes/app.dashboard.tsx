@@ -357,7 +357,7 @@ function Dashboard() {
             {" — "}
             {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
           </p>
-          <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight sm:text-3xl sm:text-4xl">
             {greeting}, <span className="capitalize">{firstName}</span>!
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -467,7 +467,7 @@ function Dashboard() {
             </div>
           </div>
           <div className="mt-5 flex items-baseline justify-between">
-            <span className="font-display text-3xl font-semibold tracking-tight">
+            <span className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">
               {formatMoney(progressCents, currency)}
             </span>
             <span className="text-xs text-muted-foreground">of {formatMoney(goalCents, currency)}</span>

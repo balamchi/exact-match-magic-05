@@ -162,7 +162,7 @@ function ReviewsDashboard() {
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Reputation</p>
-          <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Reviews</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Reviews</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Monitor public sentiment, reply to feedback, and request reviews from happy clients.
           </p>

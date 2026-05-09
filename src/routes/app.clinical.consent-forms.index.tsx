@@ -229,7 +229,7 @@ function ConsentFormsDashboard() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Clinical Compliance</p>
-          <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Consent Forms</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Consent Forms</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">DocuSign-style e-signatures with full audit trail.</p>
         </div>
         <div className="flex gap-2">
@@ -285,7 +285,7 @@ function ConsentFormsDashboard() {
 
       {/* Template Editor Dialog */}
       <Dialog open={tmplOpen} onOpenChange={setTmplOpen}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editTmpl ? "Edit Template" : "New Consent Template"}</DialogTitle>
             <DialogDescription>Define the consent form content that clients will sign.</DialogDescription>
@@ -425,7 +425,7 @@ function ConsentFormsDashboard() {
 
       {/* View Signed Consent Dialog */}
       <Dialog open={!!viewSig} onOpenChange={() => setViewSig(null)}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{viewSig?.template?.name ?? "Consent Form"}</DialogTitle>
             <DialogDescription>

@@ -163,7 +163,7 @@ function BillingPage() {
       <PaymentTestModeBanner />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Billing</h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Billing</h1>
           <p className="mt-2 text-sm text-muted-foreground">Plan, payments, and subscription management.</p>
         </div>
         <Link to="/pricing">
@@ -212,7 +212,7 @@ function BillingPage() {
                 <div className="font-display text-base font-semibold">{plan.name}</div>
                 <p className="mt-1 text-xs text-muted-foreground">{plan.tagline}</p>
                 <div className="mt-4 flex items-baseline gap-1">
-                  <span className="font-display text-3xl font-bold">
+                  <span className="font-display text-2xl sm:text-3xl font-bold">
                     ${(plan.price_monthly_cents / 100).toFixed(0)}
                   </span>
                   <span className="text-xs text-muted-foreground">/mo after trial</span>

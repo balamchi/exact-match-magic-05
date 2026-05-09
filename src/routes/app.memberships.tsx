@@ -253,7 +253,7 @@ function MembershipsPage() {
             <BadgeCheck className="h-3.5 w-3.5 text-primary" />
             Recurring revenue
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight">Memberships</h1>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Memberships</h1>
           <p className="max-w-xl text-sm text-muted-foreground">
             Build predictable monthly revenue with VIP tiers — track members,
             MRR contribution, and tier health in one place.
@@ -546,7 +546,7 @@ function PlanCard({
       </header>
 
       <div className="mt-4 flex items-baseline gap-1.5">
-        <span className="text-3xl font-semibold tracking-tight">
+        <span className="text-2xl sm:text-3xl font-semibold tracking-tight">
           {fmtMoney(row.monthly_price_cents)}
         </span>
         <span className="text-xs text-muted-foreground">/ member / mo</span>

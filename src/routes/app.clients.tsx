@@ -204,7 +204,7 @@ function ClientsPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Client CRM</p>
-          <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Clients</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Clients</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Manage profiles, contact details, tags, and care notes.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -249,7 +249,7 @@ function ClientsPage() {
 
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <form onSubmit={handleSubmit} className="flex max-h-[92vh] w-full max-w-3xl flex-col rounded-2xl border border-border bg-card shadow-elevated">
+          <form onSubmit={handleSubmit} className="flex max-h-[92vh] w-full max-w-[95vw] sm:max-w-3xl flex-col rounded-2xl border border-border bg-card shadow-elevated">
             <div className="border-b border-border p-5">
               <h2 className="font-display text-2xl font-semibold">{editing ? "Edit client" : "New client"}</h2>
               <p className="mt-1 text-sm text-muted-foreground">Complete client profile with medical, contact, and marketing info.</p>
@@ -388,7 +388,7 @@ function Metric({ label, value, icon }: { label: string; value: string; icon: Re
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">{icon}</div>
         <span className="text-xs text-muted-foreground">Live</span>
       </div>
-      <div className="mt-4 font-display text-3xl font-semibold tracking-tight">{value}</div>
+      <div className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
     </div>
   );

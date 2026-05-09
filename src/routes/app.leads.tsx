@@ -365,7 +365,7 @@ function LeadsPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Pipeline</p>
-          <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Leads</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Leads</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Track and convert leads from all your marketing channels.
           </p>
@@ -495,7 +495,7 @@ function LeadsPage() {
       {/* Create/Edit Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
-          <form onSubmit={submit} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
+          <form onSubmit={submit} className="max-h-[90vh] w-full max-w-[95vw] sm:max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
             <div className="flex items-start justify-between border-b border-border p-5">
               <div>
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit Lead" : "New Lead"}</h2>
@@ -567,7 +567,7 @@ function LeadsPage() {
       {/* Detail / Activity Panel */}
       {detailLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) setDetailLead(null); }}>
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
+          <div className="max-h-[90vh] w-full max-w-[95vw] sm:max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
             <div className="flex items-start justify-between border-b border-border p-5">
               <div>
                 <h2 className="font-display text-2xl font-semibold">
@@ -686,7 +686,7 @@ function KpiCard({ icon: Icon, label, value, sub }: { icon: any; label: string; 
       <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
         <Icon className="h-4.5 w-4.5" />
       </div>
-      <div className="mt-4 font-display text-3xl font-semibold tracking-tight">{value}</div>
+      <div className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
       {sub && <div className="text-[10px] text-muted-foreground/70">{sub}</div>}
     </div>

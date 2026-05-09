@@ -207,7 +207,7 @@ function StaffHrPage() {
   const color = staff.color || "#a78bfa";
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 pb-12">
+    <div className="mx-auto max-w-[95vw] sm:max-w-3xl space-y-8 pb-12">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link to="/app/staff">

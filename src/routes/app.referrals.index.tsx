@@ -215,7 +215,7 @@ function ReferralsDashboard() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-[10.5px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <Megaphone className="h-3.5 w-3.5 text-primary" /> Word of mouth
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight">Referrals</h1>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Referrals</h1>
           <p className="max-w-xl text-sm text-muted-foreground">
             Turn happy clients into your best marketing channel. Track every referrer-referee pair from invite to conversion.
           </p>

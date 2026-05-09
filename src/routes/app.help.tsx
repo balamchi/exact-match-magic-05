@@ -115,14 +115,14 @@ function HelpCenterPage() {
   const totalQuestions = FAQ_DATA.reduce((sum, cat) => sum + cat.items.length, 0);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-7 pb-12">
+    <div className="mx-auto max-w-[95vw] sm:max-w-3xl space-y-7 pb-12">
       {/* Header */}
       <header className="space-y-2">
         <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-[10.5px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
           <HelpCircle className="h-3.5 w-3.5 text-primary" />
           Help center
         </div>
-        <h1 className="text-3xl font-semibold tracking-tight">How can we help?</h1>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">How can we help?</h1>
         <p className="max-w-xl text-sm text-muted-foreground">
           Browse {totalQuestions} frequently asked questions or search for what you need.
         </p>

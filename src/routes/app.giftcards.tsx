@@ -291,8 +291,8 @@ function GiftCardsPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
             <Wallet className="h-3.5 w-3.5" /> Stored value
           </div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Gift Cards</h1>
-          <p className="max-w-2xl text-sm text-muted-foreground">
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Gift Cards</h1>
+          <p className="max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">
             Issue stored-value cards, track balances, and let recipients redeem against any service.
           </p>
         </div>
@@ -440,7 +440,7 @@ function GiftCardsPage() {
             <div className="px-6 py-5 space-y-5">
               <div className={cn("rounded-xl p-4 bg-gradient-to-r text-white", designGradient(detailCard.design_template))}>
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{money(detailCard.balance_cents)}</div>
+                  <div className="text-2xl sm:text-3xl font-bold">{money(detailCard.balance_cents)}</div>
                   <div className="text-sm opacity-75">of {money(detailCard.initial_value_cents)}</div>
                 </div>
               </div>
@@ -498,7 +498,7 @@ function GiftCardsPage() {
       {/* Composer Modal */}
       {composerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
+          <div className="relative w-full max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
             <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-6 py-4">
               <div>
                 <h2 className="font-display text-lg font-semibold">{editing ? "Edit Gift Card" : "Issue Gift Card"}</h2>

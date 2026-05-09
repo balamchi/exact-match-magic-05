@@ -187,7 +187,7 @@ function StaffPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-[10.5px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <Users className="h-3.5 w-3.5 text-primary" /> Team roster
           </div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Staff</h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Staff</h1>
           <p className="max-w-xl text-sm text-muted-foreground">Manage providers, front desk, and support team. Calendar colors flow through to your booking grid.</p>
         </div>
         <Button onClick={() => setComposer("new")} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
@@ -497,7 +497,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-4 pt-[3vh] backdrop-blur-sm">
-      <div className="w-full max-w-4xl rounded-2xl border border-border bg-card shadow-elevated">
+      <div className="w-full max-w-[95vw] sm:max-w-4xl rounded-2xl border border-border bg-card shadow-elevated">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-border px-5 py-4">
           <div>
@@ -532,7 +532,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
                   size={160}
                   clinicId={clinicId}
                   placeholder={
-                    <div className="flex h-full w-full items-center justify-center rounded-full text-3xl font-bold text-white"
+                    <div className="flex h-full w-full items-center justify-center rounded-full text-2xl sm:text-3xl font-bold text-white"
                       style={{ background: `linear-gradient(135deg, ${color}, #9333EA)` }}>
                       {initials(displayName || "?")}
                     </div>

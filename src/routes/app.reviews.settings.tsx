@@ -98,11 +98,11 @@ function ReviewSettings() {
         </Link>
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Settings</p>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Review Settings</h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Review Settings</h1>
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl space-y-6">
+      <div className="mx-auto max-w-[95vw] sm:max-w-2xl space-y-6">
         {/* Enable toggle */}
         <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5 shadow-card">
           <div>
