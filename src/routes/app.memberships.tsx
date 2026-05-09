@@ -20,6 +20,8 @@ import {
   RefreshCw,
   CheckCircle2,
   AlertTriangle,
+  UserPlus,
+  Ban,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -27,6 +29,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { syncPlanToSquare } from "@/lib/square/plans.functions";
+import {
+  enrollMember,
+  cancelMemberSubscription,
+} from "@/lib/square/subscriptions.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -122,6 +128,7 @@ function MembershipsPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "paused">("all");
   const [composer, setComposer] = useState<MembershipRow | "new" | null>(null);
+  const [enrollFor, setEnrollFor] = useState<MembershipRow | null>(null);
 
   const load = async () => {
     if (!activeClinic) {
@@ -415,16 +422,26 @@ function MembershipsPage() {
               onDuplicate={() => duplicate(row)}
               onDelete={() => remove(row)}
               onSync={() => syncToSquare(row)}
+              onEnroll={() => setEnrollFor(row)}
               syncing={syncingId === row.id}
             />
           ))}
         </section>
       )}
 
+      {activeClinic && <MembersPanel clinicId={activeClinic.clinic_id} />}
+
       {composer && (
         <ComposerModal
           row={composer === "new" ? null : composer}
           onClose={() => setComposer(null)}
+        />
+      )}
+
+      {enrollFor && (
+        <EnrollModal
+          membership={enrollFor}
+          onClose={() => setEnrollFor(null)}
         />
       )}
     </div>
@@ -520,6 +537,7 @@ function PlanCard({
   onDuplicate,
   onDelete,
   onSync,
+  onEnroll,
   syncing,
 }: {
   row: MembershipRow;
@@ -529,6 +547,7 @@ function PlanCard({
   onDuplicate: () => void;
   onDelete: () => void;
   onSync: () => void;
+  onEnroll: () => void;
   syncing: boolean;
 }) {
   const planMrr =
@@ -648,15 +667,34 @@ function PlanCard({
       )}
 
       <footer className="mt-4 flex items-center justify-between gap-1.5 border-t border-border/60 pt-3">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={onEdit}
-          className="h-8 px-2 text-xs"
-        >
-          <Edit3 className="mr-1 h-3.5 w-3.5" />
-          Edit
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onEdit}
+            className="h-8 px-2 text-xs"
+          >
+            <Edit3 className="mr-1 h-3.5 w-3.5" />
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onEnroll}
+            disabled={!row.square_plan_variation_id || !row.active}
+            title={
+              !row.square_plan_variation_id
+                ? "Sync this plan to Square first"
+                : !row.active
+                  ? "Plan is paused"
+                  : "Enroll a member"
+            }
+            className="h-8 px-2 text-xs"
+          >
+            <UserPlus className="mr-1 h-3.5 w-3.5" />
+            Enroll
+          </Button>
+        </div>
         <div className="flex items-center gap-0.5">
           <IconBtn
             label={row.active ? "Pause" : "Resume"}
@@ -966,6 +1004,302 @@ function ComposerModal({
             className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow hover:opacity-90"
           >
             {busy ? "Saving…" : row ? "Save changes" : "Create plan"}
+          </Button>
+        </footer>
+      </form>
+    </div>
+  );
+}
+
+/* ─────────── Members panel (enrolled subscriptions) ─────────── */
+type SubRow = {
+  id: string;
+  status: string;
+  started_at: string | null;
+  next_billing_at: string | null;
+  square_subscription_id: string | null;
+  client_id: string;
+  membership_id: string;
+  clients: { first_name: string; last_name: string | null; email: string | null } | null;
+  memberships: { name: string; monthly_price_cents: number } | null;
+};
+
+function MembersPanel({ clinicId }: { clinicId: string }) {
+  const [rows, setRows] = useState<SubRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const cancelFn = useServerFn(cancelMemberSubscription);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("membership_subscriptions")
+      .select(
+        "id,status,started_at,next_billing_at,square_subscription_id,client_id,membership_id,clients(first_name,last_name,email),memberships(name,monthly_price_cents)",
+      )
+      .eq("clinic_id", clinicId)
+      .order("started_at", { ascending: false });
+    setRows((data ?? []) as unknown as SubRow[]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel(`msubs-${clinicId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "membership_subscriptions", filter: `clinic_id=eq.${clinicId}` },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clinicId]);
+
+  const handleCancel = async (id: string) => {
+    if (!confirm("Cancel this membership in Square? Member loses access at period end.")) return;
+    setBusyId(id);
+    try {
+      await cancelFn({ data: { subscription_id: id } });
+      toast.success("Membership canceled");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Cancel failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  return (
+    <section className="rounded-2xl border border-border/60 bg-card/40">
+      <header className="flex items-center justify-between border-b border-border/60 px-5 py-3">
+        <div>
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            Enrolled members
+          </p>
+          <h2 className="mt-0.5 text-base font-semibold tracking-tight">
+            {rows.length} active subscription{rows.length === 1 ? "" : "s"}
+          </h2>
+        </div>
+      </header>
+      {loading ? (
+        <div className="px-5 py-6 text-sm text-muted-foreground">Loading…</div>
+      ) : rows.length === 0 ? (
+        <div className="px-5 py-8 text-center text-sm text-muted-foreground">
+          No members enrolled yet. Sync a plan to Square, then click Enroll on a plan card.
+        </div>
+      ) : (
+        <ul className="divide-y divide-border/60">
+          {rows.map((r) => {
+            const name = r.clients
+              ? `${r.clients.first_name} ${r.clients.last_name ?? ""}`.trim()
+              : "Unknown client";
+            const statusColor =
+              r.status === "active"
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                : r.status === "paused"
+                  ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                  : r.status === "past_due"
+                    ? "border-rose-500/40 bg-rose-500/10 text-rose-300"
+                    : "border-border/60 bg-muted/30 text-muted-foreground";
+            return (
+              <li key={r.id} className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{name}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {r.memberships?.name ?? "—"} · {r.clients?.email ?? "no email"}
+                  </p>
+                </div>
+                <div className="text-right text-xs text-muted-foreground tabular-nums">
+                  {r.next_billing_at
+                    ? `Next charge ${new Date(r.next_billing_at).toLocaleDateString()}`
+                    : `Started ${r.started_at ? new Date(r.started_at).toLocaleDateString() : "—"}`}
+                </div>
+                <Badge variant="outline" className={cn("text-[10px] uppercase", statusColor)}>
+                  {r.status}
+                </Badge>
+                {r.status !== "canceled" && r.status !== "expired" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
+                    onClick={() => handleCancel(r.id)}
+                    className="h-8 px-2 text-xs text-rose-300 hover:bg-rose-500/10"
+                  >
+                    <Ban className="mr-1 h-3.5 w-3.5" />
+                    Cancel
+                  </Button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+/* ─────────── Enroll modal ─────────── */
+type ClientLite = {
+  id: string;
+  first_name: string;
+  last_name: string | null;
+  email: string | null;
+};
+
+function EnrollModal({
+  membership,
+  onClose,
+}: {
+  membership: MembershipRow;
+  onClose: () => void;
+}) {
+  const enrollFn = useServerFn(enrollMember);
+  const [clients, setClients] = useState<ClientLite[]>([]);
+  const [clientId, setClientId] = useState<string>("");
+  const [cardSourceId, setCardSourceId] = useState<string>("");
+  const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    supabase
+      .from("clients")
+      .select("id,first_name,last_name,email")
+      .eq("clinic_id", membership.clinic_id)
+      .order("first_name")
+      .limit(500)
+      .then(({ data }) => setClients((data ?? []) as ClientLite[]));
+  }, [membership.clinic_id]);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return clients;
+    return clients.filter((c) =>
+      `${c.first_name} ${c.last_name ?? ""} ${c.email ?? ""}`.toLowerCase().includes(q),
+    );
+  }, [clients, search]);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!clientId) return toast.error("Pick a client");
+    if (!cardSourceId.trim()) return toast.error("Card source token required");
+    setBusy(true);
+    try {
+      await enrollFn({
+        data: {
+          membership_id: membership.id,
+          client_id: clientId,
+          card_source_id: cardSourceId.trim(),
+        },
+      });
+      toast.success("Member enrolled in Square");
+      onClose();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Enroll failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 p-4 backdrop-blur-sm sm:items-center"
+      onClick={onClose}
+    >
+      <form
+        onSubmit={submit}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-xl rounded-2xl border border-border/60 bg-card shadow-elegant"
+      >
+        <header className="flex items-center justify-between border-b border-border/60 px-5 py-4">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+              Enroll member
+            </p>
+            <h2 className="mt-0.5 text-lg font-semibold tracking-tight">
+              {membership.name} — {fmtMoney(membership.monthly_price_cents)}/mo
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1.5 text-muted-foreground hover:bg-muted/40"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </header>
+
+        <div className="space-y-4 px-5 py-5">
+          <div className="space-y-1.5">
+            <Label htmlFor="e-search">Find client</Label>
+            <Input
+              id="e-search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name or email"
+            />
+            <div className="max-h-56 overflow-y-auto rounded-md border border-border/60 bg-background/40">
+              {filtered.length === 0 ? (
+                <p className="px-3 py-4 text-center text-xs text-muted-foreground">
+                  No clients match
+                </p>
+              ) : (
+                <ul className="divide-y divide-border/40">
+                  {filtered.slice(0, 100).map((c) => {
+                    const selected = c.id === clientId;
+                    return (
+                      <li key={c.id}>
+                        <button
+                          type="button"
+                          onClick={() => setClientId(c.id)}
+                          className={cn(
+                            "flex w-full items-center justify-between px-3 py-2 text-left text-sm transition",
+                            selected ? "bg-primary/15" : "hover:bg-muted/40",
+                          )}
+                        >
+                          <span className="truncate">
+                            {c.first_name} {c.last_name ?? ""}
+                          </span>
+                          <span className="ml-3 truncate text-xs text-muted-foreground">
+                            {c.email}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="e-card">Square card token (source_id)</Label>
+            <Input
+              id="e-card"
+              value={cardSourceId}
+              onChange={(e) => setCardSourceId(e.target.value)}
+              placeholder="cnon:..."
+            />
+            <p className="text-[10.5px] text-muted-foreground">
+              Generated by the Square Web Payments SDK after the cardholder enters their
+              details. In sandbox you can use a test nonce like{" "}
+              <code className="rounded bg-muted/50 px-1">cnon:card-nonce-ok</code>.
+            </p>
+          </div>
+        </div>
+
+        <footer className="flex items-center justify-end gap-2 border-t border-border/60 px-5 py-4">
+          <Button type="button" variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={busy || !clientId || !cardSourceId.trim()}
+            className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-glow hover:opacity-90"
+          >
+            {busy ? "Enrolling…" : "Enroll member"}
           </Button>
         </footer>
       </form>
