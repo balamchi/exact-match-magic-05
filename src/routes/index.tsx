@@ -138,6 +138,7 @@ const CLINIC_NAMES = ["Roda Clinic", "Lavista Cosmetic", "Dr. Ariana Aesthetics"
 /* ------------------------------ Page ------------------------------ */
 function Landing() {
   const { user, loading } = useAuth();
+  const { theme, toggle } = useTheme();
   const ctaHref = !loading && user ? "/app/dashboard" : "/auth/sign-up";
   const [demoOpen, setDemoOpen] = useState(false);
   const [pricingInterval, setPricingInterval] = useState<"monthly" | "annual">("monthly");
