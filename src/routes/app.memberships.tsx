@@ -519,6 +519,8 @@ function PlanCard({
   onTogglePause,
   onDuplicate,
   onDelete,
+  onSync,
+  syncing,
 }: {
   row: MembershipRow;
   mrrTotal: number;
@@ -526,6 +528,8 @@ function PlanCard({
   onTogglePause: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onSync: () => void;
+  syncing: boolean;
 }) {
   const planMrr =
     Number(row.monthly_price_cents ?? 0) * Number(row.member_count ?? 0);
