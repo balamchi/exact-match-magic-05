@@ -165,6 +165,13 @@ function WhatsAppPage() {
         </div>
       </div>
 
+      <div className="px-4 pt-3 sm:px-6">
+        <ComingSoonBanner
+          title="WhatsApp Business API — coming in Phase 4"
+          description="Compose and view conversations now; outbound delivery activates once your WABA number is approved. We'll queue messages and send them automatically when live."
+        />
+      </div>
+
       {/* KPI strip */}
       <div className="grid grid-cols-3 gap-px border-b border-border bg-border">
         <div className="bg-surface px-4 py-2.5">
