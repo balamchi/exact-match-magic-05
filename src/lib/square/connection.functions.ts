@@ -68,3 +68,27 @@ export const getSquareConnection = createServerFn({ method: "GET" })
       .maybeSingle();
     return { connection: row };
   });
+
+// Returns the public Web Payments SDK config for a clinic
+// (application_id + location_id + environment). No secrets included.
+export const getSquarePaymentsConfig = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ clinic_id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: row } = await supabase
+      .from("clinic_square_connections")
+      .select("location_id, status")
+      .eq("clinic_id", data.clinic_id)
+      .maybeSingle();
+    if (!row || row.status !== "active" || !row.location_id) {
+      throw new Error("Square is not connected for this clinic.");
+    }
+    const cfg = getSquareEnv();
+    if (!cfg.appId) throw new Error("Square application id not configured.");
+    return {
+      applicationId: cfg.appId,
+      locationId: row.location_id,
+      environment: cfg.isProd ? "production" : "sandbox",
+    };
+  });
