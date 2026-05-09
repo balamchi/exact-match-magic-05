@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getSquareEnv, SQUARE_API_VERSION } from "@/lib/square/config";
+import { getSquareEnv } from "@/lib/square/config";
+import { getActiveSquareConnection, sqHeaders } from "@/lib/square/token.server";
 
 // Enroll a client in a membership plan via Square Subscriptions.
 // Flow:
