@@ -255,6 +255,20 @@ function MembershipsPage() {
     else toast.success(`${tier.name} added`);
   };
 
+  const syncFn = useServerFn(syncPlanToSquare);
+  const [syncingId, setSyncingId] = useState<string | null>(null);
+  const syncToSquare = async (row: MembershipRow) => {
+    setSyncingId(row.id);
+    try {
+      await syncFn({ data: { membership_id: row.id } });
+      toast.success(`${row.name} synced to Square`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Sync failed");
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
   return (
     <div className="space-y-7 pb-12">
       {/* Header */}
