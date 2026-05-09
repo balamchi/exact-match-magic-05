@@ -11,6 +11,7 @@ import {
   Shield, Clock, CheckCircle2, XCircle, RefreshCw, Code,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Phase4Badge, ComingSoonBanner } from "@/components/beta-badge";
 
 export const Route = createFileRoute("/app/api-settings")({
   component: ApiSettingsPage,
@@ -80,10 +81,15 @@ function ApiSettingsPage() {
 
   return (
     <div className="space-y-8">
+      <ComingSoonBanner
+        title="Public API & Webhooks — coming in Phase 4"
+        description="Keys you create here are illustrative. Live API access and webhook delivery activate when Phase 4 ships."
+      />
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Globe className="h-7 w-7 text-primary" />
           API & Webhooks
+          <Phase4Badge />
         </h1>
         <p className="text-muted-foreground mt-1">
           Manage API keys and webhook endpoints for third-party integrations
