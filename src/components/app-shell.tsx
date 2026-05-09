@@ -24,7 +24,7 @@ import {
 import { TrialBanner } from "@/components/trial-banner";
 
 type Badge = { kind: "count"; value: number } | { kind: "pill"; label: string; tone: "new" | "live" };
-interface NavItem { to: string; label: string; icon: LucideIcon; badge?: Badge; }
+interface NavItem { to: string; label: string; icon: LucideIcon; badge?: Badge; phase4?: boolean; }
 interface NavGroup { section: string; items: NavItem[]; }
 
 const NAV: NavGroup[] = [
@@ -33,7 +33,7 @@ const NAV: NavGroup[] = [
     items: [
       { to: "/app/dashboard", label: "Dashboard", icon: Activity },
       { to: "/app/reports", label: "Reports", icon: BarChart3 },
-      { to: "/app/ai", label: "AI Assistant", icon: Bot },
+      { to: "/app/ai", label: "AI Assistant", icon: Bot, phase4: true },
     ],
   },
   {
@@ -90,7 +90,7 @@ const NAV: NavGroup[] = [
   {
     section: "AI",
     items: [
-      { to: "/app/ai-optimizer", label: "Schedule Optimizer", icon: Brain },
+      { to: "/app/ai-optimizer", label: "Schedule Optimizer", icon: Brain, phase4: true },
     ],
   },
   {
@@ -98,8 +98,8 @@ const NAV: NavGroup[] = [
     items: [
       { to: "/app/settings", label: "Settings", icon: Settings },
       { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
-      { to: "/app/quickbooks", label: "QuickBooks", icon: BookOpen },
-      { to: "/app/api-settings", label: "API & Webhooks", icon: Globe },
+      { to: "/app/quickbooks", label: "QuickBooks", icon: BookOpen, phase4: true },
+      { to: "/app/api-settings", label: "API & Webhooks", icon: Globe, phase4: true },
       { to: "/app/feature-status", label: "Feature status", icon: Sparkles },
     ],
   },
@@ -236,6 +236,14 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
                     <span className={["truncate", active ? "font-semibold" : "font-medium"].join(" ")}>
                       {item.label}
                     </span>
+                    {item.phase4 && (
+                      <span
+                        title="Coming in Phase 4"
+                        className="ms-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500/20 px-1 text-[9px] font-bold text-amber-300"
+                      >
+                        4
+                      </span>
+                    )}
                     {item.badge && <NavBadge badge={item.badge} active={active} />}
                   </Link>
                 );
