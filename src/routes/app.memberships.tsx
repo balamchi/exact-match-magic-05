@@ -1159,11 +1159,32 @@ function EnrollModal({
   onClose: () => void;
 }) {
   const enrollFn = useServerFn(enrollMember);
+  const cfgFn = useServerFn(getSquarePaymentsConfig);
   const [clients, setClients] = useState<ClientLite[]>([]);
   const [clientId, setClientId] = useState<string>("");
   const [cardSourceId, setCardSourceId] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [search, setSearch] = useState("");
+  const [paymentsCfg, setPaymentsCfg] = useState<{
+    applicationId: string;
+    locationId: string;
+    environment: "sandbox" | "production";
+  } | null>(null);
+  const [cfgErr, setCfgErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    cfgFn({ data: { clinic_id: membership.clinic_id } })
+      .then((r) =>
+        setPaymentsCfg({
+          applicationId: r.applicationId,
+          locationId: r.locationId,
+          environment: r.environment as "sandbox" | "production",
+        }),
+      )
+      .catch((e: unknown) =>
+        setCfgErr(e instanceof Error ? e.message : "Failed to load Square config"),
+      );
+  }, [cfgFn, membership.clinic_id]);
 
   useEffect(() => {
     supabase
