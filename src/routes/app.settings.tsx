@@ -38,7 +38,11 @@ interface AuditRow { id: string; action: string; entity_type: string | null; det
 function SettingsPage() {
   const { activeClinic, user, memberships, refreshMemberships, signOut } = useAuth();
   const isOwnerOrAdmin = activeClinic?.role === "owner" || activeClinic?.role === "admin";
-  const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
+  const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
+    if (typeof window === "undefined") return "profile";
+    const t = new URLSearchParams(window.location.search).get("tab") as SettingsTab | null;
+    return t && ["profile","branding","booking","notifications","communication","tax","integrations","team","audit"].includes(t) ? t : "profile";
+  });
 
   // Clinic data
   const [clinicData, setClinicData] = useState<any>(null);
