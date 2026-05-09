@@ -302,8 +302,46 @@ function InboxPage() {
       setSending(false);
       return;
     }
-    // Mark as sent (mocked — channel-specific dispatch happens in Phase 4)
-    await supabase.from("messages").update({ status: "sent" }).eq("id", data.id);
+    // Channel-specific dispatch
+    try {
+      if (selected.channel === "email" && selected.contact_handle) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const sendRes = await fetch("/lovable/email/transactional/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
+          body: JSON.stringify({
+            templateName: "direct-message",
+            recipientEmail: selected.contact_handle,
+            idempotencyKey: `msg-${data.id}`,
+            templateData: {
+              firstName: selected.contact_name?.split(" ")[0] ?? "there",
+              messageBody: body,
+              clinicName: "ClinicPro",
+            },
+          }),
+        });
+        if (sendRes.ok) {
+          fetch("/lovable/email/queue/process", { method: "POST", headers: { "Content-Type": "application/json" } }).catch(() => {});
+          await supabase.from("messages").update({ status: "sent" }).eq("id", data.id);
+          toast.success("Email sent");
+        } else {
+          const errText = await sendRes.text();
+          console.error("[Inbox] Email send failed:", errText);
+          await supabase.from("messages").update({ status: "failed", failure_reason: errText.slice(0, 200) }).eq("id", data.id);
+          toast.error("Email failed", { description: "Check console for details" });
+        }
+      } else {
+        await supabase.from("messages").update({ status: "sent" }).eq("id", data.id);
+        toast.info(`${selected.channel.toUpperCase()} dispatch coming in Phase 4. Message saved.`);
+      }
+    } catch (dispatchErr: any) {
+      console.error("[Inbox] Dispatch error:", dispatchErr);
+      await supabase.from("messages").update({ status: "failed", failure_reason: String(dispatchErr).slice(0, 200) }).eq("id", data.id);
+      toast.error("Send failed");
+    }
     loadMessages(selected.id);
     setSending(false);
   };

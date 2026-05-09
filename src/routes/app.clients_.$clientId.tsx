@@ -441,7 +441,7 @@ function ClientDetailPage() {
           {activeTab === "communication" && <CommunicationTab clientId={clientId} clinicId={activeClinic?.clinic_id ?? ""} client={client} />}
           {activeTab === "files" && <PlaceholderTab title="Files" description="Upload and manage client documents — IDs, insurance, referrals." icon={<File className="h-8 w-8" />} />}
           {activeTab === "loyalty" && <LoyaltyTab loyalty={loyaltyAccount} packages={clientPackages} currency={currency} />}
-          {activeTab === "reviews" && <ReviewsTab clientId={clientId} clinicId={activeClinic?.clinic_id ?? ""} />}
+          {activeTab === "reviews" && <ReviewsTab clientId={clientId} clinicId={activeClinic?.clinic_id ?? ""} clientName={`${client?.first_name ?? ""} ${client?.last_name ?? ""}`.trim()} />}
           {activeTab === "referrals" && <ReferralsTab clientId={clientId} clinicId={activeClinic?.clinic_id ?? ""} currency={currency} />}
         </section>
 
@@ -942,12 +942,27 @@ function SpendingBreakdown({ appointments, currency }: { appointments: Appointme
   );
 }
 
-function ReviewsTab({ clientId, clinicId }: { clientId: string; clinicId: string }) {
+function ReviewsTab({ clientId, clinicId, clientName }: { clientId: string; clinicId: string; clientName?: string }) {
   const { data: reviews, isLoading } = useQuery({
-    queryKey: ["client-reviews", clientId],
+    queryKey: ["client-reviews", clientId, clientName],
     queryFn: async () => {
-      const { data } = await supabase.from("reviews").select("*").eq("clinic_id", clinicId).eq("client_id", clientId).order("created_at", { ascending: false });
-      return data ?? [];
+      const { data: byId } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("clinic_id", clinicId)
+        .eq("client_id", clientId)
+        .order("created_at", { ascending: false });
+      if (byId && byId.length > 0) return byId;
+      if (clientName) {
+        const { data: byName } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("clinic_id", clinicId)
+          .ilike("reviewer_name", clientName)
+          .order("created_at", { ascending: false });
+        return byName ?? [];
+      }
+      return [];
     },
     enabled: !!clinicId,
   });
@@ -974,8 +989,19 @@ function ReferralsTab({ clientId, clinicId, currency }: { clientId: string; clin
   const { data: code, isLoading } = useQuery({
     queryKey: ["client-referral", clientId],
     queryFn: async () => {
-      const { data } = await supabase.from("referral_codes").select("*, referral_rewards(*)").eq("clinic_id", clinicId).eq("client_id", clientId).maybeSingle();
-      return data;
+      const { data: codeData } = await supabase
+        .from("referral_codes")
+        .select("*")
+        .eq("clinic_id", clinicId)
+        .eq("client_id", clientId)
+        .maybeSingle();
+      if (!codeData) return null;
+      const { data: rewards } = await supabase
+        .from("referral_rewards")
+        .select("*")
+        .eq("referral_id", codeData.id)
+        .order("created_at", { ascending: false });
+      return { ...codeData, referral_rewards: rewards ?? [] };
     },
     enabled: !!clinicId,
   });
@@ -1074,17 +1100,69 @@ function CommunicationTab({ clientId, clinicId, client }: { clientId: string; cl
     if (!selectedId || !draft.trim() || !clinicId) return;
     setSending(true);
     const conv = conversations.find((c) => c.id === selectedId);
-    const { error } = await supabase.from("messages").insert({
+    if (!conv) { setSending(false); return; }
+    const body = draft.trim();
+    setDraft("");
+
+    const { data: msgData, error: insertError } = await supabase.from("messages").insert({
       clinic_id: clinicId,
       conversation_id: selectedId,
       direction: "outbound",
-      channel: conv?.channel ?? "sms",
-      body: draft.trim(),
-      status: "sent",
-    });
+      channel: conv.channel,
+      body,
+      status: "queued",
+      sent_by_name: "Staff",
+    }).select().single();
+
+    if (insertError || !msgData) {
+      toast.error(`Failed to send: ${insertError?.message}`);
+      setDraft(body);
+      setSending(false);
+      return;
+    }
+
+    try {
+      if (conv.channel === "email" && conv.contact_handle) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const sendRes = await fetch("/lovable/email/transactional/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
+          body: JSON.stringify({
+            templateName: "direct-message",
+            recipientEmail: conv.contact_handle,
+            idempotencyKey: `msg-${msgData.id}`,
+            templateData: {
+              firstName: client.first_name ?? "there",
+              messageBody: body,
+              clinicName: "ClinicPro",
+            },
+          }),
+        });
+        if (sendRes.ok) {
+          fetch("/lovable/email/queue/process", { method: "POST", headers: { "Content-Type": "application/json" } }).catch(() => {});
+          await supabase.from("messages").update({ status: "sent" }).eq("id", msgData.id);
+          toast.success("Email sent");
+        } else {
+          const errText = await sendRes.text();
+          console.error("[CommunicationTab] Email send failed:", errText);
+          await supabase.from("messages").update({ status: "failed", failure_reason: errText.slice(0, 200) }).eq("id", msgData.id);
+          toast.error("Email failed to send");
+        }
+      } else {
+        await supabase.from("messages").update({ status: "sent" }).eq("id", msgData.id);
+        toast.success("Message saved (SMS/WhatsApp dispatch coming Phase 4)");
+      }
+    } catch (dispatchErr: any) {
+      console.error("[CommunicationTab] Dispatch error:", dispatchErr);
+      await supabase.from("messages").update({ status: "failed", failure_reason: String(dispatchErr).slice(0, 200) }).eq("id", msgData.id);
+      toast.error("Send failed");
+    }
+
+    loadConvs();
     setSending(false);
-    if (error) { toast.error(error.message); return; }
-    setDraft("");
   };
 
   if (loading) {

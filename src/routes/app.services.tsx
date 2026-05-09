@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { PhotoUpload } from "@/components/photo-upload";
+import { seedClinicDefaults } from "@/server/seed-clinic.functions";
 
 export const Route = createFileRoute("/app/services")({ component: ServicesPage });
 
@@ -445,8 +446,34 @@ function ServicesPage() {
           <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><HeartPulse className="h-6 w-6" /></div>
             <h2 className="font-display text-xl font-semibold">No services yet</h2>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">Add your first treatment to start building your bookable service menu.</p>
-            <Button onClick={openCreate} className="mt-5 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Plus className="mr-1.5 h-4 w-4" /> Add first service</Button>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">Start by loading 60+ pre-built services for medical aesthetics, or add your own.</p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Button
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const result = await seedClinicDefaults();
+                    if (result.seeded) {
+                      toast.success(`Loaded ${result.summary?.services ?? 60}+ services!`);
+                      await load();
+                    } else {
+                      toast.info(result.message ?? "Already seeded");
+                      await load();
+                    }
+                  } catch (err: any) {
+                    toast.error(`Seed failed: ${err.message}`);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"
+              >
+                <Sparkles className="mr-1.5 h-4 w-4" /> Load pre-built services
+              </Button>
+              <Button variant="outline" onClick={openCreate}>
+                <Plus className="mr-1.5 h-4 w-4" /> Add custom service
+              </Button>
+            </div>
           </div>
         ) : (
           <>

@@ -2503,7 +2503,15 @@ export type Database = {
           reward_type?: Database["public"]["Enums"]["reward_type"]
           status?: Database["public"]["Enums"]["reward_status"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "referral_rewards_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       referral_settings: {
         Row: {
