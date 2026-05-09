@@ -128,6 +128,7 @@ function MembershipsPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "paused">("all");
   const [composer, setComposer] = useState<MembershipRow | "new" | null>(null);
+  const [enrollFor, setEnrollFor] = useState<MembershipRow | null>(null);
 
   const load = async () => {
     if (!activeClinic) {
