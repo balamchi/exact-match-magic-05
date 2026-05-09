@@ -20,6 +20,8 @@ import {
   RefreshCw,
   CheckCircle2,
   AlertTriangle,
+  UserPlus,
+  Ban,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -27,6 +29,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { syncPlanToSquare } from "@/lib/square/plans.functions";
+import {
+  enrollMember,
+  cancelMemberSubscription,
+} from "@/lib/square/subscriptions.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
