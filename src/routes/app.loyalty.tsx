@@ -198,7 +198,7 @@ function LoyaltyPage() {
             <Trophy className="h-3.5 w-3.5 text-primary" />
             Retention engine
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight">Loyalty</h1>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Loyalty</h1>
           <p className="max-w-xl text-sm text-muted-foreground">
             Reward repeat clients with points and tier perks. Tiers auto-adjust
             from lifetime points — no manual upkeep.

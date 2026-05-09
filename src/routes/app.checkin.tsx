@@ -205,10 +205,10 @@ function CheckinPage() {
             <ClipboardCheck className="h-3.5 w-3.5" />
             Front desk
           </div>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-foreground">
+          <h1 className="mt-2 font-display text-2xl sm:text-3xl font-semibold text-foreground">
             Live waitlist
           </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          <p className="mt-1 max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">
             Track who has arrived, who's seated, and who's been seen. Updates in real time across
             every device on the front desk.
           </p>
@@ -470,7 +470,7 @@ function KpiCard({
         <span>{label}</span>
         <span className={accent}>{icon}</span>
       </div>
-      <div className={cn("mt-2 font-display text-3xl font-semibold", accent)}>{value}</div>
+      <div className={cn("mt-2 font-display text-2xl sm:text-3xl font-semibold", accent)}>{value}</div>
       {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
     </Card>
   );

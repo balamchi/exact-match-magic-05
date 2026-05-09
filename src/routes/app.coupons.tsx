@@ -334,8 +334,8 @@ function CouponsPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
             <Sparkles className="h-3.5 w-3.5" /> Promotions engine
           </div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Coupons</h1>
-          <p className="max-w-2xl text-sm text-muted-foreground">
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Coupons</h1>
+          <p className="max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">
             Create promo codes, track redemptions, set usage caps, and let expiry windows do the marketing for you.
           </p>
         </div>
@@ -504,7 +504,7 @@ function CouponsPage() {
       {/* Composer Modal */}
       {composerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
+          <div className="relative w-full max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
             <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-6 py-4">
               <div>
                 <h2 className="font-display text-lg font-semibold">{editing ? "Edit Coupon" : "New Coupon"}</h2>

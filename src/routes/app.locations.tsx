@@ -249,8 +249,8 @@ function LocationsPage() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-3 py-1 text-[10.5px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             <Building2 className="h-3.5 w-3.5 text-primary" /> Multi-site network
           </div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Locations</h1>
-          <p className="max-w-2xl text-sm text-muted-foreground">Manage clinic sites — addresses, timezones, tax rates, and operating hours.</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Locations</h1>
+          <p className="max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">Manage clinic sites — addresses, timezones, tax rates, and operating hours.</p>
         </div>
         <Button onClick={openCreate} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
           <Plus className="mr-1.5 h-4 w-4" /> Add location
@@ -338,7 +338,7 @@ function LocationsPage() {
       {/* ── Composer Modal ──────────────────────────── */}
       {composerOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-4 pt-[3vh] backdrop-blur-sm">
-          <form onSubmit={handleSubmit} className="w-full max-w-3xl rounded-2xl border border-border bg-card shadow-elevated">
+          <form onSubmit={handleSubmit} className="w-full max-w-[95vw] sm:max-w-3xl rounded-2xl border border-border bg-card shadow-elevated">
             <div className="flex items-start justify-between border-b border-border px-5 py-4">
               <div>
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit location" : "Add a location"}</h2>

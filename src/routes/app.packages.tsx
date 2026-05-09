@@ -339,8 +339,8 @@ function PackagesPage() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
             <PackageIcon className="h-3.5 w-3.5" /> Prepaid care
           </div>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-foreground">Packages & Series</h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          <h1 className="mt-2 font-display text-2xl sm:text-3xl font-semibold text-foreground">Packages & Series</h1>
+          <p className="mt-1 max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">
             Build prepaid bundles with session counts, locked-in pricing, and expiry windows. Sell once, deliver over months.
           </p>
         </div>
@@ -592,7 +592,7 @@ function PackagesPage() {
       {/* Compose Dialog */}
       {composeOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
+          <div className="relative w-full max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
             <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-6 py-4">
               <div>
                 <h2 className="font-display text-lg font-semibold">{editing ? "Edit Package" : "New Package"}</h2>

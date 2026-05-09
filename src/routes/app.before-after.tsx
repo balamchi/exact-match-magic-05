@@ -268,8 +268,8 @@ function BeforeAfterPage() {
             <Camera className="h-3.5 w-3.5" />
             Photo library
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight">Before &amp; After</h1>
-          <p className="max-w-2xl text-sm text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Before &amp; After</h1>
+          <p className="max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">
             Capture transformation stories with consent baked in. Use these comparisons in consults, marketing, and
             clinical reviews.
           </p>
@@ -443,7 +443,7 @@ function BeforeAfterPage() {
       {/* Composer */}
       {composerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
+          <div className="relative max-h-[90vh] w-full max-w-[95vw] sm:max-w-2xl overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
             <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card/95 px-6 py-4 backdrop-blur">
               <div>
                 <h2 className="text-lg font-semibold">{editing ? "Edit photo set" : "Add photo set"}</h2>

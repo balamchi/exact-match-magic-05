@@ -159,7 +159,7 @@ function InventoryPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Stock control</p>
-          <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Inventory</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Inventory</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Track products, suppliers, and reorder thresholds with live alerts.</p>
         </div>
         <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
@@ -280,7 +280,7 @@ function InventoryPage() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <form onSubmit={submit} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
+          <form onSubmit={submit} className="max-h-[90vh] w-full max-w-[95vw] sm:max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
             <div className="flex items-start justify-between border-b border-border p-5">
               <div>
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit item" : "New item"}</h2>
@@ -330,7 +330,7 @@ function Metric({ label, value, icon, accent, onClick }: { label: string; value:
   return (
     <Tag onClick={onClick} className={cn("rounded-2xl border bg-card p-5 text-left shadow-card transition", accent ? "border-rose-500/40" : "border-border", onClick && "hover:border-primary/40")}>
       <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", accent ? "bg-rose-500/15 text-rose-300" : "bg-primary/10 text-primary")}>{icon}</div>
-      <div className="mt-4 font-display text-3xl font-semibold tracking-tight">{value}</div>
+      <div className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
     </Tag>
   );

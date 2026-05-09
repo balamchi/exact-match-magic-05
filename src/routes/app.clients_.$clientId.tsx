@@ -296,14 +296,14 @@ function ClientDetailPage() {
               {client.photo_url ? (
                 <img src={client.photo_url} alt={fullName} className="h-24 w-24 rounded-2xl object-cover shadow-lg md:h-32 md:w-32" />
               ) : (
-                <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-primary text-2xl font-semibold text-primary-foreground shadow-glow md:h-32 md:w-32 md:text-3xl">{initials}</div>
+                <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-primary text-2xl font-semibold text-primary-foreground shadow-glow md:h-32 md:w-32 md:text-2xl sm:text-3xl">{initials}</div>
               )}
             </div>
 
             {/* Info */}
             <div className="flex-1">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Client profile</p>
-              <h1 className="mt-1 flex items-center gap-2 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h1 className="mt-1 flex items-center gap-2 font-display text-2xl font-semibold tracking-tight sm:text-2xl sm:text-3xl">
                 {fullName}
                 {client.vip_status && <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-400"><Crown className="h-3 w-3" />VIP</span>}
               </h1>
@@ -810,7 +810,7 @@ function ConsentsTab({ consents, onSend }: { consents: any[]; onSend: () => void
         </Button>
       </div>
       {consents.length === 0 ? (
-        <div className="p-6"><EmptyTab title="No signed consents" description="Signed consent forms for this client will appear here." icon={<PenLine className="h-8 w-8" />} /></div>
+        <div className="p-4 sm:p-6"><EmptyTab title="No signed consents" description="Signed consent forms for this client will appear here." icon={<PenLine className="h-8 w-8" />} /></div>
       ) : (
         <div className="divide-y divide-border">
           {consents.map((sc: any) => (

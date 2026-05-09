@@ -160,7 +160,7 @@ function TasksPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Team work</p>
-          <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">Tasks</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Tasks</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Drag to update status. Overdue items are flagged automatically.</p>
         </div>
         <Button onClick={() => openCreate("todo")} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
@@ -168,7 +168,7 @@ function TasksPage() {
         </Button>
       </section>
 
-      <section className="grid grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         <Metric label="Open" value={openCount.toString()} icon={<CheckSquare className="h-4.5 w-4.5" />} />
         <Metric label="Overdue" value={overdueCount.toString()} icon={<Clock className="h-4.5 w-4.5" />} accent={overdueCount > 0} />
         <Metric label="Done" value={byStatus.done.length.toString()} icon={<CheckSquare className="h-4.5 w-4.5" />} />
@@ -280,7 +280,7 @@ function TasksPage() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <form onSubmit={submit} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
+          <form onSubmit={submit} className="max-h-[90vh] w-full max-w-[95vw] sm:max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
             <div className="flex items-start justify-between border-b border-border p-5">
               <div>
                 <h2 className="font-display text-2xl font-semibold">{editing ? "Edit task" : "New task"}</h2>
@@ -361,7 +361,7 @@ function Metric({ label, value, icon, accent }: { label: string; value: string; 
       <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", accent ? "bg-rose-500/15 text-rose-300" : "bg-primary/10 text-primary")}>
         {icon}
       </div>
-      <div className="mt-4 font-display text-3xl font-semibold tracking-tight">{value}</div>
+      <div className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
     </div>
   );

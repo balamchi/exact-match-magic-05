@@ -384,7 +384,7 @@ function InjectionMappingPage() {
           <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
             <Syringe className="h-3 w-3" /> Clinical
           </span>
-          <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight">Injection Mapping</h1>
+          <h1 className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Injection Mapping</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {clientFilter && sessionMeta
               ? `${clientFilter} · Session ${sessionMeta.number} · ${new Date(sessionDate!).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}`
@@ -742,7 +742,7 @@ function InjectionMappingPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
           <form
             onSubmit={submit}
-            className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated"
+            className="max-h-[92vh] w-full max-w-[95vw] sm:max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated"
           >
             <div className="flex items-start justify-between border-b border-border p-5">
               <div>

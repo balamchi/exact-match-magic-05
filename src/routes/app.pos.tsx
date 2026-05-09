@@ -208,7 +208,7 @@ function PosPage() {
           <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
             <Receipt className="h-3 w-3" /> Point of sale
           </div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">
+          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">
             Ring it up.
             <span className="ms-2 bg-gradient-to-r from-primary to-fuchsia-400 bg-clip-text italic text-transparent">
               Get paid.
@@ -469,7 +469,7 @@ function PosPage() {
                 <span className="text-sm font-medium text-muted-foreground">
                   {depositMode ? `Deposit (${depositPercent}%)` : "Total"}
                 </span>
-                <span className="bg-gradient-to-r from-primary to-fuchsia-400 bg-clip-text font-mono text-3xl font-bold tabular-nums text-transparent">
+                <span className="bg-gradient-to-r from-primary to-fuchsia-400 bg-clip-text font-mono text-2xl sm:text-3xl font-bold tabular-nums text-transparent">
                   {formatCAD(total)}
                 </span>
               </div>
