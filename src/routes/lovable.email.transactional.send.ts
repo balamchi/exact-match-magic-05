@@ -70,6 +70,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         let recipientEmail: string
         let idempotencyKey: string
         let messageId: string
+        let replyTo: string | undefined
         let templateData: Record<string, any> = {}
         try {
           const body = await request.json()
@@ -77,9 +78,11 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           recipientEmail = body.recipientEmail || body.recipient_email
           messageId = crypto.randomUUID()
           idempotencyKey = body.idempotencyKey || body.idempotency_key || messageId
+          replyTo = body.replyTo || body.reply_to || undefined
           if (body.templateData && typeof body.templateData === 'object') {
             templateData = body.templateData
           }
+          if (!replyTo && templateData.replyTo) replyTo = templateData.replyTo
         } catch {
           return Response.json(
             { error: 'Invalid JSON in request body' },
