@@ -422,16 +422,26 @@ function MembershipsPage() {
               onDuplicate={() => duplicate(row)}
               onDelete={() => remove(row)}
               onSync={() => syncToSquare(row)}
+              onEnroll={() => setEnrollFor(row)}
               syncing={syncingId === row.id}
             />
           ))}
         </section>
       )}
 
+      {activeClinic && <MembersPanel clinicId={activeClinic.clinic_id} />}
+
       {composer && (
         <ComposerModal
           row={composer === "new" ? null : composer}
           onClose={() => setComposer(null)}
+        />
+      )}
+
+      {enrollFor && (
+        <EnrollModal
+          membership={enrollFor}
+          onClose={() => setEnrollFor(null)}
         />
       )}
     </div>
