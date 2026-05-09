@@ -659,11 +659,19 @@ function InboxPage() {
                     rows={2}
                     className="min-h-[44px] resize-none text-sm"
                   />
-                  <Button onClick={handleSend} disabled={sending || !reply.trim()}
-                    className="gap-1.5 bg-gradient-to-r from-primary to-fuchsia-600 text-primary-foreground hover:opacity-90">
+                  <Button onClick={handleSend} disabled={sending || !reply.trim() || selected.channel === "sms" || selected.channel === "whatsapp"}
+                    className="gap-1.5 bg-gradient-to-r from-primary to-fuchsia-600 text-primary-foreground hover:opacity-90"
+                    aria-label="Send reply">
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
+                {(selected.channel === "sms" || selected.channel === "whatsapp") && (
+                  <div className="mt-2">
+                    <PhaseInlineNotice>
+                      {selected.channel === "sms" ? "SMS" : "WhatsApp"} sending activates in Phase 4. You can read incoming messages today; outbound replies are disabled until carrier integration goes live.
+                    </PhaseInlineNotice>
+                  </div>
+                )}
                 {selected.channel === "sms" && (
                   <p className="mt-1 text-end text-[10px] text-muted-foreground">
                     {reply.length} / 160 chars · {Math.ceil(reply.length / 160) || 1} SMS
