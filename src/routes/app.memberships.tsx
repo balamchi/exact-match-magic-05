@@ -29,6 +29,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { syncPlanToSquare } from "@/lib/square/plans.functions";
+import { getSquarePaymentsConfig } from "@/lib/square/connection.functions";
+import { SquareCardForm } from "@/components/square-card-form";
 import {
   enrollMember,
   cancelMemberSubscription,
