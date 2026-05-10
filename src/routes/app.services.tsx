@@ -176,6 +176,17 @@ function ServicesPage() {
   const safePage = Math.min(page, totalPages - 1);
   const paginated = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
+  const grouped = useMemo(() => {
+    if (catFilter !== "all") return null;
+    const groups = new Map<string, typeof paginated>();
+    for (const s of paginated) {
+      const cat = s.category?.trim() || "Uncategorized";
+      if (!groups.has(cat)) groups.set(cat, []);
+      groups.get(cat)!.push(s);
+    }
+    return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [paginated, catFilter]);
+
   const stats = useMemo(() => {
     const active = services.filter(s => s.active);
     const avg = active.length ? active.reduce((sum, s) => sum + (s.price_cents ?? 0), 0) / active.length : 0;
