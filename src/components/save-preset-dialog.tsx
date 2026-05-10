@@ -31,12 +31,15 @@ export function SavePresetDialog({
   const handleSave = async () => {
     if (!activeClinic || !user || !name.trim()) return;
     setSaving(true);
+    const config = customConfig
+      ? { custom: true, builder: customConfig, presetId, compare }
+      : { presetId, compare };
     const { error } = await supabase.from("report_presets" as never).insert({
       clinic_id: activeClinic.clinic_id,
       user_id: user.id,
-      report_key: reportKey,
+      report_key: customConfig ? "custom" : reportKey,
       name: name.trim(),
-      config: { presetId, compare },
+      config,
     } as never);
     setSaving(false);
     if (error) { toast.error("Could not save preset"); return; }
