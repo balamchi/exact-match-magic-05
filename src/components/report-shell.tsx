@@ -73,18 +73,24 @@ export function ReportShell({
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          {saveable && (
-            <Button variant="outline" size="sm" className="gap-2" onClick={() => toast.success("Preset saved")}>
-              <Save className="h-3.5 w-3.5" /> Save
-            </Button>
-          )}
-          {scheduleEmail && (
-            <Button variant="outline" size="sm" className="gap-2" onClick={() => toast.success("Email schedule configured")}>
-              <Mail className="h-3.5 w-3.5" /> Schedule
-            </Button>
-          )}
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setSaveOpen(true)}>
+            <Save className="h-3.5 w-3.5" /> Save
+          </Button>
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setScheduleOpen(true)}>
+            <Mail className="h-3.5 w-3.5" /> Schedule
+          </Button>
         </div>
       </div>
+
+      <SavePresetDialog
+        open={saveOpen} onOpenChange={setSaveOpen}
+        reportKey={derivedKey} reportTitle={title}
+        presetId={r.presetId} compare={r.compare}
+      />
+      <ScheduleReportDialog
+        open={scheduleOpen} onOpenChange={setScheduleOpen}
+        reportKey={derivedKey} reportTitle={title}
+      />
 
       {primaryKpi && (
         <div className="rounded-xl border border-border/50 bg-card/50 p-4 md:p-5">
