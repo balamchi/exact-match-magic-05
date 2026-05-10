@@ -41,6 +41,11 @@ import {
   retryFailedCharge,
   changeMemberPlan,
 } from "@/lib/square/subscriptions.functions";
+import { createPortalToken } from "@/lib/square/portal.functions";
+const _PORTAL_IMPORT = { changeMemberPlan, createPortalToken };
+void _PORTAL_IMPORT;
+import _legacyMarker from "@/lib/utils";
+} from "@/lib/square/subscriptions.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
