@@ -32,7 +32,7 @@ Status legend:
 | `/app/coupons` | ✅ Live | supabase CRUD on `coupons` | |
 | `/app/giftcards` | ✅ Live | supabase CRUD + `sendGiftCardEmail` server fn | Resend wired to real email |
 | `/app/packages` | ✅ Live | supabase CRUD on `packages`, `package_redemptions` | |
-| `/app/memberships` | 🟡 Beta | supabase CRUD on `memberships` | Recurring billing deferred to Phase 4 |
+| `/app/memberships` | ✅ Live | supabase + Square server fns + webhook | Recurring billing live via Square; member portal + dunning emails wired |
 | `/app/loyalty` | 🟡 Beta | supabase CRUD on `loyalty_points` | |
 | `/app/inventory` | 🟡 Beta | supabase CRUD on `inventory_items` | BetaBadge — auto-decrement WIP |
 | `/app/inbox` | 🟡 Beta | supabase CRUD on `messages` (email channel real) | SMS/WhatsApp send disabled in UI |

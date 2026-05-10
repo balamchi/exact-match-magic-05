@@ -42,3 +42,13 @@ rg -n "Dialog open|Modal open" src/routes/app.*.tsx
 ```
 
 Each finding was inspected by reading the surrounding handler and confirming whether the toast/UI state matched a real backend write.
+
+## Memberships polish (May 10, 2026)
+
+| ID | Status | Area | Notes |
+|----|--------|------|-------|
+| M1 | ✅ Fixed | `membership_charges.square_invoice_id` | Replaced partial unique index with named unique constraint so Supabase upserts honor `onConflict`. |
+| M2 | ✅ Fixed | Square webhook | Added `ignoreDuplicates: false` on both upsert calls for explicit idempotent behavior. |
+| M3 | ✅ Fixed | Member emails | 5 membership templates wired (welcome, charge succeeded, charge failed, paused, canceled) and dispatched from webhook. |
+| M4 | ✅ Done | Settings → Integrations | `SquareConnectionCard` already mounted under Payment Integration. |
+| M5 | ✅ Done | Production webhook | Added `supabase/functions/square-memberships-webhook` as the production endpoint; TanStack route remains for dev. |
