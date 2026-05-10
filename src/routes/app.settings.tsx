@@ -504,6 +504,8 @@ function SettingsPage() {
         })()}
       </section>
 
+      <KioskUrlCard />
+
       {/* Clinic switcher */}
       {memberships.length > 1 && (
         <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
