@@ -13,7 +13,7 @@ import { money } from "@/lib/reports/format";
 export const Route = createFileRoute("/app/reports/staff/commissions")({ component: Commissions });
 
 interface Appt { staff_id: string | null; status: string; price_cents: number | null }
-interface Staff { id: string; first_name: string; last_name: string | null; commission_rate?: number | null }
+interface Staff { id: string; display_name: string; commission_rate?: number | null }
 
 function Commissions() {
   const { activeClinic } = useAuth();
@@ -46,7 +46,7 @@ function Commissions() {
     const rate = s.commission_rate ?? 0;
     return {
       id: s.id,
-      name: `${s.first_name} ${s.last_name ?? ""}`.trim(),
+      name: s.display_name,
       revenue: rev,
       rate,
       commission: Math.round(rev * (rate / 100)),

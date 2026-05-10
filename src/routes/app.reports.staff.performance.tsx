@@ -13,7 +13,7 @@ import { money, num } from "@/lib/reports/format";
 export const Route = createFileRoute("/app/reports/staff/performance")({ component: Performance });
 
 interface Appt { staff_id: string | null; status: string; price_cents: number | null; client_id: string | null }
-interface Staff { id: string; first_name: string; last_name: string | null }
+interface Staff { id: string; display_name: string }
 
 function Performance() {
   const { activeClinic } = useAuth();
@@ -32,7 +32,7 @@ function Performance() {
           .eq("clinic_id", activeClinic.clinic_id)
           .gte("starts_at", range.range.from.toISOString())
           .lte("starts_at", range.range.to.toISOString()),
-        supabase.from("staff").select("id, first_name, last_name").eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("staff").select("id, display_name").eq("clinic_id", activeClinic.clinic_id),
       ]);
       setAppts(((a.data ?? []) as unknown) as Appt[]);
       setStaff(((s.data ?? []) as unknown) as Staff[]);
@@ -57,7 +57,7 @@ function Performance() {
     const s = staff.find((x) => x.id === id);
     return {
       id,
-      name: s ? `${s.first_name} ${s.last_name ?? ""}`.trim() : "Unassigned",
+      name: s ? s.display_name : "Unassigned",
       bookings: v.bookings,
       completed: v.completed,
       revenue: v.revenue,
