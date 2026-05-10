@@ -29,14 +29,12 @@ const SUB_STATUS_MAP: Record<string, string> = {
 async function enqueueEmail(templateName: string, recipientEmail: string, data: Record<string, unknown>) {
   const { error } = await supabaseAdmin.rpc("enqueue_email", {
     queue_name: "transactional_email_queue",
-    payload: { templateName, recipientEmail, data },
+    payload: { templateName, recipientEmail, data } as any,
   });
   if (error) console.warn(`${templateName} enqueue failed:`, error.message);
 }
 
-async function buildPortalUrl(subscriptionId: string) {
-  // Generate (or reuse) a portal token for self-service updates.
-  // Look up an existing live token first to avoid spamming new tokens on every webhook.
+async function buildPortalUrl(subscriptionId: string, clinicId: string) {
   const { data: existing } = await supabaseAdmin
     .from("member_portal_tokens")
     .select("token, expires_at, revoked_at")
@@ -47,12 +45,12 @@ async function buildPortalUrl(subscriptionId: string) {
     .maybeSingle();
   let token = existing?.token;
   if (!token || (existing?.expires_at && new Date(existing.expires_at).getTime() < Date.now())) {
-    // Mint a fresh token (90 days)
     const newToken = Array.from(crypto.getRandomValues(new Uint8Array(18)))
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
     const expires = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
     const { error } = await supabaseAdmin.from("member_portal_tokens").insert({
+      clinic_id: clinicId,
       subscription_id: subscriptionId,
       token: newToken,
       expires_at: expires,
