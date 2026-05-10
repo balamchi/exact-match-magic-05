@@ -350,7 +350,7 @@ async function runQuery(
       const chart = Array.from(planAgg.entries()).map(([x, y]) => ({ x, y }));
 
       const rows: ReportRow[] = list.map((s) => {
-        const p = planMap.get(s.membership_id) as any;
+        const p = planMap.get(s.membership_id) as { name?: string } | undefined;
         return {
           id: s.id,
           cells: {
