@@ -1184,6 +1184,18 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
                     size="sm"
                     variant="ghost"
                     disabled={busyId === r.id}
+                    onClick={() => setChangeFor(r)}
+                    className="h-8 px-2 text-xs text-sky-300 hover:bg-sky-500/10"
+                  >
+                    <ArrowLeftRight className="mr-1 h-3.5 w-3.5" />
+                    Change plan
+                  </Button>
+                )}
+                {r.status !== "canceled" && r.status !== "expired" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
                     onClick={() => handleCancel(r.id)}
                     className="h-8 px-2 text-xs text-rose-300 hover:bg-rose-500/10"
                   >
@@ -1195,6 +1207,13 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
             );
           })}
         </ul>
+      )}
+      {changeFor && (
+        <ChangePlanModal
+          clinicId={clinicId}
+          subscription={changeFor}
+          onClose={() => setChangeFor(null)}
+        />
       )}
     </section>
   );
