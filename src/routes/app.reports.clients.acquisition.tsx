@@ -25,7 +25,7 @@ function Acquisition() {
     (async () => {
       setLoading(true);
       const { data } = await supabase.from("clients")
-        .select("id, created_at, referral_source" as never)
+        .select("id, created_at, source" as never)
         .eq("clinic_id", activeClinic.clinic_id)
         .gte("created_at", range.range.from.toISOString())
         .lte("created_at", range.range.to.toISOString());
