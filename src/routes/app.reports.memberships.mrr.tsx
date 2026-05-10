@@ -21,10 +21,18 @@ function MRR() {
     if (!activeClinic) return;
     (async () => {
       setLoading(true);
-      const { data } = await supabase.from("membership_subscriptions" as never)
-        .select("id, status, price_cents, billing_period, canceled_at, created_at")
+      const { data } = await supabase.from("membership_subscriptions")
+        .select("id, status, canceled_at, created_at, membership:memberships(monthly_price_cents, billing_cadence)")
         .eq("clinic_id", activeClinic.clinic_id);
-      setSubs(((data ?? []) as unknown) as SubscriptionLite[]);
+      const raw = ((data ?? []) as unknown) as Array<{
+        id: string; status: string; canceled_at: string | null; created_at: string;
+        membership: { monthly_price_cents: number | null; billing_cadence: string | null } | null;
+      }>;
+      setSubs(raw.map((s) => ({
+        id: s.id, status: s.status, canceled_at: s.canceled_at, created_at: s.created_at,
+        monthly_price_cents: s.membership?.monthly_price_cents ?? 0,
+        billing_cadence: s.membership?.billing_cadence ?? "MONTHLY",
+      })));
       setLoading(false);
     })();
   }, [activeClinic]);
