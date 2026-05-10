@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import { ReportCard } from "@/components/report-card";
 import { ReportDatePicker } from "@/components/report-date-picker";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { SavedPresetsList } from "@/components/saved-presets-list";
+import { ScheduledReportsList } from "@/components/scheduled-reports-list";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useReportRange } from "@/lib/reports/hooks";
