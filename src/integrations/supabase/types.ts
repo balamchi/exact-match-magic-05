@@ -737,6 +737,8 @@ export type Database = {
           logo_url: string | null
           name: string
           notification_settings: Json | null
+          onboarding_completed_at: string | null
+          onboarding_dismissed_at: string | null
           operating_hours: Json | null
           phone: string | null
           primary_color: string | null
@@ -766,6 +768,8 @@ export type Database = {
           logo_url?: string | null
           name: string
           notification_settings?: Json | null
+          onboarding_completed_at?: string | null
+          onboarding_dismissed_at?: string | null
           operating_hours?: Json | null
           phone?: string | null
           primary_color?: string | null
@@ -795,6 +799,8 @@ export type Database = {
           logo_url?: string | null
           name?: string
           notification_settings?: Json | null
+          onboarding_completed_at?: string | null
+          onboarding_dismissed_at?: string | null
           operating_hours?: Json | null
           phone?: string | null
           primary_color?: string | null
