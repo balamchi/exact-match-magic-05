@@ -92,11 +92,23 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    if (activeClinic?.clinic_id) {
+      await supabase
+        .from("clinics")
+        .update({ onboarding_dismissed_at: new Date().toISOString() } as any)
+        .eq("id", activeClinic.clinic_id);
+    }
     onComplete();
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    if (activeClinic?.clinic_id) {
+      await supabase
+        .from("clinics")
+        .update({ onboarding_completed_at: new Date().toISOString() } as any)
+        .eq("id", activeClinic.clinic_id);
+    }
     onComplete();
     navigate({ to: "/app/dashboard" } as any);
   };
