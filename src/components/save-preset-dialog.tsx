@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { REPORT_PRESETS } from "@/lib/reports/hooks";
+import type { CustomReportConfig } from "@/lib/reports/builder-schema";
 
 interface Props {
   open: boolean;
@@ -15,9 +16,13 @@ interface Props {
   reportTitle: string;
   presetId: string;
   compare: boolean;
+  /** When provided, the preset is saved as a custom-builder config instead of a canned-report preset. */
+  customConfig?: CustomReportConfig;
 }
 
-export function SavePresetDialog({ open, onOpenChange, reportKey, reportTitle, presetId, compare }: Props) {
+export function SavePresetDialog({
+  open, onOpenChange, reportKey, reportTitle, presetId, compare, customConfig,
+}: Props) {
   const { activeClinic, user } = useAuth();
   const [name, setName] = useState(`${reportTitle} view`);
   const [saving, setSaving] = useState(false);
@@ -26,12 +31,15 @@ export function SavePresetDialog({ open, onOpenChange, reportKey, reportTitle, p
   const handleSave = async () => {
     if (!activeClinic || !user || !name.trim()) return;
     setSaving(true);
+    const config = customConfig
+      ? { custom: true, builder: customConfig, presetId, compare }
+      : { presetId, compare };
     const { error } = await supabase.from("report_presets" as never).insert({
       clinic_id: activeClinic.clinic_id,
       user_id: user.id,
-      report_key: reportKey,
+      report_key: customConfig ? "custom" : reportKey,
       name: name.trim(),
-      config: { presetId, compare },
+      config,
     } as never);
     setSaving(false);
     if (error) { toast.error("Could not save preset"); return; }
