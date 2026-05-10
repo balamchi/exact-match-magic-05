@@ -199,7 +199,7 @@ function LoyaltyPage() {
             Retention engine
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Loyalty</h1>
-          <p className="max-w-xl text-sm text-muted-foreground">
+          <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">
             Reward repeat clients with points and tier perks. Tiers auto-adjust
             from lifetime points — no manual upkeep.
           </p>
@@ -305,7 +305,7 @@ function LoyaltyPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-card/20 px-6 py-16 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-card/20 px-4 sm:px-6 py-16 text-center">
           <Trophy className="mb-3 h-8 w-8 text-muted-foreground" />
           <p className="text-sm font-medium">
             {rows.length === 0 ? "No loyalty members yet" : "No members match your filter"}
@@ -566,7 +566,7 @@ function ComposerModal({ row, onClose }: { row: LoyaltyRow | null; onClose: () =
       <form
         onSubmit={submit}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-elegant"
+        className="w-full max-w-[95vw] sm:max-w-lg rounded-2xl border border-border/60 bg-card shadow-elegant"
       >
         <header className="flex items-center justify-between border-b border-border/60 px-5 py-4">
           <div>
@@ -705,7 +705,7 @@ function AdjustModal({ row, onClose }: { row: LoyaltyRow; onClose: () => void })
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl border border-border/60 bg-card shadow-elegant"
+        className="w-full max-w-[95vw] sm:max-w-md rounded-2xl border border-border/60 bg-card shadow-elegant"
       >
         <header className="flex items-center justify-between border-b border-border/60 px-5 py-4">
           <div>

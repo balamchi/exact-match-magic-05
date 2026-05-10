@@ -281,7 +281,7 @@ function BeforeAfterPage() {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-cols-4">
         <MetricCard
           label="With consent"
           value={metrics.consented.toString()}
@@ -310,7 +310,7 @@ function BeforeAfterPage() {
 
       {/* Search + filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-md flex-1">
+        <div className="relative max-w-[95vw] sm:max-w-md flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
@@ -372,7 +372,7 @@ function BeforeAfterPage() {
               <button
                 type="button"
                 onClick={() => setLightbox(p)}
-                className="grid w-full grid-cols-2 gap-px bg-border/40 text-left"
+                className="grid w-full grid-cols-1 sm:grid-cols-2 gap-px bg-border/40 text-left"
               >
                 <PhotoTile url={p.before_url} label="Before" />
                 <PhotoTile url={p.after_url} label="After" />
@@ -444,7 +444,7 @@ function BeforeAfterPage() {
       {composerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
           <div className="relative max-h-[90vh] w-full max-w-[95vw] sm:max-w-2xl overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card/95 px-6 py-4 backdrop-blur">
+            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card/95 px-4 sm:px-6 py-4 backdrop-blur">
               <div>
                 <h2 className="text-lg font-semibold">{editing ? "Edit photo set" : "Add photo set"}</h2>
                 <p className="mt-0.5 text-xs text-muted-foreground">
@@ -459,7 +459,7 @@ function BeforeAfterPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5 px-6 py-5">
+            <form onSubmit={handleSubmit} className="space-y-5 px-4 sm:px-6 py-5">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="client">Client *</Label>
@@ -572,7 +572,7 @@ function BeforeAfterPage() {
                 </div>
               </label>
 
-              <div className="sticky bottom-0 -mx-6 flex justify-end gap-2 border-t border-border/60 bg-card/95 px-6 py-4 backdrop-blur">
+              <div className="sticky bottom-0 -mx-6 flex justify-end gap-2 border-t border-border/60 bg-card/95 px-4 sm:px-6 py-4 backdrop-blur">
                 <Button type="button" variant="ghost" onClick={closeComposer}>
                   Cancel
                 </Button>
@@ -588,7 +588,7 @@ function BeforeAfterPage() {
       {/* Lightbox */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 p-6 backdrop-blur"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 p-4 sm:p-6 backdrop-blur"
           onClick={() => setLightbox(null)}
         >
           <button

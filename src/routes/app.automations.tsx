@@ -309,7 +309,7 @@ function AutomationsPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Growth</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Automations<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Automations<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Set-and-forget workflows. Send reminders, recover no-shows, and grow rebook rates on autopilot.
           </p>
@@ -319,7 +319,7 @@ function AutomationsPage() {
         </Button>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-4">
         <Metric label="Active workflows" value={stats.active.toString()} icon={<Zap className="h-4 w-4" />} accent />
         <Metric label="Paused" value={stats.paused.toString()} icon={<Power className="h-4 w-4" />} />
         <Metric label="Total runs" value={stats.totalRuns.toLocaleString()} icon={<Sparkles className="h-4 w-4" />} />
@@ -419,12 +419,12 @@ function AutomationsPage() {
             {[0, 1, 2].map((i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/40" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-16 text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow">
               <Zap className="h-6 w-6" />
             </div>
             <h2 className="font-display text-xl font-semibold">No workflows yet</h2>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+            <p className="mt-1 max-w-[95vw] sm:max-w-sm text-sm text-muted-foreground">
               Pick a recipe above or build a custom flow. Your first automation pays for itself within a week.
             </p>
           </div>
@@ -529,7 +529,7 @@ function AutomationsPage() {
                 <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   When (trigger)
                 </p>
-                <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:grid-cols-3">
                   {(Object.keys(TRIGGER_META) as Trigger[]).map((key) => {
                     const m = TRIGGER_META[key];
                     const Icon = m.Icon;
@@ -560,7 +560,7 @@ function AutomationsPage() {
                 <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   Then (action)
                 </p>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {(Object.keys(ACTION_META) as Action[]).map((key) => {
                     const m = ACTION_META[key];
                     const Icon = m.Icon;

@@ -247,7 +247,7 @@ function ApiSettingsPage() {
           <CardTitle className="text-base">Available Webhook Events</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             {ALL_EVENTS.map((e) => (
               <div key={e} className="flex items-center gap-2 text-sm p-2 rounded bg-muted/20">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />

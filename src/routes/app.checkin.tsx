@@ -226,7 +226,7 @@ function CheckinPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiCard
           label="Waiting"
           value={counts.waiting.toString()}
@@ -577,7 +577,7 @@ function ComposeDialog({
 
           <div className="space-y-2">
             <Label>Status</Label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {(Object.keys(STATUS_META) as StatusKey[]).map((key) => {
                 const meta = STATUS_META[key];
                 const Icon = meta.icon;

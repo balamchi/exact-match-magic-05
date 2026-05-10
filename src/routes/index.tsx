@@ -78,9 +78,9 @@ function Mark({ size = 32 }: { size?: number }) {
 const btnPrimary =
   "inline-flex items-center justify-center gap-2 rounded-xl px-[18px] py-[10px] text-sm font-semibold text-foreground transition shadow-[0_4px_20px_-4px_rgba(147,51,234,0.5)] hover:shadow-[0_6px_24px_-4px_rgba(147,51,234,0.7)] hover:-translate-y-px [background:linear-gradient(135deg,#9333EA,#7E22CE)] hover:[background:linear-gradient(135deg,#A855F7,#9333EA)]";
 const btnPrimaryLg =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-foreground transition shadow-[0_4px_20px_-4px_rgba(147,51,234,0.5)] hover:shadow-[0_6px_24px_-4px_rgba(147,51,234,0.7)] hover:-translate-y-px [background:linear-gradient(135deg,#9333EA,#7E22CE)] hover:[background:linear-gradient(135deg,#A855F7,#9333EA)]";
+  "inline-flex items-center justify-center gap-2 rounded-xl px-4 sm:px-6 py-3.5 text-[15px] font-semibold text-foreground transition shadow-[0_4px_20px_-4px_rgba(147,51,234,0.5)] hover:shadow-[0_6px_24px_-4px_rgba(147,51,234,0.7)] hover:-translate-y-px [background:linear-gradient(135deg,#9333EA,#7E22CE)] hover:[background:linear-gradient(135deg,#A855F7,#9333EA)]";
 const btnSecondary =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-foreground/[0.05] px-6 py-3.5 text-[15px] font-semibold text-foreground transition hover:bg-foreground/[0.08]";
+  "inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-foreground/[0.05] px-4 sm:px-6 py-3.5 text-[15px] font-semibold text-foreground transition hover:bg-foreground/[0.08]";
 const btnGhost =
   "inline-flex items-center justify-center rounded-xl px-[18px] py-[10px] text-sm font-medium text-muted-foreground transition hover:bg-foreground/[0.05] hover:text-foreground";
 
@@ -276,7 +276,7 @@ function Landing() {
                 <span className="h-3 w-3 rounded-full bg-[#28c940]" />
                 <div className="flex-1 text-center font-mono text-xs text-muted-foreground">app.clinicpro.io/dashboard</div>
               </div>
-              <div className="grid min-h-[320px] grid-cols-2 gap-4 p-5 sm:grid-cols-4 sm:min-h-[480px] sm:p-8">
+              <div className="grid min-h-[320px] grid-cols-1 sm:grid-cols-2 gap-4 p-5 sm:grid-cols-4 sm:min-h-[480px] sm:p-8">
                 <MockStat icon={Calendar} num="47" label="Today's appointments" trend="↑ 12% vs avg" />
                 <MockStat icon={DollarSign} num="$14,280" label="Today's revenue" trend="↑ 34% vs avg" />
                 <MockStat icon={Users} num="2,847" label="Active clients" trend="↑ 234 this month" />
@@ -309,7 +309,7 @@ function Landing() {
 
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="overflow-hidden rounded-3xl border border-border/60 bg-surface">
-            <div className="border-b border-border/60 bg-[rgba(244,63,94,0.05)] px-7 py-6">
+            <div className="border-b border-border/60 bg-[rgba(244,63,94,0.05)] px-7 py-4 sm:py-6">
               <h3 className="font-display text-xl font-semibold">What clinic owners told us</h3>
               <p className="mt-1 text-[13px] text-muted-foreground">From 100+ interviews with med spa owners across North America</p>
             </div>
@@ -325,13 +325,13 @@ function Landing() {
 
           <div className="rounded-3xl border border-primary/30 p-10 lg:sticky lg:top-24 [background:linear-gradient(135deg,rgba(147,51,234,0.08),rgba(217,70,239,0.04))]">
             <div className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">ClinicPro fixes this</div>
-            <h3 className="font-display text-3xl font-bold leading-[1.1] tracking-tight">
+            <h3 className="font-display text-2xl sm:text-3xl font-bold leading-[1.1] tracking-tight">
               One platform. Pre-loaded. Profitable from day one.
             </h3>
             <p className="mt-4 text-muted-foreground">
               Booking, payments, CRM, marketing, consent forms, injection mapping, inventory, AI — in one operating system designed by clinic owners, for clinic owners.
             </p>
-            <div className="my-6 grid grid-cols-2 gap-3">
+            <div className="my-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 { num: "10 min", lab: "Time to first booking" },
                 { num: "322", lab: "Services pre-loaded" },
@@ -374,7 +374,7 @@ function Landing() {
             <p className="mt-1 text-sm text-muted-foreground">Founder & CEO · Divan Digital Corp</p>
           </div>
           <div>
-            <h3 className="font-display text-4xl font-bold leading-tight max-md:text-3xl">Built by clinic operators, for clinic operators.</h3>
+            <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight max-md:text-3xl">Built by clinic operators, for clinic operators.</h3>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
               Built by Shahab Balamchi, founder of Divan Digital Corp. We've managed marketing and operations for 50+ medical aesthetic, dental, and wellness clinics across Toronto, Montreal, Dubai, and Los Angeles since 2019.
             </p>
@@ -389,7 +389,7 @@ function Landing() {
           {TESTIMONIALS.map((t) => (
             <div
               key={t.author}
-              className="group rounded-2xl border border-primary/20 bg-background p-8 transition hover:border-primary/40 hover:shadow-[0_0_30px_-10px_rgba(147,51,234,0.3)]"
+              className="group rounded-2xl border border-primary/20 bg-background p-4 sm:p-8 transition hover:border-primary/40 hover:shadow-[0_0_30px_-10px_rgba(147,51,234,0.3)]"
             >
               <div className="flex gap-0.5">
                 {Array.from({ length: t.stars }).map((_, i) => (
@@ -421,7 +421,7 @@ function Landing() {
           {FEATURES.map((f) => (
             <div
               key={f.title}
-              className="group relative overflow-hidden rounded-[20px] border border-border/60 bg-surface p-8 transition hover:-translate-y-0.5 hover:border-primary/40"
+              className="group relative overflow-hidden rounded-[20px] border border-border/60 bg-surface p-4 sm:p-8 transition hover:-translate-y-0.5 hover:border-primary/40"
             >
               <div
                 aria-hidden
@@ -503,7 +503,7 @@ function Landing() {
 
         {/* Founding member banner */}
         <div className="mb-12 overflow-hidden rounded-2xl p-px [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-          <div className="rounded-[15px] px-8 py-6 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
+          <div className="rounded-[15px] px-4 sm:px-8 py-4 sm:py-6 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
             <div className="font-display text-xl font-bold text-foreground sm:text-2xl">🔒 Founding Member Pricing — Locked Forever</div>
             <p className="mt-2 text-sm text-muted-foreground">
               First 100 clinics get <strong>$49/$149/$349</strong> per month locked in for life. No price increases, ever.
@@ -548,8 +548,8 @@ function Landing() {
                 key={p.name}
                 className={
                   p.featured
-                    ? "relative rounded-3xl border border-primary/40 p-8 shadow-[0_30px_60px_-20px_rgba(147,51,234,0.4)] [background:linear-gradient(180deg,rgba(147,51,234,0.08),var(--surface))]"
-                    : "relative rounded-3xl border border-border/60 bg-surface p-8"
+                    ? "relative rounded-3xl border border-primary/40 p-4 sm:p-8 shadow-[0_30px_60px_-20px_rgba(147,51,234,0.4)] [background:linear-gradient(180deg,rgba(147,51,234,0.08),var(--surface))]"
+                    : "relative rounded-3xl border border-border/60 bg-surface p-4 sm:p-8"
                 }
               >
                 {p.featured && (
@@ -597,7 +597,7 @@ function Landing() {
 
       {/* FINAL CTA */}
       <Section id="cta">
-        <div className="relative overflow-hidden rounded-[32px] border border-primary/30 px-8 py-16 text-center sm:px-12 sm:py-20 [background:linear-gradient(135deg,rgba(147,51,234,0.15),rgba(217,70,239,0.1))]">
+        <div className="relative overflow-hidden rounded-[32px] border border-primary/30 px-4 sm:px-8 py-16 text-center sm:px-12 sm:py-20 [background:linear-gradient(135deg,rgba(147,51,234,0.15),rgba(217,70,239,0.1))]">
           <div
             aria-hidden
             className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2"
@@ -677,7 +677,7 @@ function Landing() {
       {/* Demo Modal */}
       {demoOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setDemoOpen(false)}>
-          <div className="relative w-full max-w-lg rounded-3xl border border-border bg-surface p-8 text-center" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-[95vw] sm:max-w-lg rounded-3xl border border-border bg-surface p-4 sm:p-8 text-center" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setDemoOpen(false)} className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-foreground/10">
               <X className="h-5 w-5" />
             </button>

@@ -258,7 +258,7 @@ function LocationsPage() {
       </header>
 
       {/* Metrics */}
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:grid-cols-4">
         <MetricCard label="Active locations" value={metrics.active} icon={<MapPin className="h-4 w-4" />} accent="from-violet-500/20" />
         <MetricCard label="Cities covered" value={metrics.cities} icon={<Building2 className="h-4 w-4" />} accent="from-sky-500/20" />
         <MetricCard label="Countries" value={metrics.countries} icon={<Globe2 className="h-4 w-4" />} accent="from-emerald-500/20" />
@@ -266,7 +266,7 @@ function LocationsPage() {
       </section>
 
       {/* Search */}
-      <div className="relative max-w-md">
+      <div className="relative max-w-[95vw] sm:max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, city, region…" className="pl-9" />
       </div>

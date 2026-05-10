@@ -215,12 +215,12 @@ function AiAssistantPage() {
       {/* Messages area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto rounded-2xl border border-border bg-card shadow-card">
         {messages.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+          <div className="flex h-full flex-col items-center justify-center p-4 sm:p-8 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow">
               <Bot className="h-8 w-8" />
             </div>
             <h2 className="mt-5 font-display text-xl font-semibold">How can I help?</h2>
-            <p className="mt-1 max-w-md text-sm text-muted-foreground">
+            <p className="mt-1 max-w-[95vw] sm:max-w-md text-sm text-muted-foreground">
               Ask about treatment protocols, draft patient communications, generate SOAP notes, or get clinical insights.
             </p>
             <div className="mt-6 grid gap-2 sm:grid-cols-2">

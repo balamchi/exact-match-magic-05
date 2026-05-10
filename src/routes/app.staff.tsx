@@ -188,7 +188,7 @@ function StaffPage() {
             <Users className="h-3.5 w-3.5 text-primary" /> Team roster
           </div>
           <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Staff</h1>
-          <p className="max-w-xl text-sm text-muted-foreground">Manage providers, front desk, and support team. Calendar colors flow through to your booking grid.</p>
+          <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">Manage providers, front desk, and support team. Calendar colors flow through to your booking grid.</p>
         </div>
         <Button onClick={() => setComposer("new")} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
           <Plus className="mr-1.5 h-4 w-4" /> Add staff
@@ -196,7 +196,7 @@ function StaffPage() {
       </header>
 
       {/* KPIs */}
-      <section className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Total team" value={stats.total} accent="violet" icon={<Users className="h-4 w-4" />} />
         <KpiCard label="Providers" value={stats.providers} accent="emerald" icon={<Stethoscope className="h-4 w-4" />} />
         <KpiCard label="Linked accounts" value={stats.linked} accent="amber" icon={<ShieldCheck className="h-4 w-4" />} />
@@ -205,7 +205,7 @@ function StaffPage() {
 
       {/* Filters */}
       <section className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[260px] flex-1 max-w-sm">
+        <div className="relative min-w-[260px] flex-1 max-w-[95vw] sm:max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search name, title, email…" className="pl-9" />
         </div>
@@ -234,7 +234,7 @@ function StaffPage() {
         </section>
       ) : filtered.length === 0 ? (
         <section className="rounded-xl border border-dashed border-border/60 bg-card/20">
-          <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+          <div className="flex flex-col items-center justify-center gap-3 px-4 sm:px-6 py-16 text-center">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/30">
               <UserCog className="h-5 w-5 text-primary" />
             </div>

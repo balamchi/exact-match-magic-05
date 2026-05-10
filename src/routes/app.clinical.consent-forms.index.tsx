@@ -229,7 +229,7 @@ function ConsentFormsDashboard() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Clinical Compliance</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Consent Forms</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Consent Forms</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">DocuSign-style e-signatures with full audit trail.</p>
         </div>
         <div className="flex gap-2">
@@ -238,7 +238,7 @@ function ConsentFormsDashboard() {
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard icon={<FileText className="h-4 w-4" />} label="Templates" value={templates.length} />
         <StatCard icon={<Send className="h-4 w-4" />} label="Pending" value={pending.length} accent />
         <StatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Signed" value={signed.length} />
@@ -329,7 +329,7 @@ function ConsentFormsDashboard() {
 
       {/* Send for Signature Dialog */}
       <Dialog open={sendOpen} onOpenChange={setSendOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[95vw] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Send for Signature</DialogTitle>
             <DialogDescription>Choose a template and client to send a consent form.</DialogDescription>
@@ -449,7 +449,7 @@ function ConsentFormsDashboard() {
                   <p className="font-medium">{viewSig.signature_typed_name}</p>
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div><span className="text-muted-foreground">Status:</span> <span className="font-medium capitalize">{viewSig.status}</span></div>
                 <div><span className="text-muted-foreground">Template Version:</span> <span className="font-medium">v{viewSig.template_version}</span></div>
                 {viewSig.sent_at && <div><span className="text-muted-foreground">Sent:</span> <span className="font-medium">{new Date(viewSig.sent_at).toLocaleString()}</span></div>}

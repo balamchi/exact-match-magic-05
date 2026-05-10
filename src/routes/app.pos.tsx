@@ -257,7 +257,7 @@ function PosPage() {
             </div>
 
             <ScrollArea className="h-[340px]">
-              <div className="grid grid-cols-2 gap-2 p-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-4 sm:grid-cols-3 lg:grid-cols-4">
                 {loading ? (
                   Array.from({ length: 8 }).map((_, i) => (
                     <div key={i} className="h-20 animate-pulse rounded-lg bg-muted/40" />
@@ -377,7 +377,7 @@ function PosPage() {
             <h2 className="mb-4 font-display text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Tip
             </h2>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
               {TIP_PRESETS.map((p) => {
                 const active = customTipCents === null && p === tipPercent;
                 return (
@@ -437,7 +437,7 @@ function PosPage() {
               </button>
             </div>
             {depositMode && (
-              <div className="mt-3 grid grid-cols-4 gap-2">
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {[25, 50, 75, 100].map((p) => (
                   <button
                     key={p}
@@ -482,7 +482,7 @@ function PosPage() {
               )}
             </div>
 
-            <div className="mt-5 grid grid-cols-4 gap-2">
+            <div className="mt-5 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
               <PayButton
                 label="Card"
                 icon={CreditCard}

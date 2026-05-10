@@ -204,7 +204,7 @@ function ClientsPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Client CRM</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Clients</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Clients</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Manage profiles, contact details, tags, and care notes.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -236,10 +236,10 @@ function ClientsPage() {
         {loading ? (
           <div className="grid gap-3 p-4">{[0, 1, 2].map((row) => <div key={row} className="h-20 animate-pulse rounded-xl bg-muted" />)}</div>
         ) : filteredClients.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-16 text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><UserRound className="h-6 w-6" /></div>
             <h2 className="font-display text-xl font-semibold">No clients yet</h2>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">Create your first client profile to start building treatment history and CRM records.</p>
+            <p className="mt-1 max-w-[95vw] sm:max-w-sm text-sm text-muted-foreground">Create your first client profile to start building treatment history and CRM records.</p>
             <Button onClick={openCreate} className="mt-5 gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Plus className="h-4 w-4" /> Add first client</Button>
           </div>
         ) : (

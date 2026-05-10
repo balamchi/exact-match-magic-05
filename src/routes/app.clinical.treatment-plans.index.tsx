@@ -169,13 +169,13 @@ function TreatmentPlansDashboard() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Clinical</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Treatment Plans</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Treatment Plans</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Multi-session treatment plans with progress tracking and before/after photos.</p>
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Plus className="h-4 w-4" /> New Plan</Button>
       </section>
 
-      <div className="relative max-w-md">
+      <div className="relative max-w-[95vw] sm:max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search plans…"
           className="h-10 w-full rounded-lg border border-input bg-surface pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30" />
@@ -224,7 +224,7 @@ function TreatmentPlansDashboard() {
 
       {/* Create Plan Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[95vw] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>New Treatment Plan</DialogTitle>
             <DialogDescription>Create a multi-session treatment plan for a client.</DialogDescription>
@@ -344,7 +344,7 @@ function TreatmentPlansDashboard() {
                       </div>
                     </div>
                     {detailPhotos.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:grid-cols-4">
                         {detailPhotos.map((p: any) => (
                           <div key={p.id} className="group relative rounded-lg border border-border overflow-hidden">
                             <img src={p.photo_url} alt={p.photo_type ?? "Photo"} className="w-full h-28 object-cover cursor-pointer" onClick={() => window.open(p.photo_url, "_blank")} />
@@ -375,7 +375,7 @@ function TreatmentPlansDashboard() {
                         ))}
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-6 text-center">
+                      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-4 sm:p-6 text-center">
                         <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
                         <p className="mt-2 text-xs text-muted-foreground">No photos yet. Upload before/after photos to track progress.</p>
                       </div>

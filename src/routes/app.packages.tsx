@@ -353,7 +353,7 @@ function PackagesPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiCard label="Active Packages" value={stats.active.toString()} sub={`${rows.length - stats.active} paused`} icon={<CheckCircle2 className="h-4 w-4" />} accent="text-emerald-300" />
         <KpiCard label="Sold This Month" value={stats.soldMonthCount.toString()} sub="Client packages" icon={<ShoppingBag className="h-4 w-4" />} accent="text-sky-300" />
         <KpiCard label="Sessions Used" value={stats.sessionsUsed.toString()} sub="All time" icon={<Layers className="h-4 w-4" />} accent="text-violet-300" />
@@ -370,7 +370,7 @@ function PackagesPage() {
         <TabsContent value="types" className="space-y-4 mt-4">
           {/* Recipe library */}
           {rows.length === 0 && !loading && (
-            <Card className="border-border/60 bg-card/40 p-6 backdrop-blur">
+            <Card className="border-border/60 bg-card/40 p-4 sm:p-6 backdrop-blur">
               <div className="flex items-center gap-2 text-sm font-medium"><Sparkles className="h-4 w-4 text-primary" /> Start from a template</div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {RECIPES.map((r) => (
@@ -451,7 +451,7 @@ function PackagesPage() {
                       </Badge>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3 border-y border-border/40 bg-background/40 px-5 py-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 border-y border-border/40 bg-background/40 px-5 py-4">
                       <Stat icon={<Layers className="h-3 w-3" />} label="Sessions" value={row.sessions.toString()} />
                       <Stat icon={<Tag className="h-3 w-3" />} label="Per visit" value={fmtMoney(perSession)} />
                       <Stat icon={<Calendar className="h-3 w-3" />} label="Expires" value={row.expires_after_days ? `${row.expires_after_days}d` : "Never"} />
@@ -556,12 +556,12 @@ function PackagesPage() {
       {/* Sell Modal */}
       {sellOpen && sellPkg && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card shadow-2xl">
-            <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
+          <div className="w-full max-w-[95vw] sm:max-w-md rounded-2xl border border-border/60 bg-card shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border/60 px-4 sm:px-6 py-4">
               <h2 className="font-display text-lg font-semibold">Sell Package</h2>
               <button onClick={() => setSellOpen(false)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted" aria-label="Close"><X className="h-4 w-4" /></button>
             </div>
-            <div className="px-6 py-5 space-y-4">
+            <div className="px-4 sm:px-6 py-5 space-y-4">
               <div className="rounded-xl border border-border/60 bg-background/40 p-4">
                 <div className="font-medium">{sellPkg.name}</div>
                 <div className="text-sm text-muted-foreground">{sellPkg.sessions} sessions · {fmtMoney(sellPkg.price_cents)}</div>
@@ -593,16 +593,16 @@ function PackagesPage() {
       {composeOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
           <div className="relative w-full max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-6 py-4">
+            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-4 sm:px-6 py-4">
               <div>
                 <h2 className="font-display text-lg font-semibold">{editing ? "Edit Package" : "New Package"}</h2>
                 <p className="mt-0.5 text-xs text-muted-foreground">{editing ? "Update package details." : "Configure a prepaid bundle."}</p>
               </div>
               <button onClick={closeComposer} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted" aria-label="Close"><X className="h-4 w-4" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="px-6 py-5">
+            <form onSubmit={handleSubmit} className="px-4 sm:px-6 py-5">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-6 w-full grid grid-cols-5">
+                <TabsList className="mb-6 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
                   <TabsTrigger value="basic">Basic</TabsTrigger>
                   <TabsTrigger value="services">Services</TabsTrigger>
                   <TabsTrigger value="validity">Validity</TabsTrigger>
@@ -643,7 +643,7 @@ function PackagesPage() {
                 <TabsContent value="services" className="space-y-4">
                   <div className="space-y-2">
                     <Label>Session Type</Label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                       {[{ id: "specific", label: "Single Service" }, { id: "choice", label: "Choice of Services" }, { id: "different", label: "Different Each" }].map((t) => (
                         <button key={t.id} type="button" onClick={() => setForm({ ...form, session_type: t.id })}
                           className={cn("rounded-lg border px-3 py-2 text-xs font-medium transition",
@@ -693,7 +693,7 @@ function PackagesPage() {
                   </div>
                   <div className="space-y-2">
                     <Label>Activation Policy</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {[{ id: "on_purchase", label: "Activates on purchase" }, { id: "on_first_use", label: "Activates on first use" }].map((a) => (
                         <button key={a.id} type="button" onClick={() => setForm({ ...form, activation_policy: a.id })}
                           className={cn("rounded-lg border px-3 py-2 text-xs font-medium transition",

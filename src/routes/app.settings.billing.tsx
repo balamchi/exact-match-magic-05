@@ -172,14 +172,14 @@ function BillingPage() {
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-border bg-card p-8 text-center text-muted-foreground">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-8 text-center text-muted-foreground">
           Loading subscription…
         </div>
       )}
 
       {/* No subscription at all → trial picker */}
       {!loading && !subscription && (
-        <section className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/10 to-transparent p-6 sm:p-8">
+        <section className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/10 to-transparent p-4 sm:p-6 sm:p-8">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
               <Sparkles className="h-6 w-6 text-primary-foreground" />
@@ -281,7 +281,7 @@ function BillingPage() {
             </div>
           )}
 
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+          <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
             <header className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/15 text-primary">
@@ -371,7 +371,7 @@ function BillingPage() {
           </section>
 
           {!isTrialPlaceholder && (
-            <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
               <header className="flex items-center justify-between gap-3">
                 <div>
                   <h2 className="font-display text-lg font-semibold">Change plan</h2>
@@ -437,7 +437,7 @@ function BillingPage() {
             </section>
           )}
 
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+          <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
             <h2 className="font-display text-lg font-semibold">What's included in your plan</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               Visit pricing to compare all tiers and features.

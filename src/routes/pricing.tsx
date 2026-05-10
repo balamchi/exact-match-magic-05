@@ -75,7 +75,7 @@ function PricingPage() {
       <PaymentTestModeBanner />
 
       <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-4 sm:px-6 py-4">
           <Link to="/" className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary shadow-glow">
               <Sparkles className="h-4 w-4 text-primary-foreground" strokeWidth={2.5} />
@@ -101,9 +101,9 @@ function PricingPage() {
         </div>
       </nav>
 
-      <section className="px-6 pt-20 pb-12 text-center">
-        <div className="mx-auto max-w-3xl">
-          <h1 className="font-display text-5xl font-bold tracking-tight sm:text-6xl">
+      <section className="px-4 sm:px-6 pt-20 pb-12 text-center">
+        <div className="mx-auto max-w-[95vw] sm:max-w-3xl">
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight sm:text-6xl">
             Pricing that scales with your clinic
           </h1>
           <p className="mt-6 text-lg text-muted-foreground">
@@ -111,8 +111,8 @@ function PricingPage() {
           </p>
 
           {/* Founding member banner */}
-          <div className="mx-auto mt-8 max-w-xl overflow-hidden rounded-2xl p-px [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-            <div className="rounded-[15px] px-6 py-4 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
+          <div className="mx-auto mt-8 max-w-[95vw] sm:max-w-xl overflow-hidden rounded-2xl p-px [background:linear-gradient(135deg,#9333EA,#D946EF)]">
+            <div className="rounded-[15px] px-4 sm:px-6 py-4 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
               <div className="font-display text-lg font-bold text-foreground">🔒 Founding Member Pricing — Locked Forever</div>
               <p className="mt-1 text-sm text-zinc-200">
                 First 100 clinics get <strong>$49/$149/$349</strong>/mo locked in for life.
@@ -145,7 +145,7 @@ function PricingPage() {
         </div>
       </section>
 
-      <section className="px-6 pb-24">
+      <section className="px-4 sm:px-6 pb-24">
         <div className="mx-auto grid max-w-[1280px] gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {loading && <div className="col-span-4 text-center text-muted-foreground">Loading plans…</div>}
           {plans.map((plan) => {
@@ -171,7 +171,7 @@ function PricingPage() {
                 <div className="mb-1 font-display text-xl font-semibold">{plan.name}</div>
                 <p className="text-xs text-muted-foreground">{plan.tagline}</p>
                 <div className="mt-6 flex items-baseline gap-1">
-                  <span className="font-display text-5xl font-bold">{display}</span>
+                  <span className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold">{display}</span>
                   {plan.code !== "enterprise" && (
                     <span className="text-sm text-muted-foreground">/mo</span>
                   )}
@@ -207,7 +207,7 @@ function PricingPage() {
           })}
         </div>
 
-        <p className="mx-auto mt-12 max-w-2xl text-center text-xs text-muted-foreground">
+        <p className="mx-auto mt-12 max-w-[95vw] sm:max-w-2xl text-center text-xs text-muted-foreground">
           All plans include unlimited online bookings, integrated payments, and email support. Card processing fees
           apply on transactions: 2.9% (Starter), 2.7% (Professional), 2.5% (Growth) + $0.30 per transaction.
         </p>

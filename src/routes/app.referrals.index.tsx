@@ -216,7 +216,7 @@ function ReferralsDashboard() {
             <Megaphone className="h-3.5 w-3.5 text-primary" /> Word of mouth
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Referrals</h1>
-          <p className="max-w-xl text-sm text-muted-foreground">
+          <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">
             Turn happy clients into your best marketing channel. Track every referrer-referee pair from invite to conversion.
           </p>
         </div>
@@ -264,7 +264,7 @@ function ReferralsDashboard() {
 
       {/* Search */}
       {(tab === "active" || tab === "codes") && (
-        <div className="relative max-w-md">
+        <div className="relative max-w-[95vw] sm:max-w-md">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search referrer, referred, email…" className="pl-9" />
         </div>
@@ -276,7 +276,7 @@ function ReferralsDashboard() {
           {loading ? (
             <div className="space-y-2 p-4">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-lg bg-muted/30" />)}</div>
           ) : filteredRows.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+            <div className="flex flex-col items-center justify-center gap-3 px-4 sm:px-6 py-16 text-center">
               <Share2 className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium">No referrals yet</p>
               <p className="text-xs text-muted-foreground">Log your first referral to start tracking.</p>
@@ -441,7 +441,7 @@ function GenerateCodeModal({ clients, existingCodes, onGenerate, onClose }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-[95vw] sm:max-w-md rounded-2xl border border-border bg-card shadow-2xl">
         <div className="flex items-start justify-between border-b border-border p-5">
           <div>
             <h2 className="font-display text-xl font-semibold">Generate referral code</h2>
@@ -533,7 +533,7 @@ function ComposerModal({ row, clinicId, onClose }: { row: ReferralRow | null; cl
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 backdrop-blur-sm sm:items-center sm:p-6">
-      <div className="relative w-full max-w-xl overflow-hidden rounded-t-2xl border border-border/60 bg-card shadow-2xl sm:rounded-2xl">
+      <div className="relative w-full max-w-[95vw] sm:max-w-xl overflow-hidden rounded-t-2xl border border-border/60 bg-card shadow-2xl sm:rounded-2xl">
         <div className="flex items-start justify-between border-b border-border/40 px-5 py-4">
           <h2 className="text-lg font-semibold">{editing ? "Edit referral" : "Log referral"}</h2>
           <Button size="sm" variant="ghost" onClick={onClose} className="h-8 w-8 p-0"><X className="h-4 w-4" /></Button>

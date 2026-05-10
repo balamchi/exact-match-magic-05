@@ -295,7 +295,7 @@ function MembershipsPage() {
             Recurring revenue
           </div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Memberships</h1>
-          <p className="max-w-xl text-sm text-muted-foreground">
+          <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">
             Build predictable monthly revenue with VIP tiers — track members,
             MRR contribution, and tier health in one place.
           </p>
@@ -412,7 +412,7 @@ function MembershipsPage() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-card/20 px-6 py-16 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-card/20 px-4 sm:px-6 py-16 text-center">
           <BadgeCheck className="mb-3 h-8 w-8 text-muted-foreground" />
           <p className="text-sm font-medium">No plans match your filter</p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -631,7 +631,7 @@ function PlanCard({
         <span className="text-xs text-muted-foreground">/ member / mo</span>
       </div>
 
-      <dl className="mt-4 grid grid-cols-3 gap-2 rounded-lg border border-border/60 bg-background/40 p-3 text-center">
+      <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 rounded-lg border border-border/60 bg-background/40 p-3 text-center">
         <div>
           <dt className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
             Members
@@ -857,7 +857,7 @@ function ComposerModal({
       <form
         onSubmit={submit}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl rounded-2xl border border-border/60 bg-card shadow-elegant"
+        className="w-full max-w-[95vw] sm:max-w-xl rounded-2xl border border-border/60 bg-card shadow-elegant"
       >
         <header className="flex items-center justify-between border-b border-border/60 px-5 py-4">
           <div>
@@ -1142,7 +1142,7 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
         </div>
       </header>
       {loading ? (
-        <div className="px-5 py-6 text-sm text-muted-foreground">Loading…</div>
+        <div className="px-5 py-4 sm:py-6 text-sm text-muted-foreground">Loading…</div>
       ) : rows.length === 0 ? (
         <div className="px-5 py-8 text-center text-sm text-muted-foreground">
           No members enrolled yet. Sync a plan to Square, then click Enroll on a plan card.
@@ -1344,7 +1344,7 @@ function EnrollModal({
       <form
         onSubmit={submit}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl rounded-2xl border border-border/60 bg-card shadow-elegant"
+        className="w-full max-w-[95vw] sm:max-w-xl rounded-2xl border border-border/60 bg-card shadow-elegant"
       >
         <header className="flex items-center justify-between border-b border-border/60 px-5 py-4">
           <div>
@@ -1537,7 +1537,7 @@ function ChargesPanel({ clinicId }: { clinicId: string }) {
         </div>
       </header>
       {loading ? (
-        <div className="px-5 py-6 text-sm text-muted-foreground">Loading…</div>
+        <div className="px-5 py-4 sm:py-6 text-sm text-muted-foreground">Loading…</div>
       ) : rows.length === 0 ? (
         <div className="px-5 py-8 text-center text-sm text-muted-foreground">
           No charges yet. Square will post invoices here as members are billed.
@@ -1649,7 +1649,7 @@ function ChangePlanModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card p-6 shadow-2xl">
+      <div className="w-full max-w-[95vw] sm:max-w-md rounded-2xl border border-border/60 bg-card p-4 sm:p-6 shadow-2xl">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-base font-semibold tracking-tight">Change plan</h3>
@@ -1788,7 +1788,7 @@ function AtRiskPanel({ clinicId }: { clinicId: string }) {
         </Button>
       </header>
       {loading ? (
-        <div className="px-5 py-6 text-sm text-muted-foreground">Loading…</div>
+        <div className="px-5 py-4 sm:py-6 text-sm text-muted-foreground">Loading…</div>
       ) : (
         <ul className="divide-y divide-rose-500/15">
           {rows.map((s) => {

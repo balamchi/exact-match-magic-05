@@ -199,7 +199,7 @@ function SettingsPage() {
         </nav>
 
         {/* Content */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
           {activeTab === "profile" && (
             <SettingsSection title="Clinic Profile" description="Public name, contact, and operating details.">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -415,7 +415,7 @@ function SettingsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {loadingMembers && <tr><td colSpan={4} className="py-6 text-center text-muted-foreground">Loading…</td></tr>}
+                    {loadingMembers && <tr><td colSpan={4} className="py-4 sm:py-6 text-center text-muted-foreground">Loading…</td></tr>}
                     {!loadingMembers && members.map((m) => {
                       const isSelf = m.user_id === user?.id;
                       return (
@@ -475,7 +475,7 @@ function SettingsPage() {
       </div>
 
       {/* Public booking link */}
-      <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+      <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
         <header className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/15 text-primary">
             <Link2 className="h-5 w-5" />
@@ -506,7 +506,7 @@ function SettingsPage() {
 
       {/* Clinic switcher */}
       {memberships.length > 1 && (
-        <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
           <h2 className="font-display text-lg font-semibold">Your clinics</h2>
           <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
             {memberships.map((m) => (

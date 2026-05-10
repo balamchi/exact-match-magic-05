@@ -365,7 +365,7 @@ function LeadsPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Pipeline</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Leads</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Leads</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Track and convert leads from all your marketing channels.
           </p>
@@ -381,7 +381,7 @@ function LeadsPage() {
       </section>
 
       {/* KPI Cards */}
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-4">
         <KpiCard icon={Target} label="Active Leads" value={String(activeLeads.length)} />
         <KpiCard icon={TrendingUp} label="Conversion Rate" value={`${conversionRate}%`} />
         <KpiCard icon={Flame} label="New This Week" value={String(newThisWeek)} />
@@ -391,7 +391,7 @@ function LeadsPage() {
       {/* Filters */}
       <section className="rounded-2xl border border-border bg-card p-4 shadow-card">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative max-w-sm flex-1">
+          <div className="relative max-w-[95vw] sm:max-w-sm flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search leads…"
               className="h-10 w-full rounded-lg border border-input bg-surface pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30" />
@@ -600,7 +600,7 @@ function LeadsPage() {
             </div>
 
             {/* Info Grid */}
-            <div className="grid grid-cols-2 gap-3 px-5 py-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-5 py-4 text-sm">
               <div><span className="text-muted-foreground">Stage:</span> <span className="ml-1 font-medium">{STAGES.find((s) => s.id === detailLead.stage)?.label ?? detailLead.stage}</span></div>
               <div><span className="text-muted-foreground">Source:</span> <span className="ml-1 font-medium">{SOURCES.find((s) => s.key === detailLead.source)?.label ?? detailLead.source ?? "—"}</span></div>
               <div><span className="text-muted-foreground">Value:</span> <span className="ml-1 font-medium text-primary">{money(detailLead.estimated_value_cents)}</span></div>
@@ -785,7 +785,7 @@ function CsvImportModal({ clinicId, onClose, onDone }: { clinicId: string; onClo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
+      <div className="max-h-[90vh] w-full max-w-[95vw] sm:max-w-lg overflow-y-auto rounded-2xl border border-border bg-card shadow-elevated">
         <div className="flex items-center justify-between border-b border-border p-5">
           <h2 className="font-display text-xl font-semibold">Import Leads from CSV</h2>
           <Button aria-label="Action" variant="ghost" size="icon" onClick={onClose}><X className="h-4 w-4" /></Button>

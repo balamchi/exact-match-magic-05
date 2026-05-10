@@ -161,7 +161,7 @@ function TasksPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Team work</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Tasks<BetaBadge /></h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Tasks<BetaBadge /></h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Drag to update status. Overdue items are flagged automatically.</p>
         </div>
         <Button onClick={() => openCreate("todo")} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
@@ -176,7 +176,7 @@ function TasksPage() {
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-4 shadow-card">
-        <div className="relative max-w-sm">
+        <div className="relative max-w-[95vw] sm:max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={query}
@@ -222,7 +222,7 @@ function TasksPage() {
                   {items.length === 0 ? (
                     <button
                       onClick={() => openCreate(col.id)}
-                      className="flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-border py-6 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-primary"
+                      className="flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-border py-4 sm:py-6 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-primary"
                     >
                       <Plus className="h-3.5 w-3.5" /> Add task
                     </button>

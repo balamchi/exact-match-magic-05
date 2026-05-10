@@ -198,7 +198,7 @@ function TemplatesPage() {
           <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
             <MessageSquareText className="h-3 w-3" /> Communication
           </div>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Message Templates</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Message Templates</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Pre-write replies, reminders, and campaigns to send with one click.
           </p>
@@ -210,7 +210,7 @@ function TemplatesPage() {
       </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-4">
         <div className="rounded-xl border border-border bg-surface p-4">
           <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Total</div>
           <div className="mt-1 font-mono text-2xl font-bold">{stats.total}</div>
@@ -317,7 +317,7 @@ function TemplatesPage() {
                 <Input value={editing.name ?? ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })}
                   placeholder="e.g. Appointment Reminder" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-medium text-muted-foreground">Category</label>
                   <Select value={editing.category ?? "general"} onValueChange={(v) => setEditing({ ...editing, category: v as Category })}>

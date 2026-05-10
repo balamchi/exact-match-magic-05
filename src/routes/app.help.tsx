@@ -123,7 +123,7 @@ function HelpCenterPage() {
           Help center
         </div>
         <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">How can we help?</h1>
-        <p className="max-w-xl text-sm text-muted-foreground">
+        <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">
           Browse {totalQuestions} frequently asked questions or search for what you need.
         </p>
       </header>
@@ -200,7 +200,7 @@ function HelpCenterPage() {
       </div>
 
       {/* Contact */}
-      <section className="rounded-xl border border-border/60 bg-gradient-to-br from-primary/5 to-transparent p-6 text-center">
+      <section className="rounded-xl border border-border/60 bg-gradient-to-br from-primary/5 to-transparent p-4 sm:p-6 text-center">
         <Mail className="mx-auto mb-2 h-6 w-6 text-primary" />
         <h2 className="text-lg font-semibold">Still need help?</h2>
         <p className="mt-1 text-sm text-muted-foreground">

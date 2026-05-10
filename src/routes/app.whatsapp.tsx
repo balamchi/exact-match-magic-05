@@ -174,7 +174,7 @@ function WhatsAppPage() {
       </div>
 
       {/* KPI strip */}
-      <div className="grid grid-cols-3 gap-px border-b border-border bg-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px border-b border-border bg-border">
         <div className="bg-surface px-4 py-2.5">
           <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Conversations</div>
           <div className="font-mono text-lg font-bold">{stats.total}</div>
@@ -204,7 +204,7 @@ function WhatsAppPage() {
             {loading ? (
               <div className="space-y-2 p-3">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
             ) : conversations.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+              <div className="flex h-full flex-col items-center justify-center p-4 sm:p-8 text-center">
                 <MessageCircle className="mb-3 h-10 w-10 text-emerald-500/40" />
                 <p className="text-sm font-semibold">No WhatsApp conversations yet</p>
                 <p className="mt-1 max-w-[240px] text-xs text-muted-foreground">

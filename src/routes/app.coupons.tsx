@@ -350,7 +350,7 @@ function CouponsPage() {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-cols-4">
         <MetricCard label="Active Coupons" value={metrics.active.toString()} icon={Ticket} accent="from-violet-500/20 to-indigo-500/10" />
         <MetricCard label="Total Redemptions" value={metrics.totalRedemptions.toString()} icon={TrendingUp} accent="from-emerald-500/20 to-teal-500/10" />
         <MetricCard label="Total Discount Given" value={metrics.totalDiscountCents > 0 ? `$${(metrics.totalDiscountCents / 100).toLocaleString()}` : "—"} icon={DollarSign} accent="from-amber-500/20 to-orange-500/10" />
@@ -383,7 +383,7 @@ function CouponsPage() {
 
       {/* Search + filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-md flex-1">
+        <div className="relative max-w-[95vw] sm:max-w-md flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by code or name…" className="pl-9" />
         </div>
@@ -505,7 +505,7 @@ function CouponsPage() {
       {composerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
           <div className="relative w-full max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-6 py-4">
+            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-4 sm:px-6 py-4">
               <div>
                 <h2 className="font-display text-lg font-semibold">{editing ? "Edit Coupon" : "New Coupon"}</h2>
                 <p className="mt-0.5 text-xs text-muted-foreground">{editing ? "Update promo terms and rules." : "Configure discount, limits, and validity."}</p>
@@ -515,9 +515,9 @@ function CouponsPage() {
               </button>
             </div>
 
-            <form onSubmit={(e) => handleSubmit(e)} className="px-6 py-5">
+            <form onSubmit={(e) => handleSubmit(e)} className="px-4 sm:px-6 py-5">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-6 w-full grid grid-cols-5">
+                <TabsList className="mb-6 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
                   <TabsTrigger value="basic">Basic</TabsTrigger>
                   <TabsTrigger value="discount">Discount</TabsTrigger>
                   <TabsTrigger value="limits">Limits</TabsTrigger>
@@ -562,7 +562,7 @@ function CouponsPage() {
                 <TabsContent value="discount" className="space-y-4">
                   <div className="space-y-2">
                     <Label>Discount Type</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {(["percent", "fixed"] as const).map((t) => (
                         <button key={t} type="button" onClick={() => setForm({ ...form, discount_type: t })}
                           className={cn("flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition",

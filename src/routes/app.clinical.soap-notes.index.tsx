@@ -171,7 +171,7 @@ function SoapNotesDashboard() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Clinical Documentation</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">SOAP Notes</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">SOAP Notes</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Medical-grade documentation with amendment audit trail. Draft → Finalize → Amend only.
           </p>
@@ -182,7 +182,7 @@ function SoapNotesDashboard() {
       </section>
 
       {/* Stats */}
-      <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard icon={<FileText className="h-4 w-4" />} label="Total Notes" value={stats.total} />
         <StatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Finalized" value={stats.finalized} accent />
         <StatCard icon={<Circle className="h-4 w-4" />} label="Drafts" value={stats.draft} />
