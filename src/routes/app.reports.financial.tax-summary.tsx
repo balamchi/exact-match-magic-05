@@ -12,7 +12,9 @@ import { money } from "@/lib/reports/format";
 
 export const Route = createFileRoute("/app/reports/financial/tax-summary")({ component: TaxSummary });
 
-interface Inv { tax_cents: number | null; subtotal_cents: number | null; total_cents: number | null; created_at: string; status: string }
+interface Inv { total_cents: number | null; created_at: string; status: string }
+
+const TAX_RATE = 0.13; // configurable per-clinic later
 
 function TaxSummary() {
   const { activeClinic } = useAuth();
@@ -25,7 +27,7 @@ function TaxSummary() {
     (async () => {
       setLoading(true);
       const { data } = await supabase.from("invoices")
-        .select("tax_cents, subtotal_cents, total_cents, created_at, status" as never)
+        .select("total_cents, created_at, status")
         .eq("clinic_id", activeClinic.clinic_id)
         .eq("status", "paid")
         .gte("created_at", range.range.from.toISOString())
@@ -39,9 +41,12 @@ function TaxSummary() {
   for (const r of rows) {
     const k = r.created_at.slice(0, 7);
     const cur = byMonth.get(k) ?? { subtotal: 0, tax: 0, total: 0 };
-    cur.subtotal += r.subtotal_cents ?? 0;
-    cur.tax += r.tax_cents ?? 0;
-    cur.total += r.total_cents ?? 0;
+    const total = r.total_cents ?? 0;
+    const subtotal = Math.round(total / (1 + TAX_RATE));
+    const tax = total - subtotal;
+    cur.subtotal += subtotal;
+    cur.tax += tax;
+    cur.total += total;
     byMonth.set(k, cur);
   }
   const months = Array.from(byMonth.entries()).map(([m, v]) => ({ month: m, ...v })).sort((a, b) => b.month.localeCompare(a.month));
@@ -53,9 +58,9 @@ function TaxSummary() {
       <div className="px-4 pt-4 md:px-6"><Button asChild variant="ghost" size="sm" className="gap-1"><Link to="/app/reports"><ArrowLeft className="h-4 w-4" />Reports</Link></Button></div>
       <ReportShell
         title="Tax Summary"
-        description="Tax collected on paid invoices by month"
+        description={`Tax estimate (assumes ${(TAX_RATE * 100).toFixed(0)}% inclusive) — configure per-invoice tax in a future update`}
         rangeControl={range}
-        primaryKpi={{ label: "Total tax collected", value: money(totalTax) }}
+        primaryKpi={{ label: "Estimated tax", value: money(totalTax) }}
         secondaryKpis={[{ label: "Taxable sales", value: money(totalSub) }]}
         exportFormats={["csv"]}
         onExport={() => exportToCsv(reportFilename("tax-summary", "csv"),
