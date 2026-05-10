@@ -14,8 +14,11 @@ export interface AppointmentLite {
 export interface SubscriptionLite {
   id: string;
   status: string;
-  price_cents: number | null;
-  billing_period?: string | null; // 'month' | 'year' | etc
+  // monthly normalized price (after applying billing_cadence)
+  price_cents?: number | null;
+  monthly_price_cents?: number | null;
+  billing_period?: string | null; // 'month' | 'year' | 'week' | 'day'
+  billing_cadence?: string | null; // 'MONTHLY' | 'YEARLY' | etc
   canceled_at?: string | null;
   created_at?: string | null;
 }
