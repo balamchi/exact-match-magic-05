@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Clock, Copy, DollarSign, Download, Edit3, Filter, HeartPulse, Plus,
   Search, Sparkles, Trash2, Upload, X, Check, ChevronLeft, ChevronRight,
@@ -50,7 +50,13 @@ interface Service {
 }
 
 const CATEGORIES = [
-  "Injectables", "Facials", "Laser", "Body", "Hair", "Skin", "Wellness", "Other",
+  "Injectables",
+  "Skin Treatments",
+  "Laser & Energy",
+  "Body Contouring",
+  "Wellness & IV",
+  "Consultations",
+  "Other",
 ] as const;
 
 const TREATMENT_AREAS = ["Face", "Body", "Hair", "Hands", "Feet"] as const;
@@ -169,6 +175,17 @@ function ServicesPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
   const paginated = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+
+  const grouped = useMemo(() => {
+    if (catFilter !== "all") return null;
+    const groups = new Map<string, typeof paginated>();
+    for (const s of paginated) {
+      const cat = s.category?.trim() || "Uncategorized";
+      if (!groups.has(cat)) groups.set(cat, []);
+      groups.get(cat)!.push(s);
+    }
+    return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [paginated, catFilter]);
 
   const stats = useMemo(() => {
     const active = services.filter(s => s.active);
@@ -405,10 +422,17 @@ function ServicesPage() {
           <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search services…" className="pl-9" />
         </div>
         <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
-          <FilterChip active={catFilter === "all"} onClick={() => { setCatFilter("all"); setPage(0); }}>All</FilterChip>
-          {CATEGORIES.map(c => (
-            <FilterChip key={c} active={catFilter === c} onClick={() => { setCatFilter(c); setPage(0); }}>{c}</FilterChip>
-          ))}
+          <FilterChip active={catFilter === "all"} onClick={() => { setCatFilter("all"); setPage(0); }}>
+            All ({services.length})
+          </FilterChip>
+          {categories.map(c => {
+            const count = services.filter(s => (s.category?.trim() || "Uncategorized") === c).length;
+            return (
+              <FilterChip key={c} active={catFilter === c} onClick={() => { setCatFilter(c); setPage(0); }}>
+                {c} ({count})
+              </FilterChip>
+            );
+          })}
         </div>
         <div className="inline-flex rounded-lg border border-border/60 bg-card/30 p-0.5">
           {(["all", "active", "inactive"] as const).map(s => (
@@ -526,45 +550,56 @@ function ServicesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40">
-                  {paginated.map(s => (
-                    <tr key={s.id} className={cn("transition hover:bg-surface/50", !s.active && "opacity-60")}>
-                      <td className="p-3">
-                        <input type="checkbox" checked={selected.has(s.id)} onChange={() => {
-                          const next = new Set(selected);
-                          next.has(s.id) ? next.delete(s.id) : next.add(s.id);
-                          setSelected(next);
-                        }} className="accent-primary" />
-                      </td>
-                      <td className="p-3">
-                        {s.image_url ? (
-                          <img src={s.image_url} alt="" className="h-10 w-10 rounded-lg object-cover" />
-                        ) : (
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <Sparkles className="h-4 w-4" />
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-3">
-                        <button onClick={() => openEdit(s)} className="text-left hover:text-primary transition">
-                          <span className="font-medium">{s.name}</span>
-                          {s.sub_category && <span className="ml-2 text-xs text-muted-foreground">{s.sub_category}</span>}
-                        </button>
-                      </td>
-                      <td className="p-3"><Badge variant="outline" className="text-[10px]">{s.category || "—"}</Badge></td>
-                      <td className="p-3 text-muted-foreground">{s.duration_minutes} min</td>
-                      <td className="p-3 font-medium">{formatMoney(s.price_cents ?? 0, currency)}</td>
-                      <td className="p-3">{s.deposit_required ? <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">{formatMoney(s.deposit_cents ?? 0, currency)}</Badge> : <span className="text-muted-foreground">—</span>}</td>
-                      <td className="p-3">
-                        <Badge variant={s.active ? "default" : "secondary"} className="text-[10px]">{s.active ? "Active" : "Inactive"}</Badge>
-                      </td>
-                      <td className="p-3">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(s)} aria-label="Edit"><Edit3 className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => duplicate(s)} aria-label="Duplicate"><Copy className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => remove(s)} aria-label="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
-                        </div>
-                      </td>
-                    </tr>
+                  {(grouped ?? [["__all", paginated] as [string, typeof paginated]]).map(([cat, items]) => (
+                    <Fragment key={cat}>
+                      {grouped && (
+                        <tr className="bg-surface/30">
+                          <td colSpan={9} className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            {cat} <span className="ml-2 normal-case text-muted-foreground/70">· {items.length} {items.length === 1 ? "service" : "services"}</span>
+                          </td>
+                        </tr>
+                      )}
+                      {items.map(s => (
+                        <tr key={s.id} className={cn("transition hover:bg-surface/50", !s.active && "opacity-60")}>
+                          <td className="p-3">
+                            <input type="checkbox" checked={selected.has(s.id)} onChange={() => {
+                              const next = new Set(selected);
+                              next.has(s.id) ? next.delete(s.id) : next.add(s.id);
+                              setSelected(next);
+                            }} className="accent-primary" />
+                          </td>
+                          <td className="p-3">
+                            {s.image_url ? (
+                              <img src={s.image_url} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Sparkles className="h-4 w-4" />
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3">
+                            <button onClick={() => openEdit(s)} className="text-left hover:text-primary transition">
+                              <span className="font-medium">{s.name}</span>
+                              {s.sub_category && <span className="ml-2 text-xs text-muted-foreground">{s.sub_category}</span>}
+                            </button>
+                          </td>
+                          <td className="p-3"><Badge variant="outline" className="text-[10px]">{s.category || "—"}</Badge></td>
+                          <td className="p-3 text-muted-foreground">{s.duration_minutes} min</td>
+                          <td className="p-3 font-medium">{formatMoney(s.price_cents ?? 0, currency)}</td>
+                          <td className="p-3">{s.deposit_required ? <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">{formatMoney(s.deposit_cents ?? 0, currency)}</Badge> : <span className="text-muted-foreground">—</span>}</td>
+                          <td className="p-3">
+                            <Badge variant={s.active ? "default" : "secondary"} className="text-[10px]">{s.active ? "Active" : "Inactive"}</Badge>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex justify-end gap-1">
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(s)} aria-label="Edit"><Edit3 className="h-3.5 w-3.5" /></Button>
+                              <Button variant="ghost" size="icon" onClick={() => duplicate(s)} aria-label="Duplicate"><Copy className="h-3.5 w-3.5" /></Button>
+                              <Button variant="ghost" size="icon" onClick={() => remove(s)} aria-label="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -572,23 +607,32 @@ function ServicesPage() {
 
             {/* Mobile card view */}
             <div className="md:hidden divide-y divide-border/40">
-              {paginated.map(s => (
-                <div key={s.id} className={cn("p-4 space-y-2", !s.active && "opacity-60")}>
-                  <div className="flex items-center justify-between">
-                    <button onClick={() => openEdit(s)} className="font-medium hover:text-primary">{s.name}</button>
-                    <Badge variant={s.active ? "default" : "secondary"} className="text-[10px]">{s.active ? "Active" : "Inactive"}</Badge>
-                  </div>
-                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                    <span>{s.category || "No category"}</span>
-                    <span>{s.duration_minutes} min</span>
-                    <span className="font-medium text-foreground">{formatMoney(s.price_cents ?? 0, currency)}</span>
-                  </div>
-                  <div className="flex gap-1 pt-1">
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(s)}><Edit3 className="mr-1 h-3 w-3" /> Edit</Button>
-                    <Button variant="ghost" size="sm" onClick={() => duplicate(s)}><Copy className="mr-1 h-3 w-3" /> Copy</Button>
-                    <Button variant="ghost" size="sm" onClick={() => remove(s)} className="text-destructive"><Trash2 className="mr-1 h-3 w-3" /> Delete</Button>
-                  </div>
-                </div>
+              {(grouped ?? [["__all", paginated] as [string, typeof paginated]]).map(([cat, items]) => (
+                <Fragment key={cat}>
+                  {grouped && (
+                    <div className="bg-surface/30 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {cat} <span className="ml-2 normal-case text-muted-foreground/70">· {items.length}</span>
+                    </div>
+                  )}
+                  {items.map(s => (
+                    <div key={s.id} className={cn("p-4 space-y-2", !s.active && "opacity-60")}>
+                      <div className="flex items-center justify-between">
+                        <button onClick={() => openEdit(s)} className="font-medium hover:text-primary">{s.name}</button>
+                        <Badge variant={s.active ? "default" : "secondary"} className="text-[10px]">{s.active ? "Active" : "Inactive"}</Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                        <span>{s.category || "No category"}</span>
+                        <span>{s.duration_minutes} min</span>
+                        <span className="font-medium text-foreground">{formatMoney(s.price_cents ?? 0, currency)}</span>
+                      </div>
+                      <div className="flex gap-1 pt-1">
+                        <Button variant="ghost" size="sm" onClick={() => openEdit(s)}><Edit3 className="mr-1 h-3 w-3" /> Edit</Button>
+                        <Button variant="ghost" size="sm" onClick={() => duplicate(s)}><Copy className="mr-1 h-3 w-3" /> Copy</Button>
+                        <Button variant="ghost" size="sm" onClick={() => remove(s)} className="text-destructive"><Trash2 className="mr-1 h-3 w-3" /> Delete</Button>
+                      </div>
+                    </div>
+                  ))}
+                </Fragment>
               ))}
             </div>
 
