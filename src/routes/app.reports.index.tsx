@@ -75,14 +75,17 @@ function ReportsLibrary() {
       const prevAppts = (prevApptsRes.data ?? []) as AppointmentLite[];
       const invoices = (invoicesRes.data ?? []) as { total_cents: number | null; status: string }[];
       const subsRaw = (subsRes.data ?? []) as unknown as Array<{
-        id: string; status: string; canceled_at: string | null; created_at: string;
-        membership: { monthly_price_cents: number | null; billing_cadence: string | null } | null;
+        id: string; status: string; canceled_at: string | null; created_at: string; membership_id: string;
       }>;
-      const subs: SubscriptionLite[] = subsRaw.map((s) => ({
-        id: s.id, status: s.status, canceled_at: s.canceled_at, created_at: s.created_at,
-        monthly_price_cents: s.membership?.monthly_price_cents ?? 0,
-        billing_cadence: s.membership?.billing_cadence ?? "MONTHLY",
-      }));
+      const plans = new Map(((plansRes.data ?? []) as Array<{ id: string; monthly_price_cents: number | null; billing_cadence: string | null }>).map((p) => [p.id, p]));
+      const subs: SubscriptionLite[] = subsRaw.map((s) => {
+        const p = plans.get(s.membership_id);
+        return {
+          id: s.id, status: s.status, canceled_at: s.canceled_at, created_at: s.created_at,
+          monthly_price_cents: p?.monthly_price_cents ?? 0,
+          billing_cadence: p?.billing_cadence ?? "MONTHLY",
+        };
+      });
       const inventory = (inventoryRes.data ?? []) as { stock_quantity: number | null; reorder_threshold: number | null; unit_cost_cents: number | null }[];
 
       const days = Math.max(1, Math.round(ms / 86_400_000));
