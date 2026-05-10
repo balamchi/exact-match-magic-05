@@ -447,32 +447,58 @@ function ServicesPage() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><HeartPulse className="h-6 w-6" /></div>
             <h2 className="font-display text-xl font-semibold">No services yet</h2>
             <p className="mt-1 max-w-[95vw] sm:max-w-sm text-sm text-muted-foreground">Start by loading 60+ pre-built services for medical aesthetics, or add your own.</p>
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <Button
-                onClick={async () => {
-                  setLoading(true);
-                  try {
-                    const result = await seedClinicDefaults();
-                    if (result.seeded) {
-                      toast.success(`Loaded ${result.summary?.services ?? 60}+ services!`);
-                      await load();
-                    } else {
-                      toast.info(result.message ?? "Already seeded");
-                      await load();
+            <div className="mt-5 flex flex-col items-center gap-2">
+              <div className="flex flex-wrap justify-center gap-2">
+                <Button
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      const result = await seedClinicDefaults({ data: {} });
+                      if (result.seeded) {
+                        toast.success(`Loaded ${result.summary?.services ?? 60}+ services!`);
+                        await load();
+                      } else {
+                        toast.info(result.message ?? "Already seeded");
+                        await load();
+                      }
+                    } catch (err: any) {
+                      toast.error(`Seed failed: ${err.message}`);
+                    } finally {
+                      setLoading(false);
                     }
-                  } catch (err: any) {
-                    toast.error(`Seed failed: ${err.message}`);
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
-                className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"
-              >
-                <Sparkles className="mr-1.5 h-4 w-4" /> Load pre-built services
-              </Button>
-              <Button variant="outline" onClick={openCreate}>
-                <Plus className="mr-1.5 h-4 w-4" /> Add custom service
-              </Button>
+                  }}
+                  className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"
+                >
+                  <Sparkles className="mr-1.5 h-4 w-4" /> Load pre-built services
+                </Button>
+                <Button variant="outline" onClick={openCreate}>
+                  <Plus className="mr-1.5 h-4 w-4" /> Add custom service
+                </Button>
+              </div>
+              <details className="mt-2">
+                <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
+                  Already seeded but missing content? Force re-seed
+                </summary>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2"
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      const result = await seedClinicDefaults({ data: { force: true } });
+                      toast.success(result.seeded ? `Re-seeded ${result.summary?.services ?? 0}+ services` : (result.message ?? "Done"));
+                      await load();
+                    } catch (err: any) {
+                      toast.error(`Re-seed failed: ${err.message}`);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                >
+                  Force re-seed (skips duplicates)
+                </Button>
+              </details>
             </div>
           </div>
         ) : (
