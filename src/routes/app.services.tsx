@@ -443,39 +443,43 @@ function ServicesPage() {
         {loading ? (
           <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}</div>
         ) : paginated.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-16 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><HeartPulse className="h-6 w-6" /></div>
-            <h2 className="font-display text-xl font-semibold">No services yet</h2>
-            <p className="mt-1 max-w-[95vw] sm:max-w-sm text-sm text-muted-foreground">Start by loading 60+ pre-built services for medical aesthetics, or add your own.</p>
-            <div className="mt-5 flex flex-col items-center gap-2">
-              <div className="flex flex-wrap justify-center gap-2">
-                <Button
-                  onClick={async () => {
-                    setLoading(true);
-                    try {
-                      const result = await seedClinicDefaults({ data: {} });
-                      if (result.seeded) {
-                        toast.success(`Loaded ${result.summary?.services ?? 60}+ services!`);
-                        await load();
-                      } else {
-                        toast.info(result.message ?? "Already seeded");
-                        await load();
-                      }
-                    } catch (err: any) {
-                      toast.error(`Seed failed: ${err.message}`);
-                    } finally {
-                      setLoading(false);
+          <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-20 text-center">
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary/20 via-fuchsia-500/15 to-primary/10 text-primary shadow-glow">
+              <Sparkles className="h-10 w-10" />
+            </div>
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Your service menu is empty</h2>
+            <p className="mt-3 max-w-md text-sm sm:text-base text-muted-foreground">
+              Get started in 5 seconds with our pre-built library of <strong className="text-foreground">60+ medical aesthetic services</strong> — fully priced, categorized, and ready to book.
+            </p>
+            <div className="mt-7 flex flex-col items-center gap-3">
+              <Button
+                size="lg"
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const result = await seedClinicDefaults({ data: {} });
+                    if (result.seeded) {
+                      toast.success(`Loaded ${result.summary?.services ?? 60}+ services!`);
+                      await load();
+                    } else {
+                      toast.info(result.message ?? "Already seeded");
+                      await load();
                     }
-                  }}
-                  className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"
-                >
-                  <Sparkles className="mr-1.5 h-4 w-4" /> Load pre-built services
-                </Button>
-                <Button variant="outline" onClick={openCreate}>
-                  <Plus className="mr-1.5 h-4 w-4" /> Add custom service
-                </Button>
-              </div>
-              <details className="mt-2">
+                  } catch (err: any) {
+                    toast.error(`Seed failed: ${err.message}`);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="gap-2 bg-gradient-primary px-6 text-primary-foreground shadow-glow hover:opacity-90"
+              >
+                <Sparkles className="h-5 w-5" /> Load 60+ pre-built services
+              </Button>
+              <span className="text-xs text-muted-foreground">or</span>
+              <Button variant="outline" onClick={openCreate} className="gap-2">
+                <Plus className="h-4 w-4" /> Add custom service
+              </Button>
+              <details className="mt-4">
                 <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
                   Already seeded but missing content? Force re-seed
                 </summary>
