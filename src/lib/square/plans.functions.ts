@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuth } from "@/integrations/supabase/client-auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getSquareEnv, SQUARE_API_VERSION } from "@/lib/square/config";
 
@@ -21,7 +22,7 @@ type SquareCatalogObject = {
 };
 
 export const syncPlanToSquare = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => SyncInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuth } from "@/integrations/supabase/client-auth-middleware";
 
 const FilterSchema = z.object({
   range: z.enum(["24h", "7d", "30d", "all"]).default("7d"),
@@ -48,7 +49,7 @@ function dedupeByMessageId(rows: EmailLogRow[]): EmailLogRow[] {
 }
 
 export const fetchEmailLog = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((input: unknown) => FilterSchema.parse(input))
   .handler(async ({ data, context }): Promise<EmailLogResponse> => {
     // Only clinic owners/admins should see email logs.

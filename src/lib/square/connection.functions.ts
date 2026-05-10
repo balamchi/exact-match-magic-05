@@ -1,13 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuth } from "@/integrations/supabase/client-auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getSquareEnv } from "@/lib/square/config";
 
 // Disconnect: revoke at Square + delete row.
 // Caller must be owner/admin of the clinic.
 export const disconnectSquare = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => z.object({ clinic_id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -57,7 +58,7 @@ export const disconnectSquare = createServerFn({ method: "POST" })
 
 // Returns connection metadata for a clinic (no secrets).
 export const getSquareConnection = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => z.object({ clinic_id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -72,7 +73,7 @@ export const getSquareConnection = createServerFn({ method: "GET" })
 // Returns the public Web Payments SDK config for a clinic
 // (application_id + location_id + environment). No secrets included.
 export const getSquarePaymentsConfig = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => z.object({ clinic_id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
