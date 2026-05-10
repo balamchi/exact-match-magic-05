@@ -519,7 +519,7 @@ interface ApptJoin {
 interface ClientLite { id: string; first_name: string; last_name: string|null; source: string|null; created_at: string }
 interface MemSub {
   id: string; status: string; started_at: string|null; canceled_at: string|null;
-  monthly_price_cents: number|null; membership_id: string; client_id: string;
+  membership_id: string; client_id: string;
   clients: ClientNameSrc | null;
 }
 interface InvItem { id: string; name: string; stock_quantity: number; reorder_threshold: number; unit_cost_cents: number; expires_at: string|null; active: boolean }
