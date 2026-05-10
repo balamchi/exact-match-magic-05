@@ -46,7 +46,7 @@ function ReportsLibrary() {
       const fromIso = range.from.toISOString();
       const toIso = range.to.toISOString();
 
-      const [apptsRes, prevApptsRes, invoicesRes, subsRes, inventoryRes] = await Promise.all([
+      const [apptsRes, prevApptsRes, invoicesRes, subsRes, plansRes, inventoryRes] = await Promise.all([
         supabase.from("appointments")
           .select("id, client_id, staff_id, starts_at, status, price_cents")
           .eq("clinic_id", activeClinic.clinic_id)
@@ -58,8 +58,11 @@ function ReportsLibrary() {
         supabase.from("invoices")
           .select("id, total_cents, status")
           .eq("clinic_id", activeClinic.clinic_id),
-        supabase.from("membership_subscriptions" as never)
-          .select("id, status, price_cents, billing_period, canceled_at, created_at")
+        supabase.from("membership_subscriptions")
+          .select("id, status, canceled_at, created_at, membership_id")
+          .eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("memberships")
+          .select("id, monthly_price_cents, billing_cadence")
           .eq("clinic_id", activeClinic.clinic_id),
         supabase.from("inventory_items")
           .select("id, stock_quantity, reorder_threshold, unit_cost_cents")
@@ -71,7 +74,18 @@ function ReportsLibrary() {
       const appts = (apptsRes.data ?? []) as AppointmentLite[];
       const prevAppts = (prevApptsRes.data ?? []) as AppointmentLite[];
       const invoices = (invoicesRes.data ?? []) as { total_cents: number | null; status: string }[];
-      const subs = (subsRes.data ?? []) as SubscriptionLite[];
+      const subsRaw = (subsRes.data ?? []) as unknown as Array<{
+        id: string; status: string; canceled_at: string | null; created_at: string; membership_id: string;
+      }>;
+      const plans = new Map(((plansRes.data ?? []) as Array<{ id: string; monthly_price_cents: number | null; billing_cadence: string | null }>).map((p) => [p.id, p]));
+      const subs: SubscriptionLite[] = subsRaw.map((s) => {
+        const p = plans.get(s.membership_id);
+        return {
+          id: s.id, status: s.status, canceled_at: s.canceled_at, created_at: s.created_at,
+          monthly_price_cents: p?.monthly_price_cents ?? 0,
+          billing_cadence: p?.billing_cadence ?? "MONTHLY",
+        };
+      });
       const inventory = (inventoryRes.data ?? []) as { stock_quantity: number | null; reorder_threshold: number | null; unit_cost_cents: number | null }[];
 
       const days = Math.max(1, Math.round(ms / 86_400_000));

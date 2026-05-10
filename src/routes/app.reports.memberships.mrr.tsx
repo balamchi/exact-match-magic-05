@@ -21,10 +21,26 @@ function MRR() {
     if (!activeClinic) return;
     (async () => {
       setLoading(true);
-      const { data } = await supabase.from("membership_subscriptions" as never)
-        .select("id, status, price_cents, billing_period, canceled_at, created_at")
-        .eq("clinic_id", activeClinic.clinic_id);
-      setSubs(((data ?? []) as unknown) as SubscriptionLite[]);
+      const [subsRes, plansRes] = await Promise.all([
+        supabase.from("membership_subscriptions")
+          .select("id, status, canceled_at, created_at, membership_id")
+          .eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("memberships")
+          .select("id, monthly_price_cents, billing_cadence")
+          .eq("clinic_id", activeClinic.clinic_id),
+      ]);
+      const plans = new Map(((plansRes.data ?? []) as Array<{ id: string; monthly_price_cents: number | null; billing_cadence: string | null }>).map((p) => [p.id, p]));
+      const raw = ((subsRes.data ?? []) as unknown) as Array<{
+        id: string; status: string; canceled_at: string | null; created_at: string; membership_id: string;
+      }>;
+      setSubs(raw.map((s) => {
+        const p = plans.get(s.membership_id);
+        return {
+          id: s.id, status: s.status, canceled_at: s.canceled_at, created_at: s.created_at,
+          monthly_price_cents: p?.monthly_price_cents ?? 0,
+          billing_cadence: p?.billing_cadence ?? "MONTHLY",
+        };
+      }));
       setLoading(false);
     })();
   }, [activeClinic]);

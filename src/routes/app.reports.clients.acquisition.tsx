@@ -12,7 +12,7 @@ import { num } from "@/lib/reports/format";
 
 export const Route = createFileRoute("/app/reports/clients/acquisition")({ component: Acquisition });
 
-interface Client { id: string; created_at: string; referral_source?: string | null }
+interface Client { id: string; created_at: string; source?: string | null }
 
 function Acquisition() {
   const { activeClinic } = useAuth();
@@ -25,7 +25,7 @@ function Acquisition() {
     (async () => {
       setLoading(true);
       const { data } = await supabase.from("clients")
-        .select("id, created_at, referral_source" as never)
+        .select("id, created_at, source" as never)
         .eq("clinic_id", activeClinic.clinic_id)
         .gte("created_at", range.range.from.toISOString())
         .lte("created_at", range.range.to.toISOString());
@@ -37,7 +37,7 @@ function Acquisition() {
   const bySource = new Map<string, number>();
   const byDay = new Map<string, number>();
   for (const r of rows) {
-    const s = r.referral_source ?? "Direct";
+    const s = r.source ?? "Direct";
     bySource.set(s, (bySource.get(s) ?? 0) + 1);
     const d = r.created_at.slice(0, 10);
     byDay.set(d, (byDay.get(d) ?? 0) + 1);

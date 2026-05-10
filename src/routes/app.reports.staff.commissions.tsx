@@ -13,43 +13,52 @@ import { money } from "@/lib/reports/format";
 export const Route = createFileRoute("/app/reports/staff/commissions")({ component: Commissions });
 
 interface Appt { staff_id: string | null; status: string; price_cents: number | null }
-interface Staff { id: string; display_name: string; commission_rate?: number | null }
+interface Staff { id: string; display_name: string }
+interface Comm { staff_id: string; rate: number; applies_to: string | null; commission_type: string | null }
 
 function Commissions() {
   const { activeClinic } = useAuth();
   const range = useReportRange();
   const [appts, setAppts] = useState<Appt[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
+  const [commissions, setCommissions] = useState<Comm[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!activeClinic) return;
     (async () => {
       setLoading(true);
-      const [a, s] = await Promise.all([
+      const [a, s, c] = await Promise.all([
         supabase.from("appointments")
           .select("staff_id, status, price_cents")
           .eq("clinic_id", activeClinic.clinic_id)
           .eq("status", "completed")
           .gte("starts_at", range.range.from.toISOString())
           .lte("starts_at", range.range.to.toISOString()),
-        supabase.from("staff").select("id, display_name" as never).eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("staff").select("id, display_name").eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("staff_commissions").select("staff_id, rate, applies_to, commission_type")
+          .eq("clinic_id", activeClinic.clinic_id).eq("active", true),
       ]);
       setAppts(((a.data ?? []) as unknown) as Appt[]);
       setStaff(((s.data ?? []) as unknown) as Staff[]);
+      setCommissions(((c.data ?? []) as unknown) as Comm[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);
 
   const rows = staff.map((s) => {
     const rev = appts.filter((a) => a.staff_id === s.id).reduce((sum, a) => sum + (a.price_cents ?? 0), 0);
-    const rate = s.commission_rate ?? 0;
+    // Take the highest "all"-applied rate for staff as default; rate is stored as 0-100 percent or 0-1 decimal
+    const def = commissions.find((c) => c.staff_id === s.id && (c.applies_to === "all" || !c.applies_to));
+    const rawRate = def?.rate ?? 0;
+    // Normalize: if <=1, treat as fraction; else treat as percent
+    const ratePct = rawRate <= 1 ? rawRate * 100 : rawRate;
     return {
       id: s.id,
       name: s.display_name,
       revenue: rev,
-      rate,
-      commission: Math.round(rev * (rate / 100)),
+      rate: ratePct,
+      commission: Math.round(rev * (ratePct / 100)),
     };
   }).filter((r) => r.revenue > 0).sort((a, b) => b.commission - a.commission);
 
@@ -73,7 +82,7 @@ function Commissions() {
           columns={[
             { key: "n", header: "Staff", cell: (r: typeof rows[number]) => r.name },
             { key: "r", header: "Revenue", align: "right", cell: (r) => money(r.revenue) },
-            { key: "rt", header: "Rate", align: "right", cell: (r) => `${r.rate}%` },
+            { key: "rt", header: "Rate", align: "right", cell: (r) => `${r.rate.toFixed(1)}%` },
             { key: "c", header: "Commission", align: "right", cell: (r) => money(r.commission) },
           ]}
           rows={rows}
