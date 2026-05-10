@@ -23,6 +23,7 @@ import {
   UserPlus,
   Ban,
   ArrowLeftRight,
+  Link as LinkIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -40,6 +41,7 @@ import {
   retryFailedCharge,
   changeMemberPlan,
 } from "@/lib/square/subscriptions.functions";
+import { createPortalToken } from "@/lib/square/portal.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -1037,6 +1039,7 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
   const [rows, setRows] = useState<SubRow[]>([]);
   const [loading, setLoading] = useState(true);
   const cancelFn = useServerFn(cancelMemberSubscription);
+  const portalFn = useServerFn(createPortalToken);
   const pauseFn = useServerFn(pauseMemberSubscription);
   const resumeFn = useServerFn(resumeMemberSubscription);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -1079,6 +1082,24 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
       toast.success("Membership canceled");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Cancel failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handlePortalLink = async (id: string) => {
+    setBusyId(id);
+    try {
+      const { token } = await portalFn({ data: { subscription_id: id } });
+      const url = `${window.location.origin}/portal/membership/${token}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success("Portal link copied to clipboard", { description: url });
+      } catch {
+        toast.success("Portal link created", { description: url });
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't create link");
     } finally {
       setBusyId(null);
     }
@@ -1178,6 +1199,18 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
                   >
                     <Play className="mr-1 h-3.5 w-3.5" />
                     Resume
+                  </Button>
+                )}
+                {r.status !== "canceled" && r.status !== "expired" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
+                    onClick={() => handlePortalLink(r.id)}
+                    className="h-8 px-2 text-xs text-violet-300 hover:bg-violet-500/10"
+                  >
+                    <LinkIcon className="mr-1 h-3.5 w-3.5" />
+                    Portal link
                   </Button>
                 )}
                 {r.status !== "canceled" && r.status !== "expired" && (
