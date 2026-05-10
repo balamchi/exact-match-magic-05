@@ -509,12 +509,12 @@ function PublicBookingPage() {
     };
   }, [services, searchQuery, quickFilter, popularServiceIds, popularity]);
 
-  // Auto-expand categories when searching
+  // Reset selected category when search clears or quick filter changes if invalid
   useEffect(() => {
-    if (searchQuery.trim()) {
-      setExpandedCats(new Set(matchingCats));
+    if (selectedCat !== "all" && selectedCat !== "__popular__" && !matchingCats.has(selectedCat)) {
+      setSelectedCat("all");
     }
-  }, [searchQuery, matchingCats]);
+  }, [matchingCats, selectedCat]);
 
   /* ---------- Loading / Not Found ---------- */
   if (loading) {
