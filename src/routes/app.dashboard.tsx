@@ -424,7 +424,7 @@ function Dashboard() {
       </div>
 
       {/* Lead Pipeline KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <MiniKpi label="Active Leads" value={stats?.activeLeads ?? 0} loading={loading} />
         <MiniKpi label="New Leads (Week)" value={stats?.newLeadsWeek ?? 0} loading={loading} />
         <MiniKpi label="Lead Conversion" value={`${stats?.leadConversionRate ?? 0}%`} loading={loading} />
@@ -432,7 +432,7 @@ function Dashboard() {
       </div>
 
       {/* Reviews & Referrals KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <MiniKpi label="Recent Reviews (7d)" value={stats?.recentReviews7d ?? 0} loading={loading} />
         <MiniKpi label="Avg Rating (30d)" value={stats?.avgRating30d != null ? `${stats.avgRating30d}★` : "—"} loading={loading} />
         <MiniKpi label="Active Referrals" value={stats?.activeReferrals ?? 0} loading={loading} />
@@ -440,14 +440,14 @@ function Dashboard() {
       </div>
 
       {/* Clinical KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <MiniKpi label="Pending Consents" value={stats?.pendingConsents ?? 0} loading={loading} />
         <MiniKpi label="SOAP Notes (24h)" value={stats?.soapNotesToday ?? 0} loading={loading} />
         <MiniKpi label="Active Plans" value={stats?.activeTreatmentPlans ?? 0} loading={loading} />
       </div>
 
       {/* Secondary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <MiniKpi label="Avg Service Value" value={formatMoney(stats?.avgServiceValueCents ?? 0, currency)} loading={loading} />
         <MiniKpi label="New Clients (Week)" value={stats?.newClientsWeek ?? 0} loading={loading} />
         <MiniKpi label="Outstanding Invoices" value={formatMoney(stats?.outstandingInvoiceCents ?? 0, currency)} loading={loading} />

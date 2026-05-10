@@ -344,7 +344,7 @@ function TreatmentPlansDashboard() {
                       </div>
                     </div>
                     {detailPhotos.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:grid-cols-4">
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
                         {detailPhotos.map((p: any) => (
                           <div key={p.id} className="group relative rounded-lg border border-border overflow-hidden">
                             <img src={p.photo_url} alt={p.photo_type ?? "Photo"} className="w-full h-28 object-cover cursor-pointer" onClick={() => window.open(p.photo_url, "_blank")} />

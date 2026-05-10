@@ -175,7 +175,7 @@ function EmailLogPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <StatCard label="Total" value={stats.total} icon={Mail} loading={loading} />
         <StatCard label="Delivered" value={stats.sent} icon={CheckCircle2} loading={loading} />
         <StatCard label="Failed" value={stats.failed} icon={AlertTriangle} loading={loading} />

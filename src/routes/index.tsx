@@ -276,7 +276,7 @@ function Landing() {
                 <span className="h-3 w-3 rounded-full bg-[#28c940]" />
                 <div className="flex-1 text-center font-mono text-xs text-muted-foreground">app.clinicpro.io/dashboard</div>
               </div>
-              <div className="grid min-h-[320px] grid-cols-1 sm:grid-cols-2 gap-4 p-5 sm:grid-cols-4 sm:min-h-[480px] sm:p-8">
+              <div className="grid min-h-[320px] grid-cols-1 gap-4 p-5 sm:grid-cols-4 sm:min-h-[480px] sm:p-8">
                 <MockStat icon={Calendar} num="47" label="Today's appointments" trend="↑ 12% vs avg" />
                 <MockStat icon={DollarSign} num="$14,280" label="Today's revenue" trend="↑ 34% vs avg" />
                 <MockStat icon={Users} num="2,847" label="Active clients" trend="↑ 234 this month" />

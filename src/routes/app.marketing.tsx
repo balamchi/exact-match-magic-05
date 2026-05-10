@@ -538,7 +538,7 @@ function MarketingPage() {
                   {/* Template Presets */}
                   <div className="md:col-span-2">
                     <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Quick Templates</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
                       {[
                         { label: "Promo Offer", body: "Hi {{first_name}},\n\nWe have a special offer just for you! Save 20% on your next visit when you book this week.\n\nBook now to secure your spot.\n\nBest,\n{{clinic_name}}" },
                         { label: "Follow-Up", body: "Hi {{first_name}},\n\nThank you for your recent visit! We hope you loved your results.\n\nWe'd love to hear your feedback — reply to this email or leave us a review.\n\nSee you soon!\n{{clinic_name}}" },
