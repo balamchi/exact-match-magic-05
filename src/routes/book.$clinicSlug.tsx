@@ -723,77 +723,172 @@ function PublicBookingPage() {
                   <p className="text-sm text-neutral-400">No services match your search.</p>
                   <button type="button" onClick={() => { setSearchQuery(""); setQuickFilter("all"); }} className="mt-2 text-xs text-purple-400 underline hover:text-purple-300">Clear filters</button>
                 </div>
-              ) : (
-                <div className="mt-4 space-y-2">
-                  {Object.entries(filteredGrouped).map(([cat, items]) => {
-                    const isOpen = expandedCats.has(cat);
-                    return (
-                      <div key={cat} className="rounded-xl border border-neutral-800 overflow-hidden">
-                        {/* Category header */}
-                        <button
-                          type="button"
-                          onClick={() => toggleCategory(cat)}
-                          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-800/60"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-foreground">{cat}</span>
-                            <span className="rounded-full bg-neutral-800 px-2 py-0.5 text-[11px] text-neutral-400">{items.length}</span>
-                          </div>
-                          <ChevronDown className={`h-4 w-4 text-neutral-400 transition-transform duration-200 ${isOpen ? "rotate-0" : "-rotate-90"}`} />
-                        </button>
+              ) : (() => {
+                const isSearching = searchQuery.trim().length > 0;
+                const allCats = Object.keys(filteredGrouped);
+                const totalCount = Object.values(filteredGrouped).reduce((sum, arr) => sum + arr.length, 0);
+                const popularList = Object.values(filteredGrouped).flat().filter((s) => popularServiceIds.has(s.id));
 
-                        {/* Collapsible content */}
-                        <div
-                          className="transition-all duration-200 ease-in-out overflow-hidden"
-                          style={{
-                            maxHeight: isOpen ? `${items.length * 120 + 20}px` : "0px",
-                            opacity: isOpen ? 1 : 0,
-                          }}
-                        >
-                          <div className="space-y-2 px-3 pb-3">
-                            {items.map((s) => {
-                              const active = state.serviceId === s.id;
-                              const isPopular = popularPerCategory.has(s.id);
-                              return (
-                                <button
-                                  key={s.id}
-                                  type="button"
-                                  onClick={() => setState((prev) => ({ ...prev, serviceId: s.id, staffId: "", date: "", time: "" }))}
-                                  className={`flex w-full items-start justify-between gap-3 rounded-xl border p-4 text-left transition-all min-h-[48px] ${
-                                    active ? "border-purple-500 bg-purple-500/10 ring-2 ring-purple-500/30" : "border-neutral-800 bg-neutral-800/30 hover:border-purple-500/40 hover:bg-neutral-800/60"
-                                  }`}
-                                >
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2">
-                                      <span className="font-semibold text-foreground text-[15px]">{s.name}</span>
-                                      {isPopular && (
-                                        <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
-                                          <Star className="h-2.5 w-2.5 fill-amber-400" /> Popular
-                                        </span>
-                                      )}
-                                      {active && <Check className="h-4 w-4 shrink-0 text-purple-400" />}
-                                    </div>
-                                    {(s as any).booking_description && (
-                                      <p className="mt-1 text-xs text-neutral-400 line-clamp-2">{(s as any).booking_description}</p>
-                                    )}
-                                    <div className="mt-2 flex items-center gap-3 text-xs text-neutral-500">
-                                      <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{s.duration_minutes} min</span>
-                                      {settings.show_prices !== false && (
-                                        <span className="font-medium text-purple-400">{money(s.price_cents, currency)}</span>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <ChevronRight className={`mt-1 h-4 w-4 shrink-0 transition-colors ${active ? "text-purple-400" : "text-neutral-600"}`} />
-                                </button>
-                              );
-                            })}
-                          </div>
+                // Decide what to render in the right pane
+                let paneTitle = "";
+                let paneItems: Service[] = [];
+                let paneGrouped: Array<[string, Service[]]> | null = null;
+
+                if (isSearching) {
+                  paneTitle = `${totalCount} result${totalCount === 1 ? "" : "s"}`;
+                  paneItems = Object.values(filteredGrouped).flat();
+                } else if (selectedCat === "__popular__") {
+                  paneTitle = "Most Popular";
+                  paneItems = popularList;
+                } else if (selectedCat === "all" || !filteredGrouped[selectedCat]) {
+                  paneGrouped = Object.entries(filteredGrouped);
+                } else {
+                  paneTitle = selectedCat;
+                  paneItems = filteredGrouped[selectedCat];
+                }
+
+                const renderServiceCard = (s: Service) => {
+                  const active = state.serviceId === s.id;
+                  const isPopular = popularPerCategory.has(s.id);
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setState((prev) => ({ ...prev, serviceId: s.id, staffId: "", date: "", time: "" }))}
+                      className={`flex w-full items-start justify-between gap-3 rounded-xl border p-4 text-left transition-all min-h-[48px] ${
+                        active ? "border-purple-500 bg-purple-500/10 ring-2 ring-purple-500/30" : "border-neutral-800 bg-neutral-800/30 hover:border-purple-500/40 hover:bg-neutral-800/60"
+                      }`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground text-[15px]">{s.name}</span>
+                          {isPopular && (
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                              <Star className="h-2.5 w-2.5 fill-amber-400" /> Popular
+                            </span>
+                          )}
+                          {active && <Check className="h-4 w-4 shrink-0 text-purple-400" />}
+                        </div>
+                        {(s as any).booking_description && (
+                          <p className="mt-1 text-xs text-neutral-400 line-clamp-2">{(s as any).booking_description}</p>
+                        )}
+                        <div className="mt-2 flex items-center gap-3 text-xs text-neutral-500">
+                          <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{s.duration_minutes} min</span>
+                          {settings.show_prices !== false && (
+                            <span className="font-medium text-purple-400">{money(s.price_cents, currency)}</span>
+                          )}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
+                      <ChevronRight className={`mt-1 h-4 w-4 shrink-0 transition-colors ${active ? "text-purple-400" : "text-neutral-600"}`} />
+                    </button>
+                  );
+                };
+
+                const sidebarItems: Array<{ key: string; label: string; count: number; icon?: React.ReactNode }> = [];
+                if (popularList.length > 0) {
+                  sidebarItems.push({ key: "__popular__", label: "Most Popular", count: popularList.length, icon: <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> });
+                }
+                sidebarItems.push({ key: "all", label: "All Services", count: totalCount });
+                allCats.forEach((c) => sidebarItems.push({ key: c, label: c, count: filteredGrouped[c].length }));
+
+                return (
+                  <div className="mt-4">
+                    {/* Mobile horizontal chips */}
+                    {!isSearching && (
+                      <div className="md:hidden -mx-5 sm:-mx-8 px-5 sm:px-8 mb-3 sticky top-14 z-[5] bg-neutral-900/95 backdrop-blur-sm py-2">
+                        <div className="flex gap-2 overflow-x-auto scrollbar-none">
+                          {sidebarItems.map((it) => {
+                            const sel = selectedCat === it.key;
+                            return (
+                              <button
+                                key={it.key}
+                                type="button"
+                                onClick={() => setSelectedCat(it.key)}
+                                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 min-h-[44px] text-xs font-medium transition-all ${
+                                  sel ? "border-purple-500 bg-purple-500/15 text-purple-300" : "border-neutral-700 bg-neutral-800 text-neutral-300 hover:border-neutral-600"
+                                }`}
+                              >
+                                {it.icon}
+                                <span>{it.label}</span>
+                                <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${sel ? "bg-purple-500/20 text-purple-200" : "bg-neutral-900 text-neutral-400"}`}>{it.count}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-6">
+                      {/* Desktop sidebar */}
+                      {!isSearching && (
+                        <aside className="hidden md:block w-[240px] shrink-0">
+                          <div className="sticky top-4 rounded-xl border border-neutral-800 bg-neutral-900/60 p-2">
+                            <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">Categories</div>
+                            <ul className="space-y-0.5">
+                              {sidebarItems.map((it) => {
+                                const sel = selectedCat === it.key;
+                                return (
+                                  <li key={it.key}>
+                                    <button
+                                      type="button"
+                                      onClick={() => setSelectedCat(it.key)}
+                                      className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors border-l-2 ${
+                                        sel
+                                          ? "bg-purple-500/15 text-purple-200 border-purple-500"
+                                          : "border-transparent text-neutral-300 hover:bg-neutral-800/60"
+                                      }`}
+                                    >
+                                      <span className="flex items-center gap-2 min-w-0">
+                                        {it.icon}
+                                        <span className="truncate">{it.label}</span>
+                                      </span>
+                                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] ${sel ? "bg-purple-500/20 text-purple-200" : "bg-neutral-800 text-neutral-400"}`}>{it.count}</span>
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        </aside>
+                      )}
+
+                      {/* Right pane */}
+                      <div className="min-w-0 flex-1">
+                        {paneGrouped ? (
+                          <div className="space-y-6">
+                            {paneGrouped.map(([cat, items]) => (
+                              <div key={cat}>
+                                <div className="mb-2 flex items-center justify-between">
+                                  <h3 className="text-sm font-semibold text-foreground">{cat}</h3>
+                                  <span className="text-[11px] text-neutral-500">{items.length} service{items.length === 1 ? "" : "s"}</span>
+                                </div>
+                                <div className="space-y-2">
+                                  {items.map(renderServiceCard)}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : paneItems.length === 0 ? (
+                          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-8 text-center">
+                            <p className="text-sm text-neutral-400">No services match your filters in {paneTitle}.</p>
+                            <button type="button" onClick={() => setSelectedCat("all")} className="mt-2 text-xs text-purple-400 underline hover:text-purple-300">Show all categories</button>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="mb-2 flex items-center justify-between">
+                              <h3 className="text-sm font-semibold text-foreground">{paneTitle}</h3>
+                              <span className="text-[11px] text-neutral-500">{paneItems.length} service{paneItems.length === 1 ? "" : "s"}</span>
+                            </div>
+                            <div className="space-y-2">
+                              {paneItems.map(renderServiceCard)}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
