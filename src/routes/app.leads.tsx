@@ -359,6 +359,16 @@ function LeadsPage() {
     await load();
   };
 
+  if (!activeClinic) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="rounded-2xl border border-border bg-card p-8 text-center">
+          <p className="text-sm text-muted-foreground">Loading clinic…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -415,7 +425,9 @@ function LeadsPage() {
       {loading ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">Loading pipeline…</div>
       ) : (
-        <div className="overflow-x-auto pb-2">
+        <>
+        {/* Desktop: Kanban Board */}
+        <div className="hidden lg:block overflow-x-auto pb-2">
           <div className="grid min-w-[1200px] gap-3" style={{ gridTemplateColumns: `repeat(${VISIBLE_STAGES.length}, minmax(0, 1fr))` }}>
             {VISIBLE_STAGES.map((stage) => {
               const items = byStage[stage.id] ?? [];
@@ -490,6 +502,51 @@ function LeadsPage() {
             })}
           </div>
         </div>
+
+        {/* Mobile: Stacked List by Stage */}
+        <div className="lg:hidden space-y-4">
+          {VISIBLE_STAGES.map((stage) => {
+            const items = byStage[stage.id] ?? [];
+            return (
+              <section key={stage.id} className="rounded-2xl border border-border bg-card overflow-hidden">
+                <header className="flex items-center justify-between px-4 py-3 border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider", stage.tint)}>
+                      {stage.label}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{items.length}</span>
+                  </div>
+                  <button onClick={() => openCreate(stage.id)} className="rounded-md p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                </header>
+                <div className="divide-y divide-border">
+                  {items.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-xs text-muted-foreground">No leads</div>
+                  ) : items.map((lead) => (
+                    <button key={lead.id} onClick={() => openDetail(lead)}
+                      className="w-full text-left px-4 py-3 hover:bg-muted/40 transition">
+                      <div className="font-medium text-sm">
+                        {lead.first_name ?? ""} {lead.last_name ?? ""}
+                        {!lead.first_name && lead.name}
+                      </div>
+                      {lead.source && (
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          {SOURCES.find((s) => s.key === lead.source)?.label ?? lead.source}
+                        </div>
+                      )}
+                      <div className="mt-1 flex items-center justify-between">
+                        <span className="text-xs font-semibold text-primary">{money(lead.estimated_value_cents)}</span>
+                        <span className="text-[10px] text-muted-foreground">{daysAgo(lead.created_at)}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+        </>
       )}
 
       {/* Create/Edit Modal */}

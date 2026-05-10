@@ -4,12 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Phone, Mail, ArrowRight, CheckCircle2, ClipboardCheck } from "lucide-react";
+import { Sparkles, Phone, Mail, ArrowRight, CheckCircle2, ClipboardCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   lookupClientForKiosk,
   registerNewClientFromKiosk,
   submitKioskCheckin,
+  verifyClinicSlug,
 } from "@/lib/kiosk/kiosk.functions";
 
 export const Route = createFileRoute("/kiosk/$clinicSlug")({
@@ -31,6 +32,28 @@ function KioskPage() {
   const lookup = useServerFn(lookupClientForKiosk);
   const register = useServerFn(registerNewClientFromKiosk);
   const submit = useServerFn(submitKioskCheckin);
+  const verify = useServerFn(verifyClinicSlug);
+
+  const [clinicValid, setClinicValid] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await verify({ data: { slug: clinicSlug } });
+        if (cancelled) return;
+        if (r.valid) {
+          setClinicName(r.name);
+          setClinicValid(true);
+        } else {
+          setClinicValid(false);
+        }
+      } catch {
+        if (!cancelled) setClinicValid(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [clinicSlug, verify]);
 
   // Auto reset after done
   useEffect(() => {
@@ -82,6 +105,37 @@ function KioskPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (clinicValid === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 mx-auto border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-sm text-muted-foreground">Loading kiosk…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (clinicValid === false) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="max-w-md w-full text-center space-y-4">
+          <div className="w-20 h-20 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
+            <AlertCircle className="w-10 h-10 text-destructive" />
+          </div>
+          <h1 className="text-2xl font-bold">Kiosk Not Found</h1>
+          <p className="text-sm text-muted-foreground">
+            The kiosk URL "<code className="px-1.5 py-0.5 rounded bg-muted">{clinicSlug}</code>" doesn't match any active clinic.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            If you're a clinic owner, get your kiosk URL from{" "}
+            <a href="/app/settings" className="text-primary underline">Settings</a>.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

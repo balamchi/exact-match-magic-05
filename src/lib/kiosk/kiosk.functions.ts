@@ -2,6 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+export const verifyClinicSlug = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({ slug: z.string().min(1).max(100) }).parse(d))
+  .handler(async ({ data }) => {
+    const { data: clinic } = await supabaseAdmin
+      .from("clinics")
+      .select("id, name, slug")
+      .eq("slug", data.slug)
+      .maybeSingle();
+    return clinic
+      ? { valid: true as const, name: clinic.name, slug: clinic.slug }
+      : { valid: false as const };
+  });
+
 const lookupSchema = z
   .object({
     clinic_slug: z.string().min(1).max(100),
