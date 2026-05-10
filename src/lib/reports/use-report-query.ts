@@ -94,10 +94,10 @@ async function runQuery(
       if (filters.locationId !== "all") q = q.eq("location_id", filters.locationId);
       if (filters.staffId !== "all") q = q.eq("staff_id", filters.staffId);
       if (filters.serviceId !== "all") q = q.eq("service_id", filters.serviceId);
-      if (filters.status !== "all") q = q.eq("status", filters.status);
+      if (filters.status !== "all") q = q.eq("status", filters.status as "completed" | "cancelled" | "no_show");
       const { data, error } = await q;
       if (error) throw error;
-      const appts = (data ?? []) as ApptJoin[];
+      const appts = (data ?? []) as unknown as ApptJoin[];
 
       if (type === "sales") {
         const completed = appts.filter((a) => a.status === "completed");
