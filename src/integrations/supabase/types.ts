@@ -477,6 +477,7 @@ export type Database = {
           marketing_consent: boolean | null
           medical_alerts: string | null
           medical_conditions: string[] | null
+          medical_history_completed_at: string | null
           medications: string[] | null
           no_show_count: number | null
           notes: string | null
@@ -528,6 +529,7 @@ export type Database = {
           marketing_consent?: boolean | null
           medical_alerts?: string | null
           medical_conditions?: string[] | null
+          medical_history_completed_at?: string | null
           medications?: string[] | null
           no_show_count?: number | null
           notes?: string | null
@@ -579,6 +581,7 @@ export type Database = {
           marketing_consent?: boolean | null
           medical_alerts?: string | null
           medical_conditions?: string[] | null
+          medical_history_completed_at?: string | null
           medications?: string[] | null
           no_show_count?: number | null
           notes?: string | null
@@ -1782,6 +1785,50 @@ export type Database = {
           },
           {
             foreignKeyName: "invoices_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kiosk_sessions: {
+        Row: {
+          active: boolean
+          clinic_id: string
+          created_at: string
+          device_label: string | null
+          expires_at: string | null
+          id: string
+          last_used_at: string | null
+          pin_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          clinic_id: string
+          created_at?: string
+          device_label?: string | null
+          expires_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          pin_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          clinic_id?: string
+          created_at?: string
+          device_label?: string | null
+          expires_at?: string | null
+          id?: string
+          last_used_at?: string | null
+          pin_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kiosk_sessions_clinic_id_fkey"
             columns: ["clinic_id"]
             isOneToOne: false
             referencedRelation: "clinics"
