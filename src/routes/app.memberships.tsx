@@ -1078,6 +1078,30 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
     }
   };
 
+  const handlePause = async (id: string) => {
+    setBusyId(id);
+    try {
+      await pauseFn({ data: { subscription_id: id } });
+      toast.success("Membership paused");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Pause failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleResume = async (id: string) => {
+    setBusyId(id);
+    try {
+      await resumeFn({ data: { subscription_id: id } });
+      toast.success("Membership resumed");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Resume failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <section className="rounded-2xl border border-border/60 bg-card/40">
       <header className="flex items-center justify-between border-b border-border/60 px-5 py-3">
