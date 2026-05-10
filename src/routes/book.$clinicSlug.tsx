@@ -166,8 +166,8 @@ function PublicBookingPage() {
   const [refCode, setRefCode] = useState("");
   const [refBanner, setRefBanner] = useState<{ name: string; description: string; codeId: string; referrerClientId: string } | null>(null);
 
-  // Category accordion state
-  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
+  // Category selection state (sidebar / chips)
+  const [selectedCat, setSelectedCat] = useState<string>("all");
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [popularity, setPopularity] = useState<Map<string, number>>(new Map());
 
