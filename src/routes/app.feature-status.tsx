@@ -112,7 +112,7 @@ function FeatureStatusPage() {
     <div className="mx-auto max-w-5xl space-y-8">
       <header>
         <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Transparency</p>
-        <h1 className="mt-2 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">
+        <h1 className="mt-2 font-display text-2xl sm:text-4xl font-semibold tracking-tight">
           Feature status
         </h1>
         <p className="mt-2 max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">

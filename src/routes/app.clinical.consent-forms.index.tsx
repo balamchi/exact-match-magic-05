@@ -229,7 +229,7 @@ function ConsentFormsDashboard() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Clinical Compliance</p>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Consent Forms</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Consent Forms</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">DocuSign-style e-signatures with full audit trail.</p>
         </div>
         <div className="flex gap-2">

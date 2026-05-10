@@ -357,7 +357,7 @@ function Dashboard() {
             {" — "}
             {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
           </p>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight sm:text-3xl sm:text-4xl">
+          <h1 className="mt-1 font-display text-2xl  font-semibold tracking-tight sm:text-3xl sm:text-4xl">
             {greeting}, <span className="capitalize">{firstName}</span>!
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">

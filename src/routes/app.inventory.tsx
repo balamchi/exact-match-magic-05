@@ -160,7 +160,7 @@ function InventoryPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Stock control</p>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Inventory<BetaBadge /></h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Inventory<BetaBadge /></h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Track products, suppliers, and reorder thresholds with live alerts.</p>
         </div>
         <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">

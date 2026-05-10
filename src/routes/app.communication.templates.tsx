@@ -198,7 +198,7 @@ function TemplatesPage() {
           <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
             <MessageSquareText className="h-3 w-3" /> Communication
           </div>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl sm:text-4xl font-semibold tracking-tight">Message Templates</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Message Templates</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Pre-write replies, reminders, and campaigns to send with one click.
           </p>
