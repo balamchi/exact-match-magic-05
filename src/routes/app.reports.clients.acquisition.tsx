@@ -37,7 +37,7 @@ function Acquisition() {
   const bySource = new Map<string, number>();
   const byDay = new Map<string, number>();
   for (const r of rows) {
-    const s = r.referral_source ?? "Direct";
+    const s = r.source ?? "Direct";
     bySource.set(s, (bySource.get(s) ?? 0) + 1);
     const d = r.created_at.slice(0, 10);
     byDay.set(d, (byDay.get(d) ?? 0) + 1);
