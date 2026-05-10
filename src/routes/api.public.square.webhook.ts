@@ -93,10 +93,14 @@ async function handleInvoiceFailed(invoice: any) {
   if (!invoice?.id || !invoice?.subscription_id) return;
   const { data: subRow } = await supabaseAdmin
     .from("membership_subscriptions")
-    .select("id, clinic_id, failed_charge_count")
+    .select(
+      "id, clinic_id, failed_charge_count, clients(first_name,last_name,email), memberships(name,monthly_price_cents), clinics(name)",
+    )
     .eq("square_subscription_id", invoice.subscription_id)
     .maybeSingle();
   if (!subRow) return;
+
+  const failureReason = invoice.status ?? "PAYMENT_FAILED";
 
   await supabaseAdmin.from("membership_charges").upsert(
     {
@@ -106,7 +110,7 @@ async function handleInvoiceFailed(invoice: any) {
       amount_cents: 0,
       currency: "USD",
       status: "failed",
-      failure_reason: invoice.status ?? "PAYMENT_FAILED",
+      failure_reason: failureReason,
       charged_at: new Date().toISOString(),
     },
     { onConflict: "square_invoice_id" },
@@ -122,6 +126,43 @@ async function handleInvoiceFailed(invoice: any) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", subRow.id);
+
+  // Phase 10: dunning email to the member
+  const client = (subRow as any).clients;
+  const plan = (subRow as any).memberships;
+  const clinic = (subRow as any).clinics;
+  if (client?.email) {
+    const amountDisplay = plan?.monthly_price_cents
+      ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+          plan.monthly_price_cents / 100,
+        )
+      : undefined;
+    const nextRetry = invoice.next_payment_amount_money
+      ? undefined
+      : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+    await supabaseAdmin
+      .rpc("enqueue_email", {
+        queue_name: "transactional_email_queue",
+        payload: {
+          templateName: "payment-failed",
+          recipientEmail: client.email,
+          data: {
+            clinicName: clinic?.name ?? "your clinic",
+            planName: plan?.name ?? "your membership",
+            amountDisplay,
+            retryDate: nextRetry,
+            reason: failureReason,
+          },
+        },
+      })
+      .then(({ error }) => {
+        if (error) console.warn("payment-failed email enqueue failed:", error.message);
+      });
+  }
 }
 
 export const Route = createFileRoute("/api/public/square/webhook")({
