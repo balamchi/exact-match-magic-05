@@ -26,6 +26,44 @@ const SUB_STATUS_MAP: Record<string, string> = {
   PAUSED: "paused",
 };
 
+async function enqueueEmail(templateName: string, recipientEmail: string, data: Record<string, unknown>) {
+  const { error } = await supabaseAdmin.rpc("enqueue_email", {
+    queue_name: "transactional_email_queue",
+    payload: { templateName, recipientEmail, data },
+  });
+  if (error) console.warn(`${templateName} enqueue failed:`, error.message);
+}
+
+async function buildPortalUrl(subscriptionId: string) {
+  // Generate (or reuse) a portal token for self-service updates.
+  // Look up an existing live token first to avoid spamming new tokens on every webhook.
+  const { data: existing } = await supabaseAdmin
+    .from("member_portal_tokens")
+    .select("token, expires_at, revoked_at")
+    .eq("subscription_id", subscriptionId)
+    .is("revoked_at", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  let token = existing?.token;
+  if (!token || (existing?.expires_at && new Date(existing.expires_at).getTime() < Date.now())) {
+    // Mint a fresh token (90 days)
+    const newToken = Array.from(crypto.getRandomValues(new Uint8Array(18)))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    const expires = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+    const { error } = await supabaseAdmin.from("member_portal_tokens").insert({
+      subscription_id: subscriptionId,
+      token: newToken,
+      expires_at: expires,
+    });
+    if (!error) token = newToken;
+  }
+  if (!token) return undefined;
+  const base = process.env.VITE_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? "";
+  return `${base.replace(/\/$/, "")}/portal/membership/${token}`;
+}
+
 async function handleSubscriptionUpdated(sub: any) {
   if (!sub?.id) return;
   const status = SUB_STATUS_MAP[sub.status ?? ""] ?? "active";
@@ -44,13 +82,37 @@ async function handleSubscriptionUpdated(sub: any) {
     .from("membership_subscriptions")
     .update(update)
     .eq("square_subscription_id", sub.id);
+
+  if (status === "canceled") {
+    const { data: row } = await supabaseAdmin
+      .from("membership_subscriptions")
+      .select("clients(first_name,email), memberships(name), clinics(name), next_billing_at")
+      .eq("square_subscription_id", sub.id)
+      .maybeSingle();
+    const client = (row as any)?.clients;
+    if (client?.email) {
+      const lastActive = (row as any)?.next_billing_at
+        ? new Date((row as any).next_billing_at).toLocaleDateString("en-US", {
+            year: "numeric", month: "long", day: "numeric",
+          })
+        : undefined;
+      await enqueueEmail("membership-canceled", client.email, {
+        clientName: client.first_name ?? undefined,
+        planName: (row as any)?.memberships?.name,
+        clinicName: (row as any)?.clinics?.name,
+        lastActiveDate: lastActive,
+      });
+    }
+  }
 }
 
 async function handleInvoicePaymentMade(invoice: any) {
   if (!invoice?.id || !invoice?.subscription_id) return;
   const { data: subRow } = await supabaseAdmin
     .from("membership_subscriptions")
-    .select("id, clinic_id")
+    .select(
+      "id, clinic_id, next_billing_at, clients(first_name,email), memberships(name), clinics(name)",
+    )
     .eq("square_subscription_id", invoice.subscription_id)
     .maybeSingle();
   if (!subRow) return;
@@ -75,7 +137,7 @@ async function handleInvoicePaymentMade(invoice: any) {
       status: "paid",
       charged_at: new Date().toISOString(),
     },
-    { onConflict: "square_invoice_id" },
+    { onConflict: "square_invoice_id", ignoreDuplicates: false },
   );
 
   await supabaseAdmin
@@ -87,6 +149,25 @@ async function handleInvoicePaymentMade(invoice: any) {
       updated_at: new Date().toISOString(),
     })
     .eq("id", subRow.id);
+
+  // Send success email to member
+  const client = (subRow as any).clients;
+  if (client?.email) {
+    const nextBilling = invoice.next_payment_amount_money
+      ? undefined
+      : (subRow as any).next_billing_at
+        ? new Date((subRow as any).next_billing_at).toLocaleDateString("en-US", {
+            year: "numeric", month: "long", day: "numeric",
+          })
+        : undefined;
+    await enqueueEmail("membership-charge-success", client.email, {
+      clientName: client.first_name ?? undefined,
+      planName: (subRow as any).memberships?.name,
+      amountCents: totalCents,
+      nextBillingDate: nextBilling,
+      clinicName: (subRow as any).clinics?.name,
+    });
+  }
 }
 
 async function handleInvoiceFailed(invoice: any) {
@@ -113,55 +194,35 @@ async function handleInvoiceFailed(invoice: any) {
       failure_reason: failureReason,
       charged_at: new Date().toISOString(),
     },
-    { onConflict: "square_invoice_id" },
+    { onConflict: "square_invoice_id", ignoreDuplicates: false },
   );
 
+  const newFailCount = Number(subRow.failed_charge_count ?? 0) + 1;
   await supabaseAdmin
     .from("membership_subscriptions")
     .update({
       last_charge_at: new Date().toISOString(),
       last_charge_status: "failed",
-      failed_charge_count: Number(subRow.failed_charge_count ?? 0) + 1,
+      failed_charge_count: newFailCount,
       status: "past_due",
       updated_at: new Date().toISOString(),
     })
     .eq("id", subRow.id);
 
-  // Phase 10: dunning email to the member
+  // Phase 10: dunning email to the member (membership-specific template)
   const client = (subRow as any).clients;
   const plan = (subRow as any).memberships;
   const clinic = (subRow as any).clinics;
   if (client?.email) {
-    const amountDisplay = plan?.monthly_price_cents
-      ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
-          plan.monthly_price_cents / 100,
-        )
-      : undefined;
-    const nextRetry = invoice.next_payment_amount_money
-      ? undefined
-      : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-    await supabaseAdmin
-      .rpc("enqueue_email", {
-        queue_name: "transactional_email_queue",
-        payload: {
-          templateName: "payment-failed",
-          recipientEmail: client.email,
-          data: {
-            clinicName: clinic?.name ?? "your clinic",
-            planName: plan?.name ?? "your membership",
-            amountDisplay,
-            retryDate: nextRetry,
-            reason: failureReason,
-          },
-        },
-      })
-      .then(({ error }) => {
-        if (error) console.warn("payment-failed email enqueue failed:", error.message);
-      });
+    const portalUrl = await buildPortalUrl(subRow.id as string);
+    await enqueueEmail("membership-charge-failed", client.email, {
+      clientName: client.first_name ?? undefined,
+      planName: plan?.name,
+      amountCents: plan?.monthly_price_cents ?? 0,
+      failureReason,
+      updateCardUrl: portalUrl,
+      clinicName: clinic?.name,
+    });
   }
 }
 
