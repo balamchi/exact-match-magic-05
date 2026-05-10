@@ -456,20 +456,7 @@ function PublicBookingPage() {
     }
   };
 
-  /* ---------- Category toggle ---------- */
-  const toggleCategory = (cat: string) => {
-    setExpandedCats((prev) => {
-      // On mobile, accordion behavior (only one open at a time)
-      if (isMobile) {
-        const next = new Set<string>();
-        if (!prev.has(cat)) next.add(cat);
-        return next;
-      }
-      const next = new Set(prev);
-      if (next.has(cat)) next.delete(cat); else next.add(cat);
-      return next;
-    });
-  };
+  /* ---------- (no-op placeholder retained intentionally blank) ---------- */
 
   /* ---------- Filtered + grouped services for Step 0 ---------- */
   const { filteredGrouped, matchingCats } = useMemo(() => {
