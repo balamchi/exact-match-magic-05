@@ -25,15 +25,34 @@ export function useOnboardingCheck() {
       return;
     }
 
-    // Check if clinic has been seeded (has at least 5 services)
-    supabase
-      .from("services")
-      .select("id", { count: "exact", head: true })
-      .eq("clinic_id", activeClinic.clinic_id)
-      .then(({ count }) => {
-        setShowOnboarding(!count || count < 5);
-        setLoading(false);
-      });
+    let cancelled = false;
+
+    (async () => {
+      const { count } = await supabase
+        .from("services")
+        .select("id", { count: "exact", head: true })
+        .eq("clinic_id", activeClinic.clinic_id);
+
+      const { data: clinic } = await supabase
+        .from("clinics")
+        .select("onboarding_completed_at, onboarding_dismissed_at")
+        .eq("id", activeClinic.clinic_id)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      const isUnseeded = !count || count < 5;
+      const hasDismissedOrCompleted =
+        !!(clinic as any)?.onboarding_completed_at ||
+        !!(clinic as any)?.onboarding_dismissed_at;
+
+      setShowOnboarding(isUnseeded && !hasDismissedOrCompleted);
+      setLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeClinic?.clinic_id]);
 
   return { showOnboarding, setShowOnboarding, loading };
