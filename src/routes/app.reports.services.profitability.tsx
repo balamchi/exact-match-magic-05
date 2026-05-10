@@ -13,7 +13,7 @@ import { money } from "@/lib/reports/format";
 export const Route = createFileRoute("/app/reports/services/profitability")({ component: Profitability });
 
 interface Appt { service_id: string | null; status: string; price_cents: number | null }
-interface Service { id: string; name: string; price_cents: number | null; cost_cents?: number | null; duration_minutes?: number | null }
+interface Service { id: string; name: string; price_cents: number | null; duration_minutes?: number | null }
 
 function Profitability() {
   const { activeClinic } = useAuth();
@@ -28,12 +28,12 @@ function Profitability() {
       setLoading(true);
       const [a, s] = await Promise.all([
         supabase.from("appointments")
-          .select("service_id, status, price_cents" as never)
+          .select("service_id, status, price_cents")
           .eq("clinic_id", activeClinic.clinic_id)
           .eq("status", "completed")
           .gte("starts_at", range.range.from.toISOString())
           .lte("starts_at", range.range.to.toISOString()),
-        supabase.from("services").select("id, name, price_cents, cost_cents, duration_minutes" as never).eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("services").select("id, name, price_cents, duration_minutes").eq("clinic_id", activeClinic.clinic_id),
       ]);
       setAppts(((a.data ?? []) as unknown) as Appt[]);
       setServices(((s.data ?? []) as unknown) as Service[]);
@@ -44,14 +44,14 @@ function Profitability() {
   const rows = services.map((s) => {
     const matching = appts.filter((a) => a.service_id === s.id);
     const revenue = matching.reduce((sum, a) => sum + (a.price_cents ?? s.price_cents ?? 0), 0);
-    const cost = matching.length * (s.cost_cents ?? 0);
-    const profit = revenue - cost;
-    const margin = revenue ? (profit / revenue) * 100 : 0;
-    return { id: s.id, name: s.name, count: matching.length, revenue, cost, profit, margin };
-  }).filter((r) => r.count > 0).sort((a, b) => b.profit - a.profit);
+    const minutes = matching.length * (s.duration_minutes ?? 0);
+    const revPerHour = minutes ? Math.round((revenue / minutes) * 60) : 0;
+    return { id: s.id, name: s.name, count: matching.length, revenue, minutes, revPerHour };
+  }).filter((r) => r.count > 0).sort((a, b) => b.revenue - a.revenue);
 
-  const totalProfit = rows.reduce((s, r) => s + r.profit, 0);
   const totalRev = rows.reduce((s, r) => s + r.revenue, 0);
+  const totalMin = rows.reduce((s, r) => s + r.minutes, 0);
+  const avgRevPerHour = totalMin ? Math.round((totalRev / totalMin) * 60) : 0;
 
   return (
     <>
