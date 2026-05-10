@@ -143,7 +143,7 @@ function QaChecklistPage() {
       {/* Summary */}
       <div className="space-y-3">
         <Progress value={pct} className="h-3" />
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <Card className="bg-emerald-500/10 border-emerald-500/30">
             <CardContent className="pt-4 pb-3 text-center">
               <p className="text-2xl font-bold text-emerald-400">{passCount}</p>

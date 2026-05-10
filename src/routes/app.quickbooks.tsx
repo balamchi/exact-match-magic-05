@@ -86,7 +86,7 @@ function QuickBooksPage() {
           <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
             <BookOpen className="h-3 w-3" /> Accounting
           </div>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">QuickBooks<Phase4Badge /></h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">QuickBooks<Phase4Badge /></h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Sync invoices, payments, and client records with QuickBooks Online for seamless accounting.
           </p>
@@ -110,7 +110,7 @@ function QuickBooksPage() {
       </section>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-4">
         {[
           { label: "Total Synced", value: entities.reduce((s, e) => s + e.count, 0).toString(), icon: Upload },
           { label: "Last Sync", value: entities.some((e) => e.lastSync) ? "Just now" : "Never", icon: Clock },
@@ -147,12 +147,12 @@ function QuickBooksPage() {
         <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
           <div className="space-y-4">
             {!connected ? (
-              <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-card">
+              <div className="rounded-2xl border border-border bg-card p-4 sm:p-8 text-center shadow-card">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10">
                   <BookOpen className="h-8 w-8 text-emerald-400" />
                 </div>
                 <h2 className="font-display text-2xl font-semibold">Connect QuickBooks Online</h2>
-                <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+                <p className="mx-auto mt-2 max-w-[95vw] sm:max-w-md text-sm text-muted-foreground">
                   Link your QuickBooks Online account to automatically sync sales, payments, and client data. 
                   No manual bookkeeping required.
                 </p>
@@ -230,7 +230,7 @@ function QuickBooksPage() {
           </div>
 
           <aside className="space-y-4">
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
               <h2 className="font-display text-lg font-semibold">Auto-Sync Settings</h2>
               <div className="mt-4 space-y-3">
                 {[
@@ -251,7 +251,7 @@ function QuickBooksPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
               <h2 className="font-display text-lg font-semibold">Chart of Accounts</h2>
               <p className="mt-1 text-xs text-muted-foreground">Map clinic revenue categories to your QB chart of accounts.</p>
               <div className="mt-3 space-y-2">
@@ -268,7 +268,7 @@ function QuickBooksPage() {
       )}
 
       {activeTab === "mapping" && (
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
           <h2 className="font-display text-xl font-semibold">Field Mapping</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Configure how ClinicPro fields map to QuickBooks fields for each entity.
@@ -310,7 +310,7 @@ function QuickBooksPage() {
       )}
 
       {activeTab === "logs" && (
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
           <h2 className="font-display text-xl font-semibold">Sync Logs</h2>
           <div className="mt-6 flex flex-col items-center justify-center py-12 text-center">
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">

@@ -376,7 +376,7 @@ function ServicesPage() {
             <HeartPulse className="h-3.5 w-3.5 text-primary" /> Service menu
           </div>
           <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Services</h1>
-          <p className="max-w-xl text-sm text-muted-foreground">Build your bookable treatment menu — categories, durations, pricing, and clinical details.</p>
+          <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">Build your bookable treatment menu — categories, durations, pricing, and clinical details.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={exportCSV}><Download className="mr-1.5 h-3.5 w-3.5" /> Export</Button>
@@ -391,7 +391,7 @@ function ServicesPage() {
       </header>
 
       {/* KPIs */}
-      <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-4">
         <KpiCard label="Total" value={stats.total} icon={<HeartPulse className="h-4 w-4" />} />
         <KpiCard label="Active" value={stats.active} icon={<Sparkles className="h-4 w-4" />} />
         <KpiCard label="Categories" value={stats.categories} icon={<Filter className="h-4 w-4" />} />
@@ -400,7 +400,7 @@ function ServicesPage() {
 
       {/* Filters */}
       <section className="flex flex-col gap-3 md:flex-row md:items-center">
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 max-w-[95vw] sm:max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search services…" className="pl-9" />
         </div>
@@ -443,10 +443,10 @@ function ServicesPage() {
         {loading ? (
           <div className="p-4 space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}</div>
         ) : paginated.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-16 text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><HeartPulse className="h-6 w-6" /></div>
             <h2 className="font-display text-xl font-semibold">No services yet</h2>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">Start by loading 60+ pre-built services for medical aesthetics, or add your own.</p>
+            <p className="mt-1 max-w-[95vw] sm:max-w-sm text-sm text-muted-foreground">Start by loading 60+ pre-built services for medical aesthetics, or add your own.</p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               <Button
                 onClick={async () => {

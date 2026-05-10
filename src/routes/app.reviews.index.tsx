@@ -162,7 +162,7 @@ function ReviewsDashboard() {
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Reputation</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Reviews</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Reviews</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Monitor public sentiment, reply to feedback, and request reviews from happy clients.
           </p>
@@ -188,7 +188,7 @@ function ReviewsDashboard() {
       </section>
 
       {/* Rating breakdown */}
-      <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
+      <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
         <h2 className="mb-4 font-display text-lg font-semibold">Rating breakdown</h2>
         <div className="space-y-2.5">
           {[5, 4, 3, 2, 1].map((star) => {
@@ -234,7 +234,7 @@ function ReviewsDashboard() {
             </button>
           ))}
         </div>
-        <div className="relative max-w-sm flex-1">
+        <div className="relative max-w-[95vw] sm:max-w-sm flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={search}
@@ -457,7 +457,7 @@ function ComposeModal({ clinicId, onClose }: { clinicId: string; onClose: () => 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
+      <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-[95vw] sm:max-w-md rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-2xl">
         <div className="mb-5 flex items-start justify-between">
           <div>
             <h2 className="font-display text-xl font-semibold">Log a review</h2>

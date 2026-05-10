@@ -319,7 +319,7 @@ function GiftCardsPage() {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-cols-4">
         <MetricCard label="Sold This Month" value={money(metrics.totalSoldMonth)} icon={CreditCard} accent="from-violet-500/20 to-indigo-500/10" />
         <MetricCard label="Active Cards" value={metrics.activeCards.toString()} icon={Gift} accent="from-rose-500/20 to-pink-500/10" />
         <MetricCard label="Outstanding Balance" value={money(metrics.outstanding)} icon={Wallet} accent="from-amber-500/20 to-orange-500/10" />
@@ -328,7 +328,7 @@ function GiftCardsPage() {
 
       {/* Search + filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-md flex-1">
+        <div className="relative max-w-[95vw] sm:max-w-md flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search code, recipient, purchaser…" className="pl-9" />
         </div>
@@ -443,15 +443,15 @@ function GiftCardsPage() {
       {/* Detail Panel */}
       {detailCard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-6 py-4">
+          <div className="relative w-full max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-4 sm:px-6 py-4">
               <div>
                 <h2 className="font-display text-lg font-semibold">Gift Card Details</h2>
                 <p className="font-mono text-sm text-muted-foreground">{detailCard.code}</p>
               </div>
               <button onClick={() => setDetailCard(null)} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted" aria-label="Close"><X className="h-4 w-4" /></button>
             </div>
-            <div className="px-6 py-5 space-y-5">
+            <div className="px-4 sm:px-6 py-5 space-y-5">
               <div className={cn("rounded-xl p-4 bg-gradient-to-r text-white", designGradient(detailCard.design_template))}>
                 <div className="text-center">
                   <div className="text-2xl sm:text-3xl font-bold">{money(detailCard.balance_cents)}</div>
@@ -459,7 +459,7 @@ function GiftCardsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 <div><span className="text-muted-foreground">Recipient:</span> <span className="font-medium">{detailCard.recipient_name ?? "—"}</span></div>
                 <div><span className="text-muted-foreground">Sender:</span> <span className="font-medium">{detailCard.sender_name ?? "—"}</span></div>
                 <div><span className="text-muted-foreground">Expires:</span> <span className="font-medium">{detailCard.expires_at ? new Date(detailCard.expires_at).toLocaleDateString() : "Never"}</span></div>
@@ -522,16 +522,16 @@ function GiftCardsPage() {
       {composerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
           <div className="relative w-full max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border/60 bg-card shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-6 py-4">
+            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border/60 bg-card px-4 sm:px-6 py-4">
               <div>
                 <h2 className="font-display text-lg font-semibold">{editing ? "Edit Gift Card" : "Issue Gift Card"}</h2>
                 <p className="mt-0.5 text-xs text-muted-foreground">{editing ? "Update card details." : "Create a new stored-value card."}</p>
               </div>
               <button onClick={closeComposer} className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted" aria-label="Close"><X className="h-4 w-4" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="px-6 py-5">
+            <form onSubmit={handleSubmit} className="px-4 sm:px-6 py-5">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-6 w-full grid grid-cols-4">
+                <TabsList className="mb-6 w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
                   <TabsTrigger value="design">Design</TabsTrigger>
                   <TabsTrigger value="details">Details</TabsTrigger>
                   <TabsTrigger value="delivery">Delivery</TabsTrigger>
@@ -540,7 +540,7 @@ function GiftCardsPage() {
 
                 <TabsContent value="design" className="space-y-4">
                   <Label>Choose a design</Label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {DESIGNS.map((d) => (
                       <button key={d.id} type="button" onClick={() => setForm({ ...form, design_template: d.id })}
                         className={cn("rounded-xl border-2 p-1 transition", form.design_template === d.id ? "border-primary" : "border-transparent hover:border-primary/30")}>
@@ -607,7 +607,7 @@ function GiftCardsPage() {
                 <TabsContent value="delivery" className="space-y-4">
                   <div className="space-y-2">
                     <Label>Delivery Method</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {[{ id: "email", label: "Email Now", icon: Mail }, { id: "scheduled", label: "Email Later", icon: Clock }, { id: "print", label: "Print", icon: CreditCard }, { id: "sms", label: "SMS Link", icon: Send }].map((d) => (
                         <button key={d.id} type="button" onClick={() => setForm({ ...form, delivery_method: d.id })}
                           className={cn("flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition",

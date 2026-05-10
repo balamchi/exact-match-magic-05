@@ -264,7 +264,7 @@ function MarketingPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Growth</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Marketing<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Marketing<span className="ml-2 inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-primary">Beta</span></h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Plan email & SMS campaigns, target audiences, and track open / click performance.
           </p>
@@ -274,7 +274,7 @@ function MarketingPage() {
         </Button>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-4">
         <Metric label="Total sent" value={stats.totalSent.toLocaleString()} icon={<Send className="h-4 w-4" />} />
         <Metric label="Scheduled" value={stats.scheduled.toString()} icon={<CalendarIcon className="h-4 w-4" />} />
         <Metric label="Avg open rate" value={fmtPct(stats.openRate)} icon={<TrendingUp className="h-4 w-4" />} accent />
@@ -331,12 +331,12 @@ function MarketingPage() {
             {[0, 1, 2].map((i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/40" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-16 text-center">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow">
               <Sparkles className="h-6 w-6" />
             </div>
             <h2 className="font-display text-xl font-semibold">No campaigns yet</h2>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+            <p className="mt-1 max-w-[95vw] sm:max-w-sm text-sm text-muted-foreground">
               Launch your first promotion — birthday discounts, monthly specials, or rebook reminders.
             </p>
             <Button onClick={openCreate} className="mt-5 gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
@@ -384,7 +384,7 @@ function MarketingPage() {
                     <CalendarIcon className="h-3.5 w-3.5" /> {scheduledLabel}
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                     <Stat label="Sent" value={sent.toLocaleString()} />
                     <Stat label="Opens" value={`${opens.toLocaleString()} · ${fmtPct(openRate)}`} />
                     <Stat label="Clicks" value={`${clicks.toLocaleString()} · ${fmtPct(clickRate)}`} />
@@ -451,7 +451,7 @@ function MarketingPage() {
 
               <label>
                 <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Channel</span>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {(["email", "sms"] as const).map((ch) => {
                     const m = channelMeta(ch);
                     const Icon = m.Icon;
@@ -538,7 +538,7 @@ function MarketingPage() {
                   {/* Template Presets */}
                   <div className="md:col-span-2">
                     <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Quick Templates</span>
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
                       {[
                         { label: "Promo Offer", body: "Hi {{first_name}},\n\nWe have a special offer just for you! Save 20% on your next visit when you book this week.\n\nBook now to secure your spot.\n\nBest,\n{{clinic_name}}" },
                         { label: "Follow-Up", body: "Hi {{first_name}},\n\nThank you for your recent visit! We hope you loved your results.\n\nWe'd love to hear your feedback — reply to this email or leave us a review.\n\nSee you soon!\n{{clinic_name}}" },
@@ -586,7 +586,7 @@ function MarketingPage() {
               {form.channel === "email" && form.body && (
                 <div className="md:col-span-2">
                   <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Live Preview</span>
-                  <div className="rounded-lg border border-border bg-white p-6 text-sm text-gray-800">
+                  <div className="rounded-lg border border-border bg-white p-4 sm:p-6 text-sm text-gray-800">
                     <div className="mb-4 border-b border-gray-200 pb-3">
                       <p className="text-xs text-gray-500">Subject: {form.subject || "(no subject)"}</p>
                       <p className="text-xs text-gray-500">To: {form.audience || "All clients"}</p>

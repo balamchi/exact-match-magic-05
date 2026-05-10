@@ -357,7 +357,7 @@ function Dashboard() {
             {" — "}
             {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
           </p>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-semibold tracking-tight sm:text-3xl sm:text-4xl">
+          <h1 className="mt-1 font-display text-2xl  font-semibold tracking-tight sm:text-3xl sm:text-4xl">
             {greeting}, <span className="capitalize">{firstName}</span>!
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -424,7 +424,7 @@ function Dashboard() {
       </div>
 
       {/* Lead Pipeline KPIs */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <MiniKpi label="Active Leads" value={stats?.activeLeads ?? 0} loading={loading} />
         <MiniKpi label="New Leads (Week)" value={stats?.newLeadsWeek ?? 0} loading={loading} />
         <MiniKpi label="Lead Conversion" value={`${stats?.leadConversionRate ?? 0}%`} loading={loading} />
@@ -432,7 +432,7 @@ function Dashboard() {
       </div>
 
       {/* Reviews & Referrals KPIs */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <MiniKpi label="Recent Reviews (7d)" value={stats?.recentReviews7d ?? 0} loading={loading} />
         <MiniKpi label="Avg Rating (30d)" value={stats?.avgRating30d != null ? `${stats.avgRating30d}★` : "—"} loading={loading} />
         <MiniKpi label="Active Referrals" value={stats?.activeReferrals ?? 0} loading={loading} />
@@ -440,14 +440,14 @@ function Dashboard() {
       </div>
 
       {/* Clinical KPIs */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <MiniKpi label="Pending Consents" value={stats?.pendingConsents ?? 0} loading={loading} />
         <MiniKpi label="SOAP Notes (24h)" value={stats?.soapNotesToday ?? 0} loading={loading} />
         <MiniKpi label="Active Plans" value={stats?.activeTreatmentPlans ?? 0} loading={loading} />
       </div>
 
       {/* Secondary KPI Cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
         <MiniKpi label="Avg Service Value" value={formatMoney(stats?.avgServiceValueCents ?? 0, currency)} loading={loading} />
         <MiniKpi label="New Clients (Week)" value={stats?.newClientsWeek ?? 0} loading={loading} />
         <MiniKpi label="Outstanding Invoices" value={formatMoney(stats?.outstandingInvoiceCents ?? 0, currency)} loading={loading} />
@@ -456,7 +456,7 @@ function Dashboard() {
 
       {/* Revenue Goal + AI Insights */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-gradient-surface p-6 shadow-card">
+        <div className="rounded-2xl border border-border bg-gradient-surface p-4 sm:p-6 shadow-card">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Revenue goal</p>
@@ -481,7 +481,7 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card lg:col-span-2">
+        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
@@ -533,7 +533,7 @@ function Dashboard() {
         {/* Left — Today's Schedule + Pending Actions */}
         <div className="space-y-4 lg:col-span-2">
           {/* Today's Schedule */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+          <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <h2 className="font-display text-lg font-semibold">Today's Schedule</h2>
@@ -675,13 +675,13 @@ function Dashboard() {
 
           {/* All Clear card when no alerts */}
           {lowStock.length === 0 && overdue.length === 0 && birthdays.length === 0 && !loading && (
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-surface p-6 shadow-card">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-surface p-4 sm:p-6 shadow-card">
               <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
                 <Sparkles className="h-4 w-4 text-primary-foreground" />
               </div>
               <h3 className="font-display text-lg font-semibold">All clear</h3>
               <p className="mt-1.5 text-sm text-muted-foreground">No alerts or actions needed. Great work!</p>
-              <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Link to="/app/leads" className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs hover:border-primary/40">
                   <Target className="h-3.5 w-3.5 text-primary" /> Leads
                 </Link>
@@ -742,7 +742,7 @@ function ActivityIcon({ status }: { status: string }) {
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface/40 px-6 py-14 text-center">
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface/40 px-4 sm:px-6 py-14 text-center">
       <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
         <CalendarDays className="h-5 w-5" />
       </div>

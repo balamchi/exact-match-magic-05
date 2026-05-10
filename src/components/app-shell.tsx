@@ -22,6 +22,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TrialBanner } from "@/components/trial-banner";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 type Badge = { kind: "count"; value: number } | { kind: "pill"; label: string; tone: "new" | "live" };
 interface NavItem { to: string; label: string; icon: LucideIcon; badge?: Badge; phase4?: boolean; }
@@ -154,10 +155,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <TrialBanner />
         <Header onMenu={() => setMobileOpen(true)} />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
           <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8">{children}</div>
         </main>
       </div>
+
+      <MobileBottomNav />
 
       {/* Mobile drawer */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

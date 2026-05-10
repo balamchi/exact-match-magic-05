@@ -454,7 +454,7 @@ function InboxPage() {
                 {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
               </div>
             ) : conversations.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center p-6 text-center">
+              <div className="flex h-full flex-col items-center justify-center p-4 sm:p-6 text-center">
                 <InboxIcon className="mb-2 h-8 w-8 text-muted-foreground" />
                 <p className="text-sm font-medium">No conversations</p>
                 <p className="text-xs text-muted-foreground">
@@ -686,7 +686,7 @@ function InboxPage() {
         {/* Client context panel */}
         <div className="hidden min-h-0 flex-col overflow-y-auto border-s border-border bg-surface lg:flex">
           {!selected ? (
-            <div className="flex h-full items-center justify-center p-6 text-center">
+            <div className="flex h-full items-center justify-center p-4 sm:p-6 text-center">
               <p className="text-xs text-muted-foreground">Select a conversation to see details.</p>
             </div>
           ) : client ? (
@@ -704,7 +704,7 @@ function InboxPage() {
                 {client.email && <div className="flex items-center gap-2 text-muted-foreground"><Mail className="h-3 w-3" /> {client.email}</div>}
                 {client.phone && <div className="flex items-center gap-2 text-muted-foreground"><Phone className="h-3 w-3" /> {client.phone}</div>}
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div className="rounded-lg border border-border bg-background p-2.5">
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Visits</div>
                   <div className="font-mono text-lg font-bold">{client.total_visits ?? 0}</div>

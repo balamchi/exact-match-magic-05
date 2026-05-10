@@ -160,7 +160,7 @@ function InventoryPage() {
       <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Stock control</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Inventory<BetaBadge /></h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Inventory<BetaBadge /></h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Track products, suppliers, and reorder thresholds with live alerts.</p>
         </div>
         <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
@@ -168,7 +168,7 @@ function InventoryPage() {
         </Button>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-4">
         <Metric label="Items" value={items.length.toString()} icon={<Boxes className="h-4.5 w-4.5" />} />
         <Metric label="Low stock" value={lowStock.length.toString()} icon={<AlertTriangle className="h-4.5 w-4.5" />} accent={lowStock.length > 0} onClick={() => setFilter("low")} />
         <Metric label="Expiring" value={(expiring.length + expired.length).toString()} icon={<CalendarClock className="h-4.5 w-4.5" />} accent={expired.length > 0} onClick={() => setFilter("expiring")} />
@@ -177,7 +177,7 @@ function InventoryPage() {
 
       <section className="rounded-2xl border border-border bg-card p-4 shadow-card">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="relative max-w-sm flex-1">
+          <div className="relative max-w-[95vw] sm:max-w-sm flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={query}

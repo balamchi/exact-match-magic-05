@@ -222,7 +222,7 @@ function ClientDetailPage() {
       <div className="space-y-4">
         <Skeleton className="h-8 w-40" />
         <Skeleton className="h-48 rounded-2xl" />
-        <div className="grid grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {[0, 1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}
         </div>
         <Skeleton className="h-96 rounded-2xl" />
@@ -287,7 +287,7 @@ function ClientDetailPage() {
       </button>
 
       {/* Hero Card */}
-      <section className="relative overflow-hidden rounded-2xl border border-border bg-gradient-surface p-6 shadow-card">
+      <section className="relative overflow-hidden rounded-2xl border border-border bg-gradient-surface p-4 sm:p-6 shadow-card">
         <div className="bg-gradient-glow pointer-events-none absolute inset-0" />
         <div className="relative flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div className="flex items-start gap-5">
@@ -489,7 +489,7 @@ function ClientDetailPage() {
 
       {/* Send Consent Dialog */}
       <Dialog open={sendConsentOpen} onOpenChange={setSendConsentOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Send Consent Form</DialogTitle>
             <DialogDescription>
@@ -580,7 +580,7 @@ function OverviewTab({ appointments, currency, stats, client }: { appointments: 
   return (
     <div className="p-5 space-y-6">
       {/* Quick stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div className="rounded-xl border border-border bg-surface/40 p-3 text-center">
           <div className="font-display text-2xl font-bold text-primary">{stats.visits}</div>
           <div className="text-[10px] text-muted-foreground">Completed Visits</div>
@@ -738,7 +738,7 @@ function PhotosList({ photos }: { photos: BeforeAfter[] }) {
     <div className="grid gap-4 p-4 sm:grid-cols-2">
       {photos.map((p) => (
         <div key={p.id} className="rounded-xl border border-border bg-surface/40 p-3">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {p.before_url ? <img src={p.before_url} alt="Before" className="h-32 w-full rounded-lg object-cover" /> : <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No before</div>}
             {p.after_url ? <img src={p.after_url} alt="After" className="h-32 w-full rounded-lg object-cover" /> : <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No after</div>}
           </div>
@@ -761,7 +761,7 @@ function FinancialTab({ invoices, appointments, currency }: { invoices: any[]; a
 
   return (
     <div className="p-5 space-y-5">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div className="rounded-xl border border-border bg-surface/40 p-4 text-center">
           <div className="font-display text-2xl font-bold text-primary">{formatMoney(totalSpent, currency)}</div>
           <div className="mt-1 text-xs text-muted-foreground">Total spent</div>
@@ -873,7 +873,7 @@ function LoyaltyTab({ loyalty, packages, currency }: { loyalty: any; packages: a
           </div>
         </div>
       ) : (
-        <div className="text-center py-6 text-sm text-muted-foreground">
+        <div className="text-center py-4 sm:py-6 text-sm text-muted-foreground">
           <Award className="mx-auto h-8 w-8 mb-2 text-muted-foreground" />
           <p>No loyalty account yet.</p>
         </div>
@@ -911,7 +911,7 @@ function LoyaltyTab({ loyalty, packages, currency }: { loyalty: any; packages: a
 
 function PlaceholderTab({ title, description, icon }: { title: string; description: string; icon: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+    <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-14 text-center">
       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">{icon}</div>
       <h3 className="font-medium">{title}</h3>
       <p className="mt-1 max-w-xs text-xs text-muted-foreground">{description}</p>
@@ -922,7 +922,7 @@ function PlaceholderTab({ title, description, icon }: { title: string; descripti
 
 function EmptyTab({ title, description, icon }: { title: string; description: string; icon: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+    <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-14 text-center">
       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">{icon}</div>
       <h3 className="font-medium">{title}</h3>
       <p className="mt-1 max-w-xs text-xs text-muted-foreground">{description}</p>

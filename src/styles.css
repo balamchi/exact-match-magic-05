@@ -250,3 +250,7 @@
 :root[lang="fa"], :root[lang="fa"] body { font-family: "Vazirmatn", "Plus Jakarta Sans", system-ui, sans-serif; }
 :root[lang="ar"], :root[lang="ar"] body { font-family: "Tajawal", "Plus Jakarta Sans", system-ui, sans-serif; }
 [dir="rtl"] .rtl-flip { transform: scaleX(-1); }
+
+@layer utilities {
+  .pb-safe { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
+}

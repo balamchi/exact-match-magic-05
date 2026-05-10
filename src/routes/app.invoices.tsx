@@ -134,7 +134,7 @@ function InvoicesPage() {
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Billing</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Invoices</h1>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Invoices</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Track outstanding balances, age receivables, and reconcile paid invoices.</p>
         </div>
         <button
@@ -146,7 +146,7 @@ function InvoicesPage() {
       </header>
 
       {/* KPIs */}
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-4">
         <Kpi icon={<DollarSign className="h-4.5 w-4.5" />} label="Outstanding" value={money(stats.outstanding)} hint={`${decorated.filter((i) => ["sent", "overdue"].includes(i.status)).length} open`} accent="primary" />
         <Kpi icon={<AlertCircle className="h-4.5 w-4.5" />} label="Overdue" value={money(stats.overdueAmt)} hint={`${decorated.filter((i) => i.status === "overdue").length} past due`} accent="rose" />
         <Kpi icon={<TrendingUp className="h-4.5 w-4.5" />} label="Paid this month" value={money(stats.paidThisMonth)} hint="Cleared" accent="emerald" />
@@ -155,7 +155,7 @@ function InvoicesPage() {
 
       {/* Filters */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="relative max-w-md flex-1">
+        <div className="relative max-w-[95vw] sm:max-w-md flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={search}
@@ -292,7 +292,7 @@ function InvoicesPage() {
               </div>
 
               <div className="border-t border-border bg-surface/20 p-4">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {selected.status === "draft" && (
                     <button onClick={() => updateStatus(selected.id, "sent")} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow-glow hover:opacity-90">
                       <Send className="h-3.5 w-3.5" /> Send to client
@@ -399,7 +399,7 @@ function ComposeModal({ clinicId, editing, onClose }: { clinicId: string; editin
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+      <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-[95vw] sm:max-w-lg rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-2xl">
         <div className="mb-5 flex items-start justify-between">
           <div>
             <h2 className="font-display text-xl font-semibold">{editing ? "Edit invoice" : "New invoice"}</h2>

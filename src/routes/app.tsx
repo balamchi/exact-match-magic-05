@@ -34,7 +34,7 @@ function AppLayout() {
   if (!activeClinic) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="max-w-sm text-center">
+        <div className="max-w-[95vw] sm:max-w-sm text-center">
           <h1 className="font-display text-xl font-semibold">No clinic linked to your account</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Ask your clinic owner to invite you, or create your own.
