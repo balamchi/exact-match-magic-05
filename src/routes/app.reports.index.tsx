@@ -18,7 +18,7 @@ import {
   type AppointmentLite, type SubscriptionLite,
 } from "@/lib/reports/calculations";
 
-export const Route = createFileRoute("/app/reports")({ component: ReportsLibrary });
+export const Route = createFileRoute("/app/reports/")({ component: ReportsLibrary });
 
 const money = (n: number) =>
   new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
