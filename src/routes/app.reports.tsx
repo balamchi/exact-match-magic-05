@@ -56,7 +56,7 @@ function ReportsLibrary() {
           .eq("clinic_id", activeClinic.clinic_id)
           .gte("starts_at", prevFrom).lte("starts_at", prevTo),
         supabase.from("invoices")
-          .select("id, total_cents, status, issued_at")
+          .select("id, total_cents, status")
           .eq("clinic_id", activeClinic.clinic_id),
         supabase.from("membership_subscriptions" as never)
           .select("id, status, price_cents, billing_period, canceled_at, created_at")
