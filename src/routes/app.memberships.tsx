@@ -436,6 +436,7 @@ function MembershipsPage() {
         </section>
       )}
 
+      {activeClinic && <AtRiskPanel clinicId={activeClinic.clinic_id} />}
       {activeClinic && <MembersPanel clinicId={activeClinic.clinic_id} />}
       {activeClinic && <ChargesPanel clinicId={activeClinic.clinic_id} />}
 
