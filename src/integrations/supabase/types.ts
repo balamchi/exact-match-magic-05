@@ -3149,6 +3149,47 @@ export type Database = {
           },
         ]
       }
+      report_presets: {
+        Row: {
+          clinic_id: string
+          config: Json
+          created_at: string
+          id: string
+          name: string
+          report_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          clinic_id: string
+          config?: Json
+          created_at?: string
+          id?: string
+          name: string
+          report_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          clinic_id?: string
+          config?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          report_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_presets_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_requests: {
         Row: {
           appointment_id: string | null
@@ -3339,6 +3380,116 @@ export type Database = {
             columns: ["clinic_id"]
             isOneToOne: false
             referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduled_report_log: {
+        Row: {
+          error_message: string | null
+          id: string
+          recipients_count: number
+          scheduled_report_id: string
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          error_message?: string | null
+          id?: string
+          recipients_count?: number
+          scheduled_report_id: string
+          sent_at?: string
+          status: string
+        }
+        Update: {
+          error_message?: string | null
+          id?: string
+          recipients_count?: number
+          scheduled_report_id?: string
+          sent_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_report_log_scheduled_report_id_fkey"
+            columns: ["scheduled_report_id"]
+            isOneToOne: false
+            referencedRelation: "scheduled_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduled_reports: {
+        Row: {
+          active: boolean
+          cadence: string
+          clinic_id: string
+          created_at: string
+          id: string
+          last_sent_at: string | null
+          name: string
+          next_send_at: string
+          preset_id: string | null
+          recipients: string[]
+          report_keys: string[]
+          send_day_of_month: number | null
+          send_day_of_week: number | null
+          send_time: string
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          cadence: string
+          clinic_id: string
+          created_at?: string
+          id?: string
+          last_sent_at?: string | null
+          name: string
+          next_send_at: string
+          preset_id?: string | null
+          recipients?: string[]
+          report_keys?: string[]
+          send_day_of_month?: number | null
+          send_day_of_week?: number | null
+          send_time?: string
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          cadence?: string
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          last_sent_at?: string | null
+          name?: string
+          next_send_at?: string
+          preset_id?: string | null
+          recipients?: string[]
+          report_keys?: string[]
+          send_day_of_month?: number | null
+          send_day_of_week?: number | null
+          send_time?: string
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_reports_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_reports_preset_id_fkey"
+            columns: ["preset_id"]
+            isOneToOne: false
+            referencedRelation: "report_presets"
             referencedColumns: ["id"]
           },
         ]
