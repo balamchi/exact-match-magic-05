@@ -66,7 +66,7 @@ export function SavedPresetsList() {
             </div>
             <div className="flex gap-2">
               <Button asChild size="sm" variant="outline">
-                <Link to={"/app/reports/$" as never} params={{ _splat: r.report_key.replace(/\./g, "/") } as never}>Open</Link>
+                <a href={`/app/reports/${r.report_key.replace(/\./g, "/")}`}>Open</a>
               </Button>
               <Button size="sm" variant="ghost" onClick={() => remove(r.id)}>
                 <Trash2 className="h-4 w-4" />
