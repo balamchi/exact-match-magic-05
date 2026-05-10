@@ -212,7 +212,7 @@ async function handleInvoiceFailed(invoice: any) {
   const plan = (subRow as any).memberships;
   const clinic = (subRow as any).clinics;
   if (client?.email) {
-    const portalUrl = await buildPortalUrl(subRow.id as string);
+    const portalUrl = await buildPortalUrl(subRow.id as string, subRow.clinic_id as string);
     await enqueueEmail("membership-charge-failed", client.email, {
       clientName: client.first_name ?? undefined,
       planName: plan?.name,
