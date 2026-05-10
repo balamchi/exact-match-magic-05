@@ -208,21 +208,6 @@ function ReportsLibrary() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight md:text-2xl">Reports</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Insights into every part of your clinic
-          </p>
-        </div>
-        <ReportDatePicker
-          presetId={presetId} onPresetChange={setPresetId}
-          compare={compare} onCompareChange={setCompare}
-        />
-      </div>
-
-  return (
-    <div className="space-y-6 p-4 md:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight md:text-2xl">Reports</h1>
           <p className="mt-1 text-sm text-muted-foreground">Insights into every part of your clinic</p>
         </div>
         <ReportDatePicker
