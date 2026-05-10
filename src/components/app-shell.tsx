@@ -22,6 +22,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TrialBanner } from "@/components/trial-banner";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 type Badge = { kind: "count"; value: number } | { kind: "pill"; label: string; tone: "new" | "live" };
 interface NavItem { to: string; label: string; icon: LucideIcon; badge?: Badge; phase4?: boolean; }
