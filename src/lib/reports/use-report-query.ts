@@ -332,8 +332,8 @@ async function runQuery(
       const churn = active.length ? (cancelledInRange.length / (active.length + cancelledInRange.length)) * 100 : 0;
 
       const monthlyOf = (s: MemSub) => {
-        const p = planMap.get(s.membership_id) as any;
-        const cents = s.monthly_price_cents ?? p?.monthly_price_cents ?? 0;
+        const p = planMap.get(s.membership_id) as { monthly_price_cents?: number; billing_cadence?: string } | undefined;
+        const cents = p?.monthly_price_cents ?? 0;
         const cadence = (p?.billing_cadence ?? "MONTHLY").toUpperCase();
         if (cadence === "ANNUAL" || cadence === "YEARLY") return cents / 12;
         if (cadence === "QUARTERLY") return cents / 3;
