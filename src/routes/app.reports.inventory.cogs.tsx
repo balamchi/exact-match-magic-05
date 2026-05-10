@@ -33,8 +33,8 @@ function COGS() {
           .gte("starts_at", range.range.from.toISOString())
           .lte("starts_at", range.range.to.toISOString()),
       ]);
-      setItems((i.data ?? []) as Item[]);
-      setAppts((a.data ?? []) as Appt[]);
+      setItems(((i.data ?? []) as unknown) as Item[]);
+      setAppts(((a.data ?? []) as unknown) as Appt[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);

@@ -35,8 +35,8 @@ function Profitability() {
           .lte("starts_at", range.range.to.toISOString()),
         supabase.from("services").select("id, name, price_cents, cost_cents, duration_minutes" as never).eq("clinic_id", activeClinic.clinic_id),
       ]);
-      setAppts((a.data ?? []) as Appt[]);
-      setServices((s.data ?? []) as Service[]);
+      setAppts(((a.data ?? []) as unknown) as Appt[]);
+      setServices(((s.data ?? []) as unknown) as Service[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);

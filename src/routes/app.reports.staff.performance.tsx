@@ -34,8 +34,8 @@ function Performance() {
           .lte("starts_at", range.range.to.toISOString()),
         supabase.from("staff").select("id, first_name, last_name").eq("clinic_id", activeClinic.clinic_id),
       ]);
-      setAppts((a.data ?? []) as Appt[]);
-      setStaff((s.data ?? []) as Staff[]);
+      setAppts(((a.data ?? []) as unknown) as Appt[]);
+      setStaff(((s.data ?? []) as unknown) as Staff[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);
