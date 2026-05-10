@@ -12,7 +12,7 @@ import { money, num, pct } from "@/lib/reports/format";
 
 export const Route = createFileRoute("/app/reports/marketing/channels")({ component: Channels });
 
-interface Lead { id: string; source: string | null; status: string; estimated_value_cents: number | null; created_at: string; converted_at?: string | null }
+interface Lead { id: string; source: string | null; stage: string | null; estimated_value_cents: number | null; created_at: string; converted_to_client_id: string | null }
 
 function Channels() {
   const { activeClinic } = useAuth();
@@ -25,7 +25,7 @@ function Channels() {
     (async () => {
       setLoading(true);
       const { data } = await supabase.from("leads")
-        .select("id, source, status, estimated_value_cents, created_at, converted_at" as never)
+        .select("id, source, stage, estimated_value_cents, created_at, converted_to_client_id")
         .eq("clinic_id", activeClinic.clinic_id)
         .gte("created_at", range.range.from.toISOString())
         .lte("created_at", range.range.to.toISOString());
@@ -34,12 +34,14 @@ function Channels() {
     })();
   }, [activeClinic, range.range]);
 
+  const isConverted = (l: Lead) => !!l.converted_to_client_id || l.stage === "converted" || l.stage === "won";
+
   const byChannel = new Map<string, { leads: number; converted: number; revenue: number }>();
   for (const l of leads) {
     const k = l.source ?? "Direct";
     const c = byChannel.get(k) ?? { leads: 0, converted: 0, revenue: 0 };
     c.leads++;
-    if (l.status === "converted" || l.converted_at) {
+    if (isConverted(l)) {
       c.converted++;
       c.revenue += l.estimated_value_cents ?? 0;
     }
