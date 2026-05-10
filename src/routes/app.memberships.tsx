@@ -1669,3 +1669,151 @@ function ChangePlanModal({
     </div>
   );
 }
+
+/* ─────────── At-risk subscriptions panel (Phase 9) ─────────── */
+type AtRiskRow = {
+  id: string;
+  status: string;
+  failed_charge_count: number | null;
+  next_billing_at: string | null;
+  last_charge_at: string | null;
+  clients: { first_name: string; last_name: string | null; email: string | null } | null;
+  memberships: { name: string; monthly_price_cents: number } | null;
+};
+
+function AtRiskPanel({ clinicId }: { clinicId: string }) {
+  const [rows, setRows] = useState<AtRiskRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const cancelFn = useServerFn(cancelMemberSubscription);
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("membership_subscriptions")
+      .select(
+        "id,status,failed_charge_count,next_billing_at,last_charge_at,clients(first_name,last_name,email),memberships(name,monthly_price_cents)",
+      )
+      .eq("clinic_id", clinicId)
+      .or("status.eq.past_due,status.eq.paused,failed_charge_count.gt.0")
+      .order("failed_charge_count", { ascending: false, nullsFirst: false })
+      .limit(25);
+    setRows((data ?? []) as unknown as AtRiskRow[]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel(`at-risk-${clinicId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "membership_subscriptions", filter: `clinic_id=eq.${clinicId}` },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clinicId]);
+
+  const handleCancel = async (id: string) => {
+    if (!confirm("Cancel this subscription? Square will stop future billing.")) return;
+    setBusyId(id);
+    try {
+      await cancelFn({ data: { subscription_id: id } });
+      toast.success("Subscription canceled");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Cancel failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  if (!loading && rows.length === 0) return null;
+
+  return (
+    <section className="mt-6 overflow-hidden rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-500/5 to-transparent">
+      <header className="flex items-center justify-between border-b border-rose-500/20 px-5 py-3">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/15 text-rose-300">
+            <AlertTriangle className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-rose-300/80">
+              Needs attention
+            </p>
+            <h2 className="mt-0.5 text-base font-semibold tracking-tight">
+              {rows.length} at-risk subscription{rows.length === 1 ? "" : "s"}
+            </h2>
+          </div>
+        </div>
+        <Button size="sm" variant="ghost" onClick={load} className="h-8 px-2 text-xs">
+          <RefreshCw className="mr-1 h-3.5 w-3.5" />
+          Refresh
+        </Button>
+      </header>
+      {loading ? (
+        <div className="px-5 py-6 text-sm text-muted-foreground">Loading…</div>
+      ) : (
+        <ul className="divide-y divide-rose-500/15">
+          {rows.map((s) => {
+            const cl = s.clients;
+            const name = cl ? `${cl.first_name} ${cl.last_name ?? ""}`.trim() : "—";
+            const fails = Number(s.failed_charge_count ?? 0);
+            const statusLabel =
+              s.status === "past_due"
+                ? "Past due"
+                : s.status === "paused"
+                  ? "Paused"
+                  : s.status;
+            const statusColor =
+              s.status === "past_due"
+                ? "border-rose-500/40 bg-rose-500/10 text-rose-300"
+                : s.status === "paused"
+                  ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                  : "border-border/60 bg-muted/30 text-muted-foreground";
+            return (
+              <li key={s.id} className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{name}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {s.memberships?.name ?? "—"}
+                    {s.memberships ? ` · ${fmtMoney(s.memberships.monthly_price_cents)}/mo` : ""}
+                    {cl?.email ? ` · ${cl.email}` : ""}
+                  </p>
+                </div>
+                {fails > 0 && (
+                  <Badge variant="outline" className="border-rose-500/40 bg-rose-500/10 text-[10px] uppercase text-rose-300">
+                    {fails} failed
+                  </Badge>
+                )}
+                <Badge variant="outline" className={cn("text-[10px] uppercase", statusColor)}>
+                  {statusLabel}
+                </Badge>
+                <div className="text-right text-xs text-muted-foreground tabular-nums">
+                  {s.last_charge_at
+                    ? `Last try ${new Date(s.last_charge_at).toLocaleDateString()}`
+                    : s.next_billing_at
+                      ? `Next ${new Date(s.next_billing_at).toLocaleDateString()}`
+                      : "—"}
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={busyId === s.id}
+                  onClick={() => handleCancel(s.id)}
+                  className="h-8 px-2 text-xs text-rose-300 hover:bg-rose-500/10"
+                >
+                  <Ban className="mr-1 h-3.5 w-3.5" />
+                  Cancel
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
