@@ -23,6 +23,7 @@ import {
   UserPlus,
   Ban,
   ArrowLeftRight,
+  Link as LinkIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
