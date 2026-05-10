@@ -1102,6 +1102,8 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
       setBusyId(null);
     }
   };
+
+  const handlePause = async (id: string) => {
     setBusyId(id);
     try {
       await pauseFn({ data: { subscription_id: id } });
