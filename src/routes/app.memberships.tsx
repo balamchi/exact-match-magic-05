@@ -34,6 +34,8 @@ import { SquareCardForm } from "@/components/square-card-form";
 import {
   enrollMember,
   cancelMemberSubscription,
+  pauseMemberSubscription,
+  resumeMemberSubscription,
 } from "@/lib/square/subscriptions.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
