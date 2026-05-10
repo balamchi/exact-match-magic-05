@@ -411,10 +411,17 @@ function ServicesPage() {
           <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search services…" className="pl-9" />
         </div>
         <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
-          <FilterChip active={catFilter === "all"} onClick={() => { setCatFilter("all"); setPage(0); }}>All</FilterChip>
-          {CATEGORIES.map(c => (
-            <FilterChip key={c} active={catFilter === c} onClick={() => { setCatFilter(c); setPage(0); }}>{c}</FilterChip>
-          ))}
+          <FilterChip active={catFilter === "all"} onClick={() => { setCatFilter("all"); setPage(0); }}>
+            All ({services.length})
+          </FilterChip>
+          {categories.map(c => {
+            const count = services.filter(s => (s.category?.trim() || "Uncategorized") === c).length;
+            return (
+              <FilterChip key={c} active={catFilter === c} onClick={() => { setCatFilter(c); setPage(0); }}>
+                {c} ({count})
+              </FilterChip>
+            );
+          })}
         </div>
         <div className="inline-flex rounded-lg border border-border/60 bg-card/30 p-0.5">
           {(["all", "active", "inactive"] as const).map(s => (
