@@ -1,563 +1,214 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  BarChart3, CalendarDays, DollarSign, Download, Target, Users, TrendingUp, Award,
-  Boxes, UserCog, Repeat, Package,
+  DollarSign, Receipt, CreditCard, FileText,
+  Users, Repeat, UserPlus,
+  UserCog, Wallet,
+  Award, Flame, TrendingUp, Crown,
+  Megaphone, Mail,
+  Boxes, PackageMinus, CalendarX,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart,
-  ResponsiveContainer, Tooltip, XAxis, YAxis,
-} from "recharts";
+import { ReportCard } from "@/components/report-card";
+import { ReportDatePicker } from "@/components/report-date-picker";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
+import { useReportRange } from "@/lib/reports/hooks";
+import {
+  bucketByDay, sumRevenue, deltaPercent, calculateLTV, calculateNetMRR,
+  type AppointmentLite, type SubscriptionLite,
+} from "@/lib/reports/calculations";
 
-export const Route = createFileRoute("/app/reports")({ component: ReportsPage });
+export const Route = createFileRoute("/app/reports")({ component: ReportsLibrary });
 
-type Range = "7" | "30" | "90";
-type ReportTab = "revenue" | "clients" | "services" | "staff" | "inventory" | "marketing" | "retention";
+const money = (n: number) =>
+  new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
 
-const RANGES: { id: Range; label: string }[] = [
-  { id: "7", label: "7 days" },
-  { id: "30", label: "30 days" },
-  { id: "90", label: "90 days" },
-];
-
-const TABS: { id: ReportTab; label: string; icon: React.ReactNode }[] = [
-  { id: "revenue", label: "Revenue", icon: <DollarSign className="h-3.5 w-3.5" /> },
-  { id: "clients", label: "Clients", icon: <Users className="h-3.5 w-3.5" /> },
-  { id: "services", label: "Services", icon: <Award className="h-3.5 w-3.5" /> },
-  { id: "staff", label: "Staff", icon: <UserCog className="h-3.5 w-3.5" /> },
-  { id: "inventory", label: "Inventory", icon: <Boxes className="h-3.5 w-3.5" /> },
-  { id: "marketing", label: "Marketing", icon: <Target className="h-3.5 w-3.5" /> },
-  { id: "retention", label: "Retention", icon: <Repeat className="h-3.5 w-3.5" /> },
-];
-
-const STAGE_COLORS: Record<string, string> = {
-  new: "#a78bfa", contacted: "#38bdf8", qualified: "#fbbf24",
-  consult_booked: "#c084fc", won: "#34d399", lost: "#f87171",
-};
-
-interface AppointmentRow { id: string; price_cents: number; status: string; starts_at: string; service_id: string | null; staff_id: string | null; client_id: string | null }
-interface LeadRow { id: string; stage: string; estimated_value_cents: number; source: string | null }
-interface ServiceRow { id: string; name: string; price_cents: number; category: string | null }
-interface StaffRow { id: string; display_name: string; color: string | null }
-interface InventoryRow { id: string; name: string; stock_quantity: number; reorder_threshold: number; unit_cost_cents: number; expires_at: string | null }
-interface CampaignRow { id: string; name: string; sent_count: number; open_count: number; click_count: number; status: string }
-
-function money(cents: number) {
-  return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(cents / 100);
+interface CardData {
+  primary: string;
+  trend?: { value: number; direction: "up" | "down" | "flat" };
+  sparkline?: number[];
 }
 
-function ReportsPage() {
+function ReportsLibrary() {
   const { activeClinic } = useAuth();
-  const [range, setRange] = useState<Range>("30");
-  const [tab, setTab] = useState<ReportTab>("revenue");
-  const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
-  const [leads, setLeads] = useState<LeadRow[]>([]);
-  const [services, setServices] = useState<ServiceRow[]>([]);
-  const [staffList, setStaffList] = useState<StaffRow[]>([]);
-  const [inventory, setInventory] = useState<InventoryRow[]>([]);
-  const [campaigns, setCampaigns] = useState<CampaignRow[]>([]);
-  const [clientsCount, setClientsCount] = useState(0);
+  const { presetId, setPresetId, range, compare, setCompare } = useReportRange();
   const [loading, setLoading] = useState(true);
+  const [cards, setCards] = useState<Record<string, CardData>>({});
 
   useEffect(() => {
     if (!activeClinic) return;
-    const load = async () => {
+    let cancelled = false;
+    (async () => {
       setLoading(true);
-      const days = Number(range);
-      const since = new Date(Date.now() - days * 86400000).toISOString();
-      const [a, l, s, st, inv, camp, c] = await Promise.all([
-        supabase.from("appointments").select("id, price_cents, status, starts_at, service_id, staff_id, client_id").eq("clinic_id", activeClinic.clinic_id).gte("starts_at", since),
-        supabase.from("leads").select("id, stage, estimated_value_cents, source").eq("clinic_id", activeClinic.clinic_id),
-        supabase.from("services").select("id, name, price_cents, category").eq("clinic_id", activeClinic.clinic_id),
-        supabase.from("staff").select("id, display_name, color").eq("clinic_id", activeClinic.clinic_id).eq("active", true),
-        supabase.from("inventory_items").select("id, name, stock_quantity, reorder_threshold, unit_cost_cents, expires_at").eq("clinic_id", activeClinic.clinic_id).eq("active", true),
-        supabase.from("marketing_campaigns").select("id, name, sent_count, open_count, click_count, status").eq("clinic_id", activeClinic.clinic_id),
-        supabase.from("clients").select("id", { count: "exact", head: true }).eq("clinic_id", activeClinic.clinic_id),
+      const ms = range.to.getTime() - range.from.getTime();
+      const prevFrom = new Date(range.from.getTime() - ms - 1).toISOString();
+      const prevTo = new Date(range.from.getTime() - 1).toISOString();
+      const fromIso = range.from.toISOString();
+      const toIso = range.to.toISOString();
+
+      const [apptsRes, prevApptsRes, invoicesRes, subsRes, inventoryRes] = await Promise.all([
+        supabase.from("appointments")
+          .select("id, client_id, staff_id, starts_at, status, price_cents")
+          .eq("clinic_id", activeClinic.clinic_id)
+          .gte("starts_at", fromIso).lte("starts_at", toIso),
+        supabase.from("appointments")
+          .select("id, client_id, staff_id, starts_at, status, price_cents")
+          .eq("clinic_id", activeClinic.clinic_id)
+          .gte("starts_at", prevFrom).lte("starts_at", prevTo),
+        supabase.from("invoices")
+          .select("id, total_cents, status, issued_at")
+          .eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("membership_subscriptions" as never)
+          .select("id, status, price_cents, billing_period, canceled_at, created_at")
+          .eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("inventory_items")
+          .select("id, stock_quantity, reorder_threshold, unit_cost_cents")
+          .eq("clinic_id", activeClinic.clinic_id),
       ]);
-      setAppointments(a.data ?? []);
-      setLeads(l.data ?? []);
-      setServices(s.data ?? []);
-      setStaffList(st.data ?? []);
-      setInventory(inv.data ?? []);
-      setCampaigns(camp.data ?? []);
-      setClientsCount(c.count ?? 0);
+
+      if (cancelled) return;
+
+      const appts = (apptsRes.data ?? []) as AppointmentLite[];
+      const prevAppts = (prevApptsRes.data ?? []) as AppointmentLite[];
+      const invoices = (invoicesRes.data ?? []) as { total_cents: number | null; status: string }[];
+      const subs = (subsRes.data ?? []) as SubscriptionLite[];
+      const inventory = (inventoryRes.data ?? []) as { stock_quantity: number | null; reorder_threshold: number | null; unit_cost_cents: number | null }[];
+
+      const days = Math.max(1, Math.round(ms / 86_400_000));
+      const series = bucketByDay(appts, Math.min(days, 30));
+
+      const revenue = sumRevenue(appts);
+      const prevRevenue = sumRevenue(prevAppts);
+      const revDelta = deltaPercent(revenue, prevRevenue);
+
+      const ar = invoices
+        .filter((i) => i.status === "unpaid" || i.status === "overdue")
+        .reduce((s, i) => s + (i.total_cents ?? 0), 0) / 100;
+
+      const ltv = calculateLTV(appts);
+      const mrr = calculateNetMRR(subs);
+
+      const noShows = appts.filter((a) => a.status === "no_show").length;
+      const noShowRate = appts.length ? (noShows / appts.length) * 100 : 0;
+
+      const lowStock = inventory.filter((i) => (i.stock_quantity ?? 0) <= (i.reorder_threshold ?? 0)).length;
+      const stockValue = inventory.reduce((s, i) => s + (i.stock_quantity ?? 0) * (i.unit_cost_cents ?? 0), 0) / 100;
+
+      const newCards: Record<string, CardData> = {
+        revenue: {
+          primary: money(revenue),
+          trend: { value: revDelta, direction: revDelta > 0.5 ? "up" : revDelta < -0.5 ? "down" : "flat" },
+          sparkline: series.map((s) => s.revenue),
+        },
+        "ar-aging": { primary: money(ar) },
+        ltv: { primary: money(ltv) },
+        mrr: { primary: money(mrr) },
+        "no-shows": {
+          primary: `${noShowRate.toFixed(1)}%`,
+          trend: { value: noShowRate, direction: noShowRate > 5 ? "up" : "flat" },
+        },
+        stock: { primary: `${lowStock} low · ${money(stockValue)}` },
+      };
+      setCards(newCards);
       setLoading(false);
-    };
-    load();
-  }, [activeClinic?.clinic_id, range]);
+    })();
+    return () => { cancelled = true; };
+  }, [activeClinic, range]);
 
-  const completed = useMemo(() => appointments.filter((a) => a.status === "completed"), [appointments]);
-  const totalRevenue = completed.reduce((s, a) => s + a.price_cents, 0);
-  const avgTicket = completed.length ? totalRevenue / completed.length : 0;
-  const noShowRate = appointments.length ? Math.round((appointments.filter((a) => a.status === "no_show").length / appointments.length) * 100) : 0;
-  const wonLeads = leads.filter((l) => l.stage === "won").length;
-  const conversionRate = leads.length ? Math.round((wonLeads / leads.length) * 100) : 0;
+  const base = "/app/reports";
 
-  // Revenue trend by day
-  const revenueSeries = useMemo(() => {
-    const days = Number(range);
-    const buckets: Record<string, { date: string; revenue: number; bookings: number }> = {};
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(Date.now() - i * 86400000);
-      const key = d.toISOString().slice(0, 10);
-      buckets[key] = { date: key, revenue: 0, bookings: 0 };
-    }
-    for (const a of appointments) {
-      const key = a.starts_at.slice(0, 10);
-      if (!buckets[key]) continue;
-      buckets[key].bookings += 1;
-      if (a.status === "completed") buckets[key].revenue += a.price_cents / 100;
-    }
-    return Object.values(buckets);
-  }, [appointments, range]);
-
-  // Top services
-  const topServices = useMemo(() => {
-    const counts = new Map<string, { name: string; category: string; count: number; revenue: number }>();
-    for (const a of completed) {
-      if (!a.service_id) continue;
-      const svc = services.find((s) => s.id === a.service_id);
-      const name = svc?.name ?? "Unknown";
-      const cur = counts.get(a.service_id) ?? { name, category: svc?.category ?? "", count: 0, revenue: 0 };
-      cur.count += 1;
-      cur.revenue += a.price_cents;
-      counts.set(a.service_id, cur);
-    }
-    return Array.from(counts.values()).sort((a, b) => b.revenue - a.revenue).slice(0, 8);
-  }, [completed, services]);
-
-  // Staff performance
-  const staffPerformance = useMemo(() => {
-    const map = new Map<string, { name: string; color: string; bookings: number; revenue: number; completed: number }>();
-    for (const a of appointments) {
-      if (!a.staff_id) continue;
-      const staff = staffList.find((s) => s.id === a.staff_id);
-      const cur = map.get(a.staff_id) ?? { name: staff?.display_name ?? "Unknown", color: staff?.color ?? "#a78bfa", bookings: 0, revenue: 0, completed: 0 };
-      cur.bookings += 1;
-      if (a.status === "completed") { cur.completed += 1; cur.revenue += a.price_cents; }
-      map.set(a.staff_id, cur);
-    }
-    return Array.from(map.values()).sort((a, b) => b.revenue - a.revenue);
-  }, [appointments, staffList]);
-
-  // Lead sources
-  const leadSources = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const l of leads) { const src = l.source || "unknown"; map.set(src, (map.get(src) ?? 0) + 1); }
-    return Array.from(map.entries()).map(([source, count]) => ({ source: source.replace("_", " "), count })).sort((a, b) => b.count - a.count);
-  }, [leads]);
-
-  // Lead funnel
-  const leadFunnel = useMemo(() => {
-    const stages = ["new", "contacted", "qualified", "consult_booked", "won", "lost"];
-    return stages.map((stage) => ({ stage, count: leads.filter((l) => l.stage === stage).length, color: STAGE_COLORS[stage] }));
-  }, [leads]);
-
-  // Status breakdown
-  const statusBreakdown = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const a of appointments) map.set(a.status, (map.get(a.status) ?? 0) + 1);
-    return Array.from(map.entries()).map(([status, value]) => ({ status, value }));
-  }, [appointments]);
-
-  // Retention: unique clients with 2+ visits
-  const retentionStats = useMemo(() => {
-    const clientVisits = new Map<string, number>();
-    for (const a of completed) {
-      if (a.client_id) clientVisits.set(a.client_id, (clientVisits.get(a.client_id) ?? 0) + 1);
-    }
-    const uniqueClients = clientVisits.size;
-    const repeatClients = Array.from(clientVisits.values()).filter((v) => v >= 2).length;
-    const rebookRate = uniqueClients ? Math.round((repeatClients / uniqueClients) * 100) : 0;
-    return { uniqueClients, repeatClients, rebookRate };
-  }, [completed]);
-
-  // Inventory alerts
-  const lowStock = useMemo(() => inventory.filter((i) => i.stock_quantity <= i.reorder_threshold), [inventory]);
-  const expiringSoon = useMemo(() => {
-    const cutoff = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
-    return inventory.filter((i) => i.expires_at && i.expires_at <= cutoff);
-  }, [inventory]);
-  const inventoryValue = useMemo(() => inventory.reduce((s, i) => s + i.stock_quantity * i.unit_cost_cents, 0), [inventory]);
-
-  // Smart insights
-  const insights = useMemo(() => {
-    const items: string[] = [];
-    if (totalRevenue > 0) items.push(`Revenue this period: ${money(totalRevenue)} across ${completed.length} completed visits.`);
-    if (noShowRate > 10) items.push(`⚠ No-show rate is ${noShowRate}% — consider implementing deposit collection.`);
-    if (lowStock.length > 0) items.push(`📦 ${lowStock.length} inventory item${lowStock.length > 1 ? "s" : ""} below reorder threshold.`);
-    if (expiringSoon.length > 0) items.push(`⏰ ${expiringSoon.length} product${expiringSoon.length > 1 ? "s" : ""} expiring within 30 days.`);
-    if (retentionStats.rebookRate > 0 && retentionStats.rebookRate < 60) items.push(`📉 Rebook rate is ${retentionStats.rebookRate}%. Consider follow-up automations.`);
-    if (conversionRate > 0) items.push(`🎯 Lead conversion rate: ${conversionRate}% (${wonLeads} of ${leads.length} leads).`);
-    return items;
-  }, [totalRevenue, completed.length, noShowRate, lowStock.length, expiringSoon.length, retentionStats.rebookRate, conversionRate, wonLeads, leads.length]);
+  const sections: { title: string; reports: Array<Parameters<typeof ReportCard>[0]> }[] = [
+    {
+      title: "Financial",
+      reports: [
+        { href: `${base}/financial/revenue`, title: "Revenue", icon: DollarSign,
+          primaryMetric: cards.revenue?.primary ?? "—", trend: cards.revenue?.trend, sparkline: cards.revenue?.sparkline, loading },
+        { href: `${base}/financial/ar-aging`, title: "AR Aging", icon: Receipt,
+          primaryMetric: cards["ar-aging"]?.primary ?? "—", loading, comingSoon: true },
+        { href: `${base}/financial/payment-methods`, title: "Payment Methods", icon: CreditCard,
+          primaryMetric: "—", loading, comingSoon: true },
+        { href: `${base}/financial/tax-summary`, title: "Tax Summary", icon: FileText,
+          primaryMetric: "—", loading, comingSoon: true },
+      ],
+    },
+    {
+      title: "Clients",
+      reports: [
+        { href: `${base}/clients/lifetime-value`, title: "Lifetime Value", icon: Crown,
+          primaryMetric: cards.ltv?.primary ?? "—", loading, comingSoon: true },
+        { href: `${base}/clients/retention`, title: "Retention", icon: Repeat,
+          primaryMetric: "—", loading, comingSoon: true },
+        { href: `${base}/clients/acquisition`, title: "Acquisition", icon: UserPlus,
+          primaryMetric: "—", loading, comingSoon: true },
+      ],
+    },
+    {
+      title: "Staff",
+      reports: [
+        { href: `${base}/staff/performance`, title: "Performance", icon: UserCog,
+          primaryMetric: "—", loading, comingSoon: true },
+        { href: `${base}/staff/commissions`, title: "Commissions", icon: Wallet,
+          primaryMetric: "—", loading, comingSoon: true },
+      ],
+    },
+    {
+      title: "Services & Memberships",
+      reports: [
+        { href: `${base}/services/profitability`, title: "Profitability", icon: TrendingUp,
+          primaryMetric: "—", loading, comingSoon: true },
+        { href: `${base}/services/heat-map`, title: "Heat Map", icon: Flame,
+          primaryMetric: "—", loading, comingSoon: true },
+        { href: `${base}/memberships/mrr`, title: "MRR", icon: Award,
+          primaryMetric: cards.mrr?.primary ?? "—", loading, comingSoon: true },
+        { href: `${base}/memberships/utilization`, title: "Member Util.", icon: Users,
+          primaryMetric: "—", loading, comingSoon: true },
+      ],
+    },
+    {
+      title: "Marketing",
+      reports: [
+        { href: `${base}/marketing/channels`, title: "Channel ROI", icon: Megaphone,
+          primaryMetric: "—", loading, comingSoon: true },
+        { href: `${base}/marketing/campaigns`, title: "Campaigns", icon: Mail,
+          primaryMetric: "—", loading, comingSoon: true },
+      ],
+    },
+    {
+      title: "Inventory & Operations",
+      reports: [
+        { href: `${base}/inventory/stock`, title: "Stock Levels", icon: Boxes,
+          primaryMetric: cards.stock?.primary ?? "—", loading, comingSoon: true },
+        { href: `${base}/inventory/cogs`, title: "COGS", icon: PackageMinus,
+          primaryMetric: "—", loading, comingSoon: true },
+        { href: `${base}/operations/no-shows`, title: "No-shows", icon: CalendarX,
+          primaryMetric: cards["no-shows"]?.primary ?? "—", trend: cards["no-shows"]?.trend, inverseTrend: true, loading, comingSoon: true },
+      ],
+    },
+  ];
 
   return (
-    <div className="space-y-6">
-      <section className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="space-y-6 p-4 md:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Analytics</p>
-          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Reports</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">Insights into every part of your clinic.</p>
+          <h1 className="text-xl font-semibold tracking-tight md:text-2xl">Reports</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Insights into every part of your clinic
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="gap-2" onClick={() => {
-            const rows = [["Date","Revenue","Bookings"], ...revenueSeries.map(r => [r.date, String(r.revenue), String(r.bookings)])];
-            const csv = rows.map(r => r.join(",")).join("\n");
-            const blob = new Blob([csv], { type: "text/csv" });
-            const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `report_${tab}_${range}d.csv`; a.click();
-          }}><Download className="h-4 w-4" /> Export CSV</Button>
-          <div className="flex gap-1 rounded-lg border border-border bg-surface p-1">
-            {RANGES.map((r) => (
-              <button key={r.id} onClick={() => setRange(r.id)} className={cn("rounded-md px-3 py-1.5 text-xs font-medium transition", range === r.id ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground")}>
-                {r.label}
-              </button>
-            ))}
+        <ReportDatePicker
+          presetId={presetId} onPresetChange={setPresetId}
+          compare={compare} onCompareChange={setCompare}
+        />
+      </div>
+
+      {sections.map((s) => (
+        <section key={s.title} className="space-y-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{s.title}</h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {s.reports.map((r) => <ReportCard key={r.href} {...r} />)}
           </div>
-        </div>
-      </section>
-
-      {/* Smart Insights */}
-      {insights.length > 0 && (
-        <section className="rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-card">
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary">
-            <TrendingUp className="h-4 w-4" /> Smart Insights
-          </h2>
-          <ul className="space-y-1.5">
-            {insights.map((insight, i) => (
-              <li key={i} className="text-sm text-foreground/85">• {insight}</li>
-            ))}
-          </ul>
         </section>
-      )}
-
-      {/* Category Tabs */}
-      <div className="flex gap-1 overflow-x-auto rounded-lg border border-border bg-surface p-1 [scrollbar-width:none]">
-        {TABS.map((t) => (
-          <button key={t.id} onClick={() => setTab(t.id)} className={cn("flex shrink-0 items-center gap-1.5 rounded-md px-3 py-2 text-xs font-medium transition whitespace-nowrap", tab === t.id ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground")}>
-            {t.icon} {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* KPI row */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-4">
-        {tab === "revenue" && (
-          <>
-            <Metric label="Revenue" value={money(totalRevenue)} icon={<DollarSign className="h-4.5 w-4.5" />} hint={`${completed.length} completed`} />
-            <Metric label="Avg ticket" value={money(avgTicket)} icon={<TrendingUp className="h-4.5 w-4.5" />} hint="Per visit" />
-            <Metric label="No-show rate" value={`${noShowRate}%`} icon={<CalendarDays className="h-4.5 w-4.5" />} />
-            <Metric label="Total bookings" value={appointments.length.toString()} icon={<CalendarDays className="h-4.5 w-4.5" />} />
-          </>
-        )}
-        {tab === "clients" && (
-          <>
-            <Metric label="Total clients" value={clientsCount.toString()} icon={<Users className="h-4.5 w-4.5" />} />
-            <Metric label="Active this period" value={retentionStats.uniqueClients.toString()} icon={<Users className="h-4.5 w-4.5" />} />
-            <Metric label="Repeat clients" value={retentionStats.repeatClients.toString()} icon={<Repeat className="h-4.5 w-4.5" />} />
-            <Metric label="Rebook rate" value={`${retentionStats.rebookRate}%`} icon={<TrendingUp className="h-4.5 w-4.5" />} />
-          </>
-        )}
-        {tab === "services" && (
-          <>
-            <Metric label="Active services" value={services.length.toString()} icon={<Package className="h-4.5 w-4.5" />} />
-            <Metric label="Top revenue" value={topServices[0] ? money(topServices[0].revenue) : "$0"} icon={<Award className="h-4.5 w-4.5" />} hint={topServices[0]?.name} />
-            <Metric label="Categories" value={new Set(services.map((s) => s.category).filter(Boolean)).size.toString()} icon={<BarChart3 className="h-4.5 w-4.5" />} />
-            <Metric label="Avg price" value={money(services.length ? services.reduce((s, sv) => s + sv.price_cents, 0) / services.length : 0)} icon={<DollarSign className="h-4.5 w-4.5" />} />
-          </>
-        )}
-        {tab === "staff" && (
-          <>
-            <Metric label="Active staff" value={staffList.length.toString()} icon={<UserCog className="h-4.5 w-4.5" />} />
-            <Metric label="Total revenue" value={money(totalRevenue)} icon={<DollarSign className="h-4.5 w-4.5" />} />
-            <Metric label="Avg per staff" value={money(staffPerformance.length ? totalRevenue / staffPerformance.length : 0)} icon={<TrendingUp className="h-4.5 w-4.5" />} />
-            <Metric label="Top performer" value={staffPerformance[0]?.name ?? "—"} icon={<Award className="h-4.5 w-4.5" />} hint={staffPerformance[0] ? money(staffPerformance[0].revenue) : undefined} />
-          </>
-        )}
-        {tab === "inventory" && (
-          <>
-            <Metric label="Total items" value={inventory.length.toString()} icon={<Boxes className="h-4.5 w-4.5" />} />
-            <Metric label="Inventory value" value={money(inventoryValue)} icon={<DollarSign className="h-4.5 w-4.5" />} />
-            <Metric label="Low stock alerts" value={lowStock.length.toString()} icon={<Boxes className="h-4.5 w-4.5" />} />
-            <Metric label="Expiring soon" value={expiringSoon.length.toString()} icon={<CalendarDays className="h-4.5 w-4.5" />} hint="Within 30 days" />
-          </>
-        )}
-        {tab === "marketing" && (
-          <>
-            <Metric label="Total leads" value={leads.length.toString()} icon={<Target className="h-4.5 w-4.5" />} />
-            <Metric label="Conversion" value={`${conversionRate}%`} icon={<TrendingUp className="h-4.5 w-4.5" />} hint={`${wonLeads} won`} />
-            <Metric label="Campaigns" value={campaigns.length.toString()} icon={<BarChart3 className="h-4.5 w-4.5" />} />
-            <Metric label="Pipeline value" value={money(leads.reduce((s, l) => s + l.estimated_value_cents, 0))} icon={<DollarSign className="h-4.5 w-4.5" />} />
-          </>
-        )}
-        {tab === "retention" && (
-          <>
-            <Metric label="Rebook rate" value={`${retentionStats.rebookRate}%`} icon={<Repeat className="h-4.5 w-4.5" />} />
-            <Metric label="Repeat clients" value={retentionStats.repeatClients.toString()} icon={<Users className="h-4.5 w-4.5" />} />
-            <Metric label="No-shows" value={`${noShowRate}%`} icon={<CalendarDays className="h-4.5 w-4.5" />} />
-            <Metric label="Avg lifetime" value={money(avgTicket * (retentionStats.rebookRate / 100 + 1))} icon={<DollarSign className="h-4.5 w-4.5" />} hint="Est. LTV" />
-          </>
-        )}
-      </section>
-
-      {loading ? (
-        <div className="rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">Loading analytics…</div>
-      ) : (
-        <>
-          {/* Revenue tab */}
-          {tab === "revenue" && (
-            <>
-              <ChartCard icon={<BarChart3 className="h-5 w-5" />} title="Revenue trend" subtitle="Daily completed-appointment revenue.">
-                <div className="h-64 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={revenueSeries}>
-                      <defs>
-                        <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.5} />
-                          <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                      <XAxis dataKey="date" tickFormatter={(d) => new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric" })} stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickFormatter={(v) => `$${v}`} />
-                      <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} labelFormatter={(d) => new Date(d as string).toLocaleDateString()} formatter={(v: number) => [`$${v.toFixed(0)}`, "Revenue"]} />
-                      <Area type="monotone" dataKey="revenue" stroke="#a78bfa" strokeWidth={2} fill="url(#rev)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </ChartCard>
-
-              <ChartCard icon={<CalendarDays className="h-5 w-5" />} title="Appointment outcomes" subtitle="Status distribution for this period.">
-                {statusBreakdown.length === 0 ? (
-                  <EmptyChart message="No appointments in this range." />
-                ) : (
-                  <div className="grid gap-6 md:grid-cols-[1fr_1fr] md:items-center">
-                    <div className="h-56">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie data={statusBreakdown} dataKey="value" nameKey="status" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                            {statusBreakdown.map((entry, i) => (
-                              <Cell key={entry.status} fill={["#a78bfa", "#38bdf8", "#34d399", "#fbbf24", "#f87171", "#94a3b8"][i % 6]} />
-                            ))}
-                          </Pie>
-                          <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="space-y-2">
-                      {statusBreakdown.map((s, i) => (
-                        <div key={s.status} className="flex items-center justify-between rounded-lg border border-border bg-surface/40 px-3 py-2">
-                          <div className="flex items-center gap-2">
-                            <span className="h-2.5 w-2.5 rounded-full" style={{ background: ["#a78bfa", "#38bdf8", "#34d399", "#fbbf24", "#f87171", "#94a3b8"][i % 6] }} />
-                            <span className="text-sm capitalize">{s.status.replace("_", " ")}</span>
-                          </div>
-                          <span className="font-mono text-sm">{s.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </ChartCard>
-            </>
-          )}
-
-          {/* Services tab */}
-          {tab === "services" && (
-            <ChartCard icon={<Award className="h-5 w-5" />} title="Top services" subtitle="By completed revenue this period.">
-              {topServices.length === 0 ? <EmptyChart message="No completed bookings yet." /> : (
-                <div className="space-y-3">
-                  {topServices.map((svc, i) => {
-                    const max = topServices[0].revenue || 1;
-                    const pct = (svc.revenue / max) * 100;
-                    return (
-                      <div key={svc.name + i}>
-                        <div className="mb-1 flex items-center justify-between text-sm">
-                          <div>
-                            <span className="font-medium">{svc.name}</span>
-                            {svc.category && <span className="ml-2 text-xs text-muted-foreground">{svc.category}</span>}
-                          </div>
-                          <span className="text-muted-foreground">{money(svc.revenue)} <span className="text-[10px]">· {svc.count} bookings</span></span>
-                        </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-surface">
-                          <div className="h-full rounded-full bg-gradient-primary" style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </ChartCard>
-          )}
-
-          {/* Staff tab */}
-          {tab === "staff" && (
-            <ChartCard icon={<UserCog className="h-5 w-5" />} title="Staff performance" subtitle="Revenue and booking count per staff member.">
-              {staffPerformance.length === 0 ? <EmptyChart message="No staff bookings in this period." /> : (
-                <div className="space-y-3">
-                  {staffPerformance.map((sp) => {
-                    const max = staffPerformance[0].revenue || 1;
-                    const pct = (sp.revenue / max) * 100;
-                    const completionRate = sp.bookings ? Math.round((sp.completed / sp.bookings) * 100) : 0;
-                    return (
-                      <div key={sp.name}>
-                        <div className="mb-1 flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <span className="h-3 w-3 rounded-full" style={{ background: sp.color }} />
-                            <span className="font-medium">{sp.name}</span>
-                          </div>
-                          <span className="text-muted-foreground">
-                            {money(sp.revenue)} · {sp.bookings} bookings · {completionRate}% completion
-                          </span>
-                        </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-surface">
-                          <div className="h-full rounded-full" style={{ width: `${pct}%`, background: sp.color }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </ChartCard>
-          )}
-
-          {/* Clients tab */}
-          {tab === "clients" && (
-            <ChartCard icon={<Users className="h-5 w-5" />} title="Client activity" subtitle="Booking trend by day for this period.">
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={revenueSeries}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                    <XAxis dataKey="date" tickFormatter={(d) => new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric" })} stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} labelFormatter={(d) => new Date(d as string).toLocaleDateString()} />
-                    <Bar dataKey="bookings" fill="#a78bfa" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </ChartCard>
-          )}
-
-          {/* Inventory tab */}
-          {tab === "inventory" && (
-            <div className="grid gap-6 lg:grid-cols-2">
-              <ChartCard icon={<Boxes className="h-5 w-5" />} title="Low stock alerts" subtitle={`${lowStock.length} items at or below reorder threshold.`}>
-                {lowStock.length === 0 ? <EmptyChart message="All items above reorder threshold." /> : (
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {lowStock.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2">
-                        <span className="text-sm font-medium">{item.name}</span>
-                        <span className="font-mono text-sm text-destructive">{item.stock_quantity} / {item.reorder_threshold}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ChartCard>
-              <ChartCard icon={<CalendarDays className="h-5 w-5" />} title="Expiring soon" subtitle="Items expiring within 30 days.">
-                {expiringSoon.length === 0 ? <EmptyChart message="No items expiring soon." /> : (
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {expiringSoon.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2">
-                        <span className="text-sm font-medium">{item.name}</span>
-                        <span className="font-mono text-sm text-amber-400">{item.expires_at}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ChartCard>
-            </div>
-          )}
-
-          {/* Marketing tab */}
-          {tab === "marketing" && (
-            <div className="grid gap-6 lg:grid-cols-2">
-              <ChartCard icon={<Target className="h-5 w-5" />} title="Lead funnel" subtitle="Pipeline stage distribution.">
-                <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={leadFunnel} layout="vertical" margin={{ left: 24 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} horizontal={false} />
-                      <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                      <YAxis type="category" dataKey="stage" stroke="hsl(var(--muted-foreground))" fontSize={11} width={90} tickFormatter={(s) => s.replace("_", " ")} />
-                      <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12, fontSize: 12 }} />
-                      <Bar dataKey="count" radius={[0, 6, 6, 0]}>
-                        {leadFunnel.map((entry) => <Cell key={entry.stage} fill={entry.color} />)}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </ChartCard>
-              <ChartCard icon={<BarChart3 className="h-5 w-5" />} title="Lead sources" subtitle="Where your leads come from.">
-                {leadSources.length === 0 ? <EmptyChart message="No leads yet." /> : (
-                  <div className="space-y-2">
-                    {leadSources.slice(0, 8).map((src) => (
-                      <div key={src.source} className="flex items-center justify-between rounded-lg border border-border bg-surface/40 px-3 py-2">
-                        <span className="text-sm capitalize">{src.source}</span>
-                        <span className="font-mono text-sm">{src.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ChartCard>
-            </div>
-          )}
-
-          {/* Retention tab */}
-          {tab === "retention" && (
-            <ChartCard icon={<Repeat className="h-5 w-5" />} title="Client retention" subtitle="Rebooking patterns and client loyalty.">
-              <div className="grid gap-6 md:grid-cols-3">
-                <div className="rounded-xl border border-border bg-surface/40 p-5 text-center">
-                  <div className="font-display text-2xl sm:text-4xl font-bold text-primary">{retentionStats.rebookRate}%</div>
-                  <div className="mt-1 text-sm text-muted-foreground">Rebook rate</div>
-                  <div className="mt-0.5 text-[10px] text-muted-foreground">Clients with 2+ visits</div>
-                </div>
-                <div className="rounded-xl border border-border bg-surface/40 p-5 text-center">
-                  <div className="font-display text-2xl sm:text-4xl font-bold">{retentionStats.uniqueClients}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">Unique clients</div>
-                  <div className="mt-0.5 text-[10px] text-muted-foreground">In this period</div>
-                </div>
-                <div className="rounded-xl border border-border bg-surface/40 p-5 text-center">
-                  <div className="font-display text-2xl sm:text-4xl font-bold text-emerald-400">{retentionStats.repeatClients}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">Repeat clients</div>
-                  <div className="mt-0.5 text-[10px] text-muted-foreground">2+ visits in period</div>
-                </div>
-              </div>
-            </ChartCard>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
-
-function ChartCard({ icon, title, subtitle, children }: { icon: React.ReactNode; title: string; subtitle: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
-      <div className="mb-5 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">{icon}</div>
-        <div>
-          <h2 className="font-display text-xl font-semibold">{title}</h2>
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-        </div>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function EmptyChart({ message }: { message: string }) {
-  return <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-border text-xs text-muted-foreground">{message}</div>;
-}
-
-function Metric({ label, value, icon, hint }: { label: string; value: string; icon: React.ReactNode; hint?: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">{icon}</div>
-      <div className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight">{value}</div>
-      <div className="mt-1 text-xs text-muted-foreground">{label}</div>
-      {hint && <div className="mt-0.5 text-[10px] text-muted-foreground">{hint}</div>}
+      ))}
     </div>
   );
 }
