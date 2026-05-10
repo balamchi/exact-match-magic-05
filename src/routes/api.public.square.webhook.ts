@@ -72,7 +72,7 @@ async function handleInvoicePaymentMade(invoice: any) {
       square_invoice_id: invoice.id,
       amount_cents: totalCents,
       currency,
-      status: "succeeded",
+      status: "paid",
       charged_at: new Date().toISOString(),
     },
     { onConflict: "square_invoice_id" },
