@@ -550,45 +550,56 @@ function ServicesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40">
-                  {paginated.map(s => (
-                    <tr key={s.id} className={cn("transition hover:bg-surface/50", !s.active && "opacity-60")}>
-                      <td className="p-3">
-                        <input type="checkbox" checked={selected.has(s.id)} onChange={() => {
-                          const next = new Set(selected);
-                          next.has(s.id) ? next.delete(s.id) : next.add(s.id);
-                          setSelected(next);
-                        }} className="accent-primary" />
-                      </td>
-                      <td className="p-3">
-                        {s.image_url ? (
-                          <img src={s.image_url} alt="" className="h-10 w-10 rounded-lg object-cover" />
-                        ) : (
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <Sparkles className="h-4 w-4" />
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-3">
-                        <button onClick={() => openEdit(s)} className="text-left hover:text-primary transition">
-                          <span className="font-medium">{s.name}</span>
-                          {s.sub_category && <span className="ml-2 text-xs text-muted-foreground">{s.sub_category}</span>}
-                        </button>
-                      </td>
-                      <td className="p-3"><Badge variant="outline" className="text-[10px]">{s.category || "—"}</Badge></td>
-                      <td className="p-3 text-muted-foreground">{s.duration_minutes} min</td>
-                      <td className="p-3 font-medium">{formatMoney(s.price_cents ?? 0, currency)}</td>
-                      <td className="p-3">{s.deposit_required ? <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">{formatMoney(s.deposit_cents ?? 0, currency)}</Badge> : <span className="text-muted-foreground">—</span>}</td>
-                      <td className="p-3">
-                        <Badge variant={s.active ? "default" : "secondary"} className="text-[10px]">{s.active ? "Active" : "Inactive"}</Badge>
-                      </td>
-                      <td className="p-3">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(s)} aria-label="Edit"><Edit3 className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => duplicate(s)} aria-label="Duplicate"><Copy className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => remove(s)} aria-label="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
-                        </div>
-                      </td>
-                    </tr>
+                  {(grouped ?? [["__all", paginated] as [string, typeof paginated]]).map(([cat, items]) => (
+                    <Fragment key={cat}>
+                      {grouped && (
+                        <tr className="bg-surface/30">
+                          <td colSpan={9} className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            {cat} <span className="ml-2 normal-case text-muted-foreground/70">· {items.length} {items.length === 1 ? "service" : "services"}</span>
+                          </td>
+                        </tr>
+                      )}
+                      {items.map(s => (
+                        <tr key={s.id} className={cn("transition hover:bg-surface/50", !s.active && "opacity-60")}>
+                          <td className="p-3">
+                            <input type="checkbox" checked={selected.has(s.id)} onChange={() => {
+                              const next = new Set(selected);
+                              next.has(s.id) ? next.delete(s.id) : next.add(s.id);
+                              setSelected(next);
+                            }} className="accent-primary" />
+                          </td>
+                          <td className="p-3">
+                            {s.image_url ? (
+                              <img src={s.image_url} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                            ) : (
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Sparkles className="h-4 w-4" />
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3">
+                            <button onClick={() => openEdit(s)} className="text-left hover:text-primary transition">
+                              <span className="font-medium">{s.name}</span>
+                              {s.sub_category && <span className="ml-2 text-xs text-muted-foreground">{s.sub_category}</span>}
+                            </button>
+                          </td>
+                          <td className="p-3"><Badge variant="outline" className="text-[10px]">{s.category || "—"}</Badge></td>
+                          <td className="p-3 text-muted-foreground">{s.duration_minutes} min</td>
+                          <td className="p-3 font-medium">{formatMoney(s.price_cents ?? 0, currency)}</td>
+                          <td className="p-3">{s.deposit_required ? <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">{formatMoney(s.deposit_cents ?? 0, currency)}</Badge> : <span className="text-muted-foreground">—</span>}</td>
+                          <td className="p-3">
+                            <Badge variant={s.active ? "default" : "secondary"} className="text-[10px]">{s.active ? "Active" : "Inactive"}</Badge>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex justify-end gap-1">
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(s)} aria-label="Edit"><Edit3 className="h-3.5 w-3.5" /></Button>
+                              <Button variant="ghost" size="icon" onClick={() => duplicate(s)} aria-label="Duplicate"><Copy className="h-3.5 w-3.5" /></Button>
+                              <Button variant="ghost" size="icon" onClick={() => remove(s)} aria-label="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
