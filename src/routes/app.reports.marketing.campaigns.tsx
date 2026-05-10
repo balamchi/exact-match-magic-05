@@ -29,7 +29,7 @@ function Campaigns() {
         .gte("sent_at", range.range.from.toISOString())
         .lte("sent_at", range.range.to.toISOString())
         .limit(1000);
-      setLogs((data ?? []) as EmailLog[]);
+      setLogs(((data ?? []) as unknown) as EmailLog[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);

@@ -24,7 +24,7 @@ function MRR() {
       const { data } = await supabase.from("membership_subscriptions" as never)
         .select("id, status, price_cents, billing_period, canceled_at, created_at")
         .eq("clinic_id", activeClinic.clinic_id);
-      setSubs((data ?? []) as SubscriptionLite[]);
+      setSubs(((data ?? []) as unknown) as SubscriptionLite[]);
       setLoading(false);
     })();
   }, [activeClinic]);

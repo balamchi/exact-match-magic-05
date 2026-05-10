@@ -29,7 +29,7 @@ function Acquisition() {
         .eq("clinic_id", activeClinic.clinic_id)
         .gte("created_at", range.range.from.toISOString())
         .lte("created_at", range.range.to.toISOString());
-      setRows((data ?? []) as Client[]);
+      setRows(((data ?? []) as unknown) as Client[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);

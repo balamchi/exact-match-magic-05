@@ -30,7 +30,7 @@ function PaymentMethods() {
         .eq("status", "paid")
         .gte("created_at", range.range.from.toISOString())
         .lte("created_at", range.range.to.toISOString());
-      setRows((data ?? []) as Inv[]);
+      setRows(((data ?? []) as unknown) as Inv[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);

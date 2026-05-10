@@ -29,7 +29,7 @@ function Channels() {
         .eq("clinic_id", activeClinic.clinic_id)
         .gte("created_at", range.range.from.toISOString())
         .lte("created_at", range.range.to.toISOString());
-      setLeads((data ?? []) as Lead[]);
+      setLeads(((data ?? []) as unknown) as Lead[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);

@@ -27,7 +27,7 @@ function ARAging() {
         .eq("clinic_id", activeClinic.clinic_id)
         .in("status", ["unpaid", "overdue", "partial"])
         .order("created_at", { ascending: true });
-      setRows((data ?? []) as Inv[]);
+      setRows(((data ?? []) as unknown) as Inv[]);
       setLoading(false);
     })();
   }, [activeClinic]);
