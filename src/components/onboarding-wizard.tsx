@@ -53,8 +53,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const handleSeed = async () => {
     setSeeding(true);
     try {
-      const result = await seedClinicDefaults();
-      if (result.seeded) {
+      const result = await seedClinicDefaults({ data: {} });
+      if (result.seeded && "summary" in result && result.summary && "consentForms" in result.summary) {
         toast.success(
           `Loaded ${result.summary.services} services, ${result.summary.consentForms} consent forms, ${result.summary.automations} automations, and ${result.summary.memberships} memberships!`
         );

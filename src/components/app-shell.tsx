@@ -2,15 +2,16 @@ import { ReactNode, useEffect, useState } from "react";
 import { GlobalSearch } from "@/components/global-search";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
+  Activity, BarChart3, CalendarDays, Calendar, Shield, Users,
   Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare, Flame,
   Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
-  Phone, BookOpen, Sun, Moon, MessageSquareText,
+  Phone, BookOpen, Sun, Moon, MessageSquareText, HelpCircle,
   type LucideIcon,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useLocale, LOCALES } from "@/lib/locale-context";
@@ -25,85 +26,116 @@ import { TrialBanner } from "@/components/trial-banner";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 type Badge = { kind: "count"; value: number } | { kind: "pill"; label: string; tone: "new" | "live" };
-interface NavItem { to: string; label: string; icon: LucideIcon; badge?: Badge; phase4?: boolean; }
-interface NavGroup { section: string; items: NavItem[]; }
+interface NavItem {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  badge?: Badge;
+  phase4?: boolean;
+  beta?: boolean;
+}
+interface NavGroup {
+  section: string;
+  icon: LucideIcon;
+  defaultOpen?: boolean;
+  items: NavItem[];
+}
 
-const NAV: NavGroup[] = [
+const NAV_PINNED: NavItem[] = [
+  { to: "/app/dashboard", label: "Dashboard", icon: Activity },
+  { to: "/app/calendar", label: "Calendar", icon: Calendar },
+  { to: "/app/clients", label: "Clients", icon: Users },
+  { to: "/app/inbox", label: "Inbox", icon: Inbox },
+  { to: "/app/leads", label: "Leads", icon: Flame },
+];
+
+const NAV_GROUPS: NavGroup[] = [
   {
-    section: "Overview",
+    section: "Front Desk",
+    icon: ClipboardCheck,
     items: [
-      { to: "/app/dashboard", label: "Dashboard", icon: Activity },
-      { to: "/app/reports", label: "Reports", icon: BarChart3 },
-      { to: "/app/ai", label: "AI Assistant", icon: Bot, phase4: true },
+      { to: "/app/checkin", label: "Check-In Board", icon: ClipboardCheck },
+      { to: "/app/booking", label: "Booking Widget", icon: CalendarDays },
+      { to: "/app/consent", label: "Consent Forms", icon: Shield },
     ],
   },
   {
-    section: "Operations",
+    section: "Catalog",
+    icon: HeartPulse,
     items: [
-      { to: "/app/booking", label: "Booking", icon: CalendarDays },
-      { to: "/app/calendar", label: "Calendar", icon: Calendar },
-      { to: "/app/checkin", label: "Check-In", icon: ClipboardCheck },
-      { to: "/app/consent", label: "Consent Forms", icon: Shield },
-      { to: "/app/clients", label: "Clients", icon: Users },
       { to: "/app/services", label: "Services", icon: HeartPulse },
       { to: "/app/staff", label: "Staff", icon: UserCog },
       { to: "/app/locations", label: "Locations", icon: MapPin },
-      { to: "/app/leads", label: "Leads", icon: Flame },
+      { to: "/app/inventory", label: "Inventory", icon: Boxes, beta: true },
     ],
   },
   {
     section: "Revenue",
+    icon: CreditCard,
     items: [
-      { to: "/app/pos", label: "POS & Payments", icon: CreditCard },
+      { to: "/app/pos", label: "POS & Payments", icon: CreditCard, beta: true },
       { to: "/app/invoices", label: "Invoices", icon: FileText },
-      { to: "/app/coupons", label: "Coupons", icon: Ticket },
+      { to: "/app/memberships", label: "Memberships", icon: BadgeCheck },
       { to: "/app/giftcards", label: "Gift Cards", icon: Gift },
       { to: "/app/packages", label: "Packages", icon: Package },
-      { to: "/app/memberships", label: "Memberships", icon: BadgeCheck },
-      { to: "/app/loyalty", label: "Loyalty", icon: Sparkles },
-      { to: "/app/inventory", label: "Inventory", icon: Boxes },
+      { to: "/app/coupons", label: "Coupons", icon: Ticket },
+      { to: "/app/loyalty", label: "Loyalty", icon: Sparkles, beta: true },
     ],
   },
   {
-    section: "Growth",
+    section: "Marketing",
+    icon: Send,
     items: [
-      { to: "/app/inbox", label: "Inbox", icon: Inbox },
-      { to: "/app/whatsapp", label: "WhatsApp", icon: Phone },
+      { to: "/app/whatsapp", label: "WhatsApp", icon: Phone, beta: true },
       { to: "/app/communication/templates", label: "Templates", icon: MessageSquareText },
-      { to: "/app/marketing", label: "Campaigns", icon: Send },
-      { to: "/app/automations", label: "Automations", icon: Zap },
+      { to: "/app/marketing", label: "Campaigns", icon: Send, beta: true },
+      { to: "/app/automations", label: "Automations", icon: Zap, beta: true },
       { to: "/app/reviews", label: "Reviews", icon: Star },
       { to: "/app/referrals", label: "Referrals", icon: Share2 },
-      { to: "/app/tasks", label: "Tasks", icon: CheckSquare },
       { to: "/app/email-log", label: "Email Log", icon: Bell },
     ],
   },
   {
     section: "Clinical",
+    icon: Stethoscope,
     items: [
       { to: "/app/clinical/soap-notes", label: "SOAP Notes", icon: Stethoscope },
       { to: "/app/clinical/treatment-plans", label: "Treatment Plans", icon: ListChecks },
       { to: "/app/clinical/consent-forms", label: "Consent Forms", icon: FileText },
-      { to: "/app/injection-mapping", label: "Injection Mapping", icon: Syringe },
+      { to: "/app/injection-mapping", label: "Injection Mapping", icon: Syringe, beta: true },
       { to: "/app/before-after", label: "Before / After", icon: Images },
     ],
   },
   {
-    section: "AI",
+    section: "Reports",
+    icon: BarChart3,
     items: [
+      { to: "/app/reports", label: "All Reports", icon: BarChart3 },
+      { to: "/app/tasks", label: "Tasks", icon: CheckSquare, beta: true },
+    ],
+  },
+  {
+    section: "AI",
+    icon: Brain,
+    items: [
+      { to: "/app/ai", label: "AI Assistant", icon: Bot, phase4: true },
       { to: "/app/ai-optimizer", label: "Schedule Optimizer", icon: Brain, phase4: true },
     ],
   },
   {
-    section: "Admin",
+    section: "Integrations",
+    icon: Globe,
     items: [
-      { to: "/app/settings", label: "Settings", icon: Settings },
-      { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
       { to: "/app/quickbooks", label: "QuickBooks", icon: BookOpen, phase4: true },
       { to: "/app/api-settings", label: "API & Webhooks", icon: Globe, phase4: true },
-      { to: "/app/feature-status", label: "Feature status", icon: Sparkles },
     ],
   },
+];
+
+const NAV_BOTTOM: NavItem[] = [
+  { to: "/app/feature-status", label: "Feature Status", icon: Sparkles },
+  { to: "/app/help", label: "Help", icon: HelpCircle },
+  { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
 function formatCount(n: number): string {
@@ -182,6 +214,91 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const initials = (user?.email ?? "?").slice(0, 2).toUpperCase();
 
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const stored = window.localStorage.getItem("clinicpro:sidebar-expanded");
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return {};
+  });
+
+  const toggleSection = (section: string) => {
+    setExpandedSections((prev) => {
+      const next = { ...prev, [section]: !prev[section] };
+      try {
+        window.localStorage.setItem("clinicpro:sidebar-expanded", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  // Auto-expand any group that contains the current route
+  useEffect(() => {
+    setExpandedSections((prev) => {
+      let changed = false;
+      const next = { ...prev };
+      for (const group of NAV_GROUPS) {
+        if (group.items.some((i) => pathname === i.to || pathname.startsWith(i.to + "/"))) {
+          if (!next[group.section]) {
+            next[group.section] = true;
+            changed = true;
+          }
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [pathname]);
+
+  const renderItem = (item: NavItem) => {
+    const active = pathname === item.to || pathname.startsWith(item.to + "/");
+    const Icon = item.icon;
+    return (
+      <Link
+        key={item.to}
+        to={item.to}
+        onClick={onNavigate}
+        className={cn(
+          "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all",
+          active
+            ? "bg-gradient-to-r from-primary/25 via-primary/10 to-transparent text-sidebar-accent-foreground shadow-[inset_0_1px_0_0_hsl(var(--primary)/0.15)]"
+            : "text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground",
+        )}
+      >
+        {active && (
+          <span className="absolute inset-y-1.5 start-0 w-0.5 rounded-full bg-gradient-to-b from-primary to-fuchsia-500 glow-purple" />
+        )}
+        <Icon
+          className={cn(
+            "h-[16px] w-[16px] shrink-0 transition-colors",
+            active ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground",
+          )}
+          strokeWidth={active ? 2.25 : 2}
+        />
+        <span className={cn("truncate", active ? "font-semibold" : "font-medium")}>
+          {item.label}
+        </span>
+        {item.beta && (
+          <span
+            title="Beta"
+            className="ms-auto inline-flex items-center rounded-md bg-fuchsia-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-fuchsia-300"
+          >
+            Beta
+          </span>
+        )}
+        {item.phase4 && (
+          <span
+            title="Coming in Phase 4"
+            className="ms-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500/20 px-1 text-[9px] font-bold text-amber-300"
+          >
+            4
+          </span>
+        )}
+        {item.badge && <NavBadge badge={item.badge} active={active} />}
+      </Link>
+    );
+  };
+
   return (
     <div className="flex h-full flex-col">
       {/* Brand */}
@@ -201,59 +318,50 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 [scrollbar-width:thin]">
-        {NAV.map((group) => (
-          <div key={group.section} className="mb-4">
-            <div className="mb-1 flex items-center gap-2 px-3">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/60">
-                {group.section}
-              </span>
-              <span className="h-px flex-1 bg-gradient-to-r from-sidebar-border/60 to-transparent" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              {group.items.map((item) => {
-                const active = pathname === item.to || pathname.startsWith(item.to + "/");
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={onNavigate}
-                    className={[
-                      "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all",
-                      active
-                        ? "bg-gradient-to-r from-primary/25 via-primary/10 to-transparent text-sidebar-accent-foreground shadow-[inset_0_1px_0_0_hsl(var(--primary)/0.15)]"
-                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground",
-                    ].join(" ")}
-                  >
-                    {active && (
-                      <span className="absolute inset-y-1.5 start-0 w-0.5 rounded-full bg-gradient-to-b from-primary to-fuchsia-500 glow-purple" />
-                    )}
-                    <Icon
-                      className={[
-                        "h-[16px] w-[16px] shrink-0 transition-colors",
-                        active ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground",
-                      ].join(" ")}
-                      strokeWidth={active ? 2.25 : 2}
-                    />
-                    <span className={["truncate", active ? "font-semibold" : "font-medium"].join(" ")}>
-                      {item.label}
-                    </span>
-                    {item.phase4 && (
-                      <span
-                        title="Coming in Phase 4"
-                        className="ms-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500/20 px-1 text-[9px] font-bold text-amber-300"
-                      >
-                        4
-                      </span>
-                    )}
-                    {item.badge && <NavBadge badge={item.badge} active={active} />}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+      <nav className="flex-1 overflow-y-auto px-3 pb-4 pt-3 [scrollbar-width:thin]">
+        {/* Pinned daily-use items */}
+        <div className="mb-2 space-y-0.5">
+          {NAV_PINNED.map(renderItem)}
+        </div>
+
+        <div className="my-3 border-t border-sidebar-border/60" />
+
+        {/* Collapsible sections */}
+        <div className="space-y-0.5">
+          {NAV_GROUPS.map((group) => {
+            const isOpen = expandedSections[group.section] ?? !!group.defaultOpen;
+            const SectionIcon = group.icon;
+            return (
+              <div key={group.section}>
+                <button
+                  type="button"
+                  onClick={() => toggleSection(group.section)}
+                  className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/80 transition hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+                >
+                  <span className="flex items-center gap-2">
+                    <SectionIcon className="h-3.5 w-3.5" />
+                    {group.section}
+                  </span>
+                  <ChevronDown
+                    className={cn("h-3.5 w-3.5 transition-transform", isOpen && "rotate-180")}
+                  />
+                </button>
+                {isOpen && (
+                  <div className="mt-1 mb-2 space-y-0.5 ps-2">
+                    {group.items.map(renderItem)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="my-3 border-t border-sidebar-border/60" />
+
+        {/* Bottom items */}
+        <div className="space-y-0.5">
+          {NAV_BOTTOM.map(renderItem)}
+        </div>
       </nav>
 
       {/* User */}

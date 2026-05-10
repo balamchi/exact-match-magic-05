@@ -7,8 +7,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  */
 export const seedClinicDefaults = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d: { force?: boolean } | undefined) => d ?? {})
+  .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const force = data?.force === true;
 
     // Get user's clinic
     const { data: membership } = await supabase
@@ -23,15 +25,26 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
 
     const clinicId = membership.clinic_id;
 
-    // Check if already seeded
-    const { count } = await supabase
+    // Check if already seeded — only block if clinic has REAL content
+    const { count: serviceCount } = await supabase
       .from("services")
       .select("id", { count: "exact", head: true })
       .eq("clinic_id", clinicId);
 
-    if (count && count > 5) {
-      return { seeded: false, message: "Clinic already has content" };
+    const { count: consentCount } = await supabase
+      .from("consent_form_templates")
+      .select("id", { count: "exact", head: true })
+      .eq("clinic_id", clinicId);
+
+    if (!force && (serviceCount ?? 0) > 20 && (consentCount ?? 0) > 0) {
+      return {
+        seeded: false,
+        message: `Clinic already has ${serviceCount} services and ${consentCount} consent forms`,
+        summary: { services: serviceCount, consent_forms: consentCount },
+      };
     }
+
+    console.log(`Seeding clinic ${clinicId} (current: ${serviceCount ?? 0} services, force=${force})`);
 
     // ── Services ──
     const serviceCategories = [
@@ -139,7 +152,10 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       }))
     );
 
-    await supabase.from("services").insert(serviceRows);
+    await supabase.from("services").upsert(serviceRows, {
+      onConflict: "clinic_id,name",
+      ignoreDuplicates: true,
+    });
 
     // ── Consent Forms ──
     const consentForms = [
