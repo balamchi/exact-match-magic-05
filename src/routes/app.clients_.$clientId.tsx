@@ -412,7 +412,7 @@ function ClientDetailPage() {
       )}
 
       {/* KPI Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <KpiTile icon={<Activity className="h-4 w-4" />} label="Total Visits" value={stats.visits.toString()} />
         <KpiTile icon={<DollarSign className="h-4 w-4" />} label="Lifetime Value" value={formatMoney(stats.lifetimeValueCents, currency)} highlight />
         <KpiTile icon={<DollarSign className="h-4 w-4" />} label="Avg Visit Value" value={formatMoney(stats.avgValueCents, currency)} />
