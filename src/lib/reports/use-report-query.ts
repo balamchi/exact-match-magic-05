@@ -319,9 +319,9 @@ async function runQuery(
 
     case "memberships": {
       const { data: subs } = await supabase.from("membership_subscriptions")
-        .select("id, status, started_at, canceled_at, monthly_price_cents, membership_id, client_id, clients(first_name,last_name)")
+        .select("id, status, started_at, canceled_at, membership_id, client_id, clients(first_name,last_name)")
         .eq("clinic_id", clinicId).limit(1000);
-      const list = (subs ?? []) as MemSub[];
+      const list = (subs ?? []) as unknown as MemSub[];
       const { data: plans } = await supabase.from("memberships")
         .select("id, name, monthly_price_cents, billing_cadence").eq("clinic_id", clinicId);
       const planMap = new Map((plans ?? []).map((p: any) => [p.id, p]));
