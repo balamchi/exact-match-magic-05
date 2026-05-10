@@ -25,15 +25,26 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
 
     const clinicId = membership.clinic_id;
 
-    // Check if already seeded
-    const { count } = await supabase
+    // Check if already seeded — only block if clinic has REAL content
+    const { count: serviceCount } = await supabase
       .from("services")
       .select("id", { count: "exact", head: true })
       .eq("clinic_id", clinicId);
 
-    if (count && count > 5) {
-      return { seeded: false, message: "Clinic already has content" };
+    const { count: consentCount } = await supabase
+      .from("consent_form_templates")
+      .select("id", { count: "exact", head: true })
+      .eq("clinic_id", clinicId);
+
+    if (!force && (serviceCount ?? 0) > 20 && (consentCount ?? 0) > 0) {
+      return {
+        seeded: false,
+        message: `Clinic already has ${serviceCount} services and ${consentCount} consent forms`,
+        summary: { services: serviceCount, consent_forms: consentCount },
+      };
     }
+
+    console.log(`Seeding clinic ${clinicId} (current: ${serviceCount ?? 0} services, force=${force})`);
 
     // ── Services ──
     const serviceCategories = [
