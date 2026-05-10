@@ -1039,6 +1039,7 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
   const [rows, setRows] = useState<SubRow[]>([]);
   const [loading, setLoading] = useState(true);
   const cancelFn = useServerFn(cancelMemberSubscription);
+  const portalFn = useServerFn(createPortalToken);
   const pauseFn = useServerFn(pauseMemberSubscription);
   const resumeFn = useServerFn(resumeMemberSubscription);
   const [busyId, setBusyId] = useState<string | null>(null);
