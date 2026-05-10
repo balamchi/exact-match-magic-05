@@ -1085,7 +1085,23 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
     }
   };
 
-  const handlePause = async (id: string) => {
+  const handlePortalLink = async (id: string) => {
+    setBusyId(id);
+    try {
+      const { token } = await portalFn({ data: { subscription_id: id } });
+      const url = `${window.location.origin}/portal/membership/${token}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success("Portal link copied to clipboard", { description: url });
+      } catch {
+        toast.success("Portal link created", { description: url });
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't create link");
+    } finally {
+      setBusyId(null);
+    }
+  };
     setBusyId(id);
     try {
       await pauseFn({ data: { subscription_id: id } });
