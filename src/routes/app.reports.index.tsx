@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   DollarSign, Receipt, CreditCard, FileText,
@@ -7,6 +7,7 @@ import {
   Award, Flame, TrendingUp, Crown,
   Megaphone, Mail,
   Boxes, PackageMinus, CalendarX,
+  Sparkles, ArrowRight,
 } from "lucide-react";
 import { ReportCard } from "@/components/report-card";
 import { ReportDatePicker } from "@/components/report-date-picker";
