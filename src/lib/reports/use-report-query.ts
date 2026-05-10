@@ -324,7 +324,7 @@ async function runQuery(
       const list = (subs ?? []) as unknown as MemSub[];
       const { data: plans } = await supabase.from("memberships")
         .select("id, name, monthly_price_cents, billing_cadence").eq("clinic_id", clinicId);
-      const planMap = new Map((plans ?? []).map((p: any) => [p.id, p]));
+      const planMap = new Map((plans ?? []).map((p) => [p.id, p as { id: string; name: string; monthly_price_cents: number; billing_cadence: string }]));
 
       const active = list.filter((s) => s.status === "active");
       const newOnes = list.filter((s) => s.started_at && new Date(s.started_at) >= range.from && new Date(s.started_at) <= range.to);
