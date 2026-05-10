@@ -54,13 +54,14 @@ export function calculateChurnRate(
 export function calculateNetMRR(subs: SubscriptionLite[]): number {
   return (
     subs
-      .filter((s) => s.status === "active")
+      .filter((s) => s.status === "active" || s.status === "trialing")
       .reduce((sum, s) => {
-        const price = (s.price_cents ?? 0) / 100;
-        const period = (s.billing_period ?? "month").toLowerCase();
-        if (period.startsWith("year")) return sum + price / 12;
+        const price = ((s.monthly_price_cents ?? s.price_cents) ?? 0) / 100;
+        const period = ((s.billing_cadence ?? s.billing_period) ?? "month").toLowerCase();
+        if (period.startsWith("year") || period === "annual" || period === "annually") return sum + price / 12;
         if (period.startsWith("week")) return sum + price * 4.33;
         if (period.startsWith("day")) return sum + price * 30;
+        if (period.startsWith("quarter")) return sum + price / 3;
         return sum + price;
       }, 0)
   );
