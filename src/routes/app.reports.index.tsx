@@ -58,8 +58,8 @@ function ReportsLibrary() {
         supabase.from("invoices")
           .select("id, total_cents, status")
           .eq("clinic_id", activeClinic.clinic_id),
-        supabase.from("membership_subscriptions" as never)
-          .select("id, status, price_cents, billing_period, canceled_at, created_at")
+        supabase.from("membership_subscriptions")
+          .select("id, status, canceled_at, created_at, membership:memberships(monthly_price_cents, billing_cadence)")
           .eq("clinic_id", activeClinic.clinic_id),
         supabase.from("inventory_items")
           .select("id, stock_quantity, reorder_threshold, unit_cost_cents")
