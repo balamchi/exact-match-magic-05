@@ -58,17 +58,17 @@ function Profitability() {
       <div className="px-4 pt-4 md:px-6"><Button asChild variant="ghost" size="sm" className="gap-1"><Link to="/app/reports"><ArrowLeft className="h-4 w-4" />Reports</Link></Button></div>
       <ReportShell
         title="Service Profitability"
-        description="Revenue, cost, and margin by service"
+        description="Revenue and revenue-per-hour by service"
         rangeControl={range}
-        primaryKpi={{ label: "Gross profit", value: money(totalProfit) }}
+        primaryKpi={{ label: "Total revenue", value: money(totalRev) }}
         secondaryKpis={[
-          { label: "Revenue", value: money(totalRev) },
-          { label: "Margin", value: totalRev ? `${((totalProfit / totalRev) * 100).toFixed(1)}%` : "—" },
+          { label: "Avg $/hr", value: money(avgRevPerHour) },
+          { label: "Service hours", value: (totalMin / 60).toFixed(1) },
         ]}
         exportFormats={["csv"]}
         onExport={() => exportToCsv(reportFilename("profitability", "csv"),
-          ["Service", "Count", "Revenue", "Cost", "Profit", "Margin %"],
-          rows.map((r) => [r.name, r.count, (r.revenue / 100).toFixed(2), (r.cost / 100).toFixed(2), (r.profit / 100).toFixed(2), r.margin.toFixed(1)]))}
+          ["Service", "Count", "Revenue", "Minutes", "$/hr"],
+          rows.map((r) => [r.name, r.count, (r.revenue / 100).toFixed(2), r.minutes, (r.revPerHour / 100).toFixed(2)]))}
       >
         <ReportTable
           loading={loading}
@@ -76,9 +76,8 @@ function Profitability() {
             { key: "n", header: "Service", cell: (r: typeof rows[number]) => r.name },
             { key: "c", header: "Count", align: "right", cell: (r) => r.count },
             { key: "r", header: "Revenue", align: "right", cell: (r) => money(r.revenue) },
-            { key: "co", header: "Cost", align: "right", cell: (r) => money(r.cost) },
-            { key: "p", header: "Profit", align: "right", cell: (r) => money(r.profit) },
-            { key: "m", header: "Margin", align: "right", cell: (r) => `${r.margin.toFixed(1)}%` },
+            { key: "min", header: "Minutes", align: "right", cell: (r) => r.minutes },
+            { key: "rh", header: "$/hr", align: "right", cell: (r) => money(r.revPerHour) },
           ]}
           rows={rows}
           empty="No completed services in period"
