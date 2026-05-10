@@ -12,25 +12,25 @@ import { money, pct } from "@/lib/reports/format";
 
 export const Route = createFileRoute("/app/reports/financial/payment-methods")({ component: PaymentMethods });
 
-interface Inv { payment_method: string | null; total_cents: number; status: string; created_at: string }
+interface Order { payment_method: string | null; total_cents: number; status: string; created_at: string }
 
 function PaymentMethods() {
   const { activeClinic } = useAuth();
   const range = useReportRange();
-  const [rows, setRows] = useState<Inv[]>([]);
+  const [rows, setRows] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!activeClinic) return;
     (async () => {
       setLoading(true);
-      const { data } = await supabase.from("invoices")
-        .select("payment_method, total_cents, status, created_at" as never)
+      const { data } = await supabase.from("pos_orders")
+        .select("payment_method, total_cents, status, created_at")
         .eq("clinic_id", activeClinic.clinic_id)
-        .eq("status", "paid")
+        .in("status", ["paid", "completed"])
         .gte("created_at", range.range.from.toISOString())
         .lte("created_at", range.range.to.toISOString());
-      setRows(((data ?? []) as unknown) as Inv[]);
+      setRows(((data ?? []) as unknown) as Order[]);
       setLoading(false);
     })();
   }, [activeClinic, range.range]);
