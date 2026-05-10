@@ -343,7 +343,7 @@ async function runQuery(
 
       const planAgg = new Map<string, number>();
       for (const s of active) {
-        const p = planMap.get(s.membership_id) as any;
+        const p = planMap.get(s.membership_id) as { name?: string } | undefined;
         const name = p?.name ?? "Plan";
         planAgg.set(name, (planAgg.get(name) ?? 0) + monthlyOf(s) / 100);
       }
