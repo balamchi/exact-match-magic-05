@@ -32,6 +32,28 @@ function KioskPage() {
   const lookup = useServerFn(lookupClientForKiosk);
   const register = useServerFn(registerNewClientFromKiosk);
   const submit = useServerFn(submitKioskCheckin);
+  const verify = useServerFn(verifyClinicSlug);
+
+  const [clinicValid, setClinicValid] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await verify({ data: { slug: clinicSlug } });
+        if (cancelled) return;
+        if (r.valid) {
+          setClinicName(r.name);
+          setClinicValid(true);
+        } else {
+          setClinicValid(false);
+        }
+      } catch {
+        if (!cancelled) setClinicValid(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [clinicSlug, verify]);
 
   // Auto reset after done
   useEffect(() => {
