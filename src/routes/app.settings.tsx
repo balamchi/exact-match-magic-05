@@ -475,6 +475,32 @@ function SettingsPage() {
         </div>
       </div>
 
+      {/* Developer tools */}
+      {isOwnerOrAdmin && activeClinic && (
+        <section className="rounded-2xl border border-dashed border-border bg-card p-4 sm:p-6 shadow-card">
+          <header>
+            <h2 className="font-display text-lg font-semibold">Developer tools</h2>
+            <p className="text-xs text-muted-foreground">Internal helpers for testing flows.</p>
+          </header>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                const { error } = await supabase
+                  .from("clinics")
+                  .update({ onboarding_completed_at: null, onboarding_dismissed_at: null } as any)
+                  .eq("id", activeClinic.clinic_id);
+                if (error) { toast.error(error.message); return; }
+                toast.success("Onboarding reset. Refresh to see wizard again.");
+              }}
+            >
+              Reset onboarding flow
+            </Button>
+          </div>
+        </section>
+      )}
+
       {/* Public booking link */}
       <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-card">
         <header className="flex items-center gap-3">
