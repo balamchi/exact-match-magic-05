@@ -152,7 +152,10 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       }))
     );
 
-    await supabase.from("services").insert(serviceRows);
+    await supabase.from("services").upsert(serviceRows, {
+      onConflict: "clinic_id,name",
+      ignoreDuplicates: true,
+    });
 
     // ── Consent Forms ──
     const consentForms = [
