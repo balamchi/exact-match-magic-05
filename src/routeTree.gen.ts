@@ -86,6 +86,7 @@ import { Route as AppAiOptimizerRouteImport } from './routes/app.ai-optimizer'
 import { Route as AppAiRouteImport } from './routes/app.ai'
 import { Route as ApiPublicRouteImport } from './routes/api.public'
 import { Route as AppReviewsIndexRouteImport } from './routes/app.reviews.index'
+import { Route as AppReportsIndexRouteImport } from './routes/app.reports.index'
 import { Route as AppReferralsIndexRouteImport } from './routes/app.referrals.index'
 import { Route as ReferClinicSlugCodeRouteImport } from './routes/refer.$clinicSlug.$code'
 import { Route as PortalMembershipTokenRouteImport } from './routes/portal.membership.$token'
@@ -111,6 +112,24 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable.e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable.email.auth.webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable.email.auth.preview'
 import { Route as AppStaffHrStaffIdRouteImport } from './routes/app.staff.hr.$staffId'
+import { Route as AppReportsStaffPerformanceRouteImport } from './routes/app.reports.staff.performance'
+import { Route as AppReportsStaffCommissionsRouteImport } from './routes/app.reports.staff.commissions'
+import { Route as AppReportsServicesProfitabilityRouteImport } from './routes/app.reports.services.profitability'
+import { Route as AppReportsServicesHeatMapRouteImport } from './routes/app.reports.services.heat-map'
+import { Route as AppReportsOperationsNoShowsRouteImport } from './routes/app.reports.operations.no-shows'
+import { Route as AppReportsMembershipsUtilizationRouteImport } from './routes/app.reports.memberships.utilization'
+import { Route as AppReportsMembershipsMrrRouteImport } from './routes/app.reports.memberships.mrr'
+import { Route as AppReportsMarketingChannelsRouteImport } from './routes/app.reports.marketing.channels'
+import { Route as AppReportsMarketingCampaignsRouteImport } from './routes/app.reports.marketing.campaigns'
+import { Route as AppReportsInventoryStockRouteImport } from './routes/app.reports.inventory.stock'
+import { Route as AppReportsInventoryCogsRouteImport } from './routes/app.reports.inventory.cogs'
+import { Route as AppReportsFinancialTaxSummaryRouteImport } from './routes/app.reports.financial.tax-summary'
+import { Route as AppReportsFinancialRevenueRouteImport } from './routes/app.reports.financial.revenue'
+import { Route as AppReportsFinancialPaymentMethodsRouteImport } from './routes/app.reports.financial.payment-methods'
+import { Route as AppReportsFinancialArAgingRouteImport } from './routes/app.reports.financial.ar-aging'
+import { Route as AppReportsClientsRetentionRouteImport } from './routes/app.reports.clients.retention'
+import { Route as AppReportsClientsLifetimeValueRouteImport } from './routes/app.reports.clients.lifetime-value'
+import { Route as AppReportsClientsAcquisitionRouteImport } from './routes/app.reports.clients.acquisition'
 import { Route as AppClinicalSoapNotesNoteIdRouteImport } from './routes/app.clinical.soap-notes.$noteId'
 import { Route as ApiPublicSquareWebhookRouteImport } from './routes/api.public.square.webhook'
 import { Route as ApiPublicSquareStartRouteImport } from './routes/api.public.square.start'
@@ -501,6 +520,11 @@ const AppReviewsIndexRoute = AppReviewsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppReviewsRoute,
 } as any)
+const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppReportsRoute,
+} as any)
 const AppReferralsIndexRoute = AppReferralsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -635,6 +659,113 @@ const AppStaffHrStaffIdRoute = AppStaffHrStaffIdRouteImport.update({
   path: '/hr/$staffId',
   getParentRoute: () => AppStaffRoute,
 } as any)
+const AppReportsStaffPerformanceRoute =
+  AppReportsStaffPerformanceRouteImport.update({
+    id: '/staff/performance',
+    path: '/staff/performance',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsStaffCommissionsRoute =
+  AppReportsStaffCommissionsRouteImport.update({
+    id: '/staff/commissions',
+    path: '/staff/commissions',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsServicesProfitabilityRoute =
+  AppReportsServicesProfitabilityRouteImport.update({
+    id: '/services/profitability',
+    path: '/services/profitability',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsServicesHeatMapRoute =
+  AppReportsServicesHeatMapRouteImport.update({
+    id: '/services/heat-map',
+    path: '/services/heat-map',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsOperationsNoShowsRoute =
+  AppReportsOperationsNoShowsRouteImport.update({
+    id: '/operations/no-shows',
+    path: '/operations/no-shows',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsMembershipsUtilizationRoute =
+  AppReportsMembershipsUtilizationRouteImport.update({
+    id: '/memberships/utilization',
+    path: '/memberships/utilization',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsMembershipsMrrRoute =
+  AppReportsMembershipsMrrRouteImport.update({
+    id: '/memberships/mrr',
+    path: '/memberships/mrr',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsMarketingChannelsRoute =
+  AppReportsMarketingChannelsRouteImport.update({
+    id: '/marketing/channels',
+    path: '/marketing/channels',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsMarketingCampaignsRoute =
+  AppReportsMarketingCampaignsRouteImport.update({
+    id: '/marketing/campaigns',
+    path: '/marketing/campaigns',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsInventoryStockRoute =
+  AppReportsInventoryStockRouteImport.update({
+    id: '/inventory/stock',
+    path: '/inventory/stock',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsInventoryCogsRoute = AppReportsInventoryCogsRouteImport.update({
+  id: '/inventory/cogs',
+  path: '/inventory/cogs',
+  getParentRoute: () => AppReportsRoute,
+} as any)
+const AppReportsFinancialTaxSummaryRoute =
+  AppReportsFinancialTaxSummaryRouteImport.update({
+    id: '/financial/tax-summary',
+    path: '/financial/tax-summary',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsFinancialRevenueRoute =
+  AppReportsFinancialRevenueRouteImport.update({
+    id: '/financial/revenue',
+    path: '/financial/revenue',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsFinancialPaymentMethodsRoute =
+  AppReportsFinancialPaymentMethodsRouteImport.update({
+    id: '/financial/payment-methods',
+    path: '/financial/payment-methods',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsFinancialArAgingRoute =
+  AppReportsFinancialArAgingRouteImport.update({
+    id: '/financial/ar-aging',
+    path: '/financial/ar-aging',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsClientsRetentionRoute =
+  AppReportsClientsRetentionRouteImport.update({
+    id: '/clients/retention',
+    path: '/clients/retention',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsClientsLifetimeValueRoute =
+  AppReportsClientsLifetimeValueRouteImport.update({
+    id: '/clients/lifetime-value',
+    path: '/clients/lifetime-value',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
+const AppReportsClientsAcquisitionRoute =
+  AppReportsClientsAcquisitionRouteImport.update({
+    id: '/clients/acquisition',
+    path: '/clients/acquisition',
+    getParentRoute: () => AppReportsRoute,
+  } as any)
 const AppClinicalSoapNotesNoteIdRoute =
   AppClinicalSoapNotesNoteIdRouteImport.update({
     id: '/$noteId',
@@ -712,7 +843,7 @@ export interface FileRoutesByFullPath {
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRouteWithChildren
-  '/app/reports': typeof AppReportsRoute
+  '/app/reports': typeof AppReportsRouteWithChildren
   '/app/reviews': typeof AppReviewsRouteWithChildren
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
@@ -750,11 +881,30 @@ export interface FileRoutesByFullPath {
   '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
+  '/app/reports/': typeof AppReportsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
   '/api/public/square/webhook': typeof ApiPublicSquareWebhookRoute
   '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
+  '/app/reports/clients/acquisition': typeof AppReportsClientsAcquisitionRoute
+  '/app/reports/clients/lifetime-value': typeof AppReportsClientsLifetimeValueRoute
+  '/app/reports/clients/retention': typeof AppReportsClientsRetentionRoute
+  '/app/reports/financial/ar-aging': typeof AppReportsFinancialArAgingRoute
+  '/app/reports/financial/payment-methods': typeof AppReportsFinancialPaymentMethodsRoute
+  '/app/reports/financial/revenue': typeof AppReportsFinancialRevenueRoute
+  '/app/reports/financial/tax-summary': typeof AppReportsFinancialTaxSummaryRoute
+  '/app/reports/inventory/cogs': typeof AppReportsInventoryCogsRoute
+  '/app/reports/inventory/stock': typeof AppReportsInventoryStockRoute
+  '/app/reports/marketing/campaigns': typeof AppReportsMarketingCampaignsRoute
+  '/app/reports/marketing/channels': typeof AppReportsMarketingChannelsRoute
+  '/app/reports/memberships/mrr': typeof AppReportsMembershipsMrrRoute
+  '/app/reports/memberships/utilization': typeof AppReportsMembershipsUtilizationRoute
+  '/app/reports/operations/no-shows': typeof AppReportsOperationsNoShowsRoute
+  '/app/reports/services/heat-map': typeof AppReportsServicesHeatMapRoute
+  '/app/reports/services/profitability': typeof AppReportsServicesProfitabilityRoute
+  '/app/reports/staff/commissions': typeof AppReportsStaffCommissionsRoute
+  '/app/reports/staff/performance': typeof AppReportsStaffPerformanceRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -819,7 +969,6 @@ export interface FileRoutesByTo {
   '/app/pos': typeof AppPosRoute
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
-  '/app/reports': typeof AppReportsRoute
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
@@ -853,11 +1002,30 @@ export interface FileRoutesByTo {
   '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals': typeof AppReferralsIndexRoute
+  '/app/reports': typeof AppReportsIndexRoute
   '/app/reviews': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
   '/api/public/square/webhook': typeof ApiPublicSquareWebhookRoute
   '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
+  '/app/reports/clients/acquisition': typeof AppReportsClientsAcquisitionRoute
+  '/app/reports/clients/lifetime-value': typeof AppReportsClientsLifetimeValueRoute
+  '/app/reports/clients/retention': typeof AppReportsClientsRetentionRoute
+  '/app/reports/financial/ar-aging': typeof AppReportsFinancialArAgingRoute
+  '/app/reports/financial/payment-methods': typeof AppReportsFinancialPaymentMethodsRoute
+  '/app/reports/financial/revenue': typeof AppReportsFinancialRevenueRoute
+  '/app/reports/financial/tax-summary': typeof AppReportsFinancialTaxSummaryRoute
+  '/app/reports/inventory/cogs': typeof AppReportsInventoryCogsRoute
+  '/app/reports/inventory/stock': typeof AppReportsInventoryStockRoute
+  '/app/reports/marketing/campaigns': typeof AppReportsMarketingCampaignsRoute
+  '/app/reports/marketing/channels': typeof AppReportsMarketingChannelsRoute
+  '/app/reports/memberships/mrr': typeof AppReportsMembershipsMrrRoute
+  '/app/reports/memberships/utilization': typeof AppReportsMembershipsUtilizationRoute
+  '/app/reports/operations/no-shows': typeof AppReportsOperationsNoShowsRoute
+  '/app/reports/services/heat-map': typeof AppReportsServicesHeatMapRoute
+  '/app/reports/services/profitability': typeof AppReportsServicesProfitabilityRoute
+  '/app/reports/staff/commissions': typeof AppReportsStaffCommissionsRoute
+  '/app/reports/staff/performance': typeof AppReportsStaffPerformanceRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -924,7 +1092,7 @@ export interface FileRoutesById {
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRouteWithChildren
-  '/app/reports': typeof AppReportsRoute
+  '/app/reports': typeof AppReportsRouteWithChildren
   '/app/reviews': typeof AppReviewsRouteWithChildren
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
@@ -962,11 +1130,30 @@ export interface FileRoutesById {
   '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
+  '/app/reports/': typeof AppReportsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
   '/api/public/square/webhook': typeof ApiPublicSquareWebhookRoute
   '/app/clinical/soap-notes/$noteId': typeof AppClinicalSoapNotesNoteIdRoute
+  '/app/reports/clients/acquisition': typeof AppReportsClientsAcquisitionRoute
+  '/app/reports/clients/lifetime-value': typeof AppReportsClientsLifetimeValueRoute
+  '/app/reports/clients/retention': typeof AppReportsClientsRetentionRoute
+  '/app/reports/financial/ar-aging': typeof AppReportsFinancialArAgingRoute
+  '/app/reports/financial/payment-methods': typeof AppReportsFinancialPaymentMethodsRoute
+  '/app/reports/financial/revenue': typeof AppReportsFinancialRevenueRoute
+  '/app/reports/financial/tax-summary': typeof AppReportsFinancialTaxSummaryRoute
+  '/app/reports/inventory/cogs': typeof AppReportsInventoryCogsRoute
+  '/app/reports/inventory/stock': typeof AppReportsInventoryStockRoute
+  '/app/reports/marketing/campaigns': typeof AppReportsMarketingCampaignsRoute
+  '/app/reports/marketing/channels': typeof AppReportsMarketingChannelsRoute
+  '/app/reports/memberships/mrr': typeof AppReportsMembershipsMrrRoute
+  '/app/reports/memberships/utilization': typeof AppReportsMembershipsUtilizationRoute
+  '/app/reports/operations/no-shows': typeof AppReportsOperationsNoShowsRoute
+  '/app/reports/services/heat-map': typeof AppReportsServicesHeatMapRoute
+  '/app/reports/services/profitability': typeof AppReportsServicesProfitabilityRoute
+  '/app/reports/staff/commissions': typeof AppReportsStaffCommissionsRoute
+  '/app/reports/staff/performance': typeof AppReportsStaffPerformanceRoute
   '/app/staff/hr/$staffId': typeof AppStaffHrStaffIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -1072,11 +1259,30 @@ export interface FileRouteTypes {
     | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
+    | '/app/reports/'
     | '/app/reviews/'
     | '/api/public/square/callback'
     | '/api/public/square/start'
     | '/api/public/square/webhook'
     | '/app/clinical/soap-notes/$noteId'
+    | '/app/reports/clients/acquisition'
+    | '/app/reports/clients/lifetime-value'
+    | '/app/reports/clients/retention'
+    | '/app/reports/financial/ar-aging'
+    | '/app/reports/financial/payment-methods'
+    | '/app/reports/financial/revenue'
+    | '/app/reports/financial/tax-summary'
+    | '/app/reports/inventory/cogs'
+    | '/app/reports/inventory/stock'
+    | '/app/reports/marketing/campaigns'
+    | '/app/reports/marketing/channels'
+    | '/app/reports/memberships/mrr'
+    | '/app/reports/memberships/utilization'
+    | '/app/reports/operations/no-shows'
+    | '/app/reports/services/heat-map'
+    | '/app/reports/services/profitability'
+    | '/app/reports/staff/commissions'
+    | '/app/reports/staff/performance'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1141,7 +1347,6 @@ export interface FileRouteTypes {
     | '/app/pos'
     | '/app/qa-checklist'
     | '/app/quickbooks'
-    | '/app/reports'
     | '/app/services'
     | '/app/settings'
     | '/app/soap-notes'
@@ -1175,11 +1380,30 @@ export interface FileRouteTypes {
     | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals'
+    | '/app/reports'
     | '/app/reviews'
     | '/api/public/square/callback'
     | '/api/public/square/start'
     | '/api/public/square/webhook'
     | '/app/clinical/soap-notes/$noteId'
+    | '/app/reports/clients/acquisition'
+    | '/app/reports/clients/lifetime-value'
+    | '/app/reports/clients/retention'
+    | '/app/reports/financial/ar-aging'
+    | '/app/reports/financial/payment-methods'
+    | '/app/reports/financial/revenue'
+    | '/app/reports/financial/tax-summary'
+    | '/app/reports/inventory/cogs'
+    | '/app/reports/inventory/stock'
+    | '/app/reports/marketing/campaigns'
+    | '/app/reports/marketing/channels'
+    | '/app/reports/memberships/mrr'
+    | '/app/reports/memberships/utilization'
+    | '/app/reports/operations/no-shows'
+    | '/app/reports/services/heat-map'
+    | '/app/reports/services/profitability'
+    | '/app/reports/staff/commissions'
+    | '/app/reports/staff/performance'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1283,11 +1507,30 @@ export interface FileRouteTypes {
     | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
+    | '/app/reports/'
     | '/app/reviews/'
     | '/api/public/square/callback'
     | '/api/public/square/start'
     | '/api/public/square/webhook'
     | '/app/clinical/soap-notes/$noteId'
+    | '/app/reports/clients/acquisition'
+    | '/app/reports/clients/lifetime-value'
+    | '/app/reports/clients/retention'
+    | '/app/reports/financial/ar-aging'
+    | '/app/reports/financial/payment-methods'
+    | '/app/reports/financial/revenue'
+    | '/app/reports/financial/tax-summary'
+    | '/app/reports/inventory/cogs'
+    | '/app/reports/inventory/stock'
+    | '/app/reports/marketing/campaigns'
+    | '/app/reports/marketing/channels'
+    | '/app/reports/memberships/mrr'
+    | '/app/reports/memberships/utilization'
+    | '/app/reports/operations/no-shows'
+    | '/app/reports/services/heat-map'
+    | '/app/reports/services/profitability'
+    | '/app/reports/staff/commissions'
+    | '/app/reports/staff/performance'
     | '/app/staff/hr/$staffId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -1872,6 +2115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReviewsIndexRouteImport
       parentRoute: typeof AppReviewsRoute
     }
+    '/app/reports/': {
+      id: '/app/reports/'
+      path: '/'
+      fullPath: '/app/reports/'
+      preLoaderRoute: typeof AppReportsIndexRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
     '/app/referrals/': {
       id: '/app/referrals/'
       path: '/'
@@ -2047,6 +2297,132 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStaffHrStaffIdRouteImport
       parentRoute: typeof AppStaffRoute
     }
+    '/app/reports/staff/performance': {
+      id: '/app/reports/staff/performance'
+      path: '/staff/performance'
+      fullPath: '/app/reports/staff/performance'
+      preLoaderRoute: typeof AppReportsStaffPerformanceRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/staff/commissions': {
+      id: '/app/reports/staff/commissions'
+      path: '/staff/commissions'
+      fullPath: '/app/reports/staff/commissions'
+      preLoaderRoute: typeof AppReportsStaffCommissionsRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/services/profitability': {
+      id: '/app/reports/services/profitability'
+      path: '/services/profitability'
+      fullPath: '/app/reports/services/profitability'
+      preLoaderRoute: typeof AppReportsServicesProfitabilityRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/services/heat-map': {
+      id: '/app/reports/services/heat-map'
+      path: '/services/heat-map'
+      fullPath: '/app/reports/services/heat-map'
+      preLoaderRoute: typeof AppReportsServicesHeatMapRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/operations/no-shows': {
+      id: '/app/reports/operations/no-shows'
+      path: '/operations/no-shows'
+      fullPath: '/app/reports/operations/no-shows'
+      preLoaderRoute: typeof AppReportsOperationsNoShowsRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/memberships/utilization': {
+      id: '/app/reports/memberships/utilization'
+      path: '/memberships/utilization'
+      fullPath: '/app/reports/memberships/utilization'
+      preLoaderRoute: typeof AppReportsMembershipsUtilizationRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/memberships/mrr': {
+      id: '/app/reports/memberships/mrr'
+      path: '/memberships/mrr'
+      fullPath: '/app/reports/memberships/mrr'
+      preLoaderRoute: typeof AppReportsMembershipsMrrRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/marketing/channels': {
+      id: '/app/reports/marketing/channels'
+      path: '/marketing/channels'
+      fullPath: '/app/reports/marketing/channels'
+      preLoaderRoute: typeof AppReportsMarketingChannelsRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/marketing/campaigns': {
+      id: '/app/reports/marketing/campaigns'
+      path: '/marketing/campaigns'
+      fullPath: '/app/reports/marketing/campaigns'
+      preLoaderRoute: typeof AppReportsMarketingCampaignsRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/inventory/stock': {
+      id: '/app/reports/inventory/stock'
+      path: '/inventory/stock'
+      fullPath: '/app/reports/inventory/stock'
+      preLoaderRoute: typeof AppReportsInventoryStockRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/inventory/cogs': {
+      id: '/app/reports/inventory/cogs'
+      path: '/inventory/cogs'
+      fullPath: '/app/reports/inventory/cogs'
+      preLoaderRoute: typeof AppReportsInventoryCogsRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/financial/tax-summary': {
+      id: '/app/reports/financial/tax-summary'
+      path: '/financial/tax-summary'
+      fullPath: '/app/reports/financial/tax-summary'
+      preLoaderRoute: typeof AppReportsFinancialTaxSummaryRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/financial/revenue': {
+      id: '/app/reports/financial/revenue'
+      path: '/financial/revenue'
+      fullPath: '/app/reports/financial/revenue'
+      preLoaderRoute: typeof AppReportsFinancialRevenueRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/financial/payment-methods': {
+      id: '/app/reports/financial/payment-methods'
+      path: '/financial/payment-methods'
+      fullPath: '/app/reports/financial/payment-methods'
+      preLoaderRoute: typeof AppReportsFinancialPaymentMethodsRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/financial/ar-aging': {
+      id: '/app/reports/financial/ar-aging'
+      path: '/financial/ar-aging'
+      fullPath: '/app/reports/financial/ar-aging'
+      preLoaderRoute: typeof AppReportsFinancialArAgingRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/clients/retention': {
+      id: '/app/reports/clients/retention'
+      path: '/clients/retention'
+      fullPath: '/app/reports/clients/retention'
+      preLoaderRoute: typeof AppReportsClientsRetentionRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/clients/lifetime-value': {
+      id: '/app/reports/clients/lifetime-value'
+      path: '/clients/lifetime-value'
+      fullPath: '/app/reports/clients/lifetime-value'
+      preLoaderRoute: typeof AppReportsClientsLifetimeValueRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
+    '/app/reports/clients/acquisition': {
+      id: '/app/reports/clients/acquisition'
+      path: '/clients/acquisition'
+      fullPath: '/app/reports/clients/acquisition'
+      preLoaderRoute: typeof AppReportsClientsAcquisitionRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
     '/app/clinical/soap-notes/$noteId': {
       id: '/app/clinical/soap-notes/$noteId'
       path: '/$noteId'
@@ -2177,6 +2553,55 @@ const AppReferralsRouteWithChildren = AppReferralsRoute._addFileChildren(
   AppReferralsRouteChildren,
 )
 
+interface AppReportsRouteChildren {
+  AppReportsIndexRoute: typeof AppReportsIndexRoute
+  AppReportsClientsAcquisitionRoute: typeof AppReportsClientsAcquisitionRoute
+  AppReportsClientsLifetimeValueRoute: typeof AppReportsClientsLifetimeValueRoute
+  AppReportsClientsRetentionRoute: typeof AppReportsClientsRetentionRoute
+  AppReportsFinancialArAgingRoute: typeof AppReportsFinancialArAgingRoute
+  AppReportsFinancialPaymentMethodsRoute: typeof AppReportsFinancialPaymentMethodsRoute
+  AppReportsFinancialRevenueRoute: typeof AppReportsFinancialRevenueRoute
+  AppReportsFinancialTaxSummaryRoute: typeof AppReportsFinancialTaxSummaryRoute
+  AppReportsInventoryCogsRoute: typeof AppReportsInventoryCogsRoute
+  AppReportsInventoryStockRoute: typeof AppReportsInventoryStockRoute
+  AppReportsMarketingCampaignsRoute: typeof AppReportsMarketingCampaignsRoute
+  AppReportsMarketingChannelsRoute: typeof AppReportsMarketingChannelsRoute
+  AppReportsMembershipsMrrRoute: typeof AppReportsMembershipsMrrRoute
+  AppReportsMembershipsUtilizationRoute: typeof AppReportsMembershipsUtilizationRoute
+  AppReportsOperationsNoShowsRoute: typeof AppReportsOperationsNoShowsRoute
+  AppReportsServicesHeatMapRoute: typeof AppReportsServicesHeatMapRoute
+  AppReportsServicesProfitabilityRoute: typeof AppReportsServicesProfitabilityRoute
+  AppReportsStaffCommissionsRoute: typeof AppReportsStaffCommissionsRoute
+  AppReportsStaffPerformanceRoute: typeof AppReportsStaffPerformanceRoute
+}
+
+const AppReportsRouteChildren: AppReportsRouteChildren = {
+  AppReportsIndexRoute: AppReportsIndexRoute,
+  AppReportsClientsAcquisitionRoute: AppReportsClientsAcquisitionRoute,
+  AppReportsClientsLifetimeValueRoute: AppReportsClientsLifetimeValueRoute,
+  AppReportsClientsRetentionRoute: AppReportsClientsRetentionRoute,
+  AppReportsFinancialArAgingRoute: AppReportsFinancialArAgingRoute,
+  AppReportsFinancialPaymentMethodsRoute:
+    AppReportsFinancialPaymentMethodsRoute,
+  AppReportsFinancialRevenueRoute: AppReportsFinancialRevenueRoute,
+  AppReportsFinancialTaxSummaryRoute: AppReportsFinancialTaxSummaryRoute,
+  AppReportsInventoryCogsRoute: AppReportsInventoryCogsRoute,
+  AppReportsInventoryStockRoute: AppReportsInventoryStockRoute,
+  AppReportsMarketingCampaignsRoute: AppReportsMarketingCampaignsRoute,
+  AppReportsMarketingChannelsRoute: AppReportsMarketingChannelsRoute,
+  AppReportsMembershipsMrrRoute: AppReportsMembershipsMrrRoute,
+  AppReportsMembershipsUtilizationRoute: AppReportsMembershipsUtilizationRoute,
+  AppReportsOperationsNoShowsRoute: AppReportsOperationsNoShowsRoute,
+  AppReportsServicesHeatMapRoute: AppReportsServicesHeatMapRoute,
+  AppReportsServicesProfitabilityRoute: AppReportsServicesProfitabilityRoute,
+  AppReportsStaffCommissionsRoute: AppReportsStaffCommissionsRoute,
+  AppReportsStaffPerformanceRoute: AppReportsStaffPerformanceRoute,
+}
+
+const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
+  AppReportsRouteChildren,
+)
+
 interface AppReviewsRouteChildren {
   AppReviewsSettingsRoute: typeof AppReviewsSettingsRoute
   AppReviewsIndexRoute: typeof AppReviewsIndexRoute
@@ -2247,7 +2672,7 @@ interface AppRouteChildren {
   AppQaChecklistRoute: typeof AppQaChecklistRoute
   AppQuickbooksRoute: typeof AppQuickbooksRoute
   AppReferralsRoute: typeof AppReferralsRouteWithChildren
-  AppReportsRoute: typeof AppReportsRoute
+  AppReportsRoute: typeof AppReportsRouteWithChildren
   AppReviewsRoute: typeof AppReviewsRouteWithChildren
   AppServicesRoute: typeof AppServicesRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
@@ -2292,7 +2717,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppQaChecklistRoute: AppQaChecklistRoute,
   AppQuickbooksRoute: AppQuickbooksRoute,
   AppReferralsRoute: AppReferralsRouteWithChildren,
-  AppReportsRoute: AppReportsRoute,
+  AppReportsRoute: AppReportsRouteWithChildren,
   AppReviewsRoute: AppReviewsRouteWithChildren,
   AppServicesRoute: AppServicesRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
