@@ -328,3 +328,95 @@ export const resumeMemberSubscription = createServerFn({ method: "POST" })
       .eq("id", row.id);
     return { ok: true };
   });
+
+/* ─────────── Retry failed charge ─────────── */
+
+const RetryInput = z.object({ charge_id: z.string().uuid() });
+
+export const retryFailedCharge = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => RetryInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: charge, error } = await supabase
+      .from("membership_charges")
+      .select(
+        "id, clinic_id, subscription_id, amount_cents, currency, status, square_invoice_id",
+      )
+      .eq("id", data.charge_id)
+      .maybeSingle();
+    if (error || !charge) throw new Error("Charge not found");
+    if (charge.status !== "failed") throw new Error("Only failed charges can be retried.");
+
+    const { data: roleRow } = await supabase
+      .from("clinic_members")
+      .select("role")
+      .eq("clinic_id", charge.clinic_id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!roleRow || (roleRow.role !== "owner" && roleRow.role !== "admin")) {
+      throw new Error("Only clinic owners/admins can retry charges.");
+    }
+
+    const { data: sub } = await supabaseAdmin
+      .from("membership_subscriptions")
+      .select("square_customer_id, square_card_id, square_subscription_id")
+      .eq("id", charge.subscription_id)
+      .maybeSingle();
+    if (!sub?.square_customer_id || !sub?.square_card_id) {
+      throw new Error("Subscription is missing customer/card on file.");
+    }
+
+    const conn = await getActiveSquareConnection(charge.clinic_id);
+    const cfg = getSquareEnv();
+
+    // Charge the card-on-file directly for the failed amount. Square will
+    // emit invoice.payment_made if the underlying invoice subsequently settles,
+    // but we also mirror the success locally on a 200.
+    const payRes = await fetch(`${cfg.apiBase}/v2/payments`, {
+      method: "POST",
+      headers: sqHeaders(conn.access_token),
+      body: JSON.stringify({
+        idempotency_key: `retry-${charge.id}-${Date.now()}`,
+        source_id: sub.square_card_id,
+        customer_id: sub.square_customer_id,
+        amount_money: {
+          amount: charge.amount_cents,
+          currency: charge.currency ?? "USD",
+        },
+        reference_id: charge.subscription_id,
+        note: `Retry of failed membership charge ${charge.id}`,
+      }),
+    });
+
+    if (!payRes.ok) {
+      const t = await payRes.text();
+      throw new Error(`Square retry failed (${payRes.status}): ${t.slice(0, 200)}`);
+    }
+    const pj = (await payRes.json()) as { payment?: { id: string; status?: string } };
+    const paymentId = pj.payment?.id ?? null;
+
+    await supabaseAdmin
+      .from("membership_charges")
+      .update({
+        status: "paid",
+        square_payment_id: paymentId,
+        charged_at: new Date().toISOString(),
+        failure_reason: null,
+      })
+      .eq("id", charge.id);
+
+    await supabaseAdmin
+      .from("membership_subscriptions")
+      .update({
+        last_charge_at: new Date().toISOString(),
+        last_charge_status: "paid",
+        failed_charge_count: 0,
+        status: "active",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", charge.subscription_id);
+
+    return { ok: true, payment_id: paymentId };
+  });
