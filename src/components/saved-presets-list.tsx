@@ -55,19 +55,25 @@ export function SavedPresetsList() {
   return (
     <div className="space-y-3">
       {rows.map((r) => {
-        const presetLabel = REPORT_PRESETS.find((p) => p.id === r.config?.presetId)?.label ?? "Last 30 days";
+        const cfg = (r.config ?? {}) as { presetId?: string; compare?: boolean; custom?: boolean };
+        const presetLabel = REPORT_PRESETS.find((p) => p.id === cfg.presetId)?.label ?? "Last 30 days";
+        const isCustom = !!cfg.custom || r.report_key === "custom";
+        const href = isCustom
+          ? `/app/reports/builder?preset=${r.id}`
+          : `/app/reports/${r.report_key.replace(/\./g, "/")}`;
         return (
           <Card key={r.id} className="flex items-center justify-between p-4">
             <div>
-              <div className="font-medium">{r.name}</div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{r.name}</span>
+                {isCustom && <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">Custom</span>}
+              </div>
               <div className="text-xs text-muted-foreground">
-                {r.report_key} · {presetLabel}{r.config?.compare ? " · vs previous" : ""}
+                {isCustom ? "Custom builder" : r.report_key} · {presetLabel}{cfg.compare ? " · vs previous" : ""}
               </div>
             </div>
             <div className="flex gap-2">
-              <Button asChild size="sm" variant="outline">
-                <a href={`/app/reports/${r.report_key.replace(/\./g, "/")}`}>Open</a>
-              </Button>
+              <Button asChild size="sm" variant="outline"><a href={href}>Open</a></Button>
               <Button size="sm" variant="ghost" onClick={() => remove(r.id)}>
                 <Trash2 className="h-4 w-4" />
               </Button>
