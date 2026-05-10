@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import { ReportCard } from "@/components/report-card";
 import { ReportDatePicker } from "@/components/report-date-picker";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { SavedPresetsList } from "@/components/saved-presets-list";
+import { ScheduledReportsList } from "@/components/scheduled-reports-list";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useReportRange } from "@/lib/reports/hooks";
@@ -205,9 +208,7 @@ function ReportsLibrary() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight md:text-2xl">Reports</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Insights into every part of your clinic
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">Insights into every part of your clinic</p>
         </div>
         <ReportDatePicker
           presetId={presetId} onPresetChange={setPresetId}
@@ -215,14 +216,25 @@ function ReportsLibrary() {
         />
       </div>
 
-      {sections.map((s) => (
-        <section key={s.title} className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{s.title}</h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {s.reports.map((r) => <ReportCard key={r.href} {...r} />)}
-          </div>
-        </section>
-      ))}
+      <Tabs defaultValue="all">
+        <TabsList>
+          <TabsTrigger value="all">All Reports</TabsTrigger>
+          <TabsTrigger value="saved">Saved</TabsTrigger>
+          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+        </TabsList>
+        <TabsContent value="all" className="space-y-6 pt-4">
+          {sections.map((s) => (
+            <section key={s.title} className="space-y-3">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{s.title}</h2>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {s.reports.map((r) => <ReportCard key={r.href} {...r} />)}
+              </div>
+            </section>
+          ))}
+        </TabsContent>
+        <TabsContent value="saved" className="pt-4"><SavedPresetsList /></TabsContent>
+        <TabsContent value="scheduled" className="pt-4"><ScheduledReportsList /></TabsContent>
+      </Tabs>
     </div>
   );
 }

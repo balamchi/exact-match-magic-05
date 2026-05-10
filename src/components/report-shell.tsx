@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { useLocation } from "@tanstack/react-router";
 import { Download, Save, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -6,19 +7,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ReportDatePicker } from "./report-date-picker";
 import { ReportComparisonBadge } from "./report-comparison-badge";
+import { SavePresetDialog } from "./save-preset-dialog";
+import { ScheduleReportDialog } from "./schedule-report-dialog";
 import { useReportRange } from "@/lib/reports/hooks";
 import type { DateRange } from "@/lib/reports/hooks";
-import { toast } from "sonner";
 
 export interface ReportShellProps {
   title: string;
   description?: string;
+  reportKey?: string;
   primaryKpi?: { label: string; value: string; trend?: { value: number; direction: "up" | "down" | "flat" }; inverse?: boolean };
   secondaryKpis?: { label: string; value: string }[];
   exportFormats?: ("csv" | "pdf" | "xlsx")[];
   onExport?: (format: "csv" | "pdf" | "xlsx") => void;
-  saveable?: boolean;
-  scheduleEmail?: boolean;
   toolbar?: ReactNode;
   children: ReactNode;
   rangeControl?: {
@@ -31,11 +32,15 @@ export interface ReportShellProps {
 }
 
 export function ReportShell({
-  title, description, primaryKpi, secondaryKpis, exportFormats = ["csv"], onExport,
-  saveable, scheduleEmail, toolbar, children, rangeControl,
+  title, description, reportKey, primaryKpi, secondaryKpis, exportFormats = ["csv"], onExport,
+  toolbar, children, rangeControl,
 }: ReportShellProps) {
   const fallback = useReportRange();
   const r = rangeControl ?? fallback;
+  const location = useLocation();
+  const derivedKey = reportKey ?? location.pathname.replace(/^\/app\/reports\//, "").replace(/\//g, ".");
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
 
   return (
     <div className="space-y-4 p-4 md:p-6">
@@ -68,18 +73,24 @@ export function ReportShell({
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          {saveable && (
-            <Button variant="outline" size="sm" className="gap-2" onClick={() => toast.success("Preset saved")}>
-              <Save className="h-3.5 w-3.5" /> Save
-            </Button>
-          )}
-          {scheduleEmail && (
-            <Button variant="outline" size="sm" className="gap-2" onClick={() => toast.success("Email schedule configured")}>
-              <Mail className="h-3.5 w-3.5" /> Schedule
-            </Button>
-          )}
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setSaveOpen(true)}>
+            <Save className="h-3.5 w-3.5" /> Save
+          </Button>
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setScheduleOpen(true)}>
+            <Mail className="h-3.5 w-3.5" /> Schedule
+          </Button>
         </div>
       </div>
+
+      <SavePresetDialog
+        open={saveOpen} onOpenChange={setSaveOpen}
+        reportKey={derivedKey} reportTitle={title}
+        presetId={r.presetId} compare={r.compare}
+      />
+      <ScheduleReportDialog
+        open={scheduleOpen} onOpenChange={setScheduleOpen}
+        reportKey={derivedKey} reportTitle={title}
+      />
 
       {primaryKpi && (
         <div className="rounded-xl border border-border/50 bg-card/50 p-4 md:p-5">

@@ -81,8 +81,6 @@ function RevenueReport() {
         ]}
         exportFormats={["csv"]}
         onExport={handleExport}
-        saveable
-        scheduleEmail
       >
         <Card className="p-4">
           <h3 className="mb-3 text-sm font-semibold">Daily revenue</h3>
