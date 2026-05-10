@@ -4,12 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Phone, Mail, ArrowRight, CheckCircle2, ClipboardCheck } from "lucide-react";
+import { Sparkles, Phone, Mail, ArrowRight, CheckCircle2, ClipboardCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   lookupClientForKiosk,
   registerNewClientFromKiosk,
   submitKioskCheckin,
+  verifyClinicSlug,
 } from "@/lib/kiosk/kiosk.functions";
 
 export const Route = createFileRoute("/kiosk/$clinicSlug")({
