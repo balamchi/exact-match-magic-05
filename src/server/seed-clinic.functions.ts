@@ -7,8 +7,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  */
 export const seedClinicDefaults = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((d: { force?: boolean } | undefined) => d ?? {})
+  .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const force = data?.force === true;
 
     // Get user's clinic
     const { data: membership } = await supabase
