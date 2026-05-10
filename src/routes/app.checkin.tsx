@@ -32,6 +32,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { KioskUrlCard } from "@/components/kiosk-url-card";
 
 export const Route = createFileRoute("/app/checkin")({ component: CheckinPage });
 
