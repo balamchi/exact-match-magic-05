@@ -12,7 +12,7 @@ import { num } from "@/lib/reports/format";
 
 export const Route = createFileRoute("/app/reports/clients/acquisition")({ component: Acquisition });
 
-interface Client { id: string; created_at: string; referral_source?: string | null }
+interface Client { id: string; created_at: string; source?: string | null }
 
 function Acquisition() {
   const { activeClinic } = useAuth();
