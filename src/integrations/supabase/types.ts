@@ -2102,6 +2102,54 @@ export type Database = {
         }
         Relationships: []
       }
+      member_portal_tokens: {
+        Row: {
+          clinic_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          last_used_at: string | null
+          revoked_at: string | null
+          subscription_id: string
+          token: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          subscription_id: string
+          token: string
+        }
+        Update: {
+          clinic_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          subscription_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_portal_tokens_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_portal_tokens_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "membership_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       membership_benefits: {
         Row: {
           active: boolean | null
