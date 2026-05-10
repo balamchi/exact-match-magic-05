@@ -82,7 +82,7 @@ function Commissions() {
           columns={[
             { key: "n", header: "Staff", cell: (r: typeof rows[number]) => r.name },
             { key: "r", header: "Revenue", align: "right", cell: (r) => money(r.revenue) },
-            { key: "rt", header: "Rate", align: "right", cell: (r) => `${r.rate}%` },
+            { key: "rt", header: "Rate", align: "right", cell: (r) => `${r.rate.toFixed(1)}%` },
             { key: "c", header: "Commission", align: "right", cell: (r) => money(r.commission) },
           ]}
           rows={rows}
