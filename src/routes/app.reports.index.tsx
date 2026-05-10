@@ -46,7 +46,7 @@ function ReportsLibrary() {
       const fromIso = range.from.toISOString();
       const toIso = range.to.toISOString();
 
-      const [apptsRes, prevApptsRes, invoicesRes, subsRes, inventoryRes] = await Promise.all([
+      const [apptsRes, prevApptsRes, invoicesRes, subsRes, plansRes, inventoryRes] = await Promise.all([
         supabase.from("appointments")
           .select("id, client_id, staff_id, starts_at, status, price_cents")
           .eq("clinic_id", activeClinic.clinic_id)
@@ -59,7 +59,10 @@ function ReportsLibrary() {
           .select("id, total_cents, status")
           .eq("clinic_id", activeClinic.clinic_id),
         supabase.from("membership_subscriptions")
-          .select("id, status, canceled_at, created_at, membership:memberships(monthly_price_cents, billing_cadence)")
+          .select("id, status, canceled_at, created_at, membership_id")
+          .eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("memberships")
+          .select("id, monthly_price_cents, billing_cadence")
           .eq("clinic_id", activeClinic.clinic_id),
         supabase.from("inventory_items")
           .select("id, stock_quantity, reorder_threshold, unit_cost_cents")
