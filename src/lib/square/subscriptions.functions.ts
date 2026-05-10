@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuth } from "@/integrations/supabase/client-auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getSquareEnv } from "@/lib/square/config";
 import { getActiveSquareConnection, sqHeaders } from "@/lib/square/token.server";
@@ -22,7 +23,7 @@ const EnrollInput = z.object({
 
 
 export const enrollMember = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => EnrollInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -186,7 +187,7 @@ export const enrollMember = createServerFn({ method: "POST" })
 const CancelInput = z.object({ subscription_id: z.string().uuid() });
 
 export const cancelMemberSubscription = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => CancelInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -272,7 +273,7 @@ async function loadSubAndAuthorize(
 }
 
 export const pauseMemberSubscription = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => SubIdInput.parse(d))
   .handler(async ({ data, context }) => {
     const row = await loadSubAndAuthorize(context.supabase, context.userId, data.subscription_id);
@@ -301,7 +302,7 @@ export const pauseMemberSubscription = createServerFn({ method: "POST" })
   });
 
 export const resumeMemberSubscription = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => SubIdInput.parse(d))
   .handler(async ({ data, context }) => {
     const row = await loadSubAndAuthorize(context.supabase, context.userId, data.subscription_id);
@@ -334,7 +335,7 @@ export const resumeMemberSubscription = createServerFn({ method: "POST" })
 const RetryInput = z.object({ charge_id: z.string().uuid() });
 
 export const retryFailedCharge = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => RetryInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -429,7 +430,7 @@ const ChangePlanInput = z.object({
 });
 
 export const changeMemberPlan = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((d) => ChangePlanInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
