@@ -33,7 +33,7 @@ function Commissions() {
           .eq("status", "completed")
           .gte("starts_at", range.range.from.toISOString())
           .lte("starts_at", range.range.to.toISOString()),
-        supabase.from("staff").select("id, first_name, last_name, commission_rate" as never).eq("clinic_id", activeClinic.clinic_id),
+        supabase.from("staff").select("id, display_name" as never).eq("clinic_id", activeClinic.clinic_id),
       ]);
       setAppts(((a.data ?? []) as unknown) as Appt[]);
       setStaff(((s.data ?? []) as unknown) as Staff[]);
