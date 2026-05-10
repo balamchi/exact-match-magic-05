@@ -50,7 +50,13 @@ interface Service {
 }
 
 const CATEGORIES = [
-  "Injectables", "Facials", "Laser", "Body", "Hair", "Skin", "Wellness", "Other",
+  "Injectables",
+  "Skin Treatments",
+  "Laser & Energy",
+  "Body Contouring",
+  "Wellness & IV",
+  "Consultations",
+  "Other",
 ] as const;
 
 const TREATMENT_AREAS = ["Face", "Body", "Hair", "Hands", "Feet"] as const;
