@@ -271,7 +271,7 @@ async function runQuery(
         .gte("starts_at", fromISO).lte("starts_at", toISO);
       if (filters.locationId !== "all") q = q.eq("location_id", filters.locationId);
       if (filters.serviceId !== "all") q = q.eq("service_id", filters.serviceId);
-      if (filters.status !== "all") q = q.eq("status", filters.status);
+      if (filters.status !== "all") q = q.eq("status", filters.status as "completed" | "cancelled" | "no_show");
       const { data: appts } = await q;
       const list = (appts ?? []) as { staff_id: string|null; starts_at: string; ends_at: string; price_cents: number; status: string }[];
 
