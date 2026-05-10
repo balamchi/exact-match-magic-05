@@ -52,7 +52,6 @@ import { Route as AppSoapNotesRouteImport } from './routes/app.soap-notes'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppServicesRouteImport } from './routes/app.services'
 import { Route as AppReviewsRouteImport } from './routes/app.reviews'
-import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppReferralsRouteImport } from './routes/app.referrals'
 import { Route as AppQuickbooksRouteImport } from './routes/app.quickbooks'
 import { Route as AppQaChecklistRouteImport } from './routes/app.qa-checklist'
@@ -86,6 +85,7 @@ import { Route as AppAiOptimizerRouteImport } from './routes/app.ai-optimizer'
 import { Route as AppAiRouteImport } from './routes/app.ai'
 import { Route as ApiPublicRouteImport } from './routes/api.public'
 import { Route as AppReviewsIndexRouteImport } from './routes/app.reviews.index'
+import { Route as AppReportsIndexRouteImport } from './routes/app.reports.index'
 import { Route as AppReferralsIndexRouteImport } from './routes/app.referrals.index'
 import { Route as ReferClinicSlugCodeRouteImport } from './routes/refer.$clinicSlug.$code'
 import { Route as PortalMembershipTokenRouteImport } from './routes/portal.membership.$token'
@@ -331,11 +331,6 @@ const AppReviewsRoute = AppReviewsRouteImport.update({
   path: '/reviews',
   getParentRoute: () => AppRoute,
 } as any)
-const AppReportsRoute = AppReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppReferralsRoute = AppReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
@@ -500,6 +495,11 @@ const AppReviewsIndexRoute = AppReviewsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppReviewsRoute,
+} as any)
+const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
+  id: '/reports/',
+  path: '/reports/',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppReferralsIndexRoute = AppReferralsIndexRouteImport.update({
   id: '/',
@@ -712,7 +712,6 @@ export interface FileRoutesByFullPath {
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRouteWithChildren
-  '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRouteWithChildren
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
@@ -750,6 +749,7 @@ export interface FileRoutesByFullPath {
   '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
+  '/app/reports/': typeof AppReportsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
@@ -819,7 +819,6 @@ export interface FileRoutesByTo {
   '/app/pos': typeof AppPosRoute
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
-  '/app/reports': typeof AppReportsRoute
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
   '/app/soap-notes': typeof AppSoapNotesRoute
@@ -853,6 +852,7 @@ export interface FileRoutesByTo {
   '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals': typeof AppReferralsIndexRoute
+  '/app/reports': typeof AppReportsIndexRoute
   '/app/reviews': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
@@ -924,7 +924,6 @@ export interface FileRoutesById {
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRouteWithChildren
-  '/app/reports': typeof AppReportsRoute
   '/app/reviews': typeof AppReviewsRouteWithChildren
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
@@ -962,6 +961,7 @@ export interface FileRoutesById {
   '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
+  '/app/reports/': typeof AppReportsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
   '/api/public/square/callback': typeof ApiPublicSquareCallbackRoute
   '/api/public/square/start': typeof ApiPublicSquareStartRoute
@@ -1034,7 +1034,6 @@ export interface FileRouteTypes {
     | '/app/qa-checklist'
     | '/app/quickbooks'
     | '/app/referrals'
-    | '/app/reports'
     | '/app/reviews'
     | '/app/services'
     | '/app/settings'
@@ -1072,6 +1071,7 @@ export interface FileRouteTypes {
     | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
+    | '/app/reports/'
     | '/app/reviews/'
     | '/api/public/square/callback'
     | '/api/public/square/start'
@@ -1141,7 +1141,6 @@ export interface FileRouteTypes {
     | '/app/pos'
     | '/app/qa-checklist'
     | '/app/quickbooks'
-    | '/app/reports'
     | '/app/services'
     | '/app/settings'
     | '/app/soap-notes'
@@ -1175,6 +1174,7 @@ export interface FileRouteTypes {
     | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals'
+    | '/app/reports'
     | '/app/reviews'
     | '/api/public/square/callback'
     | '/api/public/square/start'
@@ -1245,7 +1245,6 @@ export interface FileRouteTypes {
     | '/app/qa-checklist'
     | '/app/quickbooks'
     | '/app/referrals'
-    | '/app/reports'
     | '/app/reviews'
     | '/app/services'
     | '/app/settings'
@@ -1283,6 +1282,7 @@ export interface FileRouteTypes {
     | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
+    | '/app/reports/'
     | '/app/reviews/'
     | '/api/public/square/callback'
     | '/api/public/square/start'
@@ -1634,13 +1634,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReviewsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/reports': {
-      id: '/app/reports'
-      path: '/reports'
-      fullPath: '/app/reports'
-      preLoaderRoute: typeof AppReportsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/referrals': {
       id: '/app/referrals'
       path: '/referrals'
@@ -1871,6 +1864,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/reviews/'
       preLoaderRoute: typeof AppReviewsIndexRouteImport
       parentRoute: typeof AppReviewsRoute
+    }
+    '/app/reports/': {
+      id: '/app/reports/'
+      path: '/reports'
+      fullPath: '/app/reports/'
+      preLoaderRoute: typeof AppReportsIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/referrals/': {
       id: '/app/referrals/'
@@ -2247,7 +2247,6 @@ interface AppRouteChildren {
   AppQaChecklistRoute: typeof AppQaChecklistRoute
   AppQuickbooksRoute: typeof AppQuickbooksRoute
   AppReferralsRoute: typeof AppReferralsRouteWithChildren
-  AppReportsRoute: typeof AppReportsRoute
   AppReviewsRoute: typeof AppReviewsRouteWithChildren
   AppServicesRoute: typeof AppServicesRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
@@ -2258,6 +2257,7 @@ interface AppRouteChildren {
   AppWhatsappRoute: typeof AppWhatsappRoute
   AppClientsClientIdRoute: typeof AppClientsClientIdRoute
   AppCommunicationTemplatesRoute: typeof AppCommunicationTemplatesRoute
+  AppReportsIndexRoute: typeof AppReportsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -2292,7 +2292,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppQaChecklistRoute: AppQaChecklistRoute,
   AppQuickbooksRoute: AppQuickbooksRoute,
   AppReferralsRoute: AppReferralsRouteWithChildren,
-  AppReportsRoute: AppReportsRoute,
   AppReviewsRoute: AppReviewsRouteWithChildren,
   AppServicesRoute: AppServicesRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
@@ -2303,6 +2302,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppWhatsappRoute: AppWhatsappRoute,
   AppClientsClientIdRoute: AppClientsClientIdRoute,
   AppCommunicationTemplatesRoute: AppCommunicationTemplatesRoute,
+  AppReportsIndexRoute: AppReportsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -2441,3 +2441,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
