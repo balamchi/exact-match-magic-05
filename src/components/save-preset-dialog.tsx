@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { REPORT_PRESETS } from "@/lib/reports/hooks";
+import type { CustomReportConfig } from "@/lib/reports/builder-schema";
 
 interface Props {
   open: boolean;
@@ -15,9 +16,13 @@ interface Props {
   reportTitle: string;
   presetId: string;
   compare: boolean;
+  /** When provided, the preset is saved as a custom-builder config instead of a canned-report preset. */
+  customConfig?: CustomReportConfig;
 }
 
-export function SavePresetDialog({ open, onOpenChange, reportKey, reportTitle, presetId, compare }: Props) {
+export function SavePresetDialog({
+  open, onOpenChange, reportKey, reportTitle, presetId, compare, customConfig,
+}: Props) {
   const { activeClinic, user } = useAuth();
   const [name, setName] = useState(`${reportTitle} view`);
   const [saving, setSaving] = useState(false);

@@ -96,6 +96,7 @@ import { Route as LovableEmailQueueRouteImport } from './routes/lovable.email.qu
 import { Route as LovableEmailAuthRouteImport } from './routes/lovable.email.auth'
 import { Route as AppSettingsBillingRouteImport } from './routes/app.settings.billing'
 import { Route as AppReviewsSettingsRouteImport } from './routes/app.reviews.settings'
+import { Route as AppReportsBuilderRouteImport } from './routes/app.reports.builder'
 import { Route as AppReferralsSettingsRouteImport } from './routes/app.referrals.settings'
 import { Route as AppCommunicationTemplatesRouteImport } from './routes/app.communication.templates'
 import { Route as AppClinicalTreatmentPlansRouteImport } from './routes/app.clinical.treatment-plans'
@@ -571,6 +572,11 @@ const AppReviewsSettingsRoute = AppReviewsSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppReviewsRoute,
 } as any)
+const AppReportsBuilderRoute = AppReportsBuilderRouteImport.update({
+  id: '/builder',
+  path: '/builder',
+  getParentRoute: () => AppReportsRoute,
+} as any)
 const AppReferralsSettingsRoute = AppReferralsSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -872,6 +878,7 @@ export interface FileRoutesByFullPath {
   '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansRouteWithChildren
   '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
+  '/app/reports/builder': typeof AppReportsBuilderRoute
   '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
@@ -993,6 +1000,7 @@ export interface FileRoutesByTo {
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
+  '/app/reports/builder': typeof AppReportsBuilderRoute
   '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
@@ -1121,6 +1129,7 @@ export interface FileRoutesById {
   '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansRouteWithChildren
   '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
+  '/app/reports/builder': typeof AppReportsBuilderRoute
   '/app/reviews/settings': typeof AppReviewsSettingsRoute
   '/app/settings/billing': typeof AppSettingsBillingRoute
   '/lovable/email/auth': typeof LovableEmailAuthRouteWithChildren
@@ -1250,6 +1259,7 @@ export interface FileRouteTypes {
     | '/app/clinical/treatment-plans'
     | '/app/communication/templates'
     | '/app/referrals/settings'
+    | '/app/reports/builder'
     | '/app/reviews/settings'
     | '/app/settings/billing'
     | '/lovable/email/auth'
@@ -1371,6 +1381,7 @@ export interface FileRouteTypes {
     | '/app/clients/$clientId'
     | '/app/communication/templates'
     | '/app/referrals/settings'
+    | '/app/reports/builder'
     | '/app/reviews/settings'
     | '/app/settings/billing'
     | '/lovable/email/auth'
@@ -1498,6 +1509,7 @@ export interface FileRouteTypes {
     | '/app/clinical/treatment-plans'
     | '/app/communication/templates'
     | '/app/referrals/settings'
+    | '/app/reports/builder'
     | '/app/reviews/settings'
     | '/app/settings/billing'
     | '/lovable/email/auth'
@@ -2185,6 +2197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReviewsSettingsRouteImport
       parentRoute: typeof AppReviewsRoute
     }
+    '/app/reports/builder': {
+      id: '/app/reports/builder'
+      path: '/builder'
+      fullPath: '/app/reports/builder'
+      preLoaderRoute: typeof AppReportsBuilderRouteImport
+      parentRoute: typeof AppReportsRoute
+    }
     '/app/referrals/settings': {
       id: '/app/referrals/settings'
       path: '/settings'
@@ -2554,6 +2573,7 @@ const AppReferralsRouteWithChildren = AppReferralsRoute._addFileChildren(
 )
 
 interface AppReportsRouteChildren {
+  AppReportsBuilderRoute: typeof AppReportsBuilderRoute
   AppReportsIndexRoute: typeof AppReportsIndexRoute
   AppReportsClientsAcquisitionRoute: typeof AppReportsClientsAcquisitionRoute
   AppReportsClientsLifetimeValueRoute: typeof AppReportsClientsLifetimeValueRoute
@@ -2576,6 +2596,7 @@ interface AppReportsRouteChildren {
 }
 
 const AppReportsRouteChildren: AppReportsRouteChildren = {
+  AppReportsBuilderRoute: AppReportsBuilderRoute,
   AppReportsIndexRoute: AppReportsIndexRoute,
   AppReportsClientsAcquisitionRoute: AppReportsClientsAcquisitionRoute,
   AppReportsClientsLifetimeValueRoute: AppReportsClientsLifetimeValueRoute,
