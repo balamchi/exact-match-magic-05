@@ -226,6 +226,8 @@ function CheckinPage() {
         </Button>
       </div>
 
+      <KioskUrlCard variant="banner" />
+
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiCard
