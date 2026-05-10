@@ -87,6 +87,7 @@ import { Route as ApiPublicRouteImport } from './routes/api.public'
 import { Route as AppReviewsIndexRouteImport } from './routes/app.reviews.index'
 import { Route as AppReferralsIndexRouteImport } from './routes/app.referrals.index'
 import { Route as ReferClinicSlugCodeRouteImport } from './routes/refer.$clinicSlug.$code'
+import { Route as PortalMembershipTokenRouteImport } from './routes/portal.membership.$token'
 import { Route as LovableEmailTransactionalRouteImport } from './routes/lovable.email.transactional'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable.email.suppression'
 import { Route as LovableEmailQueueRouteImport } from './routes/lovable.email.queue'
@@ -504,6 +505,11 @@ const ReferClinicSlugCodeRoute = ReferClinicSlugCodeRouteImport.update({
   path: '/refer/$clinicSlug/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalMembershipTokenRoute = PortalMembershipTokenRouteImport.update({
+  id: '/portal/membership/$token',
+  path: '/portal/membership/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalRoute =
   LovableEmailTransactionalRouteImport.update({
     id: '/transactional',
@@ -734,6 +740,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
@@ -835,6 +842,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals': typeof AppReferralsIndexRoute
   '/app/reviews': typeof AppReviewsIndexRoute
@@ -942,6 +950,7 @@ export interface FileRoutesById {
   '/lovable/email/queue': typeof LovableEmailQueueRouteWithChildren
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/transactional': typeof LovableEmailTransactionalRouteWithChildren
+  '/portal/membership/$token': typeof PortalMembershipTokenRoute
   '/refer/$clinicSlug/$code': typeof ReferClinicSlugCodeRoute
   '/app/referrals/': typeof AppReferralsIndexRoute
   '/app/reviews/': typeof AppReviewsIndexRoute
@@ -1050,6 +1059,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
     | '/app/reviews/'
@@ -1151,6 +1161,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals'
     | '/app/reviews'
@@ -1257,6 +1268,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue'
     | '/lovable/email/suppression'
     | '/lovable/email/transactional'
+    | '/portal/membership/$token'
     | '/refer/$clinicSlug/$code'
     | '/app/referrals/'
     | '/app/reviews/'
@@ -1302,6 +1314,7 @@ export interface RootRouteChildren {
   ConsentPublicTokenRoute: typeof ConsentPublicTokenRoute
   PortalSlugRoute: typeof PortalSlugRoute
   ReviewsPublicTokenRoute: typeof ReviewsPublicTokenRoute
+  PortalMembershipTokenRoute: typeof PortalMembershipTokenRoute
   ReferClinicSlugCodeRoute: typeof ReferClinicSlugCodeRoute
 }
 
@@ -1853,6 +1866,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReferClinicSlugCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/membership/$token': {
+      id: '/portal/membership/$token'
+      path: '/portal/membership/$token'
+      fullPath: '/portal/membership/$token'
+      preLoaderRoute: typeof PortalMembershipTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional': {
       id: '/lovable/email/transactional'
       path: '/transactional'
@@ -2394,6 +2414,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConsentPublicTokenRoute: ConsentPublicTokenRoute,
   PortalSlugRoute: PortalSlugRoute,
   ReviewsPublicTokenRoute: ReviewsPublicTokenRoute,
+  PortalMembershipTokenRoute: PortalMembershipTokenRoute,
   ReferClinicSlugCodeRoute: ReferClinicSlugCodeRoute,
 }
 export const routeTree = rootRouteImport
