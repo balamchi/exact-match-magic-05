@@ -2,15 +2,16 @@ import { ReactNode, useEffect, useState } from "react";
 import { GlobalSearch } from "@/components/global-search";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Activity, BarChart3, CalendarDays, Calendar, Shield, Users, Target,
+  Activity, BarChart3, CalendarDays, Calendar, Shield, Users,
   Ticket, Gift, Package, Boxes, Send, Zap, CheckSquare, Flame,
-  Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
+  Bell, Settings, LogOut, ChevronDown, Sparkles,
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
   Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
-  Phone, BookOpen, Sun, Moon, MessageSquareText,
+  Phone, BookOpen, Sun, Moon, MessageSquareText, HelpCircle,
   type LucideIcon,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useLocale, LOCALES } from "@/lib/locale-context";
