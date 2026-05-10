@@ -214,6 +214,91 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const initials = (user?.email ?? "?").slice(0, 2).toUpperCase();
 
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const stored = window.localStorage.getItem("clinicpro:sidebar-expanded");
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return {};
+  });
+
+  const toggleSection = (section: string) => {
+    setExpandedSections((prev) => {
+      const next = { ...prev, [section]: !prev[section] };
+      try {
+        window.localStorage.setItem("clinicpro:sidebar-expanded", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  // Auto-expand any group that contains the current route
+  useEffect(() => {
+    setExpandedSections((prev) => {
+      let changed = false;
+      const next = { ...prev };
+      for (const group of NAV_GROUPS) {
+        if (group.items.some((i) => pathname === i.to || pathname.startsWith(i.to + "/"))) {
+          if (!next[group.section]) {
+            next[group.section] = true;
+            changed = true;
+          }
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [pathname]);
+
+  const renderItem = (item: NavItem) => {
+    const active = pathname === item.to || pathname.startsWith(item.to + "/");
+    const Icon = item.icon;
+    return (
+      <Link
+        key={item.to}
+        to={item.to}
+        onClick={onNavigate}
+        className={cn(
+          "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all",
+          active
+            ? "bg-gradient-to-r from-primary/25 via-primary/10 to-transparent text-sidebar-accent-foreground shadow-[inset_0_1px_0_0_hsl(var(--primary)/0.15)]"
+            : "text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground",
+        )}
+      >
+        {active && (
+          <span className="absolute inset-y-1.5 start-0 w-0.5 rounded-full bg-gradient-to-b from-primary to-fuchsia-500 glow-purple" />
+        )}
+        <Icon
+          className={cn(
+            "h-[16px] w-[16px] shrink-0 transition-colors",
+            active ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground",
+          )}
+          strokeWidth={active ? 2.25 : 2}
+        />
+        <span className={cn("truncate", active ? "font-semibold" : "font-medium")}>
+          {item.label}
+        </span>
+        {item.beta && (
+          <span
+            title="Beta"
+            className="ms-auto inline-flex items-center rounded-md bg-fuchsia-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-fuchsia-300"
+          >
+            Beta
+          </span>
+        )}
+        {item.phase4 && (
+          <span
+            title="Coming in Phase 4"
+            className="ms-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500/20 px-1 text-[9px] font-bold text-amber-300"
+          >
+            4
+          </span>
+        )}
+        {item.badge && <NavBadge badge={item.badge} active={active} />}
+      </Link>
+    );
+  };
+
   return (
     <div className="flex h-full flex-col">
       {/* Brand */}
@@ -233,59 +318,50 @@ function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4 [scrollbar-width:thin]">
-        {NAV.map((group) => (
-          <div key={group.section} className="mb-4">
-            <div className="mb-1 flex items-center gap-2 px-3">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/60">
-                {group.section}
-              </span>
-              <span className="h-px flex-1 bg-gradient-to-r from-sidebar-border/60 to-transparent" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              {group.items.map((item) => {
-                const active = pathname === item.to || pathname.startsWith(item.to + "/");
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={onNavigate}
-                    className={[
-                      "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all",
-                      active
-                        ? "bg-gradient-to-r from-primary/25 via-primary/10 to-transparent text-sidebar-accent-foreground shadow-[inset_0_1px_0_0_hsl(var(--primary)/0.15)]"
-                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground",
-                    ].join(" ")}
-                  >
-                    {active && (
-                      <span className="absolute inset-y-1.5 start-0 w-0.5 rounded-full bg-gradient-to-b from-primary to-fuchsia-500 glow-purple" />
-                    )}
-                    <Icon
-                      className={[
-                        "h-[16px] w-[16px] shrink-0 transition-colors",
-                        active ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-foreground",
-                      ].join(" ")}
-                      strokeWidth={active ? 2.25 : 2}
-                    />
-                    <span className={["truncate", active ? "font-semibold" : "font-medium"].join(" ")}>
-                      {item.label}
-                    </span>
-                    {item.phase4 && (
-                      <span
-                        title="Coming in Phase 4"
-                        className="ms-auto inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500/20 px-1 text-[9px] font-bold text-amber-300"
-                      >
-                        4
-                      </span>
-                    )}
-                    {item.badge && <NavBadge badge={item.badge} active={active} />}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+      <nav className="flex-1 overflow-y-auto px-3 pb-4 pt-3 [scrollbar-width:thin]">
+        {/* Pinned daily-use items */}
+        <div className="mb-2 space-y-0.5">
+          {NAV_PINNED.map(renderItem)}
+        </div>
+
+        <div className="my-3 border-t border-sidebar-border/60" />
+
+        {/* Collapsible sections */}
+        <div className="space-y-0.5">
+          {NAV_GROUPS.map((group) => {
+            const isOpen = expandedSections[group.section] ?? !!group.defaultOpen;
+            const SectionIcon = group.icon;
+            return (
+              <div key={group.section}>
+                <button
+                  type="button"
+                  onClick={() => toggleSection(group.section)}
+                  className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/80 transition hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+                >
+                  <span className="flex items-center gap-2">
+                    <SectionIcon className="h-3.5 w-3.5" />
+                    {group.section}
+                  </span>
+                  <ChevronDown
+                    className={cn("h-3.5 w-3.5 transition-transform", isOpen && "rotate-180")}
+                  />
+                </button>
+                {isOpen && (
+                  <div className="mt-1 mb-2 space-y-0.5 ps-2">
+                    {group.items.map(renderItem)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="my-3 border-t border-sidebar-border/60" />
+
+        {/* Bottom items */}
+        <div className="space-y-0.5">
+          {NAV_BOTTOM.map(renderItem)}
+        </div>
       </nav>
 
       {/* User */}
