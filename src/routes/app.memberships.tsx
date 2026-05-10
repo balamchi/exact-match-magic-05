@@ -1038,6 +1038,7 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
   const pauseFn = useServerFn(pauseMemberSubscription);
   const resumeFn = useServerFn(resumeMemberSubscription);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [changeFor, setChangeFor] = useState<SubRow | null>(null);
 
   const load = async () => {
     setLoading(true);
