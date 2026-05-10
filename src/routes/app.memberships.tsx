@@ -434,6 +434,7 @@ function MembershipsPage() {
       )}
 
       {activeClinic && <MembersPanel clinicId={activeClinic.clinic_id} />}
+      {activeClinic && <ChargesPanel clinicId={activeClinic.clinic_id} />}
 
       {composer && (
         <ComposerModal
