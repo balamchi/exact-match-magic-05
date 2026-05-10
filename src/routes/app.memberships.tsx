@@ -1150,6 +1150,30 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
                 <Badge variant="outline" className={cn("text-[10px] uppercase", statusColor)}>
                   {r.status}
                 </Badge>
+                {r.status === "active" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
+                    onClick={() => handlePause(r.id)}
+                    className="h-8 px-2 text-xs text-amber-300 hover:bg-amber-500/10"
+                  >
+                    <Pause className="mr-1 h-3.5 w-3.5" />
+                    Pause
+                  </Button>
+                )}
+                {r.status === "paused" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
+                    onClick={() => handleResume(r.id)}
+                    className="h-8 px-2 text-xs text-emerald-300 hover:bg-emerald-500/10"
+                  >
+                    <Play className="mr-1 h-3.5 w-3.5" />
+                    Resume
+                  </Button>
+                )}
                 {r.status !== "canceled" && r.status !== "expired" && (
                   <Button
                     size="sm"
