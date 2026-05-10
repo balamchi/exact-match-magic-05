@@ -32,6 +32,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { KioskUrlCard } from "@/components/kiosk-url-card";
 
 export const Route = createFileRoute("/app/checkin")({ component: CheckinPage });
 
@@ -224,6 +225,8 @@ function CheckinPage() {
           <Plus className="mr-2 h-4 w-4" /> Check in client
         </Button>
       </div>
+
+      <KioskUrlCard variant="banner" />
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:grid-cols-4">

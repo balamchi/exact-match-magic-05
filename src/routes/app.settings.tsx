@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { SquareConnectionCard } from "@/components/square-connection-card";
+import { KioskUrlCard } from "@/components/kiosk-url-card";
 
 export const Route = createFileRoute("/app/settings")({ component: SettingsPage });
 
@@ -503,6 +504,8 @@ function SettingsPage() {
           );
         })()}
       </section>
+
+      <KioskUrlCard />
 
       {/* Clinic switcher */}
       {memberships.length > 1 && (
