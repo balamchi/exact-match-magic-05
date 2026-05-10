@@ -26,85 +26,116 @@ import { TrialBanner } from "@/components/trial-banner";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 type Badge = { kind: "count"; value: number } | { kind: "pill"; label: string; tone: "new" | "live" };
-interface NavItem { to: string; label: string; icon: LucideIcon; badge?: Badge; phase4?: boolean; }
-interface NavGroup { section: string; items: NavItem[]; }
+interface NavItem {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  badge?: Badge;
+  phase4?: boolean;
+  beta?: boolean;
+}
+interface NavGroup {
+  section: string;
+  icon: LucideIcon;
+  defaultOpen?: boolean;
+  items: NavItem[];
+}
 
-const NAV: NavGroup[] = [
+const NAV_PINNED: NavItem[] = [
+  { to: "/app/dashboard", label: "Dashboard", icon: Activity },
+  { to: "/app/calendar", label: "Calendar", icon: Calendar },
+  { to: "/app/clients", label: "Clients", icon: Users },
+  { to: "/app/inbox", label: "Inbox", icon: Inbox },
+  { to: "/app/leads", label: "Leads", icon: Flame },
+];
+
+const NAV_GROUPS: NavGroup[] = [
   {
-    section: "Overview",
+    section: "Front Desk",
+    icon: ClipboardCheck,
     items: [
-      { to: "/app/dashboard", label: "Dashboard", icon: Activity },
-      { to: "/app/reports", label: "Reports", icon: BarChart3 },
-      { to: "/app/ai", label: "AI Assistant", icon: Bot, phase4: true },
+      { to: "/app/checkin", label: "Check-In Board", icon: ClipboardCheck },
+      { to: "/app/booking", label: "Booking Widget", icon: CalendarDays },
+      { to: "/app/consent", label: "Consent Forms", icon: Shield },
     ],
   },
   {
-    section: "Operations",
+    section: "Catalog",
+    icon: HeartPulse,
     items: [
-      { to: "/app/booking", label: "Booking", icon: CalendarDays },
-      { to: "/app/calendar", label: "Calendar", icon: Calendar },
-      { to: "/app/checkin", label: "Check-In", icon: ClipboardCheck },
-      { to: "/app/consent", label: "Consent Forms", icon: Shield },
-      { to: "/app/clients", label: "Clients", icon: Users },
       { to: "/app/services", label: "Services", icon: HeartPulse },
       { to: "/app/staff", label: "Staff", icon: UserCog },
       { to: "/app/locations", label: "Locations", icon: MapPin },
-      { to: "/app/leads", label: "Leads", icon: Flame },
+      { to: "/app/inventory", label: "Inventory", icon: Boxes, beta: true },
     ],
   },
   {
     section: "Revenue",
+    icon: CreditCard,
     items: [
-      { to: "/app/pos", label: "POS & Payments", icon: CreditCard },
+      { to: "/app/pos", label: "POS & Payments", icon: CreditCard, beta: true },
       { to: "/app/invoices", label: "Invoices", icon: FileText },
-      { to: "/app/coupons", label: "Coupons", icon: Ticket },
+      { to: "/app/memberships", label: "Memberships", icon: BadgeCheck },
       { to: "/app/giftcards", label: "Gift Cards", icon: Gift },
       { to: "/app/packages", label: "Packages", icon: Package },
-      { to: "/app/memberships", label: "Memberships", icon: BadgeCheck },
-      { to: "/app/loyalty", label: "Loyalty", icon: Sparkles },
-      { to: "/app/inventory", label: "Inventory", icon: Boxes },
+      { to: "/app/coupons", label: "Coupons", icon: Ticket },
+      { to: "/app/loyalty", label: "Loyalty", icon: Sparkles, beta: true },
     ],
   },
   {
-    section: "Growth",
+    section: "Marketing",
+    icon: Send,
     items: [
-      { to: "/app/inbox", label: "Inbox", icon: Inbox },
-      { to: "/app/whatsapp", label: "WhatsApp", icon: Phone },
+      { to: "/app/whatsapp", label: "WhatsApp", icon: Phone, beta: true },
       { to: "/app/communication/templates", label: "Templates", icon: MessageSquareText },
-      { to: "/app/marketing", label: "Campaigns", icon: Send },
-      { to: "/app/automations", label: "Automations", icon: Zap },
+      { to: "/app/marketing", label: "Campaigns", icon: Send, beta: true },
+      { to: "/app/automations", label: "Automations", icon: Zap, beta: true },
       { to: "/app/reviews", label: "Reviews", icon: Star },
       { to: "/app/referrals", label: "Referrals", icon: Share2 },
-      { to: "/app/tasks", label: "Tasks", icon: CheckSquare },
       { to: "/app/email-log", label: "Email Log", icon: Bell },
     ],
   },
   {
     section: "Clinical",
+    icon: Stethoscope,
     items: [
       { to: "/app/clinical/soap-notes", label: "SOAP Notes", icon: Stethoscope },
       { to: "/app/clinical/treatment-plans", label: "Treatment Plans", icon: ListChecks },
       { to: "/app/clinical/consent-forms", label: "Consent Forms", icon: FileText },
-      { to: "/app/injection-mapping", label: "Injection Mapping", icon: Syringe },
+      { to: "/app/injection-mapping", label: "Injection Mapping", icon: Syringe, beta: true },
       { to: "/app/before-after", label: "Before / After", icon: Images },
     ],
   },
   {
-    section: "AI",
+    section: "Reports",
+    icon: BarChart3,
     items: [
+      { to: "/app/reports", label: "All Reports", icon: BarChart3 },
+      { to: "/app/tasks", label: "Tasks", icon: CheckSquare, beta: true },
+    ],
+  },
+  {
+    section: "AI",
+    icon: Brain,
+    items: [
+      { to: "/app/ai", label: "AI Assistant", icon: Bot, phase4: true },
       { to: "/app/ai-optimizer", label: "Schedule Optimizer", icon: Brain, phase4: true },
     ],
   },
   {
-    section: "Admin",
+    section: "Integrations",
+    icon: Globe,
     items: [
-      { to: "/app/settings", label: "Settings", icon: Settings },
-      { to: "/app/settings/billing", label: "Billing", icon: CreditCard },
       { to: "/app/quickbooks", label: "QuickBooks", icon: BookOpen, phase4: true },
       { to: "/app/api-settings", label: "API & Webhooks", icon: Globe, phase4: true },
-      { to: "/app/feature-status", label: "Feature status", icon: Sparkles },
     ],
   },
+];
+
+const NAV_BOTTOM: NavItem[] = [
+  { to: "/app/feature-status", label: "Feature Status", icon: Sparkles },
+  { to: "/app/help", label: "Help", icon: HelpCircle },
+  { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
 function formatCount(n: number): string {
