@@ -243,7 +243,7 @@ function Landing() {
             </em>
             .
           </h1>
-          <p className="mx-auto mt-7 max-w-[720px] text-[clamp(1rem,2.5vw,22px)] leading-[1.5] text-zinc-300">
+          <p className="mx-auto mt-7 max-w-[720px] text-[clamp(1rem,2.5vw,22px)] leading-[1.5] text-muted-foreground">
             The operating system clinics use to manage everything — booking, payments, marketing, consent forms,
             injection mapping, AI insights. Pre-loaded with 322 services and 73 forms. Ready in 10 minutes.
           </p>
@@ -288,7 +288,7 @@ function Landing() {
                     </div>
                     <div className="text-start">
                       <div className="font-display text-lg font-bold">AI Insights</div>
-                      <div className="mt-1 text-sm leading-relaxed text-zinc-300">
+                      <div className="mt-1 text-sm leading-relaxed text-muted-foreground">
                         12 clients at risk of churning. Activate win-back campaign — estimated recovery:{" "}
                         <strong className="text-success">$4,200</strong>.
                       </div>
@@ -317,7 +317,7 @@ function Landing() {
               {PAINS.map((p) => (
                 <li key={p} className="flex items-center gap-3.5 border-b border-border/60 px-7 py-[18px] last:border-b-0">
                   <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-[rgba(244,63,94,0.35)] bg-[rgba(244,63,94,0.1)] text-sm font-bold text-[#F43F5E]">!</span>
-                  <span className="text-sm text-zinc-300">{p}</span>
+                  <span className="text-sm text-muted-foreground">{p}</span>
                 </li>
               ))}
             </ul>
@@ -328,7 +328,7 @@ function Landing() {
             <h3 className="font-display text-3xl font-bold leading-[1.1] tracking-tight">
               One platform. Pre-loaded. Profitable from day one.
             </h3>
-            <p className="mt-4 text-zinc-300">
+            <p className="mt-4 text-muted-foreground">
               Booking, payments, CRM, marketing, consent forms, injection mapping, inventory, AI — in one operating system designed by clinic owners, for clinic owners.
             </p>
             <div className="my-6 grid grid-cols-2 gap-3">
@@ -375,10 +375,10 @@ function Landing() {
           </div>
           <div>
             <h3 className="font-display text-4xl font-bold leading-tight max-md:text-3xl">Built by clinic operators, for clinic operators.</h3>
-            <p className="mt-6 text-lg leading-relaxed text-zinc-300">
+            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
               Built by Shahab Balamchi, founder of Divan Digital Corp. We've managed marketing and operations for 50+ medical aesthetic, dental, and wellness clinics across Toronto, Montreal, Dubai, and Los Angeles since 2019.
             </p>
-            <p className="mt-4 text-lg leading-relaxed text-zinc-300">
+            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
               We built ClinicPro because every clinic we worked with said the same thing: their software was the bottleneck, not their growth. So we replaced six tools with one operating system.
             </p>
           </div>
@@ -396,7 +396,7 @@ function Landing() {
                   <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="mt-4 text-sm leading-relaxed text-zinc-300">"{t.quote}"</p>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">"{t.quote}"</p>
               <div className="mt-6 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full [background:linear-gradient(135deg,#9333EA,#D946EF)]">
                   <span className="text-xs font-bold text-foreground">{t.initials}</span>
@@ -505,7 +505,7 @@ function Landing() {
         <div className="mb-12 overflow-hidden rounded-2xl p-px [background:linear-gradient(135deg,#9333EA,#D946EF)]">
           <div className="rounded-[15px] px-8 py-6 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
             <div className="font-display text-xl font-bold text-foreground sm:text-2xl">🔒 Founding Member Pricing — Locked Forever</div>
-            <p className="mt-2 text-sm text-zinc-200">
+            <p className="mt-2 text-sm text-muted-foreground">
               First 100 clinics get <strong>$49/$149/$349</strong> per month locked in for life. No price increases, ever.
             </p>
             <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-foreground/10 px-4 py-1.5 text-sm font-semibold text-foreground">
@@ -583,7 +583,7 @@ function Landing() {
                 </Link>
                 <ul className="mt-6 border-t border-border/60 pt-6">
                   {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 py-1.5 text-[13px] text-zinc-300">
+                    <li key={f} className="flex items-start gap-2 py-1.5 text-[13px] text-muted-foreground">
                       <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" strokeWidth={3} />
                       {f}
                     </li>
@@ -606,7 +606,7 @@ function Landing() {
           <h2 className="relative font-display text-[clamp(2rem,5vw,64px)] font-bold leading-[1.05] tracking-tight">
             Your front desk is asleep at 9pm.<br className="hidden sm:block" />Your bookings shouldn't be.
           </h2>
-          <p className="relative mx-auto mt-6 max-w-[560px] text-lg text-zinc-300">
+          <p className="relative mx-auto mt-6 max-w-[560px] text-lg text-muted-foreground">
             Start your free 14-day trial. No credit card. Be live in 10 minutes.
           </p>
           <div className="relative mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
