@@ -235,11 +235,8 @@ function PublicBookingPage() {
       const cat = s.category || "Other";
       catPop.set(cat, (catPop.get(cat) ?? 0) + (popMap.get(s.id) ?? 0));
     });
-    const sortedCats = [...catPop.entries()].sort((a, b) => b[1] - a[1]);
-    const defaultExpanded = new Set(sortedCats.slice(0, 2).map(([cat]) => cat));
-    // If fewer than 2 categories, expand all
-    if (sortedCats.length <= 2) sortedCats.forEach(([cat]) => defaultExpanded.add(cat));
-    setExpandedCats(defaultExpanded);
+    // No-op: default category is "all"
+    void catPop;
 
     // Check for referral code in URL
     if (typeof window !== "undefined") {
