@@ -420,3 +420,121 @@ export const retryFailedCharge = createServerFn({ method: "POST" })
 
     return { ok: true, payment_id: paymentId };
   });
+
+/* ─────────── Change plan (upgrade / downgrade) ─────────── */
+
+const ChangePlanInput = z.object({
+  subscription_id: z.string().uuid(),
+  new_membership_id: z.string().uuid(),
+});
+
+export const changeMemberPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => ChangePlanInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: row, error } = await supabase
+      .from("membership_subscriptions")
+      .select("id, clinic_id, membership_id, square_subscription_id, status")
+      .eq("id", data.subscription_id)
+      .maybeSingle();
+    if (error || !row) throw new Error("Subscription not found");
+    if (!row.square_subscription_id) throw new Error("Subscription is not in Square.");
+    if (row.membership_id === data.new_membership_id) {
+      throw new Error("Member is already on this plan.");
+    }
+
+    const { data: roleRow } = await supabase
+      .from("clinic_members")
+      .select("role")
+      .eq("clinic_id", row.clinic_id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!roleRow || (roleRow.role !== "owner" && roleRow.role !== "admin")) {
+      throw new Error("Only clinic owners/admins can change plans.");
+    }
+
+    const { data: target } = await supabase
+      .from("memberships")
+      .select("id, clinic_id, square_plan_variation_id, name")
+      .eq("id", data.new_membership_id)
+      .maybeSingle();
+    if (!target) throw new Error("Target plan not found");
+    if (target.clinic_id !== row.clinic_id) {
+      throw new Error("Plans belong to different clinics.");
+    }
+    if (!target.square_plan_variation_id) {
+      throw new Error("Target plan hasn't been synced to Square yet.");
+    }
+
+    const conn = await getActiveSquareConnection(row.clinic_id);
+    const cfg = getSquareEnv();
+
+    // Square swap-plan prorates automatically: the current period is closed and
+    // a new invoice is generated for the new plan starting today.
+    const swapRes = await fetch(
+      `${cfg.apiBase}/v2/subscriptions/${row.square_subscription_id}/swap-plan`,
+      {
+        method: "POST",
+        headers: sqHeaders(conn.access_token),
+        body: JSON.stringify({
+          new_plan_variation_id: target.square_plan_variation_id,
+        }),
+      },
+    );
+    if (!swapRes.ok) {
+      const t = await swapRes.text();
+      throw new Error(`Square swap-plan failed (${swapRes.status}): ${t.slice(0, 200)}`);
+    }
+    const sj = (await swapRes.json()) as {
+      subscription?: { status?: string; charged_through_date?: string };
+    };
+
+    const statusMap: Record<string, string> = {
+      ACTIVE: "active",
+      PENDING: "pending",
+      CANCELED: "canceled",
+      DEACTIVATED: "expired",
+      PAUSED: "paused",
+    };
+    const newStatus = statusMap[sj.subscription?.status ?? "ACTIVE"] ?? "active";
+
+    await supabaseAdmin
+      .from("membership_subscriptions")
+      .update({
+        membership_id: target.id,
+        status: newStatus,
+        next_billing_at: sj.subscription?.charged_through_date
+          ? `${sj.subscription.charged_through_date}T00:00:00Z`
+          : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", row.id);
+
+    // Maintain member_count KPIs on both plans
+    const { data: oldCount } = await supabaseAdmin
+      .from("memberships")
+      .select("member_count")
+      .eq("id", row.membership_id)
+      .maybeSingle();
+    if (oldCount) {
+      await supabaseAdmin
+        .from("memberships")
+        .update({ member_count: Math.max(0, Number(oldCount.member_count ?? 0) - 1) })
+        .eq("id", row.membership_id);
+    }
+    const { data: newCount } = await supabaseAdmin
+      .from("memberships")
+      .select("member_count")
+      .eq("id", target.id)
+      .maybeSingle();
+    if (newCount) {
+      await supabaseAdmin
+        .from("memberships")
+        .update({ member_count: Number(newCount.member_count ?? 0) + 1 })
+        .eq("id", target.id);
+    }
+
+    return { ok: true, status: newStatus };
+  });

@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   UserPlus,
   Ban,
+  ArrowLeftRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -37,6 +38,7 @@ import {
   pauseMemberSubscription,
   resumeMemberSubscription,
   retryFailedCharge,
+  changeMemberPlan,
 } from "@/lib/square/subscriptions.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1037,6 +1039,7 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
   const pauseFn = useServerFn(pauseMemberSubscription);
   const resumeFn = useServerFn(resumeMemberSubscription);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [changeFor, setChangeFor] = useState<SubRow | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -1181,6 +1184,18 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
                     size="sm"
                     variant="ghost"
                     disabled={busyId === r.id}
+                    onClick={() => setChangeFor(r)}
+                    className="h-8 px-2 text-xs text-sky-300 hover:bg-sky-500/10"
+                  >
+                    <ArrowLeftRight className="mr-1 h-3.5 w-3.5" />
+                    Change plan
+                  </Button>
+                )}
+                {r.status !== "canceled" && r.status !== "expired" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
                     onClick={() => handleCancel(r.id)}
                     className="h-8 px-2 text-xs text-rose-300 hover:bg-rose-500/10"
                   >
@@ -1192,6 +1207,13 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
             );
           })}
         </ul>
+      )}
+      {changeFor && (
+        <ChangePlanModal
+          clinicId={clinicId}
+          subscription={changeFor}
+          onClose={() => setChangeFor(null)}
+        />
       )}
     </section>
   );
@@ -1536,5 +1558,113 @@ function ChargesPanel({ clinicId }: { clinicId: string }) {
         </ul>
       )}
     </section>
+  );
+}
+
+/* ─────────── Change plan modal ─────────── */
+
+function ChangePlanModal({
+  clinicId,
+  subscription,
+  onClose,
+}: {
+  clinicId: string;
+  subscription: SubRow;
+  onClose: () => void;
+}) {
+  const [plans, setPlans] = useState<
+    Array<{ id: string; name: string; monthly_price_cents: number; square_plan_variation_id: string | null }>
+  >([]);
+  const [selected, setSelected] = useState<string>("");
+  const [busy, setBusy] = useState(false);
+  const changeFn = useServerFn(changeMemberPlan);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("memberships")
+        .select("id, name, monthly_price_cents, square_plan_variation_id, active")
+        .eq("clinic_id", clinicId)
+        .eq("active", true)
+        .order("monthly_price_cents", { ascending: true });
+      const rows = (data ?? []).filter(
+        (p) => p.id !== subscription.membership_id && p.square_plan_variation_id,
+      );
+      setPlans(rows);
+    })();
+  }, [clinicId, subscription.membership_id]);
+
+  const submit = async () => {
+    if (!selected) return;
+    setBusy(true);
+    try {
+      await changeFn({
+        data: { subscription_id: subscription.id, new_membership_id: selected },
+      });
+      toast.success("Plan changed — Square will prorate the next invoice");
+      onClose();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Plan change failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const fmt = (cents: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card p-6 shadow-2xl">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-base font-semibold tracking-tight">Change plan</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Currently on <strong>{subscription.memberships?.name ?? "—"}</strong>. Square prorates
+              the current period and bills the new amount on the next cycle.
+            </p>
+          </div>
+          <Button size="icon" variant="ghost" onClick={onClose} className="h-8 w-8">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="mt-5 space-y-2">
+          {plans.length === 0 ? (
+            <p className="rounded-md border border-border/60 bg-muted/20 px-3 py-4 text-center text-xs text-muted-foreground">
+              No other Square-synced plans available.
+            </p>
+          ) : (
+            plans.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setSelected(p.id)}
+                className={cn(
+                  "flex w-full items-center justify-between rounded-md border px-3 py-2.5 text-left text-sm transition",
+                  selected === p.id
+                    ? "border-primary/60 bg-primary/10"
+                    : "border-border/60 bg-background/40 hover:border-border",
+                )}
+              >
+                <span className="font-medium">{p.name}</span>
+                <span className="tabular-nums text-muted-foreground">
+                  {fmt(p.monthly_price_cents)}/mo
+                </span>
+              </button>
+            ))
+          )}
+        </div>
+
+        <footer className="mt-6 flex justify-end gap-2">
+          <Button variant="ghost" onClick={onClose} disabled={busy}>
+            Cancel
+          </Button>
+          <Button onClick={submit} disabled={!selected || busy}>
+            {busy ? "Switching…" : "Switch plan"}
+          </Button>
+        </footer>
+      </div>
+    </div>
   );
 }
