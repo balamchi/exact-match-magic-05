@@ -34,6 +34,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReviewsPublicTokenRouteImport } from './routes/reviews.$publicToken'
 import { Route as PortalSlugRouteImport } from './routes/portal.$slug'
 import { Route as LovableEmailRouteImport } from './routes/lovable.email'
+import { Route as KioskClinicSlugRouteImport } from './routes/kiosk.$clinicSlug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email.unsubscribe'
 import { Route as ConsentPublicTokenRouteImport } from './routes/consent.$publicToken'
 import { Route as BookClinicSlugRouteImport } from './routes/book.$clinicSlug'
@@ -239,6 +240,11 @@ const LovableEmailRoute = LovableEmailRouteImport.update({
   id: '/email',
   path: '/email',
   getParentRoute: () => LovableRoute,
+} as any)
+const KioskClinicSlugRoute = KioskClinicSlugRouteImport.update({
+  id: '/kiosk/$clinicSlug',
+  path: '/kiosk/$clinicSlug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -724,6 +730,7 @@ export interface FileRoutesByFullPath {
   '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/consent/$publicToken': typeof ConsentPublicTokenRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/kiosk/$clinicSlug': typeof KioskClinicSlugRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
   '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
@@ -829,6 +836,7 @@ export interface FileRoutesByTo {
   '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/consent/$publicToken': typeof ConsentPublicTokenRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/kiosk/$clinicSlug': typeof KioskClinicSlugRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
   '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
@@ -934,6 +942,7 @@ export interface FileRoutesById {
   '/book/$clinicSlug': typeof BookClinicSlugRoute
   '/consent/$publicToken': typeof ConsentPublicTokenRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/kiosk/$clinicSlug': typeof KioskClinicSlugRoute
   '/lovable/email': typeof LovableEmailRouteWithChildren
   '/portal/$slug': typeof PortalSlugRoute
   '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
@@ -1043,6 +1052,7 @@ export interface FileRouteTypes {
     | '/book/$clinicSlug'
     | '/consent/$publicToken'
     | '/email/unsubscribe'
+    | '/kiosk/$clinicSlug'
     | '/lovable/email'
     | '/portal/$slug'
     | '/reviews/$publicToken'
@@ -1148,6 +1158,7 @@ export interface FileRouteTypes {
     | '/book/$clinicSlug'
     | '/consent/$publicToken'
     | '/email/unsubscribe'
+    | '/kiosk/$clinicSlug'
     | '/lovable/email'
     | '/portal/$slug'
     | '/reviews/$publicToken'
@@ -1252,6 +1263,7 @@ export interface FileRouteTypes {
     | '/book/$clinicSlug'
     | '/consent/$publicToken'
     | '/email/unsubscribe'
+    | '/kiosk/$clinicSlug'
     | '/lovable/email'
     | '/portal/$slug'
     | '/reviews/$publicToken'
@@ -1312,6 +1324,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   BookClinicSlugRoute: typeof BookClinicSlugRoute
   ConsentPublicTokenRoute: typeof ConsentPublicTokenRoute
+  KioskClinicSlugRoute: typeof KioskClinicSlugRoute
   PortalSlugRoute: typeof PortalSlugRoute
   ReviewsPublicTokenRoute: typeof ReviewsPublicTokenRoute
   PortalMembershipTokenRoute: typeof PortalMembershipTokenRoute
@@ -1494,6 +1507,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/lovable/email'
       preLoaderRoute: typeof LovableEmailRouteImport
       parentRoute: typeof LovableRoute
+    }
+    '/kiosk/$clinicSlug': {
+      id: '/kiosk/$clinicSlug'
+      path: '/kiosk/$clinicSlug'
+      fullPath: '/kiosk/$clinicSlug'
+      preLoaderRoute: typeof KioskClinicSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
@@ -2412,6 +2432,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   BookClinicSlugRoute: BookClinicSlugRoute,
   ConsentPublicTokenRoute: ConsentPublicTokenRoute,
+  KioskClinicSlugRoute: KioskClinicSlugRoute,
   PortalSlugRoute: PortalSlugRoute,
   ReviewsPublicTokenRoute: ReviewsPublicTokenRoute,
   PortalMembershipTokenRoute: PortalMembershipTokenRoute,
