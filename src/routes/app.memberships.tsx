@@ -1397,3 +1397,144 @@ function EnrollModal({
     </div>
   );
 }
+
+/* ─────────── Charges history ─────────── */
+
+type ChargeRow = {
+  id: string;
+  subscription_id: string;
+  amount_cents: number;
+  currency: string | null;
+  status: string;
+  charged_at: string | null;
+  failure_reason: string | null;
+  square_invoice_id: string | null;
+  membership_subscriptions: {
+    clients: { first_name: string; last_name: string | null } | null;
+    memberships: { name: string } | null;
+  } | null;
+};
+
+function ChargesPanel({ clinicId }: { clinicId: string }) {
+  const [rows, setRows] = useState<ChargeRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const retryFn = useServerFn(retryFailedCharge);
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("membership_charges")
+      .select(
+        "id,subscription_id,amount_cents,currency,status,charged_at,failure_reason,square_invoice_id,membership_subscriptions(clients(first_name,last_name),memberships(name))",
+      )
+      .eq("clinic_id", clinicId)
+      .order("charged_at", { ascending: false, nullsFirst: false })
+      .limit(50);
+    setRows((data ?? []) as unknown as ChargeRow[]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel(`mcharges-${clinicId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "membership_charges", filter: `clinic_id=eq.${clinicId}` },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clinicId]);
+
+  const handleRetry = async (id: string) => {
+    setBusyId(id);
+    try {
+      await retryFn({ data: { charge_id: id } });
+      toast.success("Charge succeeded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Retry failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const fmtMoney = (cents: number, currency: string | null) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: currency ?? "USD" }).format(
+      cents / 100,
+    );
+
+  return (
+    <section className="mt-6 rounded-2xl border border-border/60 bg-card/40">
+      <header className="flex items-center justify-between border-b border-border/60 px-5 py-3">
+        <div>
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            Recent charges
+          </p>
+          <h2 className="mt-0.5 text-base font-semibold tracking-tight">
+            Last {rows.length} charge{rows.length === 1 ? "" : "s"}
+          </h2>
+        </div>
+      </header>
+      {loading ? (
+        <div className="px-5 py-6 text-sm text-muted-foreground">Loading…</div>
+      ) : rows.length === 0 ? (
+        <div className="px-5 py-8 text-center text-sm text-muted-foreground">
+          No charges yet. Square will post invoices here as members are billed.
+        </div>
+      ) : (
+        <ul className="divide-y divide-border/60">
+          {rows.map((c) => {
+            const cl = c.membership_subscriptions?.clients;
+            const name = cl ? `${cl.first_name} ${cl.last_name ?? ""}`.trim() : "—";
+            const planName = c.membership_subscriptions?.memberships?.name ?? "—";
+            const statusColor =
+              c.status === "paid"
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                : c.status === "failed"
+                  ? "border-rose-500/40 bg-rose-500/10 text-rose-300"
+                  : c.status === "refunded"
+                    ? "border-sky-500/40 bg-sky-500/10 text-sky-300"
+                    : "border-border/60 bg-muted/30 text-muted-foreground";
+            return (
+              <li key={c.id} className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{name}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {planName}
+                    {c.failure_reason ? ` · ${c.failure_reason}` : ""}
+                  </p>
+                </div>
+                <div className="text-right text-xs text-muted-foreground tabular-nums">
+                  {c.charged_at ? new Date(c.charged_at).toLocaleString() : "—"}
+                </div>
+                <div className="w-24 text-right text-sm font-semibold tabular-nums">
+                  {fmtMoney(c.amount_cents, c.currency)}
+                </div>
+                <Badge variant="outline" className={cn("text-[10px] uppercase", statusColor)}>
+                  {c.status}
+                </Badge>
+                {c.status === "failed" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === c.id}
+                    onClick={() => handleRetry(c.id)}
+                    className="h-8 px-2 text-xs text-emerald-300 hover:bg-emerald-500/10"
+                  >
+                    <Play className="mr-1 h-3.5 w-3.5" />
+                    Retry
+                  </Button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
