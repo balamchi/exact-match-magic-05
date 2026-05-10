@@ -55,7 +55,7 @@ function RevenueReport() {
   const days = Math.max(1, Math.round((range.range.to.getTime() - range.range.from.getTime()) / 86400000));
   const series = bucketByDay(appts, Math.min(days, 90));
 
-  const handleExport = (fmt: "csv") => {
+  const handleExport = (fmt: "csv" | "pdf" | "xlsx") => {
     if (fmt === "csv") {
       exportToCsv(reportFilename("revenue", "csv"), ["Date", "Bookings", "Revenue"],
         series.map((s) => [s.date, s.bookings, s.revenue.toFixed(2)]));
