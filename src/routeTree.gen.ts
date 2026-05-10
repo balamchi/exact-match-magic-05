@@ -52,6 +52,7 @@ import { Route as AppSoapNotesRouteImport } from './routes/app.soap-notes'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppServicesRouteImport } from './routes/app.services'
 import { Route as AppReviewsRouteImport } from './routes/app.reviews'
+import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppReferralsRouteImport } from './routes/app.referrals'
 import { Route as AppQuickbooksRouteImport } from './routes/app.quickbooks'
 import { Route as AppQaChecklistRouteImport } from './routes/app.qa-checklist'
@@ -331,6 +332,11 @@ const AppReviewsRoute = AppReviewsRouteImport.update({
   path: '/reviews',
   getParentRoute: () => AppRoute,
 } as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppReferralsRoute = AppReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
@@ -497,9 +503,9 @@ const AppReviewsIndexRoute = AppReviewsIndexRouteImport.update({
   getParentRoute: () => AppReviewsRoute,
 } as any)
 const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
-  id: '/reports/',
-  path: '/reports/',
-  getParentRoute: () => AppRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppReportsRoute,
 } as any)
 const AppReferralsIndexRoute = AppReferralsIndexRouteImport.update({
   id: '/',
@@ -712,6 +718,7 @@ export interface FileRoutesByFullPath {
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRouteWithChildren
+  '/app/reports': typeof AppReportsRouteWithChildren
   '/app/reviews': typeof AppReviewsRouteWithChildren
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
@@ -924,6 +931,7 @@ export interface FileRoutesById {
   '/app/qa-checklist': typeof AppQaChecklistRoute
   '/app/quickbooks': typeof AppQuickbooksRoute
   '/app/referrals': typeof AppReferralsRouteWithChildren
+  '/app/reports': typeof AppReportsRouteWithChildren
   '/app/reviews': typeof AppReviewsRouteWithChildren
   '/app/services': typeof AppServicesRoute
   '/app/settings': typeof AppSettingsRouteWithChildren
@@ -1034,6 +1042,7 @@ export interface FileRouteTypes {
     | '/app/qa-checklist'
     | '/app/quickbooks'
     | '/app/referrals'
+    | '/app/reports'
     | '/app/reviews'
     | '/app/services'
     | '/app/settings'
@@ -1245,6 +1254,7 @@ export interface FileRouteTypes {
     | '/app/qa-checklist'
     | '/app/quickbooks'
     | '/app/referrals'
+    | '/app/reports'
     | '/app/reviews'
     | '/app/services'
     | '/app/settings'
@@ -1634,6 +1644,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReviewsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/referrals': {
       id: '/app/referrals'
       path: '/referrals'
@@ -1867,10 +1884,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/reports/': {
       id: '/app/reports/'
-      path: '/reports'
+      path: '/'
       fullPath: '/app/reports/'
       preLoaderRoute: typeof AppReportsIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppReportsRoute
     }
     '/app/referrals/': {
       id: '/app/referrals/'
@@ -2177,6 +2194,18 @@ const AppReferralsRouteWithChildren = AppReferralsRoute._addFileChildren(
   AppReferralsRouteChildren,
 )
 
+interface AppReportsRouteChildren {
+  AppReportsIndexRoute: typeof AppReportsIndexRoute
+}
+
+const AppReportsRouteChildren: AppReportsRouteChildren = {
+  AppReportsIndexRoute: AppReportsIndexRoute,
+}
+
+const AppReportsRouteWithChildren = AppReportsRoute._addFileChildren(
+  AppReportsRouteChildren,
+)
+
 interface AppReviewsRouteChildren {
   AppReviewsSettingsRoute: typeof AppReviewsSettingsRoute
   AppReviewsIndexRoute: typeof AppReviewsIndexRoute
@@ -2247,6 +2276,7 @@ interface AppRouteChildren {
   AppQaChecklistRoute: typeof AppQaChecklistRoute
   AppQuickbooksRoute: typeof AppQuickbooksRoute
   AppReferralsRoute: typeof AppReferralsRouteWithChildren
+  AppReportsRoute: typeof AppReportsRouteWithChildren
   AppReviewsRoute: typeof AppReviewsRouteWithChildren
   AppServicesRoute: typeof AppServicesRoute
   AppSettingsRoute: typeof AppSettingsRouteWithChildren
@@ -2257,7 +2287,6 @@ interface AppRouteChildren {
   AppWhatsappRoute: typeof AppWhatsappRoute
   AppClientsClientIdRoute: typeof AppClientsClientIdRoute
   AppCommunicationTemplatesRoute: typeof AppCommunicationTemplatesRoute
-  AppReportsIndexRoute: typeof AppReportsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -2292,6 +2321,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppQaChecklistRoute: AppQaChecklistRoute,
   AppQuickbooksRoute: AppQuickbooksRoute,
   AppReferralsRoute: AppReferralsRouteWithChildren,
+  AppReportsRoute: AppReportsRouteWithChildren,
   AppReviewsRoute: AppReviewsRouteWithChildren,
   AppServicesRoute: AppServicesRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
@@ -2302,7 +2332,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppWhatsappRoute: AppWhatsappRoute,
   AppClientsClientIdRoute: AppClientsClientIdRoute,
   AppCommunicationTemplatesRoute: AppCommunicationTemplatesRoute,
-  AppReportsIndexRoute: AppReportsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -2441,12 +2470,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
