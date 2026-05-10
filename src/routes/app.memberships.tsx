@@ -1583,9 +1583,9 @@ function ChangePlanModal({
     (async () => {
       const { data } = await supabase
         .from("memberships")
-        .select("id, name, monthly_price_cents, square_plan_variation_id, archived")
+        .select("id, name, monthly_price_cents, square_plan_variation_id, active")
         .eq("clinic_id", clinicId)
-        .eq("archived", false)
+        .eq("active", true)
         .order("monthly_price_cents", { ascending: true });
       const rows = (data ?? []).filter(
         (p) => p.id !== subscription.membership_id && p.square_plan_variation_id,
