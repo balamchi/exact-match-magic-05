@@ -1185,6 +1185,18 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
                     size="sm"
                     variant="ghost"
                     disabled={busyId === r.id}
+                    onClick={() => handlePortalLink(r.id)}
+                    className="h-8 px-2 text-xs text-violet-300 hover:bg-violet-500/10"
+                  >
+                    <LinkIcon className="mr-1 h-3.5 w-3.5" />
+                    Portal link
+                  </Button>
+                )}
+                {r.status !== "canceled" && r.status !== "expired" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
                     onClick={() => setChangeFor(r)}
                     className="h-8 px-2 text-xs text-sky-300 hover:bg-sky-500/10"
                   >
