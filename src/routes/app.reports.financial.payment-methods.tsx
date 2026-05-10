@@ -52,7 +52,7 @@ function PaymentMethods() {
       <div className="px-4 pt-4 md:px-6"><Button asChild variant="ghost" size="sm" className="gap-1"><Link to="/app/reports"><ArrowLeft className="h-4 w-4" />Reports</Link></Button></div>
       <ReportShell
         title="Payment Methods"
-        description="Distribution of paid invoice amounts by method"
+        description="Distribution of POS order amounts by method"
         rangeControl={range}
         primaryKpi={{ label: "Collected", value: money(total) }}
         exportFormats={["csv"]}
