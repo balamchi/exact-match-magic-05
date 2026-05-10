@@ -34,6 +34,8 @@ import { SquareCardForm } from "@/components/square-card-form";
 import {
   enrollMember,
   cancelMemberSubscription,
+  pauseMemberSubscription,
+  resumeMemberSubscription,
 } from "@/lib/square/subscriptions.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1030,6 +1032,8 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
   const [rows, setRows] = useState<SubRow[]>([]);
   const [loading, setLoading] = useState(true);
   const cancelFn = useServerFn(cancelMemberSubscription);
+  const pauseFn = useServerFn(pauseMemberSubscription);
+  const resumeFn = useServerFn(resumeMemberSubscription);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = async () => {
@@ -1069,6 +1073,30 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
       toast.success("Membership canceled");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Cancel failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handlePause = async (id: string) => {
+    setBusyId(id);
+    try {
+      await pauseFn({ data: { subscription_id: id } });
+      toast.success("Membership paused");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Pause failed");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleResume = async (id: string) => {
+    setBusyId(id);
+    try {
+      await resumeFn({ data: { subscription_id: id } });
+      toast.success("Membership resumed");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Resume failed");
     } finally {
       setBusyId(null);
     }
@@ -1122,6 +1150,30 @@ function MembersPanel({ clinicId }: { clinicId: string }) {
                 <Badge variant="outline" className={cn("text-[10px] uppercase", statusColor)}>
                   {r.status}
                 </Badge>
+                {r.status === "active" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
+                    onClick={() => handlePause(r.id)}
+                    className="h-8 px-2 text-xs text-amber-300 hover:bg-amber-500/10"
+                  >
+                    <Pause className="mr-1 h-3.5 w-3.5" />
+                    Pause
+                  </Button>
+                )}
+                {r.status === "paused" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busyId === r.id}
+                    onClick={() => handleResume(r.id)}
+                    className="h-8 px-2 text-xs text-emerald-300 hover:bg-emerald-500/10"
+                  >
+                    <Play className="mr-1 h-3.5 w-3.5" />
+                    Resume
+                  </Button>
+                )}
                 {r.status !== "canceled" && r.status !== "expired" && (
                   <Button
                     size="sm"

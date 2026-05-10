@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getSquareEnv, SQUARE_API_VERSION } from "@/lib/square/config";
+import { getSquareEnv } from "@/lib/square/config";
+import { getActiveSquareConnection, sqHeaders } from "@/lib/square/token.server";
 
 // Enroll a client in a membership plan via Square Subscriptions.
 // Flow:
@@ -19,11 +20,6 @@ const EnrollInput = z.object({
   card_source_id: z.string().min(4).max(2048), // Square Web Payments nonce (cnon:*)
 });
 
-const sqHeaders = (token: string) => ({
-  Authorization: `Bearer ${token}`,
-  "Content-Type": "application/json",
-  "Square-Version": SQUARE_API_VERSION,
-});
 
 export const enrollMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -59,15 +55,8 @@ export const enrollMember = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!roleRow) throw new Error("Not a member of this clinic.");
 
-    // Square connection
-    const { data: conn } = await supabaseAdmin
-      .from("clinic_square_connections")
-      .select("access_token, location_id, status")
-      .eq("clinic_id", m.clinic_id)
-      .maybeSingle();
-    if (!conn || conn.status !== "active") {
-      throw new Error("Square is not connected for this clinic.");
-    }
+    // Square connection (auto-refresh OAuth token if near expiry)
+    const conn = await getActiveSquareConnection(m.clinic_id);
     if (!conn.location_id) throw new Error("No Square location on the connected account.");
 
     const cfg = getSquareEnv();
@@ -220,12 +209,8 @@ export const cancelMemberSubscription = createServerFn({ method: "POST" })
     }
 
     if (row.square_subscription_id) {
-      const { data: conn } = await supabaseAdmin
-        .from("clinic_square_connections")
-        .select("access_token")
-        .eq("clinic_id", row.clinic_id)
-        .maybeSingle();
-      if (conn?.access_token) {
+      try {
+        const conn = await getActiveSquareConnection(row.clinic_id);
         const cfg = getSquareEnv();
         const res = await fetch(
           `${cfg.apiBase}/v2/subscriptions/${row.square_subscription_id}/cancel`,
@@ -235,6 +220,8 @@ export const cancelMemberSubscription = createServerFn({ method: "POST" })
           const t = await res.text();
           console.warn("Square cancel returned non-OK; proceeding to mark local canceled:", res.status, t);
         }
+      } catch (e) {
+        console.warn("Square cancel call skipped:", e);
       }
     }
 
@@ -248,5 +235,96 @@ export const cancelMemberSubscription = createServerFn({ method: "POST" })
       .eq("id", row.id);
     if (updErr) throw new Error(updErr.message);
 
+    return { ok: true };
+  });
+
+/* ─────────── Pause / Resume ─────────── */
+
+const SubIdInput = z.object({ subscription_id: z.string().uuid() });
+
+async function loadSubAndAuthorize(
+  supabase: any,
+  userId: string,
+  subscriptionId: string,
+) {
+  const { data: row, error } = await supabase
+    .from("membership_subscriptions")
+    .select("id, clinic_id, square_subscription_id, status")
+    .eq("id", subscriptionId)
+    .maybeSingle();
+  if (error || !row) throw new Error("Subscription not found");
+
+  const { data: roleRow } = await supabase
+    .from("clinic_members")
+    .select("role")
+    .eq("clinic_id", row.clinic_id)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!roleRow || (roleRow.role !== "owner" && roleRow.role !== "admin")) {
+    throw new Error("Only clinic owners/admins can change membership status.");
+  }
+  return row as {
+    id: string;
+    clinic_id: string;
+    square_subscription_id: string | null;
+    status: string;
+  };
+}
+
+export const pauseMemberSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => SubIdInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const row = await loadSubAndAuthorize(context.supabase, context.userId, data.subscription_id);
+    if (!row.square_subscription_id) throw new Error("Subscription is not in Square.");
+    const conn = await getActiveSquareConnection(row.clinic_id);
+    const cfg = getSquareEnv();
+    const res = await fetch(
+      `${cfg.apiBase}/v2/subscriptions/${row.square_subscription_id}/actions`,
+      {
+        method: "POST",
+        headers: sqHeaders(conn.access_token),
+        body: JSON.stringify({
+          action: { type: "PAUSE", effective_date: new Date().toISOString().slice(0, 10) },
+        }),
+      },
+    );
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(`Square pause failed (${res.status}): ${t.slice(0, 200)}`);
+    }
+    await supabaseAdmin
+      .from("membership_subscriptions")
+      .update({ status: "paused", updated_at: new Date().toISOString() })
+      .eq("id", row.id);
+    return { ok: true };
+  });
+
+export const resumeMemberSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => SubIdInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const row = await loadSubAndAuthorize(context.supabase, context.userId, data.subscription_id);
+    if (!row.square_subscription_id) throw new Error("Subscription is not in Square.");
+    const conn = await getActiveSquareConnection(row.clinic_id);
+    const cfg = getSquareEnv();
+    const res = await fetch(
+      `${cfg.apiBase}/v2/subscriptions/${row.square_subscription_id}/actions`,
+      {
+        method: "POST",
+        headers: sqHeaders(conn.access_token),
+        body: JSON.stringify({
+          action: { type: "RESUME", resume_effective_date: new Date().toISOString().slice(0, 10) },
+        }),
+      },
+    );
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(`Square resume failed (${res.status}): ${t.slice(0, 200)}`);
+    }
+    await supabaseAdmin
+      .from("membership_subscriptions")
+      .update({ status: "active", updated_at: new Date().toISOString() })
+      .eq("id", row.id);
     return { ok: true };
   });
