@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { PhotoUpload } from "@/components/photo-upload";
 import { seedClinicDefaults } from "@/server/seed-clinic.functions";
+import { ClinicTypeSelector } from "@/components/clinic-type-selector";
 
 export const Route = createFileRoute("/app/services")({ component: ServicesPage });
 
@@ -130,6 +131,30 @@ function ServicesPage() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [showSelector, setShowSelector] = useState(false);
+  const [seederLoading, setSeederLoading] = useState(false);
+
+  const handleConfirmSeed = async (categories: string[]) => {
+    setSeederLoading(true);
+    try {
+      const result = await seedClinicDefaults({
+        data: { categories: categories.length > 0 ? categories : undefined },
+      });
+      if (result.seeded && result.summary) {
+        toast.success(`Loaded ${result.summary.services} services!`);
+        setShowSelector(false);
+        await load();
+      } else {
+        toast.info(result.message ?? "Already seeded");
+        setShowSelector(false);
+        await load();
+      }
+    } catch (err: any) {
+      toast.error(`Seed failed: ${err.message}`);
+    } finally {
+      setSeederLoading(false);
+    }
+  };
 
   const load = useCallback(async () => {
     if (!clinicId) return;
@@ -478,26 +503,10 @@ function ServicesPage() {
             <div className="mt-7 flex flex-col items-center gap-3">
               <Button
                 size="lg"
-                onClick={async () => {
-                  setLoading(true);
-                  try {
-                    const result = await seedClinicDefaults({ data: {} });
-                    if (result.seeded) {
-                      toast.success(`Loaded ${result.summary?.services ?? 60}+ services!`);
-                      await load();
-                    } else {
-                      toast.info(result.message ?? "Already seeded");
-                      await load();
-                    }
-                  } catch (err: any) {
-                    toast.error(`Seed failed: ${err.message}`);
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
+                onClick={() => setShowSelector(true)}
                 className="gap-2 bg-gradient-primary px-6 text-primary-foreground shadow-glow hover:opacity-90"
               >
-                <Sparkles className="h-5 w-5" /> Load 60+ pre-built services
+                <Sparkles className="h-5 w-5" /> Load pre-built services
               </Button>
               <span className="text-xs text-muted-foreground">or</span>
               <Button variant="outline" onClick={openCreate} className="gap-2">
@@ -836,6 +845,12 @@ function ServicesPage() {
           </div>
         </div>
       )}
+      <ClinicTypeSelector
+        open={showSelector}
+        onOpenChange={setShowSelector}
+        onConfirm={handleConfirmSeed}
+        isLoading={seederLoading}
+      />
     </div>
   );
 }

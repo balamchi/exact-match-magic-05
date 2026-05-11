@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { seedClinicDefaults } from "@/server/seed-clinic.functions";
 import { toast } from "sonner";
+import { ClinicTypeSelector } from "@/components/clinic-type-selector";
 
 interface OnboardingStep {
   id: string;
@@ -63,26 +64,33 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const navigate = useNavigate();
   const [seeding, setSeeding] = useState(false);
   const [seeded, setSeeded] = useState(false);
+  const [showSelector, setShowSelector] = useState(false);
   const [steps, setSteps] = useState<OnboardingStep[]>([
     { id: "seed", title: "Load starter content", description: "60+ services, consent forms, automations & memberships", done: false },
     { id: "staff", title: "Add your first staff member", description: "Set up your team with roles and schedules", done: false },
     { id: "explore", title: "Explore your dashboard", description: "See your KPIs, calendar, and client management", done: false },
   ]);
 
-  const handleSeed = async () => {
+  const handleSeedClick = () => setShowSelector(true);
+
+  const handleConfirmSeed = async (categories: string[]) => {
     setSeeding(true);
     try {
-      const result = await seedClinicDefaults({ data: {} });
+      const result = await seedClinicDefaults({
+        data: { categories: categories.length > 0 ? categories : undefined },
+      });
       if (result.seeded && "summary" in result && result.summary && "consentForms" in result.summary) {
         toast.success(
           `Loaded ${result.summary.services} services, ${result.summary.consentForms} consent forms, ${result.summary.automations} automations, and ${result.summary.memberships} memberships!`
         );
         setSteps((prev) => prev.map((s) => (s.id === "seed" ? { ...s, done: true } : s)));
         setSeeded(true);
+        setShowSelector(false);
       } else {
         toast.info("Your clinic already has content set up.");
         setSteps((prev) => prev.map((s) => (s.id === "seed" ? { ...s, done: true } : s)));
         setSeeded(true);
+        setShowSelector(false);
       }
     } catch (err) {
       toast.error("Failed to load content. Please try again.");
@@ -91,6 +99,8 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
       setSeeding(false);
     }
   };
+
+
 
   const handleSkip = async () => {
     if (activeClinic?.clinic_id) {
@@ -155,7 +165,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                   <p className="mt-0.5 text-sm text-muted-foreground">{step.description}</p>
                   {step.id === "seed" && !step.done && (
                     <Button
-                      onClick={handleSeed}
+                      onClick={handleSeedClick}
                       disabled={seeding}
                       className="mt-3 gap-2 bg-gradient-to-r from-primary to-fuchsia-600 text-primary-foreground shadow-glow hover:opacity-90"
                     >
@@ -210,6 +220,12 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
           </button>
         </div>
       </div>
+      <ClinicTypeSelector
+        open={showSelector}
+        onOpenChange={setShowSelector}
+        onConfirm={handleConfirmSeed}
+        isLoading={seeding}
+      />
     </div>
   );
 }

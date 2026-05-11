@@ -8,7 +8,7 @@ import { attachSupabaseAuth } from "@/integrations/supabase/client-auth-middlewa
  */
 export const seedClinicDefaults = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
-  .inputValidator((d: { force?: boolean } | undefined) => d ?? {})
+  .inputValidator((d: { force?: boolean; categories?: string[] } | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const force = data?.force === true;
@@ -142,7 +142,12 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       },
     ];
 
-    const serviceRows = serviceCategories.flatMap((cat) =>
+    const selectedCategoryNames = data?.categories;
+    const filteredCategories = selectedCategoryNames && selectedCategoryNames.length > 0
+      ? serviceCategories.filter((c) => selectedCategoryNames.includes(c.category))
+      : serviceCategories;
+
+    const serviceRows = filteredCategories.flatMap((cat) =>
       cat.services.map((s) => ({
         clinic_id: clinicId,
         name: s.name,
