@@ -845,6 +845,12 @@ function ServicesPage() {
           </div>
         </div>
       )}
+      <ClinicTypeSelector
+        open={showSelector}
+        onOpenChange={setShowSelector}
+        onConfirm={handleConfirmSeed}
+        isLoading={seederLoading}
+      />
     </div>
   );
 }
