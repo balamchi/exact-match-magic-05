@@ -131,6 +131,30 @@ function ServicesPage() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [showSelector, setShowSelector] = useState(false);
+  const [seederLoading, setSeederLoading] = useState(false);
+
+  const handleConfirmSeed = async (categories: string[]) => {
+    setSeederLoading(true);
+    try {
+      const result = await seedClinicDefaults({
+        data: { categories: categories.length > 0 ? categories : undefined },
+      });
+      if (result.seeded && result.summary) {
+        toast.success(`Loaded ${result.summary.services} services!`);
+        setShowSelector(false);
+        await load();
+      } else {
+        toast.info(result.message ?? "Already seeded");
+        setShowSelector(false);
+        await load();
+      }
+    } catch (err: any) {
+      toast.error(`Seed failed: ${err.message}`);
+    } finally {
+      setSeederLoading(false);
+    }
+  };
 
   const load = useCallback(async () => {
     if (!clinicId) return;
