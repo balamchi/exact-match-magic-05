@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { seedClinicDefaults } from "@/server/seed-clinic.functions";
 import { toast } from "sonner";
+import { ClinicTypeSelector } from "@/components/clinic-type-selector";
 
 interface OnboardingStep {
   id: string;
