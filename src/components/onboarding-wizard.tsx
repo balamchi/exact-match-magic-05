@@ -165,7 +165,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
                   <p className="mt-0.5 text-sm text-muted-foreground">{step.description}</p>
                   {step.id === "seed" && !step.done && (
                     <Button
-                      onClick={handleSeed}
+                      onClick={handleSeedClick}
                       disabled={seeding}
                       className="mt-3 gap-2 bg-gradient-to-r from-primary to-fuchsia-600 text-primary-foreground shadow-glow hover:opacity-90"
                     >
