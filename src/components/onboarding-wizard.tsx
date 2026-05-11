@@ -220,6 +220,12 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
           </button>
         </div>
       </div>
+      <ClinicTypeSelector
+        open={showSelector}
+        onOpenChange={setShowSelector}
+        onConfirm={handleConfirmSeed}
+        isLoading={seeding}
+      />
     </div>
   );
 }
