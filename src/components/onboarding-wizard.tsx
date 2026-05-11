@@ -64,11 +64,41 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
   const navigate = useNavigate();
   const [seeding, setSeeding] = useState(false);
   const [seeded, setSeeded] = useState(false);
+  const [showSelector, setShowSelector] = useState(false);
   const [steps, setSteps] = useState<OnboardingStep[]>([
     { id: "seed", title: "Load starter content", description: "60+ services, consent forms, automations & memberships", done: false },
     { id: "staff", title: "Add your first staff member", description: "Set up your team with roles and schedules", done: false },
     { id: "explore", title: "Explore your dashboard", description: "See your KPIs, calendar, and client management", done: false },
   ]);
+
+  const handleSeedClick = () => setShowSelector(true);
+
+  const handleConfirmSeed = async (categories: string[]) => {
+    setSeeding(true);
+    try {
+      const result = await seedClinicDefaults({
+        data: { categories: categories.length > 0 ? categories : undefined },
+      });
+      if (result.seeded && "summary" in result && result.summary && "consentForms" in result.summary) {
+        toast.success(
+          `Loaded ${result.summary.services} services, ${result.summary.consentForms} consent forms, ${result.summary.automations} automations, and ${result.summary.memberships} memberships!`
+        );
+        setSteps((prev) => prev.map((s) => (s.id === "seed" ? { ...s, done: true } : s)));
+        setSeeded(true);
+        setShowSelector(false);
+      } else {
+        toast.info("Your clinic already has content set up.");
+        setSteps((prev) => prev.map((s) => (s.id === "seed" ? { ...s, done: true } : s)));
+        setSeeded(true);
+        setShowSelector(false);
+      }
+    } catch (err) {
+      toast.error("Failed to load content. Please try again.");
+      console.error(err);
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const handleSeed = async () => {
     setSeeding(true);
