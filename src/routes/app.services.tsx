@@ -503,26 +503,10 @@ function ServicesPage() {
             <div className="mt-7 flex flex-col items-center gap-3">
               <Button
                 size="lg"
-                onClick={async () => {
-                  setLoading(true);
-                  try {
-                    const result = await seedClinicDefaults({ data: {} });
-                    if (result.seeded) {
-                      toast.success(`Loaded ${result.summary?.services ?? 60}+ services!`);
-                      await load();
-                    } else {
-                      toast.info(result.message ?? "Already seeded");
-                      await load();
-                    }
-                  } catch (err: any) {
-                    toast.error(`Seed failed: ${err.message}`);
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
+                onClick={() => setShowSelector(true)}
                 className="gap-2 bg-gradient-primary px-6 text-primary-foreground shadow-glow hover:opacity-90"
               >
-                <Sparkles className="h-5 w-5" /> Load 60+ pre-built services
+                <Sparkles className="h-5 w-5" /> Load pre-built services
               </Button>
               <span className="text-xs text-muted-foreground">or</span>
               <Button variant="outline" onClick={openCreate} className="gap-2">
