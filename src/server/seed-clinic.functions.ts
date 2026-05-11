@@ -8,7 +8,7 @@ import { attachSupabaseAuth } from "@/integrations/supabase/client-auth-middlewa
  */
 export const seedClinicDefaults = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
-  .inputValidator((d: { force?: boolean } | undefined) => d ?? {})
+  .inputValidator((d: { force?: boolean; categories?: string[] } | undefined) => d ?? {})
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const force = data?.force === true;
