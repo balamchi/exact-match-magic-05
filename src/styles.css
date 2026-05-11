@@ -254,3 +254,18 @@
 @layer utilities {
   .pb-safe { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
 }
+
+/* Hide Lovable Edit Mode badge for project owner — beta clinics
+   should never see "Edit with Lovable" branding on clinicpro.io */
+[data-lovable-edit-badge],
+[data-lovable-editor-pin],
+#lovable-edit-pin,
+.lovable-edit-overlay,
+iframe[src*="lovable.app"],
+iframe[src*="lovable.dev"],
+div[id^="lovable-"],
+div[class*="edit-with-lovable"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
