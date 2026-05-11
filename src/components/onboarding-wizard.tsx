@@ -100,28 +100,7 @@ export function OnboardingWizard({ onComplete }: { onComplete: () => void }) {
     }
   };
 
-  const handleSeed = async () => {
-    setSeeding(true);
-    try {
-      const result = await seedClinicDefaults({ data: {} });
-      if (result.seeded && "summary" in result && result.summary && "consentForms" in result.summary) {
-        toast.success(
-          `Loaded ${result.summary.services} services, ${result.summary.consentForms} consent forms, ${result.summary.automations} automations, and ${result.summary.memberships} memberships!`
-        );
-        setSteps((prev) => prev.map((s) => (s.id === "seed" ? { ...s, done: true } : s)));
-        setSeeded(true);
-      } else {
-        toast.info("Your clinic already has content set up.");
-        setSteps((prev) => prev.map((s) => (s.id === "seed" ? { ...s, done: true } : s)));
-        setSeeded(true);
-      }
-    } catch (err) {
-      toast.error("Failed to load content. Please try again.");
-      console.error(err);
-    } finally {
-      setSeeding(false);
-    }
-  };
+
 
   const handleSkip = async () => {
     if (activeClinic?.clinic_id) {
