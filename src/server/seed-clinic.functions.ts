@@ -585,7 +585,9 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       requires_witness: cf.requires_witness === true,
     }));
 
-    await supabase.from("consent_form_templates").insert(consentRows);
+    await supabase.from("consent_form_templates").upsert(consentRows, {
+      onConflict: "clinic_id,name",
+    });
 
     // ── Automations ──
     const automations = [
