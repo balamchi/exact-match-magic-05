@@ -40,7 +40,11 @@ interface AuditRow { id: string; action: string; entity_type: string | null; det
 
 function SettingsPage() {
   const { activeClinic, user, memberships, refreshMemberships, signOut } = useAuth();
-  const isOwnerOrAdmin = activeClinic?.role === "owner" || activeClinic?.role === "admin";
+  const canWriteSettings = hasPermission(activeClinic?.role, "clinic.settings.write");
+  const canReadAudit = hasPermission(activeClinic?.role, "audit.read");
+  // Alias kept so the 50+ existing JSX usages of `isOwnerOrAdmin` (disabled props on
+  // inputs/toggles for Profile/Branding/Booking/etc) Just Work without modification.
+  const isOwnerOrAdmin = canWriteSettings;
   const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
     if (typeof window === "undefined") return "profile";
     const raw = new URLSearchParams(window.location.search).get("tab");
