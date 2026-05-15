@@ -897,7 +897,7 @@ export type Database = {
           signer_ip_address: string | null
           signer_user_agent: string | null
           status: Database["public"]["Enums"]["consent_signature_status"]
-          template_id: string
+          template_id: string | null
           template_version: number
           updated_at: string
           viewed_at: string | null
@@ -932,7 +932,7 @@ export type Database = {
           signer_ip_address?: string | null
           signer_user_agent?: string | null
           status?: Database["public"]["Enums"]["consent_signature_status"]
-          template_id: string
+          template_id?: string | null
           template_version?: number
           updated_at?: string
           viewed_at?: string | null
@@ -967,7 +967,7 @@ export type Database = {
           signer_ip_address?: string | null
           signer_user_agent?: string | null
           status?: Database["public"]["Enums"]["consent_signature_status"]
-          template_id?: string
+          template_id?: string | null
           template_version?: number
           updated_at?: string
           viewed_at?: string | null
