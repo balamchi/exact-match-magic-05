@@ -637,7 +637,7 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       seeded: true,
       summary: {
         services: serviceRows.length,
-        consentForms: consentForms.length,
+        consentForms: consentRows.length,
         automations: automations.length,
         memberships: memberships.length,
       },
