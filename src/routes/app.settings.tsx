@@ -399,8 +399,8 @@ function SettingsPage() {
             </div>
           )}
 
-          {activeTab === "team" && (
-            <SettingsSection title="Team Members" description={`${members.length} member${members.length !== 1 ? "s" : ""} in ${clinicData.name}`}>
+          {activeTab === "users" && (
+            <SettingsSection title="Users" description={`${members.length} user${members.length !== 1 ? "s" : ""} in ${clinicData.name}`}>
               {isOwnerOrAdmin && (
                 <div className="mb-4">
                   <Button variant="outline" disabled title="Email invites coming soon"><Mail className="mr-2 h-4 w-4" /> Invite member</Button>
