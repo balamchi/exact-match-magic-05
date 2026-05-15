@@ -2,7 +2,14 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type ClinicRole = "owner" | "admin" | "provider" | "front_desk";
+export type ClinicRole =
+  | "owner"
+  | "admin"           // Legacy — kept for backwards compat
+  | "senior_admin"
+  | "junior_admin"
+  | "manager"
+  | "provider"
+  | "front_desk";
 
 export interface ClinicMembership {
   clinic_id: string;
