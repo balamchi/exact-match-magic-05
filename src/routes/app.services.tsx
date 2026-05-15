@@ -549,30 +549,6 @@ function ServicesPage() {
               <Button variant="outline" onClick={openCreate} className="gap-2">
                 <Plus className="h-4 w-4" /> Add custom service
               </Button>
-              <details className="mt-4">
-                <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
-                  Already seeded but missing content? Force re-seed
-                </summary>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2"
-                  onClick={async () => {
-                    setLoading(true);
-                    try {
-                      const result = await seedClinicDefaults({ data: { force: true } });
-                      toast.success(result.seeded ? `Re-seeded ${result.summary?.services ?? 0}+ services` : (result.message ?? "Done"));
-                      await load();
-                    } catch (err: any) {
-                      toast.error(`Re-seed failed: ${err.message}`);
-                    } finally {
-                      setLoading(false);
-                    }
-                  }}
-                >
-                  Force re-seed (skips duplicates)
-                </Button>
-              </details>
             </div>
           </div>
         ) : (
