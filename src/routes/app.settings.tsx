@@ -179,7 +179,7 @@ function SettingsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_1fr]">
         {/* Sidebar Nav */}
         <nav className="space-y-1">
-          {NAV_ITEMS.filter((item) => !item.adminOnly || isOwnerOrAdmin).map((item) => {
+          {NAV_ITEMS.filter((item) => !item.adminOnly || canReadAudit).map((item) => {
             const Icon = item.icon;
             return (
               <button
