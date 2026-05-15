@@ -41,8 +41,9 @@ function SettingsPage() {
   const isOwnerOrAdmin = activeClinic?.role === "owner" || activeClinic?.role === "admin";
   const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
     if (typeof window === "undefined") return "profile";
-    const t = new URLSearchParams(window.location.search).get("tab") as SettingsTab | null;
-    return t && ["profile","branding","booking","notifications","communication","tax","integrations","team","audit"].includes(t) ? t : "profile";
+    const raw = new URLSearchParams(window.location.search).get("tab");
+    const t = (raw === "team" ? "users" : raw) as SettingsTab | null;
+    return t && ["profile","branding","booking","notifications","communication","tax","integrations","users","audit"].includes(t) ? t : "profile";
   });
 
   // Clinic data
