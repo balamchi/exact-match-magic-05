@@ -471,10 +471,14 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       }))
     );
 
-    await supabase.from("services").upsert(serviceRows, {
+    const { error: servicesError } = await supabase.from("services").upsert(serviceRows, {
       onConflict: "clinic_id,name",
       ignoreDuplicates: true,
     });
+    if (servicesError) {
+      console.error("Seed services failed:", servicesError);
+      throw new Error(`Failed to seed services: ${servicesError.message}`);
+    }
 
     // ── Consent Forms ──
     const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
