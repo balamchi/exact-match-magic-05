@@ -678,9 +678,13 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       active: a.active ?? true,
     }));
 
-    await supabase.from("automations").upsert(automationRows, {
+    const { error: automationsError } = await supabase.from("automations").upsert(automationRows, {
       onConflict: "clinic_id,name",
     });
+    if (automationsError) {
+      console.error("Seed automations failed:", automationsError);
+      throw new Error(`Failed to seed automations: ${automationsError.message}`);
+    }
 
     // ── Memberships ──
     const memberships = [
