@@ -69,7 +69,7 @@ function SettingsPage() {
   }, [activeClinic?.clinic_id]);
 
   useEffect(() => {
-    if (activeTab === "audit" && activeClinic && isOwnerOrAdmin) {
+    if (activeTab === "audit" && activeClinic && canReadAudit) {
       setLoadingAudit(true);
       supabase.from("audit_log").select("*").eq("clinic_id", activeClinic.clinic_id).order("created_at", { ascending: false }).limit(50).then(({ data }) => {
         setAuditLog((data ?? []) as AuditRow[]);
