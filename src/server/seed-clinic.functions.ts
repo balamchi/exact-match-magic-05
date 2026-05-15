@@ -589,9 +589,13 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       requires_witness: cf.requires_witness === true,
     }));
 
-    await supabase.from("consent_form_templates").upsert(consentRows, {
+    const { error: consentError } = await supabase.from("consent_form_templates").upsert(consentRows, {
       onConflict: "clinic_id,name",
     });
+    if (consentError) {
+      console.error("Seed consent_form_templates failed:", consentError);
+      throw new Error(`Failed to seed consent forms: ${consentError.message}`);
+    }
 
     // ── Automations ──
     type Automation = {
