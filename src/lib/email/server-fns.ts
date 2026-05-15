@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/integrations/supabase/client-auth-middleware";
+import { hasPermission } from "@/lib/permissions";
+import type { ClinicRole } from "@/lib/auth-context";
 
 const FilterSchema = z.object({
   range: z.enum(["24h", "7d", "30d", "all"]).default("7d"),
