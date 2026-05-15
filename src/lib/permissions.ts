@@ -172,6 +172,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "reports.read", "reports.export",
     "staff.read",
     "seed.view_log",
+    "audit.read",
   ],
 
   manager: [
