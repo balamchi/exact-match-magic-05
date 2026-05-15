@@ -7,7 +7,7 @@ import {
   Check, X as XIcon,
 } from "lucide-react";
 import { useAuth, type ClinicRole } from "@/lib/auth-context";
-import { ROLE_PERMISSIONS, ROLE_LABELS as PERM_ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSION_MODULES, type PermissionKey } from "@/lib/permissions";
+import { ROLE_PERMISSIONS, ROLE_LABELS as PERM_ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSION_MODULES, hasPermission, type PermissionKey } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
