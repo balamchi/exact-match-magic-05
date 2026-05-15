@@ -9,6 +9,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { hasPermission } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchEmailLog } from "@/lib/email/server-fns";
 import { StatCard } from "@/components/stat-card";
@@ -93,7 +94,7 @@ function EmailLogPage() {
   const [unauthorized, setUnauthorized] = useState(false);
 
   const isPrivileged = useMemo(
-    () => activeClinic?.role === "owner" || activeClinic?.role === "admin",
+    () => hasPermission(activeClinic?.role, "reports.read"),
     [activeClinic],
   );
 

@@ -84,6 +84,8 @@ export const PERMISSION_KEYS = [
   "seed.run",
   "seed.reset",
   "seed.view_log",
+  // Audit
+  "audit.read",
 ] as const;
 
 export type PermissionKey = typeof PERMISSION_KEYS[number];
@@ -110,6 +112,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "reports.read", "reports.export",
     "staff.read", "staff.write",
     "seed.run", "seed.reset", "seed.view_log",
+    "audit.read",
   ],
 
   senior_admin: [
@@ -129,6 +132,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "reports.read", "reports.export",
     "staff.read", "staff.write",
     "seed.run", "seed.reset", "seed.view_log",
+    "audit.read",
   ],
 
   // Legacy — same as senior_admin for backwards compat
@@ -149,6 +153,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "reports.read", "reports.export",
     "staff.read", "staff.write",
     "seed.run", "seed.reset", "seed.view_log",
+    "audit.read",
   ],
 
   junior_admin: [
@@ -167,6 +172,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "reports.read", "reports.export",
     "staff.read",
     "seed.view_log",
+    "audit.read",
   ],
 
   manager: [
@@ -185,6 +191,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "reports.read",
     "staff.read", "staff.write",
     "seed.view_log",
+    "audit.read",
   ],
 
   provider: [
@@ -274,4 +281,5 @@ export const PERMISSION_MODULES = [
   { key: "reports", label: "Reports", keys: ["reports.read", "reports.export"] },
   { key: "staff", label: "Staff", keys: ["staff.read", "staff.write"] },
   { key: "seed", label: "Setup & Seeding", keys: ["seed.run", "seed.reset", "seed.view_log"] },
+  { key: "audit", label: "Audit Log", keys: ["audit.read"] },
 ] as const;

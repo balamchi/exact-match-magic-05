@@ -7,7 +7,7 @@ import {
   Check, X as XIcon,
 } from "lucide-react";
 import { useAuth, type ClinicRole } from "@/lib/auth-context";
-import { ROLE_PERMISSIONS, ROLE_LABELS as PERM_ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSION_MODULES, type PermissionKey } from "@/lib/permissions";
+import { ROLE_PERMISSIONS, ROLE_LABELS as PERM_ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSION_MODULES, hasPermission, type PermissionKey } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +40,11 @@ interface AuditRow { id: string; action: string; entity_type: string | null; det
 
 function SettingsPage() {
   const { activeClinic, user, memberships, refreshMemberships, signOut } = useAuth();
-  const isOwnerOrAdmin = activeClinic?.role === "owner" || activeClinic?.role === "admin";
+  const canWriteSettings = hasPermission(activeClinic?.role, "clinic.settings.write");
+  const canReadAudit = hasPermission(activeClinic?.role, "audit.read");
+  // Alias kept so the 50+ existing JSX usages of `isOwnerOrAdmin` (disabled props on
+  // inputs/toggles for Profile/Branding/Booking/etc) Just Work without modification.
+  const isOwnerOrAdmin = canWriteSettings;
   const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
     if (typeof window === "undefined") return "profile";
     const raw = new URLSearchParams(window.location.search).get("tab");
@@ -65,7 +69,7 @@ function SettingsPage() {
   }, [activeClinic?.clinic_id]);
 
   useEffect(() => {
-    if (activeTab === "audit" && activeClinic && isOwnerOrAdmin) {
+    if (activeTab === "audit" && activeClinic && canReadAudit) {
       setLoadingAudit(true);
       supabase.from("audit_log").select("*").eq("clinic_id", activeClinic.clinic_id).order("created_at", { ascending: false }).limit(50).then(({ data }) => {
         setAuditLog((data ?? []) as AuditRow[]);
@@ -175,7 +179,7 @@ function SettingsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_1fr]">
         {/* Sidebar Nav */}
         <nav className="space-y-1">
-          {NAV_ITEMS.filter((item) => !item.adminOnly || isOwnerOrAdmin).map((item) => {
+          {NAV_ITEMS.filter((item) => !item.adminOnly || canReadAudit).map((item) => {
             const Icon = item.icon;
             return (
               <button
