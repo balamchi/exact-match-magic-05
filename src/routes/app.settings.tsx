@@ -29,7 +29,7 @@ const TIMEZONES = [
 ];
 const CURRENCIES = ["CAD", "USD", "EUR", "GBP", "AUD", "AED", "SGD"];
 const INDUSTRIES = ["Aesthetic", "Beauty", "Dental", "Wellness", "Dermatology", "Med Spa", "Other"];
-const ROLE_LABELS: Record<ClinicRole, string> = { owner: "Owner", admin: "Admin", provider: "Provider", front_desk: "Front desk" };
+const ROLE_LABELS: Record<ClinicRole, string> = { owner: "Owner", admin: "Admin", senior_admin: "Senior Admin", junior_admin: "Junior Admin", manager: "Manager", provider: "Provider", front_desk: "Front desk" };
 
 type SettingsTab = "profile" | "branding" | "booking" | "notifications" | "communication" | "tax" | "integrations" | "team" | "audit";
 
