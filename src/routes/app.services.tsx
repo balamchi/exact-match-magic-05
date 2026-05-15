@@ -429,6 +429,43 @@ function ServicesPage() {
           <Button onClick={openCreate} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
             <Plus className="mr-1.5 h-4 w-4" /> New service
           </Button>
+          <details className="relative">
+            <summary className="cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 list-none">
+              Admin tools
+            </summary>
+            <div className="absolute right-0 mt-2 w-64 rounded-lg border border-border bg-popover p-3 shadow-lg z-50">
+              <p className="text-xs text-muted-foreground mb-2">
+                Re-seed picks up any new templates added since your last seed (services, consent forms, automations, etc.). Existing rows are preserved via upsert.
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const result = await seedClinicDefaults({ data: { force: true } });
+                    if (result.seeded) {
+                      const s: any = (result as any).summary ?? {};
+                      toast.success(
+                        `Re-seeded — ${s.services ?? 0} services, ${s.consentForms ?? 0} consent forms, ${s.automations ?? 0} automations, ${s.memberships ?? 0} memberships`
+                      );
+                    } else {
+                      toast.info((result as any).message ?? "Nothing to seed");
+                    }
+                    await load();
+                  } catch (err: any) {
+                    toast.error(`Re-seed failed: ${err.message}`);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                <Sparkles className="mr-2 h-3.5 w-3.5" />
+                Force re-seed (skips duplicates)
+              </Button>
+            </div>
+          </details>
         </div>
       </header>
 
@@ -512,30 +549,6 @@ function ServicesPage() {
               <Button variant="outline" onClick={openCreate} className="gap-2">
                 <Plus className="h-4 w-4" /> Add custom service
               </Button>
-              <details className="mt-4">
-                <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
-                  Already seeded but missing content? Force re-seed
-                </summary>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2"
-                  onClick={async () => {
-                    setLoading(true);
-                    try {
-                      const result = await seedClinicDefaults({ data: { force: true } });
-                      toast.success(result.seeded ? `Re-seeded ${result.summary?.services ?? 0}+ services` : (result.message ?? "Done"));
-                      await load();
-                    } catch (err: any) {
-                      toast.error(`Re-seed failed: ${err.message}`);
-                    } finally {
-                      setLoading(false);
-                    }
-                  }}
-                >
-                  Force re-seed (skips duplicates)
-                </Button>
-              </details>
             </div>
           </div>
         ) : (
