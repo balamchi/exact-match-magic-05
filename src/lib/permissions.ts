@@ -281,4 +281,5 @@ export const PERMISSION_MODULES = [
   { key: "reports", label: "Reports", keys: ["reports.read", "reports.export"] },
   { key: "staff", label: "Staff", keys: ["staff.read", "staff.write"] },
   { key: "seed", label: "Setup & Seeding", keys: ["seed.run", "seed.reset", "seed.view_log"] },
+  { key: "audit", label: "Audit Log", keys: ["audit.read"] },
 ] as const;
