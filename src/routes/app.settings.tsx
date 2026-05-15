@@ -45,7 +45,7 @@ function SettingsPage() {
     if (typeof window === "undefined") return "profile";
     const raw = new URLSearchParams(window.location.search).get("tab");
     const t = (raw === "team" ? "users" : raw) as SettingsTab | null;
-    return t && ["profile","branding","booking","notifications","communication","tax","integrations","users","audit"].includes(t) ? t : "profile";
+    return t && ["profile","branding","booking","notifications","communication","tax","integrations","users","permissions","audit"].includes(t) ? t : "profile";
   });
 
   // Clinic data
