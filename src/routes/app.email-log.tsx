@@ -94,7 +94,7 @@ function EmailLogPage() {
   const [unauthorized, setUnauthorized] = useState(false);
 
   const isPrivileged = useMemo(
-    () => activeClinic?.role === "owner" || activeClinic?.role === "admin",
+    () => hasPermission(activeClinic?.role, "reports.read"),
     [activeClinic],
   );
 
