@@ -70,7 +70,7 @@ export const fetchEmailLog = createServerFn({ method: "POST" })
     }
 
     const isPrivileged = (roles ?? []).some(
-      (r) => r.role === "owner" || r.role === "admin",
+      (r) => hasPermission(r.role as ClinicRole, "reports.read"),
     );
     if (!isPrivileged) {
       return {
