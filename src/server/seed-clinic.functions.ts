@@ -471,10 +471,14 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       }))
     );
 
-    await supabase.from("services").upsert(serviceRows, {
+    const { error: servicesError } = await supabase.from("services").upsert(serviceRows, {
       onConflict: "clinic_id,name",
       ignoreDuplicates: true,
     });
+    if (servicesError) {
+      console.error("Seed services failed:", servicesError);
+      throw new Error(`Failed to seed services: ${servicesError.message}`);
+    }
 
     // ── Consent Forms ──
     const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
@@ -585,9 +589,13 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       requires_witness: cf.requires_witness === true,
     }));
 
-    await supabase.from("consent_form_templates").upsert(consentRows, {
+    const { error: consentError } = await supabase.from("consent_form_templates").upsert(consentRows, {
       onConflict: "clinic_id,name",
     });
+    if (consentError) {
+      console.error("Seed consent_form_templates failed:", consentError);
+      throw new Error(`Failed to seed consent forms: ${consentError.message}`);
+    }
 
     // ── Automations ──
     type Automation = {
@@ -670,9 +678,13 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       active: a.active ?? true,
     }));
 
-    await supabase.from("automations").upsert(automationRows, {
+    const { error: automationsError } = await supabase.from("automations").upsert(automationRows, {
       onConflict: "clinic_id,name",
     });
+    if (automationsError) {
+      console.error("Seed automations failed:", automationsError);
+      throw new Error(`Failed to seed automations: ${automationsError.message}`);
+    }
 
     // ── Memberships ──
     const memberships = [
@@ -702,13 +714,40 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       },
     ];
 
-    await supabase.from("memberships").upsert(memberships, {
+    const { error: membershipsError } = await supabase.from("memberships").upsert(memberships, {
       onConflict: "clinic_id,name",
     });
+    if (membershipsError) {
+      console.error("Seed memberships failed:", membershipsError);
+      throw new Error(`Failed to seed memberships: ${membershipsError.message}`);
+    }
+
+    // Re-query actual counts post-upsert so the UI reports DB truth, not insert intent.
+    const [
+      { count: finalServices, error: cs1 },
+      { count: finalConsent, error: cs2 },
+      { count: finalAutomations, error: cs3 },
+      { count: finalMemberships, error: cs4 },
+    ] = await Promise.all([
+      supabase.from("services").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+      supabase.from("consent_form_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+      supabase.from("automations").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+      supabase.from("memberships").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+    ]);
+
+    if (cs1 || cs2 || cs3 || cs4) {
+      console.warn("Post-seed count queries had errors:", { cs1, cs2, cs3, cs4 });
+    }
 
     return {
       seeded: true,
       summary: {
+        services: finalServices ?? 0,
+        consentForms: finalConsent ?? 0,
+        automations: finalAutomations ?? 0,
+        memberships: finalMemberships ?? 0,
+      },
+      attempted: {
         services: serviceRows.length,
         consentForms: consentRows.length,
         automations: automationRows.length,
