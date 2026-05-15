@@ -31,7 +31,7 @@ const CURRENCIES = ["CAD", "USD", "EUR", "GBP", "AUD", "AED", "SGD"];
 const INDUSTRIES = ["Aesthetic", "Beauty", "Dental", "Wellness", "Dermatology", "Med Spa", "Other"];
 const ROLE_LABELS: Record<ClinicRole, string> = { owner: "Owner", admin: "Admin", senior_admin: "Senior Admin", junior_admin: "Junior Admin", manager: "Manager", provider: "Provider", front_desk: "Front desk" };
 
-type SettingsTab = "profile" | "branding" | "booking" | "notifications" | "communication" | "tax" | "integrations" | "team" | "audit";
+type SettingsTab = "profile" | "branding" | "booking" | "notifications" | "communication" | "tax" | "integrations" | "users" | "audit";
 
 interface MemberRow { id: string; user_id: string; role: ClinicRole; created_at: string }
 interface AuditRow { id: string; action: string; entity_type: string | null; details: any; created_at: string; user_id: string }
@@ -41,8 +41,9 @@ function SettingsPage() {
   const isOwnerOrAdmin = activeClinic?.role === "owner" || activeClinic?.role === "admin";
   const [activeTab, setActiveTab] = useState<SettingsTab>(() => {
     if (typeof window === "undefined") return "profile";
-    const t = new URLSearchParams(window.location.search).get("tab") as SettingsTab | null;
-    return t && ["profile","branding","booking","notifications","communication","tax","integrations","team","audit"].includes(t) ? t : "profile";
+    const raw = new URLSearchParams(window.location.search).get("tab");
+    const t = (raw === "team" ? "users" : raw) as SettingsTab | null;
+    return t && ["profile","branding","booking","notifications","communication","tax","integrations","users","audit"].includes(t) ? t : "profile";
   });
 
   // Clinic data
@@ -147,7 +148,7 @@ function SettingsPage() {
     { id: "communication", label: "Communication", icon: MessageSquare },
     { id: "tax", label: "Tax & Currency", icon: Receipt },
     { id: "integrations", label: "Integrations", icon: Plug },
-    { id: "team", label: "Team", icon: Users },
+    { id: "users", label: "Users", icon: Users },
     { id: "audit", label: "Audit Log", icon: ClipboardList, adminOnly: true },
   ];
 
@@ -398,8 +399,8 @@ function SettingsPage() {
             </div>
           )}
 
-          {activeTab === "team" && (
-            <SettingsSection title="Team Members" description={`${members.length} member${members.length !== 1 ? "s" : ""} in ${clinicData.name}`}>
+          {activeTab === "users" && (
+            <SettingsSection title="Users" description={`${members.length} user${members.length !== 1 ? "s" : ""} in ${clinicData.name}`}>
               {isOwnerOrAdmin && (
                 <div className="mb-4">
                   <Button variant="outline" disabled title="Email invites coming soon"><Mail className="mr-2 h-4 w-4" /> Invite member</Button>
