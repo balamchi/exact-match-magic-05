@@ -477,45 +477,115 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
     });
 
     // ── Consent Forms ──
-    const consentForms = [
-      {
-        clinic_id: clinicId,
-        title: "Botulinum Toxin (Botox/Dysport) Consent",
-        body: "I understand that botulinum toxin injections are a cosmetic procedure. Risks include bruising, swelling, asymmetry, ptosis, headache, and allergic reaction. Results typically last 3-4 months. I confirm I am not pregnant or breastfeeding, and I have disclosed all medical conditions and medications.",
-        active: true,
-      },
-      {
-        clinic_id: clinicId,
-        title: "Dermal Filler Consent",
-        body: "I understand that dermal filler injections carry risks including bruising, swelling, infection, vascular occlusion, asymmetry, and nodule formation. I will avoid blood thinners 7 days prior. I understand results are temporary (6-18 months). Emergency protocols have been explained to me.",
-        active: true,
-      },
-      {
-        clinic_id: clinicId,
-        title: "Laser/IPL Treatment Consent",
-        body: "I understand that laser treatments carry risks including burns, blistering, hyperpigmentation, hypopigmentation, and scarring. I will avoid sun exposure 2 weeks before and after treatment. I confirm I have no photosensitive conditions and am not using retinoids or photosensitizing medications.",
-        active: true,
-      },
-      {
-        clinic_id: clinicId,
-        title: "General Treatment Consent",
-        body: "I consent to receive the proposed cosmetic treatment. I have been informed of the procedure, expected outcomes, risks, and alternatives. I understand that individual results may vary. I have had the opportunity to ask questions and all my questions have been answered satisfactorily.",
-        active: true,
-      },
-      {
-        clinic_id: clinicId,
-        title: "Photo & Before/After Consent",
-        body: "I authorize the clinic to take clinical photographs before, during, and after treatment for medical records. I understand these photos may be used for educational purposes, marketing, or social media with my identity anonymized, unless I provide additional written consent for identifiable use.",
-        active: true,
-      },
+    const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
+      "Injectables": "medical_aesthetic",
+      "Laser & Energy": "medical_aesthetic",
+      "Skin Treatments": "medical_aesthetic",
+      "Body Contouring": "medical_aesthetic",
+      "PMU": "medical_aesthetic",
+      "Hair": "beauty_salon",
+      "Nails": "beauty_salon",
+      "Lash, Brow & Wax": "beauty_salon",
+      "Dental — Preventive": "dental",
+      "Dental — Restorative": "dental",
+      "Dental — Cosmetic": "dental",
+      "Dental — Surgical": "dental",
+      "Dermatology": "dermatology",
+      "Physio & Chiro": "wellness",
+      "Massage": "wellness",
+      "Holistic & Wellness": "wellness",
+    };
+
+    type ConsentForm = { clinicType: string[]; title: string; body: string; requires_witness?: boolean };
+    const consentForms: ConsentForm[] = [
+      // ── Universal (5) — always seeded ──
+      { clinicType: ["universal"], title: "General Treatment Consent", body: "I consent to receive the proposed treatment. I have been informed of the procedure, expected outcomes, risks, benefits, and alternatives. I understand individual results may vary. All my questions have been answered." },
+      { clinicType: ["universal"], title: "Photo & Before/After Consent", body: "I authorize the clinic to take clinical photographs before, during, and after treatment for medical records, education, and (optionally) anonymized marketing. Identifiable use requires additional written consent." },
+      { clinicType: ["universal"], title: "HIPAA / Privacy Acknowledgment", body: "I acknowledge receipt of the clinic's Notice of Privacy Practices. I understand how my protected health information may be used and disclosed for treatment, payment, and operations." },
+      { clinicType: ["universal"], title: "Cancellation & No-Show Policy", body: "I understand the clinic requires 24-hour notice to cancel or reschedule appointments. Late cancellations and no-shows may incur a fee of up to 50% of the service price." },
+      { clinicType: ["universal"], title: "Financial Responsibility Agreement", body: "I accept full financial responsibility for services rendered. Payment is due at time of service. I authorize the clinic to charge my card on file for any outstanding balances." },
+
+      // ── Medical Aesthetic (16, includes 2 shared with Dermatology) ──
+      { clinicType: ["medical_aesthetic"], title: "Botulinum Toxin (Botox/Dysport/Xeomin) Consent", body: "I understand neurotoxin injections carry risks including bruising, swelling, asymmetry, ptosis, headache, and rare allergic reaction. Results last 3-4 months. I confirm I am not pregnant or breastfeeding and have disclosed all medical conditions and medications." },
+      { clinicType: ["medical_aesthetic"], title: "Hyaluronic Acid Dermal Filler Consent", body: "I understand HA filler injections carry risks of bruising, swelling, infection, vascular occlusion (rare but serious), asymmetry, and nodules. I will avoid blood thinners 7 days prior. Results last 6-18 months. Emergency reversal protocols have been explained." },
+      { clinicType: ["medical_aesthetic"], title: "Lip Filler Consent", body: "I understand lip augmentation with HA filler carries risks of bruising, swelling lasting up to 2 weeks, asymmetry, lumps, and rare vascular complications. I have realistic expectations regarding final shape and volume." },
+      { clinicType: ["medical_aesthetic"], title: "Sculptra / Bio-stimulator Consent", body: "I understand Sculptra is a collagen bio-stimulator with results developing over 3-6 months across multiple sessions. Risks include nodules, granulomas, and delayed-onset swelling. I commit to the recommended treatment series." },
+      { clinicType: ["medical_aesthetic"], title: "Kybella (Submental Fat) Consent", body: "I consent to deoxycholic acid injections to reduce submental fat. I understand swelling can be significant for 1-2 weeks. Risks include nerve injury, marginal mandibular weakness, dysphagia, and skin ulceration. Multiple sessions are typically required." },
+      { clinicType: ["medical_aesthetic"], title: "PRP Facial Injection Consent", body: "I consent to platelet-rich plasma drawn from my own blood and re-injected for facial rejuvenation. Risks include bruising, swelling, infection, and lack of expected result. I confirm I have no bleeding disorders." },
+      { clinicType: ["medical_aesthetic"], title: "PRP Hair Restoration Consent", body: "I consent to PRP injections to the scalp for hair restoration. Results require multiple sessions over 3-6 months and are not guaranteed. Risks include scalp tenderness, bruising, and infection." },
+      { clinicType: ["medical_aesthetic"], title: "Microneedling Consent", body: "I consent to skin needling treatment. Risks include redness, swelling, pinpoint bleeding, post-inflammatory pigmentation, and infection. I will avoid retinoids and active acids 5 days before and after." },
+      { clinicType: ["medical_aesthetic"], title: "Microneedling with PRP Consent", body: "I consent to combined microneedling and PRP application. I acknowledge the additional risks of PRP draw and topical application, plus standard microneedling risks." },
+      { clinicType: ["medical_aesthetic"], title: "HydraFacial / Medical Facial Consent", body: "I consent to a multi-step hydradermabrasion facial. I disclose any active acne, rosacea flares, sunburn, or open lesions. Mild redness and exfoliation are expected." },
+      { clinicType: ["medical_aesthetic", "dermatology"], title: "Chemical Peel Consent", body: "I understand chemical peels cause controlled exfoliation. Risks include burning, post-inflammatory hyperpigmentation, scarring, and prolonged redness. I will strictly avoid sun exposure and follow post-peel skincare." },
+      { clinicType: ["medical_aesthetic"], title: "Mesotherapy Consent", body: "I consent to intradermal vitamin / nutrient injections. Risks include bruising, swelling, allergic reaction, and infection at injection sites." },
+      { clinicType: ["medical_aesthetic"], title: "Hyaluronidase (Filler Dissolution) Consent", body: "I consent to enzyme injection to dissolve previously placed HA filler. Risks include allergic reaction (including anaphylaxis), over-correction, and dissolution of native tissue HA. A patch test may be performed." },
+      { clinicType: ["medical_aesthetic"], title: "CoolSculpting / Body Contouring Consent", body: "I consent to non-invasive fat reduction. Risks include temporary numbness, bruising, swelling, paradoxical adipose hyperplasia (rare), and uneven results. Final outcome takes 8-12 weeks." },
+      { clinicType: ["medical_aesthetic"], title: "Thread Lift Consent", body: "I consent to PDO/PLLA thread placement for lifting. Risks include thread extrusion, dimpling, asymmetry, infection, and palpability under the skin. Results last 6-18 months.", requires_witness: true },
+      { clinicType: ["medical_aesthetic", "dermatology"], title: "Laser Skin Resurfacing Consent", body: "I understand laser resurfacing carries risks including burns, blistering, hyper/hypopigmentation, scarring, and prolonged downtime. I will avoid sun 2 weeks before and after, and have disclosed photosensitizing medications." },
+
+      // ── Dental (12) ──
+      { clinicType: ["dental"], title: "Dental Treatment & Local Anesthesia Consent", body: "I consent to dental examination, diagnostic imaging, and local anesthesia. I understand risks of local anesthesia include allergic reaction, prolonged numbness, and rarely nerve injury." },
+      { clinicType: ["dental"], title: "Teeth Whitening Consent", body: "I consent to professional teeth whitening. Risks include tooth sensitivity, gingival irritation, and uneven results. Existing restorations will not lighten." },
+      { clinicType: ["dental"], title: "Porcelain Veneers Consent", body: "I consent to veneer preparation and placement. I understand this involves irreversible removal of enamel. Veneers may chip, debond, or require replacement every 10-15 years.", requires_witness: true },
+      { clinicType: ["dental"], title: "Dental Implant Consent", body: "I consent to surgical implant placement. Risks include infection, nerve injury, sinus involvement, implant failure, and the need for bone grafting. The full process takes 3-6 months.", requires_witness: true },
+      { clinicType: ["dental"], title: "Root Canal Therapy Consent", body: "I consent to endodontic treatment. Risks include instrument separation, perforation, persistent infection, and the eventual need for extraction or apical surgery. A crown is typically required afterward." },
+      { clinicType: ["dental"], title: "Tooth Extraction Consent", body: "I consent to extraction of the indicated tooth/teeth. Risks include bleeding, dry socket, infection, sinus involvement (upper teeth), and damage to adjacent teeth or restorations." },
+      { clinicType: ["dental"], title: "Wisdom Tooth Removal Consent", body: "I consent to surgical removal of third molars. Risks include nerve injury (numbness of lip/tongue, usually temporary, rarely permanent), dry socket, infection, and jaw fracture (rare).", requires_witness: true },
+      { clinicType: ["dental"], title: "Orthodontic / Invisalign Consent", body: "I consent to orthodontic treatment. I understand treatment requires strict aligner/elastic compliance. Risks include root resorption, decalcification, gum recession, and relapse without retainer wear." },
+      { clinicType: ["dental"], title: "Crown & Bridge Consent", body: "I consent to crown/bridge preparation and cementation. Risks include sensitivity, need for root canal, debonding, and eventual replacement (10-15 year average lifespan)." },
+      { clinicType: ["dental"], title: "Periodontal (Gum) Treatment Consent", body: "I consent to scaling, root planing, and/or periodontal surgery. Risks include sensitivity, recession, root exposure, and the need for ongoing maintenance therapy every 3-4 months." },
+      { clinicType: ["dental"], title: "Sedation Dentistry Consent", body: "I consent to oral / IV / nitrous sedation. I have disclosed all medications and medical conditions. I will arrange a responsible adult to drive me home and monitor me for 24 hours.", requires_witness: true },
+      { clinicType: ["dental"], title: "Pediatric Dental Treatment Consent (Parent/Guardian)", body: "As parent/legal guardian, I consent to dental treatment for the named minor patient including examination, cleaning, restorations, extractions, and behavior management techniques as clinically indicated." },
+
+      // ── Beauty Salon (9) ──
+      { clinicType: ["beauty_salon"], title: "Hair Color & Chemical Service Consent", body: "I consent to hair coloring services. A patch test has been offered. Risks include allergic reaction, scalp irritation, color variation from expectation, and hair breakage." },
+      { clinicType: ["beauty_salon"], title: "Permanent Wave / Relaxer Consent", body: "I consent to chemical perm or relaxer services. Risks include scalp burns, hair breakage, over- or under-processing, and unpredictable results on previously treated hair." },
+      { clinicType: ["beauty_salon"], title: "Keratin / Smoothing Treatment Consent", body: "I consent to keratin smoothing treatment. I understand the smell and minor eye/respiratory irritation during application. Results last 3-5 months and require sulfate-free aftercare." },
+      { clinicType: ["beauty_salon"], title: "Hair Extension Consent", body: "I consent to extension installation. I understand attachment may stress my natural hair. Maintenance every 6-8 weeks is required to prevent matting and damage." },
+      { clinicType: ["beauty_salon"], title: "Eyelash Extension Consent", body: "I consent to lash extension application. Risks include allergic reaction to adhesive, contact dermatitis, eye irritation, and natural lash damage from improper aftercare." },
+      { clinicType: ["beauty_salon"], title: "Brow Tint / Lamination Consent", body: "I consent to brow tinting and/or lamination. A patch test has been offered. Risks include allergic reaction, skin irritation, and unexpected color result." },
+      { clinicType: ["beauty_salon"], title: "Spray Tan Consent", body: "I consent to sunless tanning application. I confirm no allergy to DHA. Color develops over 8 hours and lasts 5-10 days. Results vary by skin type and aftercare." },
+      { clinicType: ["beauty_salon"], title: "Manicure / Pedicure Consent", body: "I consent to nail services including filing, cuticle care, and polish/gel/acrylic application. Risks include cuticle infection, nail thinning, and skin irritation." },
+      { clinicType: ["beauty_salon"], title: "Waxing Service Consent", body: "I consent to hair removal by waxing. Risks include redness, ingrown hairs, lifting of skin (especially with retinoid use), and temporary discomfort. I have disclosed any photosensitizing medications." },
+
+      // ── Dermatology (6 — 4 unique + 2 shared with Medical Aesthetic) ──
+      { clinicType: ["dermatology"], title: "Skin Cancer Screening Consent", body: "I consent to a full-body skin examination for evaluation of suspicious lesions. I understand findings may require biopsy or referral for further evaluation." },
+      { clinicType: ["dermatology"], title: "Mole / Lesion Removal Consent", body: "I consent to surgical removal of the indicated lesion(s). Risks include scarring, infection, bleeding, recurrence, and the need for re-excision if margins are positive on histology.", requires_witness: true },
+      { clinicType: ["dermatology"], title: "Cryotherapy Consent", body: "I consent to liquid nitrogen treatment of the indicated lesion. Risks include blistering, hypopigmentation (especially in darker skin), scarring, and incomplete clearance requiring repeat treatment." },
+      { clinicType: ["dermatology"], title: "Patch Test / Allergy Test Consent", body: "I consent to patch testing for contact allergens. Patches remain on the back for 48 hours. I will avoid getting the area wet and return for readings as scheduled." },
+
+      // ── Wellness (6) ──
+      { clinicType: ["wellness"], title: "Chiropractic Treatment Consent", body: "I consent to chiropractic evaluation and adjustment. Risks include soreness, stiffness, and rare serious complications including disc injury and (very rarely) cervical artery dissection with cervical manipulation." },
+      { clinicType: ["wellness"], title: "Physiotherapy Treatment Consent", body: "I consent to physiotherapy assessment and treatment including manual therapy, exercise prescription, and modalities. I will report any pain or adverse response promptly." },
+      { clinicType: ["wellness"], title: "Massage Therapy Consent", body: "I consent to therapeutic massage. I have disclosed all medical conditions, medications, injuries, and areas of discomfort. I understand I may request adjustments to pressure or technique at any time." },
+      { clinicType: ["wellness"], title: "Acupuncture Consent", body: "I consent to acupuncture treatment with sterile single-use needles. Risks include bruising, minor bleeding, soreness, and rare pneumothorax with thoracic points. I have disclosed any bleeding disorders or pacemaker." },
+      { clinicType: ["wellness"], title: "Naturopathic / Functional Medicine Consent", body: "I consent to naturopathic assessment and recommendations including botanicals, supplements, and lifestyle interventions. I understand these complement, not replace, conventional medical care, and I will inform my MD of all supplements." },
+      { clinicType: ["wellness"], title: "Cupping / Gua Sha Consent", body: "I consent to cupping and/or gua sha therapy. I understand these techniques produce visible marks (petechiae) lasting 3-10 days. Risks include skin irritation, blistering, and rare burns with fire cupping." },
     ];
 
-    await supabase.from("consent_form_templates").insert(consentForms.map(cf => ({
-      clinic_id: cf.clinic_id,
+    // Determine which clinic types to seed based on selected service categories.
+    // If no categories selected (skip / load everything), seed all forms.
+    const selectedClinicTypes = selectedCategoryNames && selectedCategoryNames.length > 0
+      ? new Set(selectedCategoryNames.map((c) => CATEGORY_TO_CLINIC_TYPE[c]).filter(Boolean))
+      : null;
+
+    const filteredConsentForms = selectedClinicTypes
+      ? consentForms.filter((cf) =>
+          cf.clinicType.includes("universal") ||
+          cf.clinicType.some((t) => selectedClinicTypes.has(t))
+        )
+      : consentForms;
+
+    const consentRows = filteredConsentForms.map((cf) => ({
+      clinic_id: clinicId,
       name: cf.title,
       body_html: cf.body,
-      is_active: cf.active,
-    })));
+      is_active: true,
+      is_legal_template: true,
+      requires_witness: cf.requires_witness === true,
+    }));
+
+    await supabase.from("consent_form_templates").insert(consentRows);
 
     // ── Automations ──
     const automations = [
