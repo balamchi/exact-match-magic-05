@@ -151,6 +151,7 @@ function SettingsPage() {
     { id: "tax", label: "Tax & Currency", icon: Receipt },
     { id: "integrations", label: "Integrations", icon: Plug },
     { id: "users", label: "Users", icon: Users },
+    { id: "permissions", label: "Permissions", icon: Shield },
     { id: "audit", label: "Audit Log", icon: ClipboardList, adminOnly: true },
   ];
 
