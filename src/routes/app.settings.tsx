@@ -148,7 +148,7 @@ function SettingsPage() {
     { id: "communication", label: "Communication", icon: MessageSquare },
     { id: "tax", label: "Tax & Currency", icon: Receipt },
     { id: "integrations", label: "Integrations", icon: Plug },
-    { id: "team", label: "Team", icon: Users },
+    { id: "users", label: "Users", icon: Users },
     { id: "audit", label: "Audit Log", icon: ClipboardList, adminOnly: true },
   ];
 
