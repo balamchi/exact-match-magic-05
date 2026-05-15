@@ -743,6 +743,7 @@ export type Database = {
           phone: string | null
           primary_color: string | null
           reply_email: string | null
+          seeded_clinic_types: string[]
           slug: string
           tax_currency_settings: Json | null
           timezone: string
@@ -774,6 +775,7 @@ export type Database = {
           phone?: string | null
           primary_color?: string | null
           reply_email?: string | null
+          seeded_clinic_types?: string[]
           slug: string
           tax_currency_settings?: Json | null
           timezone?: string
@@ -805,6 +807,7 @@ export type Database = {
           phone?: string | null
           primary_color?: string | null
           reply_email?: string | null
+          seeded_clinic_types?: string[]
           slug?: string
           tax_currency_settings?: Json | null
           timezone?: string
@@ -3500,6 +3503,50 @@ export type Database = {
           },
         ]
       }
+      seed_activity_log: {
+        Row: {
+          action: string
+          clinic_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          resource: string | null
+          result: Json
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          clinic_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          resource?: string | null
+          result?: Json
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          clinic_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          resource?: string | null
+          result?: Json
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seed_activity_log_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_locations: {
         Row: {
           active: boolean
@@ -4764,7 +4811,14 @@ export type Database = {
         | "completed"
         | "no_show"
         | "cancelled"
-      clinic_role: "owner" | "admin" | "provider" | "front_desk"
+      clinic_role:
+        | "owner"
+        | "admin"
+        | "provider"
+        | "front_desk"
+        | "senior_admin"
+        | "junior_admin"
+        | "manager"
       consent_actor_type: "clinic_staff" | "client" | "witness" | "system"
       consent_audit_action:
         | "created"
@@ -4991,7 +5045,15 @@ export const Constants = {
         "no_show",
         "cancelled",
       ],
-      clinic_role: ["owner", "admin", "provider", "front_desk"],
+      clinic_role: [
+        "owner",
+        "admin",
+        "provider",
+        "front_desk",
+        "senior_admin",
+        "junior_admin",
+        "manager",
+      ],
       consent_actor_type: ["clinic_staff", "client", "witness", "system"],
       consent_audit_action: [
         "created",
