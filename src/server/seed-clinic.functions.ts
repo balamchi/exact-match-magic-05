@@ -1,55 +1,44 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/integrations/supabase/client-auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Seeds a brand-new clinic with default content.
- * Uses requireSupabaseAuth middleware for secure authentication.
+ * Clinic seeder — refactored into per-resource server functions.
+ * Each resource (services, consent forms, automations, memberships) has its own
+ * exported serverFn. seedAll orchestrates the four. seedClinicDefaults is kept
+ * as a backwards-compat alias for the onboarding wizard and /app/services button.
  */
-export const seedClinicDefaults = createServerFn({ method: "POST" })
-  .middleware([attachSupabaseAuth, requireSupabaseAuth])
-  .inputValidator((d: { force?: boolean; categories?: string[] } | undefined) => d ?? {})
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const force = data?.force === true;
 
-    // Get user's clinic
-    const { data: membership } = await supabase
-      .from("clinic_members")
-      .select("clinic_id, role")
-      .eq("user_id", userId)
-      .in("role", ["owner", "admin"])
-      .limit(1)
-      .single();
+// ============================================================================
+// SHARED TYPES
+// ============================================================================
 
-    if (!membership) throw new Error("No clinic found or insufficient role");
+export type SeedResult = {
+  resource: string;
+  attempted: number;
+  succeeded: number;
+  inserted: number;
+  updated: number;
+  errors: string[];
+  status: "success" | "partial" | "failed";
+};
 
-    const clinicId = membership.clinic_id;
+type ServiceItem = {
+  name: string;
+  duration_minutes: number;
+  price_cents: number;
+  popular: boolean;
+  description: string;
+};
+type ServiceCategory = { category: string; services: ServiceItem[] };
 
-    // Check if already seeded — only block if clinic has REAL content
-    const { count: serviceCount } = await supabase
-      .from("services")
-      .select("id", { count: "exact", head: true })
-      .eq("clinic_id", clinicId);
+// ============================================================================
+// MODULE-SCOPE DATA (lifted from prior inline arrays — content unchanged)
+// ============================================================================
 
-    const { count: consentCount } = await supabase
-      .from("consent_form_templates")
-      .select("id", { count: "exact", head: true })
-      .eq("clinic_id", clinicId);
-
-    if (!force && (serviceCount ?? 0) > 20 && (consentCount ?? 0) > 0) {
-      return {
-        seeded: false,
-        message: `Clinic already has ${serviceCount} services and ${consentCount} consent forms`,
-        summary: { services: serviceCount, consent_forms: consentCount },
-      };
-    }
-
-    console.log(`Seeding clinic ${clinicId} (current: ${serviceCount ?? 0} services, force=${force})`);
-
-    // ── Services ──
-    const serviceCategories = [
-      {
+const serviceCategories: ServiceCategory[] =
+[      {
         category: "Injectables",
         services: [
           { name: "Botox Consultation", duration_minutes: 30, price_cents: 0, popular: true, description: "Initial assessment, treatment plan, no units injected." },
@@ -453,34 +442,7 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       },
     ];
 
-    const selectedCategoryNames = data?.categories;
-    const filteredCategories = selectedCategoryNames && selectedCategoryNames.length > 0
-      ? serviceCategories.filter((c) => selectedCategoryNames.includes(c.category))
-      : serviceCategories;
-
-    const serviceRows = filteredCategories.flatMap((cat) =>
-      cat.services.map((s: any) => ({
-        clinic_id: clinicId,
-        name: s.name,
-        category: cat.category,
-        duration_minutes: s.duration_minutes,
-        price_cents: s.price_cents,
-        active: s.popular === true,
-        visible_online: s.popular === true,
-        booking_description: s.description ?? null,
-      }))
-    );
-
-    const { error: servicesError } = await supabase.from("services").upsert(serviceRows, {
-      onConflict: "clinic_id,name",
-      ignoreDuplicates: true,
-    });
-    if (servicesError) {
-      console.error("Seed services failed:", servicesError);
-      throw new Error(`Failed to seed services: ${servicesError.message}`);
-    }
-
-    // ── Consent Forms ──
+const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
     const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
       "Injectables": "medical_aesthetic",
       "Laser & Energy": "medical_aesthetic",
@@ -499,6 +461,7 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       "Massage": "wellness",
       "Holistic & Wellness": "wellness",
     };
+};
 
     type ConsentForm = { clinicType: string[]; title: string; body: string; requires_witness?: boolean };
     const consentForms: ConsentForm[] = [
@@ -567,37 +530,6 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       { clinicType: ["wellness"], title: "Cupping / Gua Sha Consent", body: "<h3>Cupping / Gua Sha Consent</h3><p>I consent to cupping therapy and/or gua sha treatment as part of my care plan.</p><p><strong>I understand:</strong></p><ul><li>Circular bruise-like marks (sha) from cupping are normal and resolve in 3-10 days</li><li>Skin redness, soreness, and minor abrasion from gua sha are expected</li><li>Marks should NOT be confused with abuse or injury</li><li>Skin can become hypersensitive temporarily</li><li>Burns are rare with fire cupping when properly performed</li><li>Treatment is contraindicated over open wounds, varicose veins, sunburn, or thin/fragile skin</li></ul><p><strong>I confirm I am not on blood thinners and have disclosed all skin conditions.</strong></p>" },
     ];
 
-    // Determine which clinic types to seed based on selected service categories.
-    // If no categories selected (skip / load everything), seed all forms.
-    const selectedClinicTypes = selectedCategoryNames && selectedCategoryNames.length > 0
-      ? new Set(selectedCategoryNames.map((c) => CATEGORY_TO_CLINIC_TYPE[c]).filter(Boolean))
-      : null;
-
-    const filteredConsentForms = selectedClinicTypes
-      ? consentForms.filter((cf) =>
-          cf.clinicType.includes("universal") ||
-          cf.clinicType.some((t) => selectedClinicTypes.has(t))
-        )
-      : consentForms;
-
-    const consentRows = filteredConsentForms.map((cf) => ({
-      clinic_id: clinicId,
-      name: cf.title,
-      body_html: cf.body,
-      is_active: true,
-      is_legal_template: true,
-      requires_witness: cf.requires_witness === true,
-    }));
-
-    const { error: consentError } = await supabase.from("consent_form_templates").upsert(consentRows, {
-      onConflict: "clinic_id,name",
-    });
-    if (consentError) {
-      console.error("Seed consent_form_templates failed:", consentError);
-      throw new Error(`Failed to seed consent forms: ${consentError.message}`);
-    }
-
-    // ── Automations ──
     type Automation = {
       clinicType: string[];
       name: string;
@@ -663,33 +595,16 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       { clinicType: ["wellness"], name: "Home Exercise Program Check-In (1 week)", trigger_event: "service_completed", action_type: "email", active: true },
     ];
 
-    const filteredAutomations = selectedClinicTypes
-      ? automationsLibrary.filter((a) =>
-          a.clinicType.includes("universal") ||
-          a.clinicType.some((t) => selectedClinicTypes.has(t))
-        )
-      : automationsLibrary;
+type MembershipSeed = {
+  name: string;
+  description: string;
+  monthly_price_cents: number;
+  benefits: string;
+  active: boolean;
+};
 
-    const automationRows = filteredAutomations.map((a) => ({
-      clinic_id: clinicId,
-      name: a.name,
-      trigger_event: a.trigger_event,
-      action_type: a.action_type,
-      active: a.active ?? true,
-    }));
-
-    const { error: automationsError } = await supabase.from("automations").upsert(automationRows, {
-      onConflict: "clinic_id,name",
-    });
-    if (automationsError) {
-      console.error("Seed automations failed:", automationsError);
-      throw new Error(`Failed to seed automations: ${automationsError.message}`);
-    }
-
-    // ── Memberships ──
-    const memberships = [
+const membershipsLibrary: MembershipSeed[] = [
       {
-        clinic_id: clinicId,
         name: "Essential Glow",
         description: "Monthly HydraFacial + 10% off all services",
         monthly_price_cents: 14900,
@@ -697,7 +612,6 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
         active: true,
       },
       {
-        clinic_id: clinicId,
         name: "Premium Beauty",
         description: "Monthly treatment credit + exclusive perks",
         monthly_price_cents: 29900,
@@ -705,53 +619,432 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
         active: true,
       },
       {
-        clinic_id: clinicId,
         name: "VIP All-Access",
         description: "Unlimited access to select treatments",
         monthly_price_cents: 49900,
         benefits: "Unlimited HydraFacials & LED, 20% off injectables, Complimentary add-ons, VIP scheduling",
         active: true,
       },
-    ];
+];
 
-    const { error: membershipsError } = await supabase.from("memberships").upsert(memberships, {
-      onConflict: "clinic_id,name",
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+async function getUserClinicId(supabase: SupabaseClient, userId: string): Promise<string> {
+  const { data: membership, error } = await supabase
+    .from("clinic_members")
+    .select("clinic_id, role")
+    .eq("user_id", userId)
+    .in("role", ["owner", "admin", "senior_admin"])
+    .limit(1)
+    .single();
+  if (error || !membership) throw new Error("No clinic found or insufficient role");
+  return membership.clinic_id;
+}
+
+async function logSeedActivity(
+  supabase: SupabaseClient,
+  clinicId: string,
+  userId: string,
+  action: string,
+  resource: string | null,
+  result: SeedResult | (Omit<SeedResult, "resource"> & { resource?: string }),
+) {
+  try {
+    await (supabase as any).from("seed_activity_log").insert({
+      clinic_id: clinicId,
+      user_id: userId,
+      action,
+      resource,
+      result: result as any,
+      status: result.status,
+      error_message: result.errors.length > 0 ? result.errors.join("; ") : null,
     });
-    if (membershipsError) {
-      console.error("Seed memberships failed:", membershipsError);
-      throw new Error(`Failed to seed memberships: ${membershipsError.message}`);
+  } catch (e) {
+    console.error("[seed_activity_log] insert failed:", e);
+  }
+}
+
+/**
+ * Resolves which clinicTypes the seeder should target.
+ * Accepts either explicit `clinicTypes` (new shape) or legacy `categories`
+ * (old shape from onboarding-wizard.tsx) and derives clinicTypes from category names.
+ */
+function resolveClinicTypes(
+  input: { clinicTypes?: string[]; categories?: string[] } | undefined,
+): string[] {
+  if (input?.clinicTypes && input.clinicTypes.length > 0) return input.clinicTypes;
+  if (input?.categories && input.categories.length > 0) {
+    const set = new Set<string>();
+    for (const c of input.categories) {
+      const t = CATEGORY_TO_CLINIC_TYPE[c];
+      if (t) set.add(t);
+    }
+    return Array.from(set);
+  }
+  return [];
+}
+
+/** Permissive validator: handles both `payload` and `{data: payload}` wrapping. */
+function unwrapInput<T>(input: unknown): Partial<T> {
+  if (input && typeof input === "object") {
+    if ("data" in (input as any) && (input as any).data && typeof (input as any).data === "object") {
+      return (input as any).data as Partial<T>;
+    }
+    return input as Partial<T>;
+  }
+  return {} as Partial<T>;
+}
+
+// ============================================================================
+// PER-RESOURCE INTERNAL SEEDERS (used by both single-resource fns and seedAll)
+// ============================================================================
+
+async function seedServicesInternal(
+  supabase: SupabaseClient,
+  userId: string,
+  clinicId: string,
+  clinicTypes: string[],
+): Promise<SeedResult> {
+  const targetTypes = clinicTypes.length > 0 ? new Set(clinicTypes) : null;
+  const cats = targetTypes
+    ? serviceCategories.filter((c) => {
+        const t = CATEGORY_TO_CLINIC_TYPE[c.category];
+        return t ? targetTypes.has(t) : false;
+      })
+    : serviceCategories;
+
+  const rows = cats.flatMap((cat) =>
+    cat.services.map((s) => ({
+      clinic_id: clinicId,
+      name: s.name,
+      category: cat.category,
+      duration_minutes: s.duration_minutes,
+      price_cents: s.price_cents,
+      active: s.popular === true,
+      visible_online: s.popular === true,
+      booking_description: s.description ?? null,
+    })),
+  );
+
+  const { error } = await supabase
+    .from("services")
+    .upsert(rows, { onConflict: "clinic_id,name" });
+
+  const { count } = await supabase
+    .from("services")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  const succeeded = error ? 0 : Math.min(count ?? 0, rows.length);
+  const result: SeedResult = {
+    resource: "services",
+    attempted: rows.length,
+    succeeded,
+    inserted: succeeded,
+    updated: 0,
+    errors: error ? [error.message] : [],
+    status: error ? "failed" : (succeeded >= rows.length ? "success" : "partial"),
+  };
+  await logSeedActivity(supabase, clinicId, userId, "seed", "services", result);
+  return result;
+}
+
+async function seedConsentFormsInternal(
+  supabase: SupabaseClient,
+  userId: string,
+  clinicId: string,
+  clinicTypes: string[],
+): Promise<SeedResult> {
+  const targetTypes = clinicTypes.length > 0 ? new Set(clinicTypes) : null;
+  const filtered = targetTypes
+    ? consentForms.filter(
+        (cf) => cf.clinicType.includes("universal") || cf.clinicType.some((t) => targetTypes.has(t)),
+      )
+    : consentForms;
+
+  const rows = filtered.map((cf) => ({
+    clinic_id: clinicId,
+    name: cf.title,
+    body_html: cf.body,
+    is_active: true,
+    is_legal_template: true,
+    requires_witness: cf.requires_witness === true,
+  }));
+
+  const { error } = await supabase
+    .from("consent_form_templates")
+    .upsert(rows, { onConflict: "clinic_id,name" });
+
+  const { count } = await supabase
+    .from("consent_form_templates")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  const succeeded = error ? 0 : Math.min(count ?? 0, rows.length);
+  const result: SeedResult = {
+    resource: "consent_forms",
+    attempted: rows.length,
+    succeeded,
+    inserted: succeeded,
+    updated: 0,
+    errors: error ? [error.message] : [],
+    status: error ? "failed" : (succeeded >= rows.length ? "success" : "partial"),
+  };
+  await logSeedActivity(supabase, clinicId, userId, "seed", "consent_forms", result);
+  return result;
+}
+
+async function seedAutomationsInternal(
+  supabase: SupabaseClient,
+  userId: string,
+  clinicId: string,
+  clinicTypes: string[],
+): Promise<SeedResult> {
+  const targetTypes = clinicTypes.length > 0 ? new Set(clinicTypes) : null;
+  const filtered = targetTypes
+    ? automationsLibrary.filter(
+        (a) => a.clinicType.includes("universal") || a.clinicType.some((t) => targetTypes.has(t)),
+      )
+    : automationsLibrary;
+
+  const rows = filtered.map((a) => ({
+    clinic_id: clinicId,
+    name: a.name,
+    trigger_event: a.trigger_event,
+    action_type: a.action_type,
+    active: a.active ?? true,
+  }));
+
+  const { error } = await supabase
+    .from("automations")
+    .upsert(rows, { onConflict: "clinic_id,name" });
+
+  const { count } = await supabase
+    .from("automations")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  const succeeded = error ? 0 : Math.min(count ?? 0, rows.length);
+  const result: SeedResult = {
+    resource: "automations",
+    attempted: rows.length,
+    succeeded,
+    inserted: succeeded,
+    updated: 0,
+    errors: error ? [error.message] : [],
+    status: error ? "failed" : (succeeded >= rows.length ? "success" : "partial"),
+  };
+  await logSeedActivity(supabase, clinicId, userId, "seed", "automations", result);
+  return result;
+}
+
+async function seedMembershipsInternal(
+  supabase: SupabaseClient,
+  userId: string,
+  clinicId: string,
+  _clinicTypes: string[],
+): Promise<SeedResult> {
+  const rows = membershipsLibrary.map((m) => ({ ...m, clinic_id: clinicId }));
+
+  const { error } = await supabase
+    .from("memberships")
+    .upsert(rows, { onConflict: "clinic_id,name" });
+
+  const { count } = await supabase
+    .from("memberships")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  const succeeded = error ? 0 : Math.min(count ?? 0, rows.length);
+  const result: SeedResult = {
+    resource: "memberships",
+    attempted: rows.length,
+    succeeded,
+    inserted: succeeded,
+    updated: 0,
+    errors: error ? [error.message] : [],
+    status: error ? "failed" : (succeeded >= rows.length ? "success" : "partial"),
+  };
+  await logSeedActivity(supabase, clinicId, userId, "seed", "memberships", result);
+  return result;
+}
+
+// ============================================================================
+// EXPORTED SERVER FUNCTIONS
+// ============================================================================
+
+type SeedInput = { clinicTypes?: string[]; categories?: string[]; force?: boolean };
+
+export const seedServices = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }): Promise<SeedResult> => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+    return seedServicesInternal(supabase, userId, clinicId, resolveClinicTypes(data));
+  });
+
+export const seedConsentForms = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }): Promise<SeedResult> => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+    return seedConsentFormsInternal(supabase, userId, clinicId, resolveClinicTypes(data));
+  });
+
+export const seedAutomations = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }): Promise<SeedResult> => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+    return seedAutomationsInternal(supabase, userId, clinicId, resolveClinicTypes(data));
+  });
+
+export const seedMemberships = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }): Promise<SeedResult> => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+    return seedMembershipsInternal(supabase, userId, clinicId, resolveClinicTypes(data));
+  });
+
+export const seedAll = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const force = data?.force === true;
+    const clinicTypes = resolveClinicTypes(data);
+    const clinicId = await getUserClinicId(supabase, userId);
+
+    console.log("[seedAll] received data:", JSON.stringify(data), "force=", force);
+
+    if (!force) {
+      const { count: serviceCount } = await supabase
+        .from("services")
+        .select("id", { count: "exact", head: true })
+        .eq("clinic_id", clinicId);
+      if ((serviceCount ?? 0) > 20) {
+        return {
+          seeded: false,
+          message: `Clinic already has ${serviceCount} services. Pass force=true to reseed.`,
+          summary: { services: serviceCount ?? 0, consentForms: 0, automations: 0, memberships: 0 },
+          attempted: { services: 0, consentForms: 0, automations: 0, memberships: 0 },
+          results: [] as SeedResult[],
+        };
+      }
     }
 
-    // Re-query actual counts post-upsert so the UI reports DB truth, not insert intent.
-    const [
-      { count: finalServices, error: cs1 },
-      { count: finalConsent, error: cs2 },
-      { count: finalAutomations, error: cs3 },
-      { count: finalMemberships, error: cs4 },
-    ] = await Promise.all([
+    const servicesResult = await seedServicesInternal(supabase, userId, clinicId, clinicTypes);
+    const consentResult = await seedConsentFormsInternal(supabase, userId, clinicId, clinicTypes);
+    const automationsResult = await seedAutomationsInternal(supabase, userId, clinicId, clinicTypes);
+    const membershipsResult = await seedMembershipsInternal(supabase, userId, clinicId, clinicTypes);
+
+    if (clinicTypes.length > 0) {
+      try {
+        await (supabase as any)
+          .from("clinics")
+          .update({ seeded_clinic_types: clinicTypes })
+          .eq("id", clinicId);
+      } catch (e) {
+        console.warn("[seedAll] failed to persist seeded_clinic_types:", e);
+      }
+    }
+
+    const results = [servicesResult, consentResult, automationsResult, membershipsResult];
+    const allSucceeded = results.every((r) => r.status === "success");
+    const anyFailed = results.some((r) => r.status === "failed");
+
+    await logSeedActivity(supabase, clinicId, userId, "seed_all", null, {
+      attempted: results.reduce((s, r) => s + r.attempted, 0),
+      succeeded: results.reduce((s, r) => s + r.succeeded, 0),
+      inserted: results.reduce((s, r) => s + r.inserted, 0),
+      updated: 0,
+      errors: results.flatMap((r) => r.errors),
+      status: anyFailed ? "failed" : allSucceeded ? "success" : "partial",
+    });
+
+    return {
+      seeded: true,
+      results,
+      // Backwards-compat shape for existing UI consumers (app.services.tsx).
+      summary: {
+        services: servicesResult.succeeded,
+        consentForms: consentResult.succeeded,
+        automations: automationsResult.succeeded,
+        memberships: membershipsResult.succeeded,
+      },
+      attempted: {
+        services: servicesResult.attempted,
+        consentForms: consentResult.attempted,
+        automations: automationsResult.attempted,
+        memberships: membershipsResult.attempted,
+      },
+    };
+  });
+
+export const getClinicSeedStatus = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+
+    const [services, consentFormsRes, automations, memberships] = await Promise.all([
       supabase.from("services").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("consent_form_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("automations").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("memberships").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
     ]);
 
-    if (cs1 || cs2 || cs3 || cs4) {
-      console.warn("Post-seed count queries had errors:", { cs1, cs2, cs3, cs4 });
+    let seededClinicTypes: string[] = [];
+    try {
+      const { data: clinic } = await (supabase as any)
+        .from("clinics")
+        .select("seeded_clinic_types")
+        .eq("id", clinicId)
+        .single();
+      seededClinicTypes = clinic?.seeded_clinic_types ?? [];
+    } catch {
+      seededClinicTypes = [];
     }
 
     return {
-      seeded: true,
-      summary: {
-        services: finalServices ?? 0,
-        consentForms: finalConsent ?? 0,
-        automations: finalAutomations ?? 0,
-        memberships: finalMemberships ?? 0,
+      clinicId,
+      seededClinicTypes,
+      counts: {
+        services: services.count ?? 0,
+        consentForms: consentFormsRes.count ?? 0,
+        automations: automations.count ?? 0,
+        memberships: memberships.count ?? 0,
       },
-      attempted: {
-        services: serviceRows.length,
-        consentForms: consentRows.length,
-        automations: automationRows.length,
-        memberships: memberships.length,
-      },
+      isSetupComplete: (services.count ?? 0) > 20 && (consentFormsRes.count ?? 0) > 0,
     };
   });
+
+export const getClinicSeedActivity = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+
+    const { data, error } = await (supabase as any)
+      .from("seed_activity_log")
+      .select("id, action, resource, result, status, error_message, created_at, user_id")
+      .eq("clinic_id", clinicId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+/**
+ * @deprecated Use seedAll instead. Kept for backwards compat with onboarding-wizard.tsx
+ * and app.services.tsx until those callsites are refactored in later commits.
+ */
+export const seedClinicDefaults = seedAll;
