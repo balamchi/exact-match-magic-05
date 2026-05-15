@@ -84,6 +84,8 @@ export const PERMISSION_KEYS = [
   "seed.run",
   "seed.reset",
   "seed.view_log",
+  // Audit
+  "audit.read",
 ] as const;
 
 export type PermissionKey = typeof PERMISSION_KEYS[number];
