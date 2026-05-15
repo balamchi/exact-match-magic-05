@@ -720,8 +720,9 @@ async function seedServicesInternal(
       category: cat.category,
       duration_minutes: s.duration_minutes,
       price_cents: s.price_cents,
-      active: s.popular === true,
+      active: true,
       visible_online: s.popular === true,
+      online_booking_enabled: true,
       booking_description: s.description ?? null,
     })),
   );
