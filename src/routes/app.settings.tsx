@@ -455,6 +455,102 @@ function SettingsPage() {
             </SettingsSection>
           )}
 
+          {activeTab === "permissions" && (
+            <SettingsSection
+              title="Role Permissions"
+              description="What each user role can do in ClinicPro. Read-only reference."
+            >
+              <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm">
+                <div className="flex items-start gap-3">
+                  <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                  <div>
+                    <p className="font-medium text-foreground">About User Permissions</p>
+                    <p className="mt-1 text-muted-foreground">
+                      These permissions control who can access what in your ClinicPro account.
+                      To manage practitioners, work schedules, and clinic roster, go to the Staff page (coming soon).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-8 space-y-3">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Available Roles</h3>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {(Object.keys(PERM_ROLE_LABELS) as ClinicRole[])
+                    .filter((role) => role !== "admin")
+                    .map((role) => {
+                      const permCount = ROLE_PERMISSIONS[role]?.length ?? 0;
+                      return (
+                        <div key={role} className="rounded-lg border border-border bg-card p-4">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <h4 className="font-semibold text-foreground">{PERM_ROLE_LABELS[role]}</h4>
+                            <span className="text-xs text-muted-foreground">{permCount} permissions</span>
+                          </div>
+                          <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{ROLE_DESCRIPTIONS[role]}</p>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Permission Matrix</h3>
+                {PERMISSION_MODULES.map((module) => (
+                  <div key={module.key} className="rounded-lg border border-border bg-card overflow-hidden">
+                    <div className="bg-muted/50 px-4 py-2.5 border-b border-border">
+                      <h4 className="text-sm font-semibold text-foreground">{module.label}</h4>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border bg-muted/30">
+                            <th className="px-4 py-2 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">Permission</th>
+                            {(Object.keys(PERM_ROLE_LABELS) as ClinicRole[])
+                              .filter((role) => role !== "admin")
+                              .map((role) => (
+                                <th key={role} className="px-2 py-2 text-center text-xs font-medium uppercase tracking-wide text-muted-foreground whitespace-nowrap">
+                                  {PERM_ROLE_LABELS[role]}
+                                </th>
+                              ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {module.keys.map((permKey) => (
+                            <tr key={permKey} className="border-b border-border last:border-0 hover:bg-muted/20">
+                              <td className="px-4 py-2.5 font-mono text-xs text-foreground">{permKey}</td>
+                              {(Object.keys(PERM_ROLE_LABELS) as ClinicRole[])
+                                .filter((role) => role !== "admin")
+                                .map((role) => {
+                                  const has = ROLE_PERMISSIONS[role]?.includes(permKey as PermissionKey);
+                                  return (
+                                    <td key={role} className="px-2 py-2.5 text-center">
+                                      {has ? (
+                                        <Check className="mx-auto h-4 w-4 text-green-600" />
+                                      ) : (
+                                        <XIcon className="mx-auto h-4 w-4 text-muted-foreground/30" />
+                                      )}
+                                    </td>
+                                  );
+                                })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 rounded-lg border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
+                <p>
+                  <strong className="text-foreground">Note:</strong> The legacy "Admin" role has the same permissions as Senior Admin
+                  and is preserved for backwards compatibility. New users should be assigned Senior Admin, Junior Admin, Manager,
+                  Provider, or Front Desk based on their responsibilities.
+                </p>
+              </div>
+            </SettingsSection>
+          )}
+
           {activeTab === "audit" && (
             <SettingsSection title="Audit Log" description="Recent actions and changes across the clinic.">
               {loadingAudit ? (
