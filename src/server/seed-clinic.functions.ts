@@ -590,20 +590,87 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
     });
 
     // ── Automations ──
-    const automations = [
-      { name: "24h Appointment Reminder", trigger_event: "appointment_upcoming", action_type: "email", active: true },
-      { name: "2h Appointment Reminder (SMS)", trigger_event: "appointment_upcoming", action_type: "sms", active: true },
-      { name: "Post-Treatment Follow-Up (48h)", trigger_event: "appointment_completed", action_type: "email", active: true },
-      { name: "Birthday Greeting + Offer", trigger_event: "client_birthday", action_type: "email", active: true },
-      { name: "No-Show Follow-Up", trigger_event: "appointment_no_show", action_type: "email", active: true },
-      { name: "Review Request (7 days post-visit)", trigger_event: "appointment_completed", action_type: "email", active: true },
-      { name: "Rebook Nudge (30 days since last visit)", trigger_event: "client_inactive", action_type: "email", active: true },
-      { name: "New Lead Welcome Email", trigger_event: "lead_created", action_type: "email", active: true },
-      { name: "Loyalty Tier Upgrade Notification", trigger_event: "loyalty_tier_change", action_type: "email", active: true },
-      { name: "Low Inventory Alert", trigger_event: "inventory_low", action_type: "email", active: true },
-    ].map((a) => ({ ...a, clinic_id: clinicId }));
+    type Automation = {
+      clinicType: string[];
+      name: string;
+      trigger_event: string;
+      action_type: string;
+      active?: boolean;
+    };
 
-    await supabase.from("automations").upsert(automations, {
+    const automationsLibrary: Automation[] = [
+      // ── UNIVERSAL (15) ──
+      { clinicType: ["universal"], name: "24h Appointment Reminder", trigger_event: "appointment_upcoming", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "2h Appointment Reminder (SMS)", trigger_event: "appointment_upcoming", action_type: "sms", active: true },
+      { clinicType: ["universal"], name: "Day-Of Appointment Reminder (SMS)", trigger_event: "appointment_upcoming", action_type: "sms", active: false },
+      { clinicType: ["universal"], name: "Post-Appointment Thank You", trigger_event: "appointment_completed", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "Review Request (3 days post-visit)", trigger_event: "appointment_completed", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "Review Request SMS (7 days post-visit)", trigger_event: "appointment_completed", action_type: "sms", active: false },
+      { clinicType: ["universal"], name: "Birthday Greeting + 15% Offer", trigger_event: "client_birthday", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "Birthday SMS", trigger_event: "client_birthday", action_type: "sms", active: false },
+      { clinicType: ["universal"], name: "No-Show Follow-Up", trigger_event: "appointment_no_show", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "Cancellation Win-Back (24h after cancel)", trigger_event: "appointment_cancelled", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "Rebook Nudge (30 days inactive)", trigger_event: "client_inactive", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "Win-Back Campaign (90 days inactive)", trigger_event: "client_inactive", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "Win-Back Campaign (180 days inactive)", trigger_event: "client_inactive", action_type: "email", active: false },
+      { clinicType: ["universal"], name: "New Lead Welcome Sequence", trigger_event: "lead_created", action_type: "email", active: true },
+      { clinicType: ["universal"], name: "Low Inventory Alert (Staff)", trigger_event: "inventory_low", action_type: "email", active: true },
+
+      // ── MEDICAL AESTHETIC (8) ──
+      { clinicType: ["medical_aesthetic"], name: "Botox Touch-Up Reminder (3.5 months)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["medical_aesthetic"], name: "Filler Refresh Reminder (10 months)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["medical_aesthetic"], name: "PRP Series Follow-Up (4 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["medical_aesthetic"], name: "Chemical Peel Series Reminder (6 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["medical_aesthetic"], name: "Laser Series Reminder (6 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["medical_aesthetic"], name: "Microneedling Series Reminder (4 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["medical_aesthetic"], name: "Post-Injection Care Day-1 SMS", trigger_event: "service_completed", action_type: "sms", active: true },
+      { clinicType: ["medical_aesthetic"], name: "Pre-Treatment Prep Email (48h before)", trigger_event: "appointment_upcoming", action_type: "email", active: true },
+
+      // ── DENTAL (5) ──
+      { clinicType: ["dental"], name: "6-Month Cleaning Recall", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["dental"], name: "3-Month Perio Maintenance Recall", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["dental"], name: "Annual X-Ray Reminder", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["dental"], name: "Invisalign Weekly Aligner Reminder", trigger_event: "service_completed", action_type: "sms", active: false },
+      { clinicType: ["dental"], name: "Post-Op Day-1 Check-In (Surgery)", trigger_event: "service_completed", action_type: "sms", active: true },
+
+      // ── BEAUTY SALON (5) ──
+      { clinicType: ["beauty_salon"], name: "Color Refresh Reminder (6 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["beauty_salon"], name: "Root Touch-Up Reminder (4 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["beauty_salon"], name: "Lash Fill Reminder (2.5 weeks)", trigger_event: "service_completed", action_type: "sms", active: true },
+      { clinicType: ["beauty_salon"], name: "Brow Lamination Refresh (8 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["beauty_salon"], name: "Keratin Touch-Up (3 months)", trigger_event: "service_completed", action_type: "email", active: true },
+
+      // ── DERMATOLOGY (4) ──
+      { clinicType: ["dermatology"], name: "Annual Full-Body Skin Screening Reminder", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["dermatology"], name: "Isotretinoin Monthly Check-In (Active Patients)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["dermatology"], name: "Post-Biopsy Pathology Follow-Up (7 days)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["dermatology"], name: "MOHS Post-Op Day-3 Check-In", trigger_event: "service_completed", action_type: "sms", active: true },
+
+      // ── WELLNESS (6) ──
+      { clinicType: ["wellness"], name: "Physiotherapy Progress Check (2 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["wellness"], name: "Chiropractic Maintenance Reminder (4 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["wellness"], name: "Massage Therapy Rebook Reminder (4 weeks)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["wellness"], name: "Acupuncture Series Reminder (1 week)", trigger_event: "service_completed", action_type: "email", active: true },
+      { clinicType: ["wellness"], name: "Treatment Package Renewal Reminder", trigger_event: "package_expiring", action_type: "email", active: true },
+      { clinicType: ["wellness"], name: "Home Exercise Program Check-In (1 week)", trigger_event: "service_completed", action_type: "email", active: true },
+    ];
+
+    const filteredAutomations = selectedClinicTypes
+      ? automationsLibrary.filter((a) =>
+          a.clinicType.includes("universal") ||
+          a.clinicType.some((t) => selectedClinicTypes.has(t))
+        )
+      : automationsLibrary;
+
+    const automationRows = filteredAutomations.map((a) => ({
+      clinic_id: clinicId,
+      name: a.name,
+      trigger_event: a.trigger_event,
+      action_type: a.action_type,
+      active: a.active ?? true,
+    }));
+
+    await supabase.from("automations").upsert(automationRows, {
       onConflict: "clinic_id,name",
     });
 
