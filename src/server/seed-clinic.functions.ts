@@ -459,7 +459,6 @@ const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
       "Physio & Chiro": "wellness",
       "Massage": "wellness",
       "Holistic & Wellness": "wellness",
-    };
 };
 
     type ConsentForm = { clinicType: string[]; title: string; body: string; requires_witness?: boolean };
