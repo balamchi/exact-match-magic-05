@@ -33,7 +33,7 @@ const CURRENCIES = ["CAD", "USD", "EUR", "GBP", "AUD", "AED", "SGD"];
 const INDUSTRIES = ["Aesthetic", "Beauty", "Dental", "Wellness", "Dermatology", "Med Spa", "Other"];
 const ROLE_LABELS: Record<ClinicRole, string> = { owner: "Owner", admin: "Admin", senior_admin: "Senior Admin", junior_admin: "Junior Admin", manager: "Manager", provider: "Provider", front_desk: "Front desk" };
 
-type SettingsTab = "profile" | "branding" | "booking" | "notifications" | "communication" | "tax" | "integrations" | "users" | "audit";
+type SettingsTab = "profile" | "branding" | "booking" | "notifications" | "communication" | "tax" | "integrations" | "users" | "permissions" | "audit";
 
 interface MemberRow { id: string; user_id: string; role: ClinicRole; created_at: string }
 interface AuditRow { id: string; action: string; entity_type: string | null; details: any; created_at: string; user_id: string }
