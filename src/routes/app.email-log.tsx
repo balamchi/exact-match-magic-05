@@ -9,6 +9,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { hasPermission } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchEmailLog } from "@/lib/email/server-fns";
 import { StatCard } from "@/components/stat-card";
