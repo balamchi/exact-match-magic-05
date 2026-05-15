@@ -447,15 +447,31 @@ function ServicesPage() {
                     const result = await seedClinicDefaults({ data: { force: true } });
                     if (result.seeded) {
                       const s: any = (result as any).summary ?? {};
-                      toast.success(
-                        `Re-seeded — ${s.services ?? 0} services, ${s.consentForms ?? 0} consent forms, ${s.automations ?? 0} automations, ${s.memberships ?? 0} memberships`
-                      );
+                      const a: any = (result as any).attempted ?? {};
+
+                      const mismatches: string[] = [];
+                      if (a.automations && s.automations < a.automations * 0.5) mismatches.push(`automations (${s.automations}/${a.automations})`);
+                      if (a.consentForms && s.consentForms < a.consentForms * 0.5) mismatches.push(`consent forms (${s.consentForms}/${a.consentForms})`);
+                      if (a.memberships && s.memberships < a.memberships * 0.5) mismatches.push(`memberships (${s.memberships}/${a.memberships})`);
+
+                      if (mismatches.length > 0) {
+                        toast.warning(
+                          `Partial seed — ${s.services ?? 0} services, ${s.consentForms ?? 0} consent forms, ${s.automations ?? 0} automations, ${s.memberships ?? 0} memberships. Issues with: ${mismatches.join(", ")}. Check console.`,
+                          { duration: 10000 }
+                        );
+                      } else {
+                        toast.success(
+                          `Re-seeded — ${s.services ?? 0} services, ${s.consentForms ?? 0} consent forms, ${s.automations ?? 0} automations, ${s.memberships ?? 0} memberships`,
+                          { duration: 6000 }
+                        );
+                      }
                     } else {
                       toast.info((result as any).message ?? "Nothing to seed");
                     }
                     await load();
                   } catch (err: any) {
-                    toast.error(`Re-seed failed: ${err.message}`);
+                    toast.error(`Re-seed failed: ${err.message}`, { duration: 10000 });
+                    console.error("Re-seed error:", err);
                   } finally {
                     setLoading(false);
                   }
