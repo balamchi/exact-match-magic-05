@@ -585,7 +585,9 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       requires_witness: cf.requires_witness === true,
     }));
 
-    await supabase.from("consent_form_templates").insert(consentRows);
+    await supabase.from("consent_form_templates").upsert(consentRows, {
+      onConflict: "clinic_id,name",
+    });
 
     // ── Automations ──
     const automations = [
@@ -601,7 +603,9 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       { name: "Low Inventory Alert", trigger_event: "inventory_low", action_type: "email", active: true },
     ].map((a) => ({ ...a, clinic_id: clinicId }));
 
-    await supabase.from("automations").insert(automations);
+    await supabase.from("automations").upsert(automations, {
+      onConflict: "clinic_id,name",
+    });
 
     // ── Memberships ──
     const memberships = [
@@ -631,7 +635,9 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       },
     ];
 
-    await supabase.from("memberships").insert(memberships);
+    await supabase.from("memberships").upsert(memberships, {
+      onConflict: "clinic_id,name",
+    });
 
     return {
       seeded: true,
