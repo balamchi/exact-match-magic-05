@@ -635,7 +635,9 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       },
     ];
 
-    await supabase.from("memberships").insert(memberships);
+    await supabase.from("memberships").upsert(memberships, {
+      onConflict: "clinic_id,name",
+    });
 
     return {
       seeded: true,
