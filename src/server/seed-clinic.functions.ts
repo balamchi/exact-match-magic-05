@@ -443,7 +443,6 @@ const serviceCategories: ServiceCategory[] =
     ];
 
 const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
-    const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
       "Injectables": "medical_aesthetic",
       "Laser & Energy": "medical_aesthetic",
       "Skin Treatments": "medical_aesthetic",
