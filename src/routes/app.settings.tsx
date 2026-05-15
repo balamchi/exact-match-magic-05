@@ -4,8 +4,10 @@ import {
   Building2, Users, Globe, LogOut, Save, Mail, Shield, Trash2, Link2, Copy, ExternalLink,
   Palette, CalendarCheck, Bell, MessageSquare, Receipt, Plug, ClipboardList,
   Phone, Clock, Image, Settings2, Zap, ChevronRight,
+  Check, X as XIcon,
 } from "lucide-react";
 import { useAuth, type ClinicRole } from "@/lib/auth-context";
+import { ROLE_PERMISSIONS, ROLE_LABELS as PERM_ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSION_MODULES, type PermissionKey } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
