@@ -603,7 +603,9 @@ export const seedClinicDefaults = createServerFn({ method: "POST" })
       { name: "Low Inventory Alert", trigger_event: "inventory_low", action_type: "email", active: true },
     ].map((a) => ({ ...a, clinic_id: clinicId }));
 
-    await supabase.from("automations").insert(automations);
+    await supabase.from("automations").upsert(automations, {
+      onConflict: "clinic_id,name",
+    });
 
     // ── Memberships ──
     const memberships = [
