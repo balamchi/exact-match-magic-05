@@ -4769,6 +4769,10 @@ export type Database = {
         Args: { check_env?: string; clinic_uuid: string }
         Returns: boolean
       }
+      has_clinic_permission: {
+        Args: { _clinic: string; _permission: string; _user: string }
+        Returns: boolean
+      }
       has_clinic_role: {
         Args: {
           _clinic: string
