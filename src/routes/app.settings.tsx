@@ -456,7 +456,7 @@ function SettingsPage() {
             <SettingsSection title="Users" description={`${members.length} user${members.length !== 1 ? "s" : ""} in ${clinicData.name}`}>
               {isOwnerOrAdmin && (
                 <div className="mb-4">
-                  <Button variant="outline" disabled title="Email invites coming soon"><Mail className="mr-2 h-4 w-4" /> Invite member</Button>
+                  <Button variant="outline" onClick={() => setInviteOpen(true)}><Mail className="mr-2 h-4 w-4" /> Invite member</Button>
                 </div>
               )}
               <div className="overflow-x-auto">
