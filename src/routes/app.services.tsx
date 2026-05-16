@@ -432,7 +432,7 @@ function ServicesPage() {
           <Button onClick={openCreate} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
             <Plus className="mr-1.5 h-4 w-4" /> New service
           </Button>
-          <details className="relative">
+          {canRunSeed && <details className="relative">
             <summary className="cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 list-none">
               Admin tools
             </summary>
