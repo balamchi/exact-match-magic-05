@@ -8,6 +8,9 @@ import {
 } from "lucide-react";
 import { useAuth, type ClinicRole } from "@/lib/auth-context";
 import { ROLE_PERMISSIONS, ROLE_LABELS as PERM_ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSION_MODULES, hasPermission, type PermissionKey } from "@/lib/permissions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { inviteUserToClinic } from "@/server/users.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -136,6 +139,49 @@ function SettingsPage() {
     if (error) { toast.error(error.message); return; }
     toast.success("Member removed");
     if (activeClinic) loadMembers(activeClinic.clinic_id);
+  };
+
+  // Invite member dialog state
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<ClinicRole>("front_desk");
+  const [inviting, setInviting] = useState(false);
+
+  const submitInvite = async () => {
+    if (!activeClinic) return;
+    const email = inviteEmail.trim();
+    if (!email || !email.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    setInviting(true);
+    try {
+      const result = await inviteUserToClinic({
+        data: { clinicId: activeClinic.clinic_id, email, role: inviteRole },
+      });
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(result.message);
+      setInviteOpen(false);
+      setInviteEmail("");
+      setInviteRole("front_desk");
+      loadMembers(activeClinic.clinic_id);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to send invite");
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  // Remove member confirmation state
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+
+  const confirmRemove = async () => {
+    if (!confirmRemoveId) return;
+    await removeMember(confirmRemoveId);
+    setConfirmRemoveId(null);
   };
 
   if (!activeClinic) return <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">No clinic selected.</div>;
@@ -410,7 +456,7 @@ function SettingsPage() {
             <SettingsSection title="Users" description={`${members.length} user${members.length !== 1 ? "s" : ""} in ${clinicData.name}`}>
               {isOwnerOrAdmin && (
                 <div className="mb-4">
-                  <Button variant="outline" disabled title="Email invites coming soon"><Mail className="mr-2 h-4 w-4" /> Invite member</Button>
+                  <Button variant="outline" onClick={() => setInviteOpen(true)}><Mail className="mr-2 h-4 w-4" /> Invite member</Button>
                 </div>
               )}
               <div className="overflow-x-auto">
@@ -436,7 +482,9 @@ function SettingsPage() {
                               <Select value={m.role} onValueChange={(v) => updateRole(m.id, v as ClinicRole)}>
                                 <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                  {(Object.keys(ROLE_LABELS) as ClinicRole[]).map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
+                                  {(Object.keys(ROLE_LABELS) as ClinicRole[])
+                                    .filter((r) => r !== "admin" || m.role === "admin")
+                                    .map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
                                 </SelectContent>
                               </Select>
                             ) : (
@@ -445,7 +493,7 @@ function SettingsPage() {
                           </td>
                           <td className="py-3 pr-4 text-right">
                             {isOwnerOrAdmin && !isSelf && m.role !== "owner" && (
-                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => removeMember(m.id)}>
+                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setConfirmRemoveId(m.id)}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             )}
@@ -652,6 +700,70 @@ function SettingsPage() {
           </div>
         </section>
       )}
+
+      {/* Invite Member Dialog */}
+      <Dialog open={inviteOpen} onOpenChange={(open) => !inviting && setInviteOpen(open)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invite a new user</DialogTitle>
+            <DialogDescription>
+              They'll receive an email invitation to join {clinicData.name} with the role you select.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="invite-email">Email address</Label>
+              <Input
+                id="invite-email"
+                type="email"
+                placeholder="name@example.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                disabled={inviting}
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="invite-role">Role</Label>
+              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as ClinicRole)} disabled={inviting}>
+                <SelectTrigger id="invite-role"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(ROLE_LABELS) as ClinicRole[])
+                    .filter((r) => r !== "owner" && r !== "admin")
+                    .map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                See the Permissions tab for what each role can do.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteOpen(false)} disabled={inviting}>Cancel</Button>
+            <Button onClick={submitInvite} disabled={inviting || !inviteEmail.trim()}>
+              {inviting ? "Sending…" : "Send invite"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Member Confirmation */}
+      <AlertDialog open={confirmRemoveId !== null} onOpenChange={(open) => !open && setConfirmRemoveId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this user?</AlertDialogTitle>
+            <AlertDialogDescription>
+              They will lose access to {clinicData.name} immediately. You can re-invite them later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
