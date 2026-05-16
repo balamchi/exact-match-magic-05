@@ -40,6 +40,7 @@ type SettingsTab = "profile" | "branding" | "booking" | "notifications" | "commu
 
 interface MemberRow { id: string; user_id: string; role: ClinicRole; created_at: string }
 interface AuditRow { id: string; action: string; entity_type: string | null; details: any; created_at: string; user_id: string }
+interface SeedActivityRow { id: string; action: string; resource: string | null; result: any; status: string; error_message: string | null; created_at: string; user_id: string | null }
 
 function SettingsPage() {
   const { activeClinic, user, memberships, refreshMemberships, signOut } = useAuth();
