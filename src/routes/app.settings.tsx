@@ -482,7 +482,9 @@ function SettingsPage() {
                               <Select value={m.role} onValueChange={(v) => updateRole(m.id, v as ClinicRole)}>
                                 <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                  {(Object.keys(ROLE_LABELS) as ClinicRole[]).map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
+                                  {(Object.keys(ROLE_LABELS) as ClinicRole[])
+                                    .filter((r) => r !== "admin" || m.role === "admin")
+                                    .map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
                                 </SelectContent>
                               </Select>
                             ) : (
