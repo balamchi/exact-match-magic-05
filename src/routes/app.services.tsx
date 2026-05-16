@@ -483,8 +483,132 @@ function ServicesPage() {
                 <Sparkles className="mr-2 h-3.5 w-3.5" />
                 Force re-seed (skips duplicates)
               </Button>
+
+              <div className="my-2 border-t border-border" />
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5 px-1">Refresh one resource</p>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                disabled={refreshingResource !== null}
+                onClick={async () => {
+                  setRefreshingResource("services");
+                  try {
+                    const r = await seedServices({ data: {} });
+                    if (r.status === "failed") {
+                      toast.error(`Services refresh failed: ${r.errors.join(", ")}`, { duration: 8000 });
+                    } else if (r.status === "partial") {
+                      toast.warning(`Services partial: ${r.succeeded}/${r.attempted} rows`, { duration: 6000 });
+                    } else {
+                      toast.success(`Refreshed ${r.succeeded} services`);
+                    }
+                    await load();
+                  } catch (err: any) {
+                    toast.error(`Services refresh error: ${err.message}`, { duration: 8000 });
+                    console.error("seedServices error:", err);
+                  } finally {
+                    setRefreshingResource(null);
+                  }
+                }}
+              >
+                {refreshingResource === "services"
+                  ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  : <Database className="mr-2 h-3.5 w-3.5" />}
+                Refresh services
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                disabled={refreshingResource !== null}
+                onClick={async () => {
+                  setRefreshingResource("consent_forms");
+                  try {
+                    const r = await seedConsentForms({ data: {} });
+                    if (r.status === "failed") {
+                      toast.error(`Consent forms refresh failed: ${r.errors.join(", ")}`, { duration: 8000 });
+                    } else if (r.status === "partial") {
+                      toast.warning(`Consent forms partial: ${r.succeeded}/${r.attempted} rows`, { duration: 6000 });
+                    } else {
+                      toast.success(`Refreshed ${r.succeeded} consent forms`);
+                    }
+                  } catch (err: any) {
+                    toast.error(`Consent forms refresh error: ${err.message}`, { duration: 8000 });
+                    console.error("seedConsentForms error:", err);
+                  } finally {
+                    setRefreshingResource(null);
+                  }
+                }}
+              >
+                {refreshingResource === "consent_forms"
+                  ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  : <FileText className="mr-2 h-3.5 w-3.5" />}
+                Refresh consent forms
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                disabled={refreshingResource !== null}
+                onClick={async () => {
+                  setRefreshingResource("automations");
+                  try {
+                    const r = await seedAutomations({ data: {} });
+                    if (r.status === "failed") {
+                      toast.error(`Automations refresh failed: ${r.errors.join(", ")}`, { duration: 8000 });
+                    } else if (r.status === "partial") {
+                      toast.warning(`Automations partial: ${r.succeeded}/${r.attempted} rows`, { duration: 6000 });
+                    } else {
+                      toast.success(`Refreshed ${r.succeeded} automations`);
+                    }
+                  } catch (err: any) {
+                    toast.error(`Automations refresh error: ${err.message}`, { duration: 8000 });
+                    console.error("seedAutomations error:", err);
+                  } finally {
+                    setRefreshingResource(null);
+                  }
+                }}
+              >
+                {refreshingResource === "automations"
+                  ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  : <Zap className="mr-2 h-3.5 w-3.5" />}
+                Refresh automations
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                disabled={refreshingResource !== null}
+                onClick={async () => {
+                  setRefreshingResource("memberships");
+                  try {
+                    const r = await seedMemberships({ data: {} });
+                    if (r.status === "failed") {
+                      toast.error(`Memberships refresh failed: ${r.errors.join(", ")}`, { duration: 8000 });
+                    } else if (r.status === "partial") {
+                      toast.warning(`Memberships partial: ${r.succeeded}/${r.attempted} rows`, { duration: 6000 });
+                    } else {
+                      toast.success(`Refreshed ${r.succeeded} memberships`);
+                    }
+                  } catch (err: any) {
+                    toast.error(`Memberships refresh error: ${err.message}`, { duration: 8000 });
+                    console.error("seedMemberships error:", err);
+                  } finally {
+                    setRefreshingResource(null);
+                  }
+                }}
+              >
+                {refreshingResource === "memberships"
+                  ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  : <CreditCard className="mr-2 h-3.5 w-3.5" />}
+                Refresh memberships
+              </Button>
             </div>
-          </details>
+          </details>}
         </div>
       </header>
 
