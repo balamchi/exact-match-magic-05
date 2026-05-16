@@ -63,6 +63,8 @@ function SettingsPage() {
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [auditLog, setAuditLog] = useState<AuditRow[]>([]);
   const [loadingAudit, setLoadingAudit] = useState(false);
+  const [seedActivity, setSeedActivity] = useState<SeedActivityRow[]>([]);
+  const [loadingSeedActivity, setLoadingSeedActivity] = useState(false);
 
   useEffect(() => {
     if (!activeClinic) return;
