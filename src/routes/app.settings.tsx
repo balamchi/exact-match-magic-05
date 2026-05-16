@@ -493,7 +493,7 @@ function SettingsPage() {
                           </td>
                           <td className="py-3 pr-4 text-right">
                             {isOwnerOrAdmin && !isSelf && m.role !== "owner" && (
-                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => removeMember(m.id)}>
+                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setConfirmRemoveId(m.id)}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             )}
