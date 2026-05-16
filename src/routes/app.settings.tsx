@@ -40,6 +40,7 @@ type SettingsTab = "profile" | "branding" | "booking" | "notifications" | "commu
 
 interface MemberRow { id: string; user_id: string; role: ClinicRole; created_at: string }
 interface AuditRow { id: string; action: string; entity_type: string | null; details: any; created_at: string; user_id: string }
+interface SeedActivityRow { id: string; action: string; resource: string | null; result: any; status: string; error_message: string | null; created_at: string; user_id: string | null }
 
 function SettingsPage() {
   const { activeClinic, user, memberships, refreshMemberships, signOut } = useAuth();
@@ -62,6 +63,8 @@ function SettingsPage() {
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [auditLog, setAuditLog] = useState<AuditRow[]>([]);
   const [loadingAudit, setLoadingAudit] = useState(false);
+  const [seedActivity, setSeedActivity] = useState<SeedActivityRow[]>([]);
+  const [loadingSeedActivity, setLoadingSeedActivity] = useState(false);
 
   useEffect(() => {
     if (!activeClinic) return;
@@ -80,6 +83,24 @@ function SettingsPage() {
       });
     }
   }, [activeTab, activeClinic?.clinic_id]);
+
+  const canViewSeedLog = hasPermission(activeClinic?.role, "seed.view_log");
+
+  useEffect(() => {
+    if (activeTab === "audit" && activeClinic && canViewSeedLog) {
+      setLoadingSeedActivity(true);
+      (supabase as any)
+        .from("seed_activity_log")
+        .select("id, action, resource, result, status, error_message, created_at, user_id")
+        .eq("clinic_id", activeClinic.clinic_id)
+        .order("created_at", { ascending: false })
+        .limit(25)
+        .then(({ data }: { data: SeedActivityRow[] | null }) => {
+          setSeedActivity((data ?? []) as SeedActivityRow[]);
+          setLoadingSeedActivity(false);
+        });
+    }
+  }, [activeTab, activeClinic?.clinic_id, canViewSeedLog]);
 
   const loadMembers = async (clinicId: string) => {
     setLoadingMembers(true);
@@ -604,25 +625,73 @@ function SettingsPage() {
           )}
 
           {activeTab === "audit" && (
-            <SettingsSection title="Audit Log" description="Recent actions and changes across the clinic.">
-              {loadingAudit ? (
-                <div className="space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-12 rounded-xl" />)}</div>
-              ) : auditLog.length === 0 ? (
-                <p className="py-10 text-center text-sm text-muted-foreground">No audit entries yet. Actions will be logged as you use the app.</p>
-              ) : (
-                <div className="space-y-2">
-                  {auditLog.map((entry) => (
-                    <div key={entry.id} className="flex items-center justify-between rounded-xl border border-border bg-surface/40 p-3">
-                      <div>
-                        <p className="text-sm font-medium">{entry.action}</p>
-                        <p className="text-[11px] text-muted-foreground">{entry.entity_type && `${entry.entity_type} · `}{new Date(entry.created_at).toLocaleString()}</p>
+            <div className="space-y-6">
+              <SettingsSection title="Audit Log" description="Recent actions and changes across the clinic.">
+                {loadingAudit ? (
+                  <div className="space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-12 rounded-xl" />)}</div>
+                ) : auditLog.length === 0 ? (
+                  <p className="py-10 text-center text-sm text-muted-foreground">No audit entries yet. Actions will be logged as you use the app.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {auditLog.map((entry) => (
+                      <div key={entry.id} className="flex items-center justify-between rounded-xl border border-border bg-surface/40 p-3">
+                        <div>
+                          <p className="text-sm font-medium">{entry.action}</p>
+                          <p className="text-[11px] text-muted-foreground">{entry.entity_type && `${entry.entity_type} · `}{new Date(entry.created_at).toLocaleString()}</p>
+                        </div>
+                        <span className="font-mono text-[10px] text-muted-foreground">{entry.user_id.slice(0, 8)}…</span>
                       </div>
-                      <span className="font-mono text-[10px] text-muted-foreground">{entry.user_id.slice(0, 8)}…</span>
+                    ))}
+                  </div>
+                )}
+              </SettingsSection>
+
+              {canViewSeedLog && (
+                <SettingsSection title="Seed Activity" description="History of clinic seeding operations (services, consent forms, automations, memberships).">
+                  {loadingSeedActivity ? (
+                    <div className="space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-12 rounded-xl" />)}</div>
+                  ) : seedActivity.length === 0 ? (
+                    <p className="py-10 text-center text-sm text-muted-foreground">No seed operations have run yet for this clinic.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {seedActivity.map((entry) => {
+                        const r = entry.result as { attempted?: number; succeeded?: number; inserted?: number; errors?: string[] } | null;
+                        const statusColor =
+                          entry.status === "success" ? "text-emerald-500" :
+                          entry.status === "partial" ? "text-amber-500" :
+                          "text-rose-500";
+                        return (
+                          <div key={entry.id} className="flex items-start justify-between gap-3 rounded-xl border border-border bg-surface/40 p-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium">
+                                  {entry.action}{entry.resource ? ` · ${entry.resource}` : ""}
+                                </p>
+                                <span className={cn("text-[10px] font-semibold uppercase tracking-wide", statusColor)}>
+                                  {entry.status}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-muted-foreground">
+                                {r?.attempted != null && r?.succeeded != null
+                                  ? `${r.succeeded}/${r.attempted} rows · `
+                                  : ""}
+                                {new Date(entry.created_at).toLocaleString()}
+                              </p>
+                              {entry.error_message && (
+                                <p className="mt-1 text-[11px] text-rose-500">{entry.error_message}</p>
+                              )}
+                            </div>
+                            <span className="font-mono text-[10px] text-muted-foreground">
+                              {entry.user_id ? `${entry.user_id.slice(0, 8)}…` : "system"}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
+                  )}
+                </SettingsSection>
               )}
-            </SettingsSection>
+            </div>
           )}
         </div>
       </div>
