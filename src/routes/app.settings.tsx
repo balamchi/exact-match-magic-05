@@ -84,6 +84,24 @@ function SettingsPage() {
     }
   }, [activeTab, activeClinic?.clinic_id]);
 
+  const canViewSeedLog = hasPermission(activeClinic?.role, "seed.view_log");
+
+  useEffect(() => {
+    if (activeTab === "audit" && activeClinic && canViewSeedLog) {
+      setLoadingSeedActivity(true);
+      (supabase as any)
+        .from("seed_activity_log")
+        .select("id, action, resource, result, status, error_message, created_at, user_id")
+        .eq("clinic_id", activeClinic.clinic_id)
+        .order("created_at", { ascending: false })
+        .limit(25)
+        .then(({ data }: { data: SeedActivityRow[] | null }) => {
+          setSeedActivity((data ?? []) as SeedActivityRow[]);
+          setLoadingSeedActivity(false);
+        });
+    }
+  }, [activeTab, activeClinic?.clinic_id, canViewSeedLog]);
+
   const loadMembers = async (clinicId: string) => {
     setLoadingMembers(true);
     const { data } = await supabase.from("clinic_members").select("id, user_id, role, created_at").eq("clinic_id", clinicId).order("created_at", { ascending: true });
