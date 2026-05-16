@@ -700,6 +700,70 @@ function SettingsPage() {
           </div>
         </section>
       )}
+
+      {/* Invite Member Dialog */}
+      <Dialog open={inviteOpen} onOpenChange={(open) => !inviting && setInviteOpen(open)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invite a new user</DialogTitle>
+            <DialogDescription>
+              They'll receive an email invitation to join {clinicData.name} with the role you select.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="invite-email">Email address</Label>
+              <Input
+                id="invite-email"
+                type="email"
+                placeholder="name@example.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                disabled={inviting}
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="invite-role">Role</Label>
+              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as ClinicRole)} disabled={inviting}>
+                <SelectTrigger id="invite-role"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(ROLE_LABELS) as ClinicRole[])
+                    .filter((r) => r !== "owner" && r !== "admin")
+                    .map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                See the Permissions tab for what each role can do.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteOpen(false)} disabled={inviting}>Cancel</Button>
+            <Button onClick={submitInvite} disabled={inviting || !inviteEmail.trim()}>
+              {inviting ? "Sending…" : "Send invite"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Member Confirmation */}
+      <AlertDialog open={confirmRemoveId !== null} onOpenChange={(open) => !open && setConfirmRemoveId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this user?</AlertDialogTitle>
+            <AlertDialogDescription>
+              They will lose access to {clinicData.name} immediately. You can re-invite them later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
