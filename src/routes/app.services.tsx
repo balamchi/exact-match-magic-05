@@ -16,7 +16,8 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { PhotoUpload } from "@/components/photo-upload";
-import { seedClinicDefaults } from "@/server/seed-clinic.functions";
+import { seedClinicDefaults, seedServices, seedConsentForms, seedAutomations, seedMemberships } from "@/server/seed-clinic.functions";
+import { hasPermission } from "@/lib/permissions";
 import { ClinicTypeSelector } from "@/components/clinic-type-selector";
 
 export const Route = createFileRoute("/app/services")({ component: ServicesPage });
