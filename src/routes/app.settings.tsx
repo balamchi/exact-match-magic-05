@@ -141,6 +141,49 @@ function SettingsPage() {
     if (activeClinic) loadMembers(activeClinic.clinic_id);
   };
 
+  // Invite member dialog state
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<ClinicRole>("front_desk");
+  const [inviting, setInviting] = useState(false);
+
+  const submitInvite = async () => {
+    if (!activeClinic) return;
+    const email = inviteEmail.trim();
+    if (!email || !email.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    setInviting(true);
+    try {
+      const result = await inviteUserToClinic({
+        data: { clinicId: activeClinic.clinic_id, email, role: inviteRole },
+      });
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success(result.message);
+      setInviteOpen(false);
+      setInviteEmail("");
+      setInviteRole("front_desk");
+      loadMembers(activeClinic.clinic_id);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to send invite");
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  // Remove member confirmation state
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+
+  const confirmRemove = async () => {
+    if (!confirmRemoveId) return;
+    await removeMember(confirmRemoveId);
+    setConfirmRemoveId(null);
+  };
+
   if (!activeClinic) return <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">No clinic selected.</div>;
   if (!clinicData) return <div className="space-y-4"><Skeleton className="h-8 w-40" /><Skeleton className="h-96 rounded-2xl" /></div>;
 
