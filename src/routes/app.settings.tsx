@@ -8,6 +8,9 @@ import {
 } from "lucide-react";
 import { useAuth, type ClinicRole } from "@/lib/auth-context";
 import { ROLE_PERMISSIONS, ROLE_LABELS as PERM_ROLE_LABELS, ROLE_DESCRIPTIONS, PERMISSION_MODULES, hasPermission, type PermissionKey } from "@/lib/permissions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { inviteUserToClinic } from "@/server/users.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
