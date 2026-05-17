@@ -685,15 +685,17 @@ function LeadsPage() {
 
             {/* Quick Actions */}
             <div className="flex flex-wrap gap-2 border-b border-border px-5 py-3">
-              <Button size="sm" variant="outline" onClick={() => { openEdit(detailLead); setDetailLead(null); }}>
-                <FileText className="mr-1.5 h-3.5 w-3.5" /> Edit
-              </Button>
-              {detailLead.stage !== "converted" && detailLead.stage !== ("won" as any) && (
+              {canWriteClients && (
+                <Button size="sm" variant="outline" onClick={() => { openEdit(detailLead); setDetailLead(null); }}>
+                  <FileText className="mr-1.5 h-3.5 w-3.5" /> Edit
+                </Button>
+              )}
+              {canWriteClients && detailLead.stage !== "converted" && detailLead.stage !== ("won" as any) && (
                 <Button size="sm" variant="outline" onClick={() => convertToClient(detailLead)}>
                   <UserPlus className="mr-1.5 h-3.5 w-3.5" /> Convert to Client
                 </Button>
               )}
-              {detailLead.stage !== "lost" && detailLead.stage !== "converted" && (
+              {canWriteClients && detailLead.stage !== "lost" && detailLead.stage !== "converted" && (
                 <Button size="sm" variant="outline" className="text-destructive" onClick={() => { markAsLost(detailLead); setDetailLead(null); }}>
                   <X className="mr-1.5 h-3.5 w-3.5" /> Mark Lost
                 </Button>
