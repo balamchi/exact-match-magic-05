@@ -258,6 +258,7 @@ function LeadsPage() {
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!clinicId) return;
+    if (!canWriteClients) return toast.error("You don't have permission to modify leads");
     if (!draft.first_name.trim()) return toast.error("First name is required");
     setSaving(true);
     const oldStage = editing?.stage;
