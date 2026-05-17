@@ -54,6 +54,9 @@ function formatCAD(cents: number) {
 function PosPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id;
+  const canProcessPayments = hasPermission(activeClinic?.role, "payments.process");
+  const canRefundPayments = hasPermission(activeClinic?.role, "payments.refund");
+  void canRefundPayments;
 
   const [catalog, setCatalog] = useState<Catalog>({ services: [], packages: [], retail: [] });
   const [loading, setLoading] = useState(true);
