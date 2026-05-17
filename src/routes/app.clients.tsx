@@ -254,7 +254,7 @@ function ClientsPage() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><UserRound className="h-6 w-6" /></div>
             <h2 className="font-display text-xl font-semibold">No clients yet</h2>
             <p className="mt-1 max-w-[95vw] sm:max-w-sm text-sm text-muted-foreground">Create your first client profile to start building treatment history and CRM records.</p>
-            <Button onClick={openCreate} className="mt-5 gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Plus className="h-4 w-4" /> Add first client</Button>
+            {canWriteClients && <Button onClick={openCreate} className="mt-5 gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Plus className="h-4 w-4" /> Add first client</Button>}
           </div>
         ) : (
           <div className="divide-y divide-border">{filteredClients.map((client) => <ClientRow key={client.id} client={client} onEdit={openEdit} onDelete={deleteClient} />)}</div>
