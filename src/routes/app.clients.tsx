@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 
 export const Route = createFileRoute("/app/clients")({
   component: ClientsPage,
