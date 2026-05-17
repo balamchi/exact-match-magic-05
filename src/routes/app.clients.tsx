@@ -50,6 +50,9 @@ const PREGNANCY_OPTIONS = [
 
 function ClientsPage() {
   const { activeClinic } = useAuth();
+  const canWriteClients = hasPermission(activeClinic?.role, "clients.write");
+  const canDeleteClients = hasPermission(activeClinic?.role, "clients.delete");
+  const canExportClients = hasPermission(activeClinic?.role, "clients.export");
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
