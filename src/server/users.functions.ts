@@ -156,6 +156,8 @@ export const inviteUserToClinic = createServerFn({ method: "POST" })
         };
       }
 
+      await autoCreateStaffRow({ clinicId, userId: existingUser.id, email, role });
+
       return {
         success: true as const,
         addedExistingUser: true as const,
