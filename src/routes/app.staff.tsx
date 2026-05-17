@@ -330,7 +330,7 @@ function KpiCard({ label, value, icon, accent }: { label: string; value: number;
 
 /* ── Staff Composer (tabbed modal) ────────────────────── */
 
-type TabKey = "profile" | "contact" | "role" | "services" | "schedule" | "hr" | "commissions";
+type TabKey = "profile" | "contact" | "role" | "services" | "locations" | "schedule" | "hr" | "commissions";
 
 function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | null; clinicId: string; onClose: () => void; onSaved: () => void }) {
   const { activeClinic } = useAuth();
