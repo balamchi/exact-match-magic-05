@@ -249,7 +249,7 @@ function StaffPage() {
             </div>
             <p className="text-sm font-medium">No team members yet</p>
             <p className="text-xs text-muted-foreground">Add your team to start scheduling appointments.</p>
-            {rows.length === 0 && <Button size="sm" onClick={() => setComposer("new")} className="mt-2"><Plus className="mr-1.5 h-3.5 w-3.5" /> Add staff</Button>}
+            {rows.length === 0 && canWriteStaff && <Button size="sm" onClick={() => setComposer("new")} className="mt-2"><Plus className="mr-1.5 h-3.5 w-3.5" /> Add staff</Button>}
           </div>
         </section>
       ) : (
