@@ -90,22 +90,7 @@ function TemplatesPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Auto-seed defaults
-  useEffect(() => {
-    if (!clinicId || loading) return;
-    if (templates.length > 0) return;
-    const key = `templates-seeded-${clinicId}`;
-    if (typeof window === "undefined" || localStorage.getItem(key)) return;
-    (async () => {
-      const rows = DEFAULT_TEMPLATES.map((t) => ({ ...t, clinic_id: clinicId }));
-      const { error } = await supabase.from("message_templates").insert(rows);
-      if (!error) {
-        localStorage.setItem(key, "true");
-        toast.success("Seeded 10 starter templates");
-        load();
-      }
-    })();
-  }, [clinicId, templates.length, loading, load]);
+
 
   const filtered = useMemo(() => {
     return templates.filter((t) => {
