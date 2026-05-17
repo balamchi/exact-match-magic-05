@@ -207,6 +207,23 @@ function PosPage() {
     clearCart();
   }
 
+  if (!canProcessPayments) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-display text-2xl sm:text-4xl font-semibold tracking-tight">Point of Sale</h1>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-10 text-center shadow-card">
+          <ShieldOff className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <h2 className="font-display text-lg font-semibold">Restricted</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            You don't have permission to process payments. Contact your clinic owner if you need access.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
