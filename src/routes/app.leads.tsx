@@ -754,7 +754,7 @@ function LeadsPage() {
       )}
 
       {/* CSV Import Modal */}
-      {csvOpen && <CsvImportModal clinicId={clinicId!} onClose={() => setCsvOpen(false)} onDone={() => { setCsvOpen(false); load(); }} />}
+      {csvOpen && <CsvImportModal clinicId={clinicId!} onClose={() => setCsvOpen(false)} onDone={() => { setCsvOpen(false); load(); }} sources={sources} />}
     </div>
   );
 }
