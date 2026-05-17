@@ -329,6 +329,7 @@ function LeadsPage() {
 
   const convertToClient = async (lead: Lead) => {
     if (!clinicId) return;
+    if (!canWriteClients) return toast.error("You don't have permission to convert leads");
     if (lead.converted_to_client_id) { toast.info("Already converted"); return; }
     // Check if client exists by email
     let clientId: string | null = null;
