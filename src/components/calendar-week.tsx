@@ -1063,12 +1063,20 @@ export function CalendarWeek() {
                 <span className="text-xs font-medium text-muted-foreground">Actions:</span>
                 {STATUS_FLOW[editing.status].map(({ next, label }) => {
                   if (next === "cancelled") {
+                    if (!canCancelAppointments) return null;
                     return (
                       <Button key={next} type="button" size="sm" variant="outline" onClick={handleCancel} className="text-rose-400 border-rose-500/30 hover:bg-rose-500/10">
                         {label}
                       </Button>
                     );
                   }
+                  const isCancel = next === "no_show";
+                  const isCheckin = next === "checked_in";
+                  const allowed =
+                    (isCancel && canCancelAppointments) ||
+                    (isCheckin && canCheckIn) ||
+                    (!isCancel && !isCheckin && canWriteAppointments);
+                  if (!allowed) return null;
                   return (
                     <Button key={next} type="button" size="sm" variant="outline" onClick={() => advanceStatus(editing, next)}>
                       {label}
