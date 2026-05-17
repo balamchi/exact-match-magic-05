@@ -1359,7 +1359,7 @@ export function CalendarWeek() {
                 <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
                   {isViewOnly ? "Close" : "Cancel"}
                 </Button>
-                {!isViewOnly && (
+                {!isViewOnly && canWriteAppointments && (
                   <Button
                     disabled={saving || (!!conflict && !overrideConflict)}
                     className="bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground shadow-lg hover:opacity-90"
