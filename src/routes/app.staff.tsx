@@ -700,6 +700,16 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
             <ServicesPicker allServices={allServices} staffServices={staffServices} setStaffServices={setStaffServices} />
           )}
 
+          {tab === "locations" && (
+            <LocationsPicker
+              allLocations={allLocations}
+              staffLocations={staffLocations}
+              setStaffLocations={setStaffLocations}
+              primaryLocation={primaryLocation}
+              setPrimaryLocation={setPrimaryLocation}
+            />
+          )}
+
           {tab === "schedule" && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">Set default working hours for each day of the week.</p>
