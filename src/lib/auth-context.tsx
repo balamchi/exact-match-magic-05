@@ -103,6 +103,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const activeClinic = memberships.find((m) => m.clinic_id === activeClinicId) ?? memberships[0] ?? null;
 
+  useEffect(() => {
+    setSentryUser(session?.user?.id ?? null, activeClinic?.clinic_id ?? null);
+  }, [session?.user?.id, activeClinic?.clinic_id]);
+
   const value: AuthContextValue = {
     session,
     user: session?.user ?? null,
