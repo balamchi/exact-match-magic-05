@@ -483,8 +483,8 @@ function AutomationsPage() {
         ) : (
           <ul className="divide-y divide-border">
             {filtered.map((a) => {
-              const t = TRIGGER_META[(a.trigger_event as Trigger) ?? "appointment_completed"];
-              const act = ACTION_META[(a.action_type as Action) ?? "email"];
+              const t = TRIGGER_META[a.trigger_event as Trigger] ?? TRIGGER_META.appointment_completed;
+              const act = ACTION_META[a.action_type as Action] ?? ACTION_META.email;
               return (
                 <li key={a.id} className="grid items-center gap-4 p-4 md:grid-cols-[1.5fr_2fr_auto_auto]">
                   <div className="flex items-start gap-3 min-w-0">
