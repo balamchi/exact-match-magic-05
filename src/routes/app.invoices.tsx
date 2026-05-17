@@ -81,7 +81,7 @@ function InvoicesPage() {
       .on("postgres_changes", { event: "*", schema: "public", table: "invoices", filter: `clinic_id=eq.${activeClinic.clinic_id}` }, load)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [activeClinic]);
+  }, [activeClinic, canReadBilling]);
 
   // Auto-mark overdue in memory (display only)
   const decorated = useMemo(() => invoices.map((i) => isOverdue(i) ? { ...i, status: "overdue" } : i), [invoices]);
