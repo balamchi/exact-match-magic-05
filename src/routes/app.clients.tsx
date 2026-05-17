@@ -164,6 +164,7 @@ function ClientsPage() {
 
   // Export
   const exportClients = () => {
+    if (!canExportClients) { toast.error("You don't have permission to export clients"); return; }
     const headers = ["first_name","last_name","email","phone","date_of_birth","gender","city","tags","vip_status"];
     const csv = [headers.join(","), ...clients.map(c =>
       headers.map(h => {
