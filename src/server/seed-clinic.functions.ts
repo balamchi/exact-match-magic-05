@@ -641,6 +641,103 @@ const messageTemplatesLibrary: Array<{
   { clinicType: ["universal"], name: "Generic Follow-up - SMS", category: "general", channel: "sms", body: "Hi {{first_name}}, this is {{clinic_name}}. {{custom_message}}" },
 ];
 
+const soapTemplatesLibrary: Array<{
+  clinicType: string[];
+  name: string;
+  subjective_template: string;
+  objective_template: string;
+  assessment_template: string;
+  plan_template: string;
+  is_active?: boolean;
+  is_default?: boolean;
+}> = [
+  // ── INJECTABLES (4) ──
+  {
+    clinicType: ["medspa"],
+    name: "Botox - Forehead & Glabellar",
+    subjective_template: "Patient presents for neuromodulator treatment of forehead lines and glabellar complex. Chief concern: [dynamic wrinkles / static wrinkles / both]. Last treatment: [date or N/A]. Allergies: [none / list]. Current medications: [list]. No contraindications reported (no pregnancy, no neuromuscular disease, no active infection at injection sites).",
+    objective_template: "Vitals stable. Patient seated upright. Treatment areas cleaned with alcohol. Forehead frontalis: [units] units across [number] injection points. Glabellar complex (procerus + corrugators): [units] units across [number] injection points. Total units administered: [total]. Injection technique: 30G needle, intramuscular. No bruising or bleeding noted at end of procedure.",
+    assessment_template: "Moderate-to-severe dynamic rhytids of the upper face. Patient is appropriate candidate for botulinum toxin treatment. No contraindications identified.",
+    plan_template: "1. Apply ice immediately if bruising. 2. Avoid lying flat for 4 hours. 3. Avoid strenuous exercise for 24 hours. 4. Avoid rubbing/massaging treated areas for 24 hours. 5. Onset of effect: 3–5 days, full effect by day 14. 6. Follow-up in 2 weeks for touch-up assessment. 7. Re-treatment recommended at 12–16 weeks.",
+  },
+  {
+    clinicType: ["medspa"],
+    name: "Dermal Filler - Lips",
+    subjective_template: "Patient presents for lip augmentation/hydration with hyaluronic acid filler. Goals: [volume / definition / hydration / asymmetry correction]. Prior filler history: [none / brand / last date]. Cold sore history: [yes — prophylaxis prescribed / no]. Allergies: [none / list]. Current medications including blood thinners: [list].",
+    objective_template: "Topical anesthetic applied for [time] minutes. Lips cleaned with chlorhexidine. Product used: [brand, e.g. Juvederm Ultra XC]. Total volume injected: [mL]. Technique: [linear threading / micro-bolus / cannula / needle]. Distribution: upper lip [mL], lower lip [mL], cupid's bow [mL]. Massage performed. No vascular compromise observed. Capillary refill normal post-injection.",
+    assessment_template: "Patient is appropriate candidate for HA lip filler. Mild-to-moderate volume loss. Symmetry concerns addressed. No signs of vascular event.",
+    plan_template: "1. Ice intermittently for 24 hours to reduce swelling. 2. Avoid lipstick/makeup for 4 hours. 3. Sleep elevated tonight. 4. Avoid strenuous exercise, alcohol, and heat exposure for 24 hours. 5. Expected swelling peaks at 24–48 hours, resolves by day 7. 6. Massage as instructed if lumps form. 7. Follow-up at 2 weeks for assessment. 8. Touch-up if needed at follow-up. 9. Call clinic immediately for severe pain, blanching, or vision changes.",
+  },
+  {
+    clinicType: ["medspa"],
+    name: "Dermal Filler - Cheeks & Midface",
+    subjective_template: "Patient presents for midface volumization and cheek contouring. Concerns: [volume loss / flat cheeks / nasolabial folds / tear troughs]. Prior filler in area: [none / brand / last date]. Allergies: [none / list]. Blood thinners or NSAIDs in past 7 days: [yes / no].",
+    objective_template: "Topical anesthetic applied. Skin marked at planned injection points. Cleaned with chlorhexidine. Product used: [brand, e.g. Juvederm Voluma XC or Restylane Lyft]. Total volume: [mL]. Right cheek: [mL], left cheek: [mL]. Technique: [bolus on bone / cannula / sub-SMAS supraperiosteal]. Aspiration negative at each entry point. Symmetric distribution achieved. No vascular compromise.",
+    assessment_template: "Moderate midface volume loss. Patient is appropriate candidate for HA filler. Symmetric correction achieved.",
+    plan_template: "1. Ice for 24 hours intermittently. 2. Avoid pressure on treated areas, no facials/massage for 2 weeks. 3. Sleep elevated tonight. 4. Avoid strenuous exercise for 24 hours. 5. Some bruising and swelling expected, peaks 24–72 hours. 6. Final result visible at 2–4 weeks. 7. Follow-up scheduled at 2 weeks. 8. Call clinic for blanching, severe pain, or vision changes.",
+  },
+  {
+    clinicType: ["medspa"],
+    name: "PRP Facial Injection",
+    subjective_template: "Patient presents for PRP (platelet-rich plasma) facial treatment. Concerns: [skin texture / acne scarring / volume / under-eye dark circles]. Prior PRP treatments: [number / dates]. Medications affecting platelets: [aspirin / NSAIDs / blood thinners — yes/no]. Allergies: [none / list].",
+    objective_template: "Blood drawn (10–20 mL) from antecubital vein. Centrifuged at [rpm] for [minutes]. PRP volume yielded: [mL]. Topical anesthetic applied to treatment area for [time] minutes. PRP injected via [microneedling / direct injection / hybrid technique] across full face / specific zones: [list]. Total volume used: [mL]. Patient tolerated procedure well.",
+    assessment_template: "Patient is appropriate candidate for PRP. No contraindications identified.",
+    plan_template: "1. Avoid washing face for 4 hours. 2. No makeup for 24 hours. 3. Avoid sun exposure and strenuous exercise for 24–48 hours. 4. Expect mild redness and swelling for 1–3 days. 5. Initial improvement visible in 2–4 weeks, full result at 3 months. 6. Recommended series: 3 treatments at 4–6 week intervals. 7. Follow-up in 4 weeks.",
+  },
+
+  // ── ENERGY-BASED / SKIN TREATMENTS (2) ──
+  {
+    clinicType: ["medspa"],
+    name: "Laser Hair Removal Session",
+    subjective_template: "Patient presents for laser hair removal session. Treatment area: [face / underarms / legs / bikini / back / chest]. Session number: [#] of [total]. Skin type (Fitzpatrick): [I-VI]. Recent sun exposure: [yes / no]. Self-tanning products in past 2 weeks: [yes / no]. Medications (photosensitizing or hormonal): [list]. Pregnancy: [N/A or no].",
+    objective_template: "Area shaved and cleaned. Test patch performed (if first session). Device used: [Alexandrite / Diode / Nd:YAG / Soprano]. Settings: fluence [J/cm²], pulse width [ms], spot size [mm], cooling [on/off]. Total pulses: [count]. Treatment endpoint: perifollicular erythema with mild edema, no epidermal damage. Patient tolerated treatment well.",
+    assessment_template: "Patient tolerating laser hair removal series well. Hair reduction visible per [percentage / qualitative description]. No adverse events.",
+    plan_template: "1. Apply cool compress to treated area for 15 minutes if needed. 2. Avoid sun exposure for 2 weeks; use SPF 30+ daily. 3. Avoid hot showers, saunas, and strenuous exercise for 24 hours. 4. No waxing, plucking, or threading in treatment area between sessions — shaving only. 5. Expect shedding of treated hairs over 1–3 weeks. 6. Next session scheduled in [4–6 weeks for body / 4 weeks for face].",
+  },
+  {
+    clinicType: ["medspa"],
+    name: "Chemical Peel",
+    subjective_template: "Patient presents for chemical peel. Skin concerns: [hyperpigmentation / texture / fine lines / acne / melasma]. Skin type (Fitzpatrick): [I-VI]. Prior peels: [yes — type/date / no]. Active skincare: [retinoids / hydroquinone / AHAs — last use]. Sun exposure in past 2 weeks: [yes / no]. Allergies: [none / list].",
+    objective_template: "Skin cleansed with [pre-peel solution]. Peel applied: [glycolic 30% / TCA 15% / Jessner / VI Peel — specify]. Layers applied: [#]. Dwell time: [minutes]. Frost level reached: [I/II/III or none]. Neutralizer applied: [yes — type / not required]. Post-peel calming and SPF applied. Patient tolerated procedure with mild stinging.",
+    assessment_template: "Patient is appropriate candidate for [peel type]. Treatment endpoint reached safely. No adverse events.",
+    plan_template: "1. Do not wash face for 4–6 hours post-treatment. 2. Apply provided post-peel moisturizer 2–3x daily. 3. Strict sun avoidance for 7–14 days; SPF 50+ daily. 4. Do not pick or peel flaking skin — let it shed naturally. 5. Avoid actives (retinoids, AHAs) for 7 days. 6. Expected peeling: days 2–5. 7. Follow-up in 4 weeks; series of 3–6 peels recommended for optimal results.",
+  },
+
+  // ── AESTHETIC PROCEDURES (2) ──
+  {
+    clinicType: ["medspa"],
+    name: "HydraFacial Treatment",
+    subjective_template: "Patient presents for HydraFacial treatment. Skin concerns: [congestion / dullness / fine lines / hyperpigmentation / dehydration]. Last facial: [date]. Skincare routine: [brief description]. Allergies: [none / list — especially salicylic acid].",
+    objective_template: "Three-step protocol performed: 1) Cleanse + Peel — glycolic/salicylic blend. 2) Extract + Hydrate — vortex extraction across T-zone and full face, hydrating serum infused. 3) Fuse + Protect — antioxidant booster ([specify, e.g. Britenol / Dermabuilder / CTGF]) and LED therapy [if used]. SPF applied. Patient tolerated well, no adverse reaction.",
+    assessment_template: "Skin tolerated treatment well. Visible improvement in clarity, hydration, and texture post-treatment.",
+    plan_template: "1. Do not apply makeup for 6 hours. 2. Use SPF 30+ daily. 3. Avoid exfoliants and retinoids for 48 hours. 4. Drink plenty of water. 5. Recommended cadence: every 4–6 weeks for maintenance. 6. Optional: pair with monthly skincare regimen consult.",
+  },
+  {
+    clinicType: ["medspa"],
+    name: "Microneedling with Topical",
+    subjective_template: "Patient presents for microneedling. Concerns: [acne scarring / fine lines / texture / hyperpigmentation / stretch marks]. Topical to be used: [PRP / hyaluronic acid / growth factor serum / vitamin C]. Active skin conditions: [none / list]. Recent isotretinoin use: [no — required to be off ≥6 months].",
+    objective_template: "Topical anesthetic applied for [time] minutes and removed. Skin cleansed. Device: [SkinPen / Dermapen / RF microneedling]. Needle depth: [mm — by region]. Pattern: 3 passes (horizontal, vertical, diagonal). Topical product infused: [specify]. Endpoint: uniform pinpoint bleeding. Calming serum and SPF applied. No adverse events.",
+    assessment_template: "Patient tolerated microneedling well. Appropriate endpoint achieved. No contraindications observed.",
+    plan_template: "1. Do not wash face for 6 hours; use only provided products for 24 hours. 2. Avoid makeup for 24 hours. 3. Sun avoidance and SPF 30+ for 7 days. 4. Avoid actives (retinoids, AHAs/BHAs) for 5 days. 5. Expected redness 24–48 hours, possible mild flaking days 3–5. 6. Series of 3–6 treatments at 4-week intervals recommended. 7. Follow-up at 4 weeks.",
+  },
+];
+
+const leadSourcesLibrary: Array<{
+  source_key: string;
+  display_name: string;
+  is_active?: boolean;
+}> = [
+  { source_key: "booking_widget", display_name: "Booking Widget" },
+  { source_key: "google_ads", display_name: "Google Ads" },
+  { source_key: "meta_ads", display_name: "Meta Ads" },
+  { source_key: "walk_in", display_name: "Walk-in" },
+  { source_key: "referral", display_name: "Referral" },
+  { source_key: "phone_call", display_name: "Phone Call" },
+  { source_key: "dm_social", display_name: "Social DM" },
+  { source_key: "online_booking", display_name: "Online Booking" },
+  { source_key: "other", display_name: "Other" },
+];
+
 type MembershipSeed = {
   name: string;
   description: string;
