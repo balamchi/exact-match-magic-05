@@ -111,12 +111,18 @@ function InvoicesPage() {
   const selected = useMemo(() => decorated.find((i) => i.id === selectedId) ?? filtered[0] ?? null, [decorated, selectedId, filtered]);
 
   async function updateStatus(id: string, status: string) {
+    if (status === "voided") {
+      if (!canRefundPayments) { toast.error("You don't have permission to void invoices"); return; }
+    } else {
+      if (!canProcessPayments) { toast.error("You don't have permission to modify invoices"); return; }
+    }
     const { error } = await supabase.from("invoices").update({ status }).eq("id", id);
     if (error) { toast.error(error.message); return; }
     toast.success(`Invoice marked ${status}`);
   }
 
   async function duplicate(inv: Invoice) {
+    if (!canProcessPayments) { toast.error("You don't have permission to create invoices"); return; }
     const num = inv.invoice_number ? `${inv.invoice_number}-COPY` : null;
     const { error } = await supabase.from("invoices").insert({
       clinic_id: inv.clinic_id,
