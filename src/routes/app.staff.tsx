@@ -286,13 +286,15 @@ function StaffPage() {
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center gap-1 border-t border-border/40 pt-3 opacity-0 transition group-hover:opacity-100">
-                  <Button size="sm" variant="ghost" onClick={() => setComposer(row)} className="h-7 flex-1 text-xs"><Edit3 className="mr-1 h-3 w-3" /> Edit</Button>
-                  <Button size="sm" variant="ghost" onClick={() => toggleActive(row)} className="h-7 px-2 text-xs" title={row.active ? "Archive" : "Reactivate"}>
-                    {row.active ? <PowerOff className="h-3 w-3" /> : <Power className="h-3 w-3" />}
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => remove(row)} className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></Button>
-                </div>
+                {canWriteStaff && (
+                  <div className="mt-4 flex items-center gap-1 border-t border-border/40 pt-3 opacity-0 transition group-hover:opacity-100">
+                    <Button size="sm" variant="ghost" onClick={() => setComposer(row)} className="h-7 flex-1 text-xs"><Edit3 className="mr-1 h-3 w-3" /> Edit</Button>
+                    <Button size="sm" variant="ghost" onClick={() => toggleActive(row)} className="h-7 px-2 text-xs" title={row.active ? "Archive" : "Reactivate"}>
+                      {row.active ? <PowerOff className="h-3 w-3" /> : <Power className="h-3 w-3" />}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => remove(row)} className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                  </div>
+                )}
               </article>
             );
           })}
