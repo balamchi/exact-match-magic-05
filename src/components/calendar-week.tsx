@@ -610,6 +610,7 @@ export function CalendarWeek() {
   };
 
   const handleCancel = () => {
+    if (!canCancelAppointments) return toast.error("You don't have permission to cancel appointments");
     if (!editing) return;
     if (!showCancelReason) {
       setShowCancelReason(true);
