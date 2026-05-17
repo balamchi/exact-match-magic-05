@@ -1045,6 +1045,7 @@ export const seedAll = createServerFn({ method: "POST" })
     const consentResult = await seedConsentFormsInternal(supabase, userId, clinicId, clinicTypes);
     const automationsResult = await seedAutomationsInternal(supabase, userId, clinicId, clinicTypes);
     const membershipsResult = await seedMembershipsInternal(supabase, userId, clinicId, clinicTypes);
+    const messageTemplatesResult = await seedMessageTemplatesInternal(supabase, userId, clinicId, clinicTypes);
 
     if (clinicTypes.length > 0) {
       try {
@@ -1057,7 +1058,7 @@ export const seedAll = createServerFn({ method: "POST" })
       }
     }
 
-    const results = [servicesResult, consentResult, automationsResult, membershipsResult];
+    const results = [servicesResult, consentResult, automationsResult, membershipsResult, messageTemplatesResult];
     const allSucceeded = results.every((r) => r.status === "success");
     const anyFailed = results.some((r) => r.status === "failed");
 
@@ -1079,12 +1080,14 @@ export const seedAll = createServerFn({ method: "POST" })
         consentForms: consentResult.succeeded,
         automations: automationsResult.succeeded,
         memberships: membershipsResult.succeeded,
+        messageTemplates: messageTemplatesResult.succeeded,
       },
       attempted: {
         services: servicesResult.attempted,
         consentForms: consentResult.attempted,
         automations: automationsResult.attempted,
         memberships: membershipsResult.attempted,
+        messageTemplates: messageTemplatesResult.attempted,
       },
     };
   });
@@ -1095,11 +1098,12 @@ export const getClinicSeedStatus = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const clinicId = await getUserClinicId(supabase, userId);
 
-    const [services, consentFormsRes, automations, memberships] = await Promise.all([
+    const [services, consentFormsRes, automations, memberships, messageTemplatesRes] = await Promise.all([
       supabase.from("services").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("consent_form_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("automations").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("memberships").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+      supabase.from("message_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
     ]);
 
     let seededClinicTypes: string[] = [];
