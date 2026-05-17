@@ -84,6 +84,8 @@ export const Route = createFileRoute("/app/leads")({ component: LeadsPage });
 
 function LeadsPage() {
   const { activeClinic, user } = useAuth();
+  const canWriteClients = hasPermission(activeClinic?.role, "clients.write");
+  const canDeleteClients = hasPermission(activeClinic?.role, "clients.delete");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
