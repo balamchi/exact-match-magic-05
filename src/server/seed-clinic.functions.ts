@@ -593,6 +593,54 @@ const CATEGORY_TO_CLINIC_TYPE: Record<string, string> = {
       { clinicType: ["wellness"], name: "Home Exercise Program Check-In (1 week)", trigger_event: "service_completed", action_type: "email", active: true },
     ];
 
+const messageTemplatesLibrary: Array<{
+  clinicType: string[];
+  name: string;
+  category: "appointment" | "follow_up" | "marketing" | "support" | "reminder" | "review_request" | "birthday" | "general";
+  channel: "sms" | "whatsapp" | "email" | "web" | "instagram" | "facebook" | null;
+  body: string;
+  is_active?: boolean;
+}> = [
+  // ── APPOINTMENT (5) ──
+  { clinicType: ["universal"], name: "Booking Confirmation - Email", category: "appointment", channel: "email", body: "Hi {{first_name}}, your appointment for {{service_name}} is confirmed for {{appointment_date}} at {{appointment_time}}. We can't wait to see you at {{clinic_name}}!" },
+  { clinicType: ["universal"], name: "Booking Confirmation - SMS", category: "appointment", channel: "sms", body: "{{clinic_name}}: Your {{service_name}} appointment is booked for {{appointment_date}} at {{appointment_time}}. See you soon!" },
+  { clinicType: ["universal"], name: "24h Reminder - Email", category: "reminder", channel: "email", body: "Hi {{first_name}}, just a friendly reminder that your {{service_name}} appointment is tomorrow at {{appointment_time}}. See you then!" },
+  { clinicType: ["universal"], name: "24h Reminder - SMS", category: "reminder", channel: "sms", body: "Reminder: Your {{service_name}} appointment with {{clinic_name}} is tomorrow at {{appointment_time}}. Reply CANCEL to reschedule." },
+  { clinicType: ["universal"], name: "2h Reminder - SMS", category: "reminder", channel: "sms", body: "{{clinic_name}}: Your appointment is in 2 hours. See you at {{appointment_time}}!" },
+
+  // ── FOLLOW-UP (4) ──
+  { clinicType: ["universal"], name: "Post-Visit Thank You", category: "follow_up", channel: "email", body: "Hi {{first_name}}, thank you for visiting {{clinic_name}} today! We hope you loved your {{service_name}}. Let us know if you have any questions about aftercare." },
+  { clinicType: ["universal"], name: "48h Aftercare Check-in", category: "follow_up", channel: "email", body: "Hi {{first_name}}, it's been 48 hours since your {{service_name}}. How are you feeling? Reply to this message if you have any concerns — we're here to help." },
+  { clinicType: ["medspa"], name: "Treatment Touch-Up Reminder", category: "follow_up", channel: "email", body: "Hi {{first_name}}, it's been a few weeks since your {{service_name}}. Most clients book a touch-up around now to maintain optimal results. Want to schedule?" },
+  { clinicType: ["universal"], name: "Re-engagement - 90 Days Inactive", category: "follow_up", channel: "email", body: "Hi {{first_name}}, we miss you at {{clinic_name}}! It's been a while since your last visit. Here's a little something to welcome you back — reply for our return-guest offer." },
+
+  // ── REVIEW REQUEST (3) ──
+  { clinicType: ["universal"], name: "Google Review Request - Email", category: "review_request", channel: "email", body: "Hi {{first_name}}, we hope you loved your visit to {{clinic_name}}! If you have a moment, would you mind sharing your experience on Google? It really helps us grow." },
+  { clinicType: ["universal"], name: "Google Review Request - SMS", category: "review_request", channel: "sms", body: "{{clinic_name}}: Loved your visit? A quick Google review means the world to us — {{review_link}} 🌟" },
+  { clinicType: ["universal"], name: "Instagram Tag Request", category: "review_request", channel: "instagram", body: "Hi {{first_name}}! If you snap a photo of your results, tag us @{{clinic_handle}} — we'd love to feature you!" },
+
+  // ── MARKETING (5) ──
+  { clinicType: ["universal"], name: "New Service Announcement", category: "marketing", channel: "email", body: "Hi {{first_name}}, we just launched {{new_service}}! Book in the next 14 days to claim our introductory rate. Tap reply or visit {{booking_link}}." },
+  { clinicType: ["universal"], name: "Seasonal Promo - Spring", category: "marketing", channel: "email", body: "Spring refresh at {{clinic_name}}! Save 15% on facials and brightening treatments through end of April. Quote code SPRING15 when booking." },
+  { clinicType: ["universal"], name: "Seasonal Promo - Holiday", category: "marketing", channel: "email", body: "Hi {{first_name}}, gift the gift of glow this holiday. {{clinic_name}} gift cards are now 10% off — perfect for the people who treat themselves well." },
+  { clinicType: ["medspa"], name: "Membership Launch Announcement", category: "marketing", channel: "email", body: "Hi {{first_name}}, our new monthly membership tiers are live. Save 20% on all services and get exclusive perks. Tap to learn more: {{membership_link}}." },
+  { clinicType: ["universal"], name: "Referral Bonus Reminder", category: "marketing", channel: "email", body: "Hi {{first_name}}, did you know you earn ${{referral_credit}} every time a friend books with us? Send them {{referral_link}} and we'll take care of the rest." },
+
+  // ── BIRTHDAY (2) ──
+  { clinicType: ["universal"], name: "Birthday Greeting + Offer", category: "birthday", channel: "email", body: "Happy birthday, {{first_name}}! 🎉 Treat yourself this month with 15% off any service. Just mention BIRTHDAY15 when booking — valid through {{birthday_month_end}}." },
+  { clinicType: ["universal"], name: "Birthday SMS", category: "birthday", channel: "sms", body: "Happy birthday {{first_name}}! 🎂 Enjoy 15% off any service this month at {{clinic_name}}. Code: BIRTHDAY15" },
+
+  // ── SUPPORT (3) ──
+  { clinicType: ["universal"], name: "Cancellation Confirmation", category: "support", channel: "email", body: "Hi {{first_name}}, your appointment on {{appointment_date}} has been cancelled. No charge — let us know when you'd like to rebook." },
+  { clinicType: ["universal"], name: "No-Show Follow-Up", category: "support", channel: "email", body: "Hi {{first_name}}, we missed you today. We understand things come up — let us know when you'd like to rebook and we'll find a time that works." },
+  { clinicType: ["universal"], name: "Pre-Treatment Instructions", category: "support", channel: "email", body: "Hi {{first_name}}, here's how to prep for your {{service_name}} on {{appointment_date}}: {{pre_treatment_instructions}}. Reply with any questions!" },
+
+  // ── GENERAL (3) ──
+  { clinicType: ["universal"], name: "Welcome New Client", category: "general", channel: "email", body: "Welcome to {{clinic_name}}, {{first_name}}! We're thrilled to have you. Save our number and reply anytime — we're here to help you look and feel your best." },
+  { clinicType: ["universal"], name: "New Year Greeting", category: "general", channel: "email", body: "Happy New Year, {{first_name}}! 🥂 Wishing you a beautiful year ahead. We've added new treatments and services for {{year}} — book any time." },
+  { clinicType: ["universal"], name: "Generic Follow-up - SMS", category: "general", channel: "sms", body: "Hi {{first_name}}, this is {{clinic_name}}. {{custom_message}}" },
+];
+
 type MembershipSeed = {
   name: string;
   description: string;
@@ -870,6 +918,51 @@ async function seedMembershipsInternal(
   return result;
 }
 
+async function seedMessageTemplatesInternal(
+  supabase: SupabaseClient,
+  userId: string,
+  clinicId: string,
+  clinicTypes: string[],
+): Promise<SeedResult> {
+  const targetTypes = clinicTypes.length > 0 ? new Set(clinicTypes) : null;
+  const filtered = targetTypes
+    ? messageTemplatesLibrary.filter(
+        (t) => t.clinicType.includes("universal") || t.clinicType.some((ct) => targetTypes.has(ct)),
+      )
+    : messageTemplatesLibrary;
+
+  const rows = filtered.map((t) => ({
+    clinic_id: clinicId,
+    name: t.name,
+    category: t.category,
+    channel: t.channel,
+    body: t.body,
+    is_active: t.is_active ?? true,
+  }));
+
+  const { error } = await supabase
+    .from("message_templates")
+    .upsert(rows, { onConflict: "clinic_id,name" });
+
+  const { count } = await supabase
+    .from("message_templates")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  const succeeded = error ? 0 : Math.min(count ?? 0, rows.length);
+  const result: SeedResult = {
+    resource: "message_templates",
+    attempted: rows.length,
+    succeeded,
+    inserted: succeeded,
+    updated: 0,
+    errors: error ? [error.message] : [],
+    status: error ? "failed" : (succeeded >= rows.length ? "success" : "partial"),
+  };
+  await logSeedActivity(supabase, clinicId, userId, "seed", "message_templates", result);
+  return result;
+}
+
 // ============================================================================
 // EXPORTED SERVER FUNCTIONS
 // ============================================================================
@@ -912,6 +1005,15 @@ export const seedMemberships = createServerFn({ method: "POST" })
     return seedMembershipsInternal(supabase, userId, clinicId, resolveClinicTypes(data));
   });
 
+export const seedMessageTemplates = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }): Promise<SeedResult> => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+    return seedMessageTemplatesInternal(supabase, userId, clinicId, resolveClinicTypes(data));
+  });
+
 export const seedAll = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
@@ -943,6 +1045,7 @@ export const seedAll = createServerFn({ method: "POST" })
     const consentResult = await seedConsentFormsInternal(supabase, userId, clinicId, clinicTypes);
     const automationsResult = await seedAutomationsInternal(supabase, userId, clinicId, clinicTypes);
     const membershipsResult = await seedMembershipsInternal(supabase, userId, clinicId, clinicTypes);
+    const messageTemplatesResult = await seedMessageTemplatesInternal(supabase, userId, clinicId, clinicTypes);
 
     if (clinicTypes.length > 0) {
       try {
@@ -955,7 +1058,7 @@ export const seedAll = createServerFn({ method: "POST" })
       }
     }
 
-    const results = [servicesResult, consentResult, automationsResult, membershipsResult];
+    const results = [servicesResult, consentResult, automationsResult, membershipsResult, messageTemplatesResult];
     const allSucceeded = results.every((r) => r.status === "success");
     const anyFailed = results.some((r) => r.status === "failed");
 
@@ -977,12 +1080,14 @@ export const seedAll = createServerFn({ method: "POST" })
         consentForms: consentResult.succeeded,
         automations: automationsResult.succeeded,
         memberships: membershipsResult.succeeded,
+        messageTemplates: messageTemplatesResult.succeeded,
       },
       attempted: {
         services: servicesResult.attempted,
         consentForms: consentResult.attempted,
         automations: automationsResult.attempted,
         memberships: membershipsResult.attempted,
+        messageTemplates: messageTemplatesResult.attempted,
       },
     };
   });
@@ -993,11 +1098,12 @@ export const getClinicSeedStatus = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const clinicId = await getUserClinicId(supabase, userId);
 
-    const [services, consentFormsRes, automations, memberships] = await Promise.all([
+    const [services, consentFormsRes, automations, memberships, messageTemplatesRes] = await Promise.all([
       supabase.from("services").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("consent_form_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("automations").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("memberships").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+      supabase.from("message_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
     ]);
 
     let seededClinicTypes: string[] = [];
@@ -1016,6 +1122,7 @@ export const getClinicSeedStatus = createServerFn({ method: "GET" })
       clinicId,
       seededClinicTypes,
       counts: {
+        messageTemplates: messageTemplatesRes.count ?? 0,
         services: services.count ?? 0,
         consentForms: consentFormsRes.count ?? 0,
         automations: automations.count ?? 0,

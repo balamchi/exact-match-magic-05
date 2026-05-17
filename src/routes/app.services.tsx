@@ -3,7 +3,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Clock, Copy, DollarSign, Download, Edit3, Filter, HeartPulse, Plus,
   Search, Sparkles, Trash2, Upload, X, Check, ChevronLeft, ChevronRight,
-  ToggleLeft, ToggleRight, Image as ImageIcon, Loader2, Database, FileText, Zap, CreditCard,
+  ToggleLeft, ToggleRight, Image as ImageIcon, Loader2, Database, FileText, Zap, MessageSquare, CreditCard,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -16,7 +16,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { PhotoUpload } from "@/components/photo-upload";
-import { seedClinicDefaults, seedServices, seedConsentForms, seedAutomations, seedMemberships } from "@/server/seed-clinic.functions";
+import { seedClinicDefaults, seedServices, seedConsentForms, seedAutomations, seedMemberships, seedMessageTemplates } from "@/server/seed-clinic.functions";
 import { hasPermission } from "@/lib/permissions";
 import { ClinicTypeSelector } from "@/components/clinic-type-selector";
 
@@ -134,7 +134,7 @@ function ServicesPage() {
   const [saving, setSaving] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
   const [seederLoading, setSeederLoading] = useState(false);
-  const [refreshingResource, setRefreshingResource] = useState<null | "services" | "consent_forms" | "automations" | "memberships">(null);
+  const [refreshingResource, setRefreshingResource] = useState<null | "services" | "consent_forms" | "automations" | "memberships" | "message_templates">(null);
   const canRunSeed = hasPermission(activeClinic?.role, "seed.run");
 
   const handleConfirmSeed = async (categories: string[]) => {
@@ -606,6 +606,35 @@ function ServicesPage() {
                   ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   : <CreditCard className="mr-2 h-3.5 w-3.5" />}
                 Refresh memberships
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                disabled={refreshingResource !== null}
+                onClick={async () => {
+                  setRefreshingResource("message_templates");
+                  try {
+                    const r = await seedMessageTemplates({ data: {} });
+                    if (r.status === "failed") {
+                      toast.error(`Message templates refresh failed: ${r.errors.join(", ")}`, { duration: 8000 });
+                    } else if (r.status === "partial") {
+                      toast.warning(`Message templates partial: ${r.succeeded}/${r.attempted} rows`, { duration: 6000 });
+                    } else {
+                      toast.success(`Refreshed ${r.succeeded} message templates`);
+                    }
+                  } catch (err: any) {
+                    toast.error(`Message templates refresh error: ${err.message}`, { duration: 8000 });
+                    console.error("seedMessageTemplates error:", err);
+                  } finally {
+                    setRefreshingResource(null);
+                  }
+                }}
+              >
+                {refreshingResource === "message_templates"
+                  ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  : <MessageSquare className="mr-2 h-3.5 w-3.5" />}
+                Refresh message templates
               </Button>
             </div>
           </details>}
