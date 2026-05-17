@@ -64,7 +64,7 @@ function InvoicesPage() {
   const [editing, setEditing] = useState<Invoice | null>(null);
 
   useEffect(() => {
-    if (!activeClinic) return;
+    if (!activeClinic || !canReadBilling) return;
     const load = async () => {
       setLoading(true);
       const { data } = await supabase
