@@ -565,6 +565,17 @@ export function CalendarWeek() {
 
   /* ── Status transitions ── */
   const advanceStatus = async (appointment: Appointment, next: AppointmentStatus, reason?: string) => {
+    const isCancelTransition = next === "cancelled" || next === "no_show";
+    const isCheckinTransition = next === "checked_in";
+    if (isCancelTransition && !canCancelAppointments) {
+      return toast.error("You don't have permission to cancel appointments");
+    }
+    if (isCheckinTransition && !canCheckIn) {
+      return toast.error("You don't have permission to check in clients");
+    }
+    if (!isCancelTransition && !isCheckinTransition && !canWriteAppointments) {
+      return toast.error("You don't have permission to modify appointments");
+    }
     if (!activeClinic) return;
     const updates: Partial<Appointment> = { status: next };
     if (next === "checked_in") updates.check_in_at = new Date().toISOString();
