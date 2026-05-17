@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { useRealtimeTable } from "@/hooks/use-realtime-table";
 import { cn } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 
 type Lead = Tables<"leads">;
 type LeadActivity = Tables<"lead_activities">;
@@ -83,6 +84,8 @@ export const Route = createFileRoute("/app/leads")({ component: LeadsPage });
 
 function LeadsPage() {
   const { activeClinic, user } = useAuth();
+  const canWriteClients = hasPermission(activeClinic?.role, "clients.write");
+  const canDeleteClients = hasPermission(activeClinic?.role, "clients.delete");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -255,6 +258,7 @@ function LeadsPage() {
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!clinicId) return;
+    if (!canWriteClients) return toast.error("You don't have permission to modify leads");
     if (!draft.first_name.trim()) return toast.error("First name is required");
     setSaving(true);
     const oldStage = editing?.stage;
@@ -297,6 +301,7 @@ function LeadsPage() {
 
   const remove = async () => {
     if (!editing || !clinicId) return;
+    if (!canDeleteClients) return toast.error("You don't have permission to delete leads");
     if (!confirm("Delete this lead?")) return;
     const { error } = await supabase.from("leads").delete().eq("id", editing.id).eq("clinic_id", clinicId);
     if (error) toast.error(error.message);
@@ -304,6 +309,7 @@ function LeadsPage() {
   };
 
   const moveLead = async (leadId: string, newStage: Stage) => {
+    if (!canWriteClients) return toast.error("You don't have permission to update leads");
     const lead = leads.find((l) => l.id === leadId);
     if (!lead || lead.stage === newStage || !clinicId) return;
     const oldStage = lead.stage;
@@ -323,6 +329,7 @@ function LeadsPage() {
 
   const convertToClient = async (lead: Lead) => {
     if (!clinicId) return;
+    if (!canWriteClients) return toast.error("You don't have permission to convert leads");
     if (lead.converted_to_client_id) { toast.info("Already converted"); return; }
     // Check if client exists by email
     let clientId: string | null = null;
@@ -367,6 +374,7 @@ function LeadsPage() {
 
   const markAsLost = async (lead: Lead) => {
     if (!clinicId) return;
+    if (!canWriteClients) return toast.error("You don't have permission to update leads");
     const reason = prompt("Reason for losing this lead?");
     if (reason === null) return;
     await supabase.from("leads").update({
@@ -405,12 +413,16 @@ function LeadsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setCsvOpen(true)} className="gap-2">
-            <Upload className="h-4 w-4" /> Import CSV
-          </Button>
-          <Button onClick={() => openCreate("new")} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-            <Plus className="h-4 w-4" /> Add lead
-          </Button>
+          {canWriteClients && (
+            <Button variant="outline" onClick={() => setCsvOpen(true)} className="gap-2">
+              <Upload className="h-4 w-4" /> Import CSV
+            </Button>
+          )}
+          {canWriteClients && (
+            <Button onClick={() => openCreate("new")} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+              <Plus className="h-4 w-4" /> Add lead
+            </Button>
+          )}
         </div>
       </section>
 
@@ -470,19 +482,25 @@ function LeadsPage() {
                       </span>
                       <span className="text-xs text-muted-foreground">{items.length}</span>
                     </div>
-                    <button onClick={() => openCreate(stage.id)} className="rounded-md p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
-                      <Plus className="h-3.5 w-3.5" />
-                    </button>
+                    {canWriteClients && (
+                      <button onClick={() => openCreate(stage.id)} className="rounded-md p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
                   <div className="flex-1 space-y-2 p-2">
                     {items.length === 0 ? (
-                      <button onClick={() => openCreate(stage.id)}
-                        className="flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-border py-8 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-primary">
-                        <Plus className="h-3.5 w-3.5" /> Add lead
-                      </button>
+                      canWriteClients ? (
+                        <button onClick={() => openCreate(stage.id)}
+                          className="flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-border py-8 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-primary">
+                          <Plus className="h-3.5 w-3.5" /> Add lead
+                        </button>
+                      ) : (
+                        <div className="flex w-full items-center justify-center rounded-lg border border-dashed border-border py-8 text-xs text-muted-foreground">No leads</div>
+                      )
                     ) : (
                       items.map((lead) => (
-                        <div key={lead.id} draggable
+                        <div key={lead.id} draggable={canWriteClients}
                           onDragStart={() => setDragging(lead.id)}
                           onDragEnd={() => { setDragging(null); setDragOver(null); }}
                           onClick={() => openDetail(lead)}
@@ -540,9 +558,11 @@ function LeadsPage() {
                     </span>
                     <span className="text-xs text-muted-foreground">{items.length}</span>
                   </div>
-                  <button onClick={() => openCreate(stage.id)} className="rounded-md p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
-                    <Plus className="h-3.5 w-3.5" />
-                  </button>
+                  {canWriteClients && (
+                    <button onClick={() => openCreate(stage.id)} className="rounded-md p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </header>
                 <div className="divide-y divide-border">
                   {items.length === 0 ? (
@@ -633,7 +653,7 @@ function LeadsPage() {
               </label>
             </div>
             <div className="flex items-center justify-between gap-2 border-t border-border p-5">
-              <div>{editing && <Button type="button" variant="ghost" onClick={remove} className="text-destructive hover:text-destructive">Delete</Button>}</div>
+              <div>{editing && canDeleteClients && <Button type="button" variant="ghost" onClick={remove} className="text-destructive hover:text-destructive">Delete</Button>}</div>
               <div className="flex gap-2">
                 <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
                 <Button disabled={saving} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
@@ -665,15 +685,17 @@ function LeadsPage() {
 
             {/* Quick Actions */}
             <div className="flex flex-wrap gap-2 border-b border-border px-5 py-3">
-              <Button size="sm" variant="outline" onClick={() => { openEdit(detailLead); setDetailLead(null); }}>
-                <FileText className="mr-1.5 h-3.5 w-3.5" /> Edit
-              </Button>
-              {detailLead.stage !== "converted" && detailLead.stage !== ("won" as any) && (
+              {canWriteClients && (
+                <Button size="sm" variant="outline" onClick={() => { openEdit(detailLead); setDetailLead(null); }}>
+                  <FileText className="mr-1.5 h-3.5 w-3.5" /> Edit
+                </Button>
+              )}
+              {canWriteClients && detailLead.stage !== "converted" && detailLead.stage !== ("won" as any) && (
                 <Button size="sm" variant="outline" onClick={() => convertToClient(detailLead)}>
                   <UserPlus className="mr-1.5 h-3.5 w-3.5" /> Convert to Client
                 </Button>
               )}
-              {detailLead.stage !== "lost" && detailLead.stage !== "converted" && (
+              {canWriteClients && detailLead.stage !== "lost" && detailLead.stage !== "converted" && (
                 <Button size="sm" variant="outline" className="text-destructive" onClick={() => { markAsLost(detailLead); setDetailLead(null); }}>
                   <X className="mr-1.5 h-3.5 w-3.5" /> Mark Lost
                 </Button>

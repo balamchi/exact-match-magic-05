@@ -16,10 +16,12 @@ import {
   Loader2,
   CheckCircle2,
   Clock,
+  ShieldOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +54,9 @@ function formatCAD(cents: number) {
 function PosPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id;
+  const canProcessPayments = hasPermission(activeClinic?.role, "payments.process");
+  const canRefundPayments = hasPermission(activeClinic?.role, "payments.refund");
+  void canRefundPayments;
 
   const [catalog, setCatalog] = useState<Catalog>({ services: [], packages: [], retail: [] });
   const [loading, setLoading] = useState(true);
@@ -167,6 +172,7 @@ function PosPage() {
 
   async function checkout(method: "card" | "tap" | "cash" | "bnpl") {
     if (!clinicId) return;
+    if (!canProcessPayments) { toast.error("You don't have permission to process payments"); return; }
     if (cart.length === 0) {
       toast.error("Cart is empty");
       return;
@@ -199,6 +205,23 @@ function PosPage() {
     }
     toast.success("Sale completed", { description: `${formatCAD(total)} • ${method.toUpperCase()}` });
     clearCart();
+  }
+
+  if (!canProcessPayments) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-display text-2xl sm:text-4xl font-semibold tracking-tight">Point of Sale</h1>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-10 text-center shadow-card">
+          <ShieldOff className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <h2 className="font-display text-lg font-semibold">Restricted</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            You don't have permission to process payments. Contact your clinic owner if you need access.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

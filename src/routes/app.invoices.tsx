@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   FileText, Plus, Search, Send, CheckCircle2, AlertCircle, X, DollarSign,
-  Clock, TrendingUp, Download, Copy, Ban, Calendar as CalendarIcon, User,
+  Clock, TrendingUp, Download, Copy, Ban, Calendar as CalendarIcon, User, ShieldOff,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { hasPermission } from "@/lib/permissions";
 
 export const Route = createFileRoute("/app/invoices")({ component: InvoicesPage });
 
@@ -51,6 +52,9 @@ function daysFromNow(date: string) {
 
 function InvoicesPage() {
   const { activeClinic } = useAuth();
+  const canReadBilling = hasPermission(activeClinic?.role, "billing.read");
+  const canProcessPayments = hasPermission(activeClinic?.role, "payments.process");
+  const canRefundPayments = hasPermission(activeClinic?.role, "payments.refund");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -60,7 +64,7 @@ function InvoicesPage() {
   const [editing, setEditing] = useState<Invoice | null>(null);
 
   useEffect(() => {
-    if (!activeClinic) return;
+    if (!activeClinic || !canReadBilling) return;
     const load = async () => {
       setLoading(true);
       const { data } = await supabase
@@ -77,7 +81,7 @@ function InvoicesPage() {
       .on("postgres_changes", { event: "*", schema: "public", table: "invoices", filter: `clinic_id=eq.${activeClinic.clinic_id}` }, load)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [activeClinic]);
+  }, [activeClinic, canReadBilling]);
 
   // Auto-mark overdue in memory (display only)
   const decorated = useMemo(() => invoices.map((i) => isOverdue(i) ? { ...i, status: "overdue" } : i), [invoices]);
@@ -107,12 +111,18 @@ function InvoicesPage() {
   const selected = useMemo(() => decorated.find((i) => i.id === selectedId) ?? filtered[0] ?? null, [decorated, selectedId, filtered]);
 
   async function updateStatus(id: string, status: string) {
+    if (status === "voided") {
+      if (!canRefundPayments) { toast.error("You don't have permission to void invoices"); return; }
+    } else {
+      if (!canProcessPayments) { toast.error("You don't have permission to modify invoices"); return; }
+    }
     const { error } = await supabase.from("invoices").update({ status }).eq("id", id);
     if (error) { toast.error(error.message); return; }
     toast.success(`Invoice marked ${status}`);
   }
 
   async function duplicate(inv: Invoice) {
+    if (!canProcessPayments) { toast.error("You don't have permission to create invoices"); return; }
     const num = inv.invoice_number ? `${inv.invoice_number}-COPY` : null;
     const { error } = await supabase.from("invoices").insert({
       clinic_id: inv.clinic_id,
@@ -129,6 +139,25 @@ function InvoicesPage() {
     toast.success("Invoice duplicated as draft");
   }
 
+  if (!canReadBilling) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Billing</p>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Invoices</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">Track outstanding balances, age receivables, and reconcile paid invoices.</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-10 text-center shadow-card">
+          <ShieldOff className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <h2 className="font-display text-lg font-semibold">Restricted</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            You don't have permission to view billing. Contact your clinic owner if you need access.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -137,12 +166,14 @@ function InvoicesPage() {
           <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Invoices</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Track outstanding balances, age receivables, and reconcile paid invoices.</p>
         </div>
-        <button
-          onClick={() => { setEditing(null); setShowCompose(true); }}
-          className="inline-flex items-center gap-2 rounded-lg bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow hover:opacity-90"
-        >
-          <Plus className="h-4 w-4" /> New invoice
-        </button>
+        {canProcessPayments && (
+          <button
+            onClick={() => { setEditing(null); setShowCompose(true); }}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" /> New invoice
+          </button>
+        )}
       </header>
 
       {/* KPIs */}
@@ -293,26 +324,30 @@ function InvoicesPage() {
 
               <div className="border-t border-border bg-surface/20 p-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {selected.status === "draft" && (
+                  {canProcessPayments && selected.status === "draft" && (
                     <button onClick={() => updateStatus(selected.id, "sent")} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow-glow hover:opacity-90">
                       <Send className="h-3.5 w-3.5" /> Send to client
                     </button>
                   )}
-                  {(selected.status === "sent" || selected.status === "overdue") && (
+                  {canProcessPayments && (selected.status === "sent" || selected.status === "overdue") && (
                     <button onClick={() => updateStatus(selected.id, "paid")} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow-glow hover:opacity-90">
                       <CheckCircle2 className="h-3.5 w-3.5" /> Mark as paid
                     </button>
                   )}
-                  <button onClick={() => { setEditing(selected); setShowCompose(true); }} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
-                    Edit
-                  </button>
-                  <button onClick={() => duplicate(selected)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
-                    <Copy className="h-3.5 w-3.5" /> Duplicate
-                  </button>
+                  {canProcessPayments && (
+                    <button onClick={() => { setEditing(selected); setShowCompose(true); }} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
+                      Edit
+                    </button>
+                  )}
+                  {canProcessPayments && (
+                    <button onClick={() => duplicate(selected)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
+                      <Copy className="h-3.5 w-3.5" /> Duplicate
+                    </button>
+                  )}
                   <button onClick={() => toast.info("PDF export coming soon")} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
                     <Download className="h-3.5 w-3.5" /> PDF
                   </button>
-                  {selected.status !== "voided" && selected.status !== "paid" && (
+                  {canRefundPayments && selected.status !== "voided" && selected.status !== "paid" && (
                     <button onClick={() => updateStatus(selected.id, "voided")} className="inline-flex items-center justify-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/5 px-3 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/15">
                       <Ban className="h-3.5 w-3.5" /> Void
                     </button>

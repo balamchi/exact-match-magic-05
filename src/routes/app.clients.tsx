@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 
 export const Route = createFileRoute("/app/clients")({
   component: ClientsPage,
@@ -49,6 +50,9 @@ const PREGNANCY_OPTIONS = [
 
 function ClientsPage() {
   const { activeClinic } = useAuth();
+  const canWriteClients = hasPermission(activeClinic?.role, "clients.write");
+  const canDeleteClients = hasPermission(activeClinic?.role, "clients.delete");
+  const canExportClients = hasPermission(activeClinic?.role, "clients.export");
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -111,6 +115,7 @@ function ClientsPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!activeClinic || !form.first_name.trim()) return;
+    if (!canWriteClients) { toast.error("You don't have permission to modify clients"); return; }
     setSaving(true);
     const payload: Record<string, any> = {
       clinic_id: activeClinic.clinic_id,
@@ -141,6 +146,7 @@ function ClientsPage() {
   };
 
   const deleteClient = async (client: Client) => {
+    if (!canDeleteClients) { toast.error("You don't have permission to delete clients"); return; }
     if (!activeClinic || !confirm(`Delete ${client.first_name} ${client.last_name ?? ""}?`)) return;
     const { error } = await supabase.from("clients").delete().eq("id", client.id).eq("clinic_id", activeClinic.clinic_id);
     if (error) toast.error("Could not delete client");
@@ -158,6 +164,7 @@ function ClientsPage() {
 
   // Export
   const exportClients = () => {
+    if (!canExportClients) { toast.error("You don't have permission to export clients"); return; }
     const headers = ["first_name","last_name","email","phone","date_of_birth","gender","city","tags","vip_status"];
     const csv = [headers.join(","), ...clients.map(c =>
       headers.map(h => {
@@ -172,6 +179,7 @@ function ClientsPage() {
 
   // Import
   const importClients = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!canWriteClients) { toast.error("You don't have permission to import clients"); e.target.value = ""; return; }
     const file = e.target.files?.[0];
     if (!file || !activeClinic) return;
     const text = await file.text();
@@ -208,14 +216,20 @@ function ClientsPage() {
           <p className="mt-1.5 text-sm text-muted-foreground">Manage profiles, contact details, tags, and care notes.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" onClick={exportClients} className="gap-2"><Download className="h-4 w-4" /> Export</Button>
-          <label>
-            <input type="file" accept=".csv" className="hidden" onChange={importClients} />
-            <Button variant="outline" className="gap-2" asChild><span><Upload className="h-4 w-4" /> Import</span></Button>
-          </label>
-          <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-            <Plus className="h-4 w-4" /> Add client
-          </Button>
+          {canExportClients && (
+            <Button variant="outline" onClick={exportClients} className="gap-2"><Download className="h-4 w-4" /> Export</Button>
+          )}
+          {canWriteClients && (
+            <label>
+              <input type="file" accept=".csv" className="hidden" onChange={importClients} />
+              <Button variant="outline" className="gap-2" asChild><span><Upload className="h-4 w-4" /> Import</span></Button>
+            </label>
+          )}
+          {canWriteClients && (
+            <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+              <Plus className="h-4 w-4" /> Add client
+            </Button>
+          )}
         </div>
       </section>
 
@@ -240,10 +254,10 @@ function ClientsPage() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><UserRound className="h-6 w-6" /></div>
             <h2 className="font-display text-xl font-semibold">No clients yet</h2>
             <p className="mt-1 max-w-[95vw] sm:max-w-sm text-sm text-muted-foreground">Create your first client profile to start building treatment history and CRM records.</p>
-            <Button onClick={openCreate} className="mt-5 gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Plus className="h-4 w-4" /> Add first client</Button>
+            {canWriteClients && <Button onClick={openCreate} className="mt-5 gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Plus className="h-4 w-4" /> Add first client</Button>}
           </div>
         ) : (
-          <div className="divide-y divide-border">{filteredClients.map((client) => <ClientRow key={client.id} client={client} onEdit={openEdit} onDelete={deleteClient} />)}</div>
+          <div className="divide-y divide-border">{filteredClients.map((client) => <ClientRow key={client.id} client={client} onEdit={openEdit} onDelete={deleteClient} canEdit={canWriteClients} canDelete={canDeleteClients} />)}</div>
         )}
       </section>
 
@@ -394,7 +408,7 @@ function Metric({ label, value, icon }: { label: string; value: string; icon: Re
   );
 }
 
-function ClientRow({ client, onEdit, onDelete }: { client: Client; onEdit: (c: Client) => void; onDelete: (c: Client) => void }) {
+function ClientRow({ client, onEdit, onDelete, canEdit, canDelete }: { client: Client; onEdit: (c: Client) => void; onDelete: (c: Client) => void; canEdit: boolean; canDelete: boolean }) {
   const fullName = [client.first_name, client.last_name].filter(Boolean).join(" ");
   return (
     <article className="group grid gap-4 p-4 transition hover:bg-surface/60 md:grid-cols-[1.4fr_1fr_auto] md:items-center">
@@ -419,8 +433,8 @@ function ClientRow({ client, onEdit, onDelete }: { client: Client; onEdit: (c: C
         {!client.email && !client.phone && <span>No contact details</span>}
       </div>
       <div className="flex justify-end gap-1">
-        <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => onEdit(client)}><Pencil className="h-4 w-4" /></Button>
-        <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => onDelete(client)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
+        {canEdit && <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => onEdit(client)}><Pencil className="h-4 w-4" /></Button>}
+        {canDelete && <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => onDelete(client)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>}
       </div>
     </article>
   );
