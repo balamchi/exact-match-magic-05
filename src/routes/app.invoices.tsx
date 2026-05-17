@@ -166,12 +166,14 @@ function InvoicesPage() {
           <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Invoices</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Track outstanding balances, age receivables, and reconcile paid invoices.</p>
         </div>
-        <button
-          onClick={() => { setEditing(null); setShowCompose(true); }}
-          className="inline-flex items-center gap-2 rounded-lg bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow hover:opacity-90"
-        >
-          <Plus className="h-4 w-4" /> New invoice
-        </button>
+        {canProcessPayments && (
+          <button
+            onClick={() => { setEditing(null); setShowCompose(true); }}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" /> New invoice
+          </button>
+        )}
       </header>
 
       {/* KPIs */}
