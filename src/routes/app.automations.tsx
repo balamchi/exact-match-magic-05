@@ -7,16 +7,20 @@ import {
   CalendarCheck,
   CheckCircle2,
   ClipboardList,
+  Clock,
   Edit3,
   Gift,
+  Hourglass,
   Mail,
   MessageSquare,
+  PackageOpen,
   Plus,
   Power,
   Search,
   Sparkles,
   Star,
   Trash2,
+  UserMinus,
   UserPlus,
   XCircle,
   Zap,
@@ -34,10 +38,16 @@ export const Route = createFileRoute("/app/automations")({ component: Automation
 type Automation = Tables<"automations">;
 type Trigger =
   | "appointment_booked"
+  | "appointment_upcoming"
   | "appointment_completed"
+  | "appointment_cancelled"
   | "no_show"
   | "lead_created"
   | "birthday"
+  | "client_inactive"
+  | "inventory_low"
+  | "service_completed"
+  | "package_expiring"
   | "rebook_due";
 type Action = "email" | "sms" | "task";
 
@@ -59,10 +69,16 @@ const formSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(160),
   trigger_event: z.enum([
     "appointment_booked",
+    "appointment_upcoming",
     "appointment_completed",
+    "appointment_cancelled",
     "no_show",
     "lead_created",
     "birthday",
+    "client_inactive",
+    "inventory_low",
+    "service_completed",
+    "package_expiring",
     "rebook_due",
   ]),
   action_type: z.enum(["email", "sms", "task"]),
@@ -105,6 +121,42 @@ const TRIGGER_META: Record<Trigger, { label: string; Icon: typeof Bell; tone: st
     Icon: Bell,
     tone: "text-amber-300 bg-amber-500/10",
     description: "75–90 days since last visit, no booking.",
+  },
+  appointment_upcoming: {
+    label: "Appointment upcoming",
+    Icon: Clock,
+    tone: "text-blue-300 bg-blue-500/10",
+    description: "24 hours before a scheduled visit.",
+  },
+  appointment_cancelled: {
+    label: "Appointment cancelled",
+    Icon: XCircle,
+    tone: "text-orange-300 bg-orange-500/10",
+    description: "When an appointment gets cancelled.",
+  },
+  client_inactive: {
+    label: "Client inactive",
+    Icon: UserMinus,
+    tone: "text-slate-300 bg-slate-500/10",
+    description: "Client hasn't visited in a while.",
+  },
+  inventory_low: {
+    label: "Inventory low",
+    Icon: PackageOpen,
+    tone: "text-yellow-300 bg-yellow-500/10",
+    description: "Stock dropped below the threshold.",
+  },
+  service_completed: {
+    label: "Service completed",
+    Icon: Sparkles,
+    tone: "text-violet-300 bg-violet-500/10",
+    description: "After a specific service is finished.",
+  },
+  package_expiring: {
+    label: "Package expiring",
+    Icon: Hourglass,
+    tone: "text-fuchsia-300 bg-fuchsia-500/10",
+    description: "Client's package is about to expire.",
   },
 };
 
@@ -431,8 +483,8 @@ function AutomationsPage() {
         ) : (
           <ul className="divide-y divide-border">
             {filtered.map((a) => {
-              const t = TRIGGER_META[(a.trigger_event as Trigger) ?? "appointment_completed"];
-              const act = ACTION_META[(a.action_type as Action) ?? "email"];
+              const t = TRIGGER_META[a.trigger_event as Trigger] ?? TRIGGER_META.appointment_completed;
+              const act = ACTION_META[a.action_type as Action] ?? ACTION_META.email;
               return (
                 <li key={a.id} className="grid items-center gap-4 p-4 md:grid-cols-[1.5fr_2fr_auto_auto]">
                   <div className="flex items-start gap-3 min-w-0">
