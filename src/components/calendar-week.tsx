@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/lib/auth-context";
+import { hasPermission } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
@@ -151,6 +152,9 @@ const emptyDraft: DraftForm = {
 /* ═════════════════════════════════════════════════════════════════ */
 export function CalendarWeek() {
   const { activeClinic } = useAuth();
+  const canWriteAppointments = hasPermission(activeClinic?.role, "appointments.write");
+  const canCancelAppointments = hasPermission(activeClinic?.role, "appointments.cancel");
+  const canCheckIn = hasPermission(activeClinic?.role, "appointments.checkin");
   const [weekStart, setWeekStart] = useState(() => startOfWeekMon(new Date()));
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -288,6 +292,7 @@ export function CalendarWeek() {
 
   /* ── Slot Click Handlers ── */
   const openSlot = (day: Date, hour: number, minute: number, staffId?: string) => {
+    if (!canWriteAppointments) return toast.error("You don't have permission to create appointments");
     const start = new Date(day);
     start.setHours(hour, minute, 0, 0);
     const end = new Date(start.getTime() + 60 * 60000);
@@ -305,8 +310,8 @@ export function CalendarWeek() {
     });
     setOpen(true);
   };
-
   const openNew = () => {
+    if (!canWriteAppointments) return toast.error("You don't have permission to create appointments");
     const now = new Date();
     const nextSlot = new Date(now);
     nextSlot.setMinutes(Math.ceil(now.getMinutes() / 30) * 30, 0, 0);
@@ -375,6 +380,7 @@ export function CalendarWeek() {
   /* ── Submit ── */
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canWriteAppointments) return toast.error("You don't have permission to modify appointments");
     if (!activeClinic) return;
     if (!draft.starts_at || !draft.ends_at) return toast.error("Start and end time required");
     if (new Date(draft.ends_at) <= new Date(draft.starts_at)) return toast.error("End must be after start");
@@ -559,6 +565,17 @@ export function CalendarWeek() {
 
   /* ── Status transitions ── */
   const advanceStatus = async (appointment: Appointment, next: AppointmentStatus, reason?: string) => {
+    const isCancelTransition = next === "cancelled" || next === "no_show";
+    const isCheckinTransition = next === "checked_in";
+    if (isCancelTransition && !canCancelAppointments) {
+      return toast.error("You don't have permission to cancel appointments");
+    }
+    if (isCheckinTransition && !canCheckIn) {
+      return toast.error("You don't have permission to check in clients");
+    }
+    if (!isCancelTransition && !isCheckinTransition && !canWriteAppointments) {
+      return toast.error("You don't have permission to modify appointments");
+    }
     if (!activeClinic) return;
     const updates: Partial<Appointment> = { status: next };
     if (next === "checked_in") updates.check_in_at = new Date().toISOString();
@@ -593,6 +610,7 @@ export function CalendarWeek() {
   };
 
   const handleCancel = () => {
+    if (!canCancelAppointments) return toast.error("You don't have permission to cancel appointments");
     if (!editing) return;
     if (!showCancelReason) {
       setShowCancelReason(true);
@@ -694,9 +712,11 @@ export function CalendarWeek() {
             {byProvider ? "Combined" : "By Provider"}
           </Button>
 
-          <Button onClick={openNew} className="gap-2 bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground shadow-lg hover:opacity-90">
-            <Plus className="h-4 w-4" /> New Appointment
-          </Button>
+          {canWriteAppointments && (
+            <Button onClick={openNew} className="gap-2 bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground shadow-lg hover:opacity-90">
+              <Plus className="h-4 w-4" /> New Appointment
+            </Button>
+          )}
         </div>
       </section>
 
@@ -865,7 +885,7 @@ export function CalendarWeek() {
                                 return (
                                   <button
                                     key={slot}
-                                    onClick={() => openSlot(day, hour, minute, member.id)}
+                                    onClick={() => { if (!canWriteAppointments) return; openSlot(day, hour, minute, member.id); }}
                                     className={cn(
                                       "block w-full border-b border-border/30 transition hover:bg-primary/5",
                                       minute === 0 && "border-border/60"
@@ -920,7 +940,7 @@ export function CalendarWeek() {
                         return (
                           <button
                             key={slot}
-                            onClick={() => openSlot(day, hour, minute)}
+                            onClick={() => { if (!canWriteAppointments) return; openSlot(day, hour, minute); }}
                             className={cn(
                               "block w-full border-b border-border/30 transition hover:bg-primary/5",
                               minute === 0 && "border-border/60"
@@ -1005,9 +1025,11 @@ export function CalendarWeek() {
                 <CalendarDays className="h-12 w-12 text-muted-foreground/40 mb-4" />
                 <h3 className="text-lg font-semibold text-muted-foreground">No appointments this week</h3>
                 <p className="mt-1 text-sm text-muted-foreground/70">Create one to get started.</p>
-                <Button onClick={openNew} className="mt-4 gap-2 bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground">
-                  <Plus className="h-4 w-4" /> New Appointment
-                </Button>
+                {canWriteAppointments && (
+                  <Button onClick={openNew} className="mt-4 gap-2 bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground">
+                    <Plus className="h-4 w-4" /> New Appointment
+                  </Button>
+                )}
               </div>
             )}
           </div>
@@ -1041,12 +1063,20 @@ export function CalendarWeek() {
                 <span className="text-xs font-medium text-muted-foreground">Actions:</span>
                 {STATUS_FLOW[editing.status].map(({ next, label }) => {
                   if (next === "cancelled") {
+                    if (!canCancelAppointments) return null;
                     return (
                       <Button key={next} type="button" size="sm" variant="outline" onClick={handleCancel} className="text-rose-400 border-rose-500/30 hover:bg-rose-500/10">
                         {label}
                       </Button>
                     );
                   }
+                  const isCancel = next === "no_show";
+                  const isCheckin = next === "checked_in";
+                  const allowed =
+                    (isCancel && canCancelAppointments) ||
+                    (isCheckin && canCheckIn) ||
+                    (!isCancel && !isCheckin && canWriteAppointments);
+                  if (!allowed) return null;
                   return (
                     <Button key={next} type="button" size="sm" variant="outline" onClick={() => advanceStatus(editing, next)}>
                       {label}
@@ -1067,9 +1097,11 @@ export function CalendarWeek() {
                     placeholder="Optional reason..."
                     className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   />
-                  <Button type="button" size="sm" variant="destructive" onClick={() => advanceStatus(editing!, "cancelled", cancelReason)}>
-                    Confirm Cancel
-                  </Button>
+                  {canCancelAppointments && (
+                    <Button type="button" size="sm" variant="destructive" onClick={() => advanceStatus(editing!, "cancelled", cancelReason)}>
+                      Confirm Cancel
+                    </Button>
+                  )}
                   <Button type="button" size="sm" variant="ghost" onClick={() => setShowCancelReason(false)}>
                     Back
                   </Button>
@@ -1327,7 +1359,7 @@ export function CalendarWeek() {
                 <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
                   {isViewOnly ? "Close" : "Cancel"}
                 </Button>
-                {!isViewOnly && (
+                {!isViewOnly && canWriteAppointments && (
                   <Button
                     disabled={saving || (!!conflict && !overrideConflict)}
                     className="bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground shadow-lg hover:opacity-90"
