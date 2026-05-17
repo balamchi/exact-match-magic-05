@@ -197,9 +197,11 @@ function StaffPage() {
           <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Staff</h1>
           <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">Manage providers, front desk, and support team. Calendar colors flow through to your booking grid.</p>
         </div>
-        <Button onClick={() => setComposer("new")} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-          <Plus className="mr-1.5 h-4 w-4" /> Add staff
-        </Button>
+        {canWriteStaff && (
+          <Button onClick={() => setComposer("new")} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+            <Plus className="mr-1.5 h-4 w-4" /> Add staff
+          </Button>
+        )}
       </header>
 
       {/* KPIs */}
