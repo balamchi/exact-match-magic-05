@@ -3,7 +3,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Clock, Copy, DollarSign, Download, Edit3, Filter, HeartPulse, Plus,
   Search, Sparkles, Trash2, Upload, X, Check, ChevronLeft, ChevronRight,
-  ToggleLeft, ToggleRight, Image as ImageIcon, Loader2, Database, FileText, Zap, MessageSquare, CreditCard,
+  ToggleLeft, ToggleRight, Image as ImageIcon, Loader2, Database, FileText, Zap, MessageSquare, ClipboardList, Tag, CreditCard,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -16,7 +16,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { PhotoUpload } from "@/components/photo-upload";
-import { seedClinicDefaults, seedServices, seedConsentForms, seedAutomations, seedMemberships, seedMessageTemplates } from "@/server/seed-clinic.functions";
+import { seedClinicDefaults, seedServices, seedConsentForms, seedAutomations, seedMemberships, seedMessageTemplates, seedSoapTemplates, seedLeadSources } from "@/server/seed-clinic.functions";
 import { hasPermission } from "@/lib/permissions";
 import { ClinicTypeSelector } from "@/components/clinic-type-selector";
 
@@ -134,7 +134,7 @@ function ServicesPage() {
   const [saving, setSaving] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
   const [seederLoading, setSeederLoading] = useState(false);
-  const [refreshingResource, setRefreshingResource] = useState<null | "services" | "consent_forms" | "automations" | "memberships" | "message_templates">(null);
+  const [refreshingResource, setRefreshingResource] = useState<null | "services" | "consent_forms" | "automations" | "memberships" | "message_templates" | "soap_templates" | "lead_sources">(null);
   const canRunSeed = hasPermission(activeClinic?.role, "seed.run");
 
   const handleConfirmSeed = async (categories: string[]) => {
@@ -635,6 +635,64 @@ function ServicesPage() {
                   ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   : <MessageSquare className="mr-2 h-3.5 w-3.5" />}
                 Refresh message templates
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                disabled={refreshingResource !== null}
+                onClick={async () => {
+                  setRefreshingResource("soap_templates");
+                  try {
+                    const r = await seedSoapTemplates({ data: {} });
+                    if (r.status === "failed") {
+                      toast.error(`SOAP templates refresh failed: ${r.errors.join(", ")}`, { duration: 8000 });
+                    } else if (r.status === "partial") {
+                      toast.warning(`SOAP templates partial: ${r.succeeded}/${r.attempted} rows`, { duration: 6000 });
+                    } else {
+                      toast.success(`Refreshed ${r.succeeded} SOAP templates`);
+                    }
+                  } catch (err: any) {
+                    toast.error(`SOAP templates refresh error: ${err.message}`, { duration: 8000 });
+                    console.error("seedSoapTemplates error:", err);
+                  } finally {
+                    setRefreshingResource(null);
+                  }
+                }}
+              >
+                {refreshingResource === "soap_templates"
+                  ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  : <ClipboardList className="mr-2 h-3.5 w-3.5" />}
+                Refresh SOAP templates
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                disabled={refreshingResource !== null}
+                onClick={async () => {
+                  setRefreshingResource("lead_sources");
+                  try {
+                    const r = await seedLeadSources({ data: {} });
+                    if (r.status === "failed") {
+                      toast.error(`Lead sources refresh failed: ${r.errors.join(", ")}`, { duration: 8000 });
+                    } else if (r.status === "partial") {
+                      toast.warning(`Lead sources partial: ${r.succeeded}/${r.attempted} rows`, { duration: 6000 });
+                    } else {
+                      toast.success(`Refreshed ${r.succeeded} lead sources`);
+                    }
+                  } catch (err: any) {
+                    toast.error(`Lead sources refresh error: ${err.message}`, { duration: 8000 });
+                    console.error("seedLeadSources error:", err);
+                  } finally {
+                    setRefreshingResource(null);
+                  }
+                }}
+              >
+                {refreshingResource === "lead_sources"
+                  ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  : <Tag className="mr-2 h-3.5 w-3.5" />}
+                Refresh lead sources
               </Button>
             </div>
           </details>}
