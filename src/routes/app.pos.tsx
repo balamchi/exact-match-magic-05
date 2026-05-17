@@ -172,6 +172,7 @@ function PosPage() {
 
   async function checkout(method: "card" | "tap" | "cash" | "bnpl") {
     if (!clinicId) return;
+    if (!canProcessPayments) { toast.error("You don't have permission to process payments"); return; }
     if (cart.length === 0) {
       toast.error("Cart is empty");
       return;
