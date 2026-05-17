@@ -38,10 +38,16 @@ export const Route = createFileRoute("/app/automations")({ component: Automation
 type Automation = Tables<"automations">;
 type Trigger =
   | "appointment_booked"
+  | "appointment_upcoming"
   | "appointment_completed"
+  | "appointment_cancelled"
   | "no_show"
   | "lead_created"
   | "birthday"
+  | "client_inactive"
+  | "inventory_low"
+  | "service_completed"
+  | "package_expiring"
   | "rebook_due";
 type Action = "email" | "sms" | "task";
 
@@ -63,10 +69,16 @@ const formSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(160),
   trigger_event: z.enum([
     "appointment_booked",
+    "appointment_upcoming",
     "appointment_completed",
+    "appointment_cancelled",
     "no_show",
     "lead_created",
     "birthday",
+    "client_inactive",
+    "inventory_low",
+    "service_completed",
+    "package_expiring",
     "rebook_due",
   ]),
   action_type: z.enum(["email", "sms", "task"]),
