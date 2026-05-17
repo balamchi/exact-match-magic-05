@@ -122,6 +122,42 @@ const TRIGGER_META: Record<Trigger, { label: string; Icon: typeof Bell; tone: st
     tone: "text-amber-300 bg-amber-500/10",
     description: "75–90 days since last visit, no booking.",
   },
+  appointment_upcoming: {
+    label: "Appointment upcoming",
+    Icon: Clock,
+    tone: "text-blue-300 bg-blue-500/10",
+    description: "24 hours before a scheduled visit.",
+  },
+  appointment_cancelled: {
+    label: "Appointment cancelled",
+    Icon: XCircle,
+    tone: "text-orange-300 bg-orange-500/10",
+    description: "When an appointment gets cancelled.",
+  },
+  client_inactive: {
+    label: "Client inactive",
+    Icon: UserMinus,
+    tone: "text-slate-300 bg-slate-500/10",
+    description: "Client hasn't visited in a while.",
+  },
+  inventory_low: {
+    label: "Inventory low",
+    Icon: PackageOpen,
+    tone: "text-yellow-300 bg-yellow-500/10",
+    description: "Stock dropped below the threshold.",
+  },
+  service_completed: {
+    label: "Service completed",
+    Icon: Sparkles,
+    tone: "text-violet-300 bg-violet-500/10",
+    description: "After a specific service is finished.",
+  },
+  package_expiring: {
+    label: "Package expiring",
+    Icon: Hourglass,
+    tone: "text-fuchsia-300 bg-fuchsia-500/10",
+    description: "Client's package is about to expire.",
+  },
 };
 
 const ACTION_META: Record<Action, { label: string; Icon: typeof Mail; tone: string; description: string }> = {
