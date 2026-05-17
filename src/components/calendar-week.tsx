@@ -380,6 +380,7 @@ export function CalendarWeek() {
   /* ── Submit ── */
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canWriteAppointments) return toast.error("You don't have permission to modify appointments");
     if (!activeClinic) return;
     if (!draft.starts_at || !draft.ends_at) return toast.error("Start and end time required");
     if (new Date(draft.ends_at) <= new Date(draft.starts_at)) return toast.error("End must be after start");
