@@ -447,12 +447,65 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
         photo_url: photoUrl || null,
       };
 
+      let staffId: string;
       if (editing && row) {
         const { error } = await supabase.from("staff").update(payload).eq("id", row.id);
         if (error) throw error;
+        staffId = row.id;
       } else {
-        const { error } = await supabase.from("staff").insert(payload);
+        const { data, error } = await supabase.from("staff").insert(payload).select("id").single();
         if (error) throw error;
+        if (!data?.id) throw new Error("Failed to retrieve new staff ID");
+        staffId = data.id as string;
+      }
+
+      // Sync staff_services (diff against initialServices)
+      const svcInitial = editing ? initialServices : new Set<string>();
+      const svcToAdd = Array.from(staffServices).filter(id => !svcInitial.has(id));
+      const svcToRemove = Array.from(svcInitial).filter(id => !staffServices.has(id));
+      const joinErrors: string[] = [];
+      if (svcToAdd.length > 0) {
+        const rows = svcToAdd.map(service_id => ({ staff_id: staffId, service_id }));
+        const { error } = await supabase.from("staff_services").insert(rows);
+        if (error) joinErrors.push(`services add: ${error.message}`);
+      }
+      if (svcToRemove.length > 0) {
+        const { error } = await supabase.from("staff_services").delete().eq("staff_id", staffId).in("service_id", svcToRemove);
+        if (error) joinErrors.push(`services remove: ${error.message}`);
+      }
+
+      // Sync staff_locations (diff against initialLocations + primary toggle)
+      const locInitial = editing ? initialLocations : new Set<string>();
+      const locToAdd = Array.from(staffLocations).filter(id => !locInitial.has(id));
+      const locToRemove = Array.from(locInitial).filter(id => !staffLocations.has(id));
+      if (locToRemove.length > 0) {
+        const { error } = await supabase.from("staff_locations").delete().eq("staff_id", staffId).in("location_id", locToRemove);
+        if (error) joinErrors.push(`locations remove: ${error.message}`);
+      }
+      if (locToAdd.length > 0) {
+        const rows = locToAdd.map(location_id => ({
+          staff_id: staffId,
+          location_id,
+          primary_location: location_id === primaryLocation,
+        }));
+        const { error } = await supabase.from("staff_locations").insert(rows);
+        if (error) joinErrors.push(`locations add: ${error.message}`);
+      }
+      // If primary changed for an existing location, update it
+      if (editing && primaryLocation !== initialPrimaryLocation) {
+        if (initialPrimaryLocation && staffLocations.has(initialPrimaryLocation)) {
+          await supabase.from("staff_locations").update({ primary_location: false }).eq("staff_id", staffId).eq("location_id", initialPrimaryLocation);
+        }
+        if (primaryLocation && staffLocations.has(primaryLocation) && !locToAdd.includes(primaryLocation)) {
+          await supabase.from("staff_locations").update({ primary_location: true }).eq("staff_id", staffId).eq("location_id", primaryLocation);
+        }
+      }
+
+      if (joinErrors.length > 0) {
+        toast.warning(`${editing ? "Staff updated" : "Staff member added"}, but: ${joinErrors.join("; ")}`);
+        onSaved();
+        onClose();
+        return;
       }
 
       toast.success(editing ? "Staff updated" : "Staff member added");
