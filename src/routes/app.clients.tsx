@@ -146,6 +146,7 @@ function ClientsPage() {
   };
 
   const deleteClient = async (client: Client) => {
+    if (!canDeleteClients) { toast.error("You don't have permission to delete clients"); return; }
     if (!activeClinic || !confirm(`Delete ${client.first_name} ${client.last_name ?? ""}?`)) return;
     const { error } = await supabase.from("clients").delete().eq("id", client.id).eq("clinic_id", activeClinic.clinic_id);
     if (error) toast.error("Could not delete client");
