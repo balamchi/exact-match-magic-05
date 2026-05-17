@@ -3,7 +3,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Clock, Copy, DollarSign, Download, Edit3, Filter, HeartPulse, Plus,
   Search, Sparkles, Trash2, Upload, X, Check, ChevronLeft, ChevronRight,
-  ToggleLeft, ToggleRight, Image as ImageIcon, Loader2, Database, FileText, Zap, CreditCard,
+  ToggleLeft, ToggleRight, Image as ImageIcon, Loader2, Database, FileText, Zap, MessageSquare, CreditCard,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
