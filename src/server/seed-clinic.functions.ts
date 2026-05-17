@@ -1005,6 +1005,15 @@ export const seedMemberships = createServerFn({ method: "POST" })
     return seedMembershipsInternal(supabase, userId, clinicId, resolveClinicTypes(data));
   });
 
+export const seedMessageTemplates = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }): Promise<SeedResult> => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+    return seedMessageTemplatesInternal(supabase, userId, clinicId, resolveClinicTypes(data));
+  });
+
 export const seedAll = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
