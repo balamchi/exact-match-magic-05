@@ -433,8 +433,8 @@ function ClientRow({ client, onEdit, onDelete, canEdit, canDelete }: { client: C
         {!client.email && !client.phone && <span>No contact details</span>}
       </div>
       <div className="flex justify-end gap-1">
-        <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => onEdit(client)}><Pencil className="h-4 w-4" /></Button>
-        <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => onDelete(client)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
+        {canEdit && <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => onEdit(client)}><Pencil className="h-4 w-4" /></Button>}
+        {canDelete && <Button aria-label="Action" type="button" variant="ghost" size="icon" onClick={() => onDelete(client)} className="text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>}
       </div>
     </article>
   );
