@@ -324,26 +324,30 @@ function InvoicesPage() {
 
               <div className="border-t border-border bg-surface/20 p-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {selected.status === "draft" && (
+                  {canProcessPayments && selected.status === "draft" && (
                     <button onClick={() => updateStatus(selected.id, "sent")} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow-glow hover:opacity-90">
                       <Send className="h-3.5 w-3.5" /> Send to client
                     </button>
                   )}
-                  {(selected.status === "sent" || selected.status === "overdue") && (
+                  {canProcessPayments && (selected.status === "sent" || selected.status === "overdue") && (
                     <button onClick={() => updateStatus(selected.id, "paid")} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-primary px-3 py-2 text-xs font-medium text-primary-foreground shadow-glow hover:opacity-90">
                       <CheckCircle2 className="h-3.5 w-3.5" /> Mark as paid
                     </button>
                   )}
-                  <button onClick={() => { setEditing(selected); setShowCompose(true); }} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
-                    Edit
-                  </button>
-                  <button onClick={() => duplicate(selected)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
-                    <Copy className="h-3.5 w-3.5" /> Duplicate
-                  </button>
+                  {canProcessPayments && (
+                    <button onClick={() => { setEditing(selected); setShowCompose(true); }} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
+                      Edit
+                    </button>
+                  )}
+                  {canProcessPayments && (
+                    <button onClick={() => duplicate(selected)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
+                      <Copy className="h-3.5 w-3.5" /> Duplicate
+                    </button>
+                  )}
                   <button onClick={() => toast.info("PDF export coming soon")} className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-medium hover:bg-surface/70">
                     <Download className="h-3.5 w-3.5" /> PDF
                   </button>
-                  {selected.status !== "voided" && selected.status !== "paid" && (
+                  {canRefundPayments && selected.status !== "voided" && selected.status !== "paid" && (
                     <button onClick={() => updateStatus(selected.id, "voided")} className="inline-flex items-center justify-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/5 px-3 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/15">
                       <Ban className="h-3.5 w-3.5" /> Void
                     </button>
