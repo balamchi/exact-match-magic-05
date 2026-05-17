@@ -374,6 +374,7 @@ function LeadsPage() {
 
   const markAsLost = async (lead: Lead) => {
     if (!clinicId) return;
+    if (!canWriteClients) return toast.error("You don't have permission to update leads");
     const reason = prompt("Reason for losing this lead?");
     if (reason === null) return;
     await supabase.from("leads").update({
