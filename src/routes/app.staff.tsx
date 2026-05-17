@@ -569,6 +569,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
     { key: "contact", label: "Contact", icon: <Phone className="h-3.5 w-3.5" /> },
     { key: "role", label: "Role", icon: <ShieldCheck className="h-3.5 w-3.5" /> },
     { key: "services", label: "Services", icon: <Sparkles className="h-3.5 w-3.5" /> },
+    { key: "locations", label: "Locations", icon: <MapPin className="h-3.5 w-3.5" /> },
     { key: "schedule", label: "Schedule", icon: <Calendar className="h-3.5 w-3.5" /> },
     { key: "hr", label: "HR", icon: <Briefcase className="h-3.5 w-3.5" />, ownerOnly: true },
     { key: "commissions", label: "Commissions", icon: <Stethoscope className="h-3.5 w-3.5" />, ownerOnly: true },
