@@ -1245,6 +1245,8 @@ export const seedAll = createServerFn({ method: "POST" })
     const automationsResult = await seedAutomationsInternal(supabase, userId, clinicId, clinicTypes);
     const membershipsResult = await seedMembershipsInternal(supabase, userId, clinicId, clinicTypes);
     const messageTemplatesResult = await seedMessageTemplatesInternal(supabase, userId, clinicId, clinicTypes);
+    const soapTemplatesResult = await seedSoapTemplatesInternal(supabase, userId, clinicId, clinicTypes);
+    const leadSourcesResult = await seedLeadSourcesInternal(supabase, userId, clinicId, clinicTypes);
 
     if (clinicTypes.length > 0) {
       try {
@@ -1257,7 +1259,7 @@ export const seedAll = createServerFn({ method: "POST" })
       }
     }
 
-    const results = [servicesResult, consentResult, automationsResult, membershipsResult, messageTemplatesResult];
+    const results = [servicesResult, consentResult, automationsResult, membershipsResult, messageTemplatesResult, soapTemplatesResult, leadSourcesResult];
     const allSucceeded = results.every((r) => r.status === "success");
     const anyFailed = results.some((r) => r.status === "failed");
 
@@ -1280,6 +1282,8 @@ export const seedAll = createServerFn({ method: "POST" })
         automations: automationsResult.succeeded,
         memberships: membershipsResult.succeeded,
         messageTemplates: messageTemplatesResult.succeeded,
+        soapTemplates: soapTemplatesResult.succeeded,
+        leadSources: leadSourcesResult.succeeded,
       },
       attempted: {
         services: servicesResult.attempted,
@@ -1287,6 +1291,8 @@ export const seedAll = createServerFn({ method: "POST" })
         automations: automationsResult.attempted,
         memberships: membershipsResult.attempted,
         messageTemplates: messageTemplatesResult.attempted,
+        soapTemplates: soapTemplatesResult.attempted,
+        leadSources: leadSourcesResult.attempted,
       },
     };
   });
