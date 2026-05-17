@@ -5,6 +5,11 @@ import { AuthProvider } from "@/lib/auth-context";
 import { LocaleProvider } from "@/lib/locale-context";
 import { ThemeProvider } from "@/lib/theme-context";
 import { Toaster } from "@/components/ui/sonner";
+import { initSentry, Sentry } from "@/lib/sentry";
+
+if (typeof window !== "undefined") {
+  initSentry();
+}
 
 function NotFoundComponent() {
   return (
