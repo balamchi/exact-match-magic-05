@@ -30,7 +30,8 @@ const STAGES: { id: Stage; label: string; tint: string }[] = [
 // Keep old stages for backward compat in DB but hide from kanban
 const VISIBLE_STAGES = STAGES;
 
-const SOURCES = [
+// Default hardcoded sources — used as fallback if lead_sources_config query fails or is empty.
+const DEFAULT_SOURCES = [
   { key: "booking_widget", label: "Booking Widget" },
   { key: "google_ads", label: "Google Ads" },
   { key: "meta_ads", label: "Meta Ads" },
@@ -120,6 +121,29 @@ function LeadsPage() {
 
   useEffect(() => { load(); }, [load]);
   useRealtimeTable("leads", clinicId, load);
+
+  const [sources, setSources] = useState<Array<{ key: string; label: string }>>(DEFAULT_SOURCES);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("lead_sources_config")
+          .select("source_key, display_name")
+          .eq("is_active", true)
+          .order("display_name");
+        if (!mounted) return;
+        if (error || !data || data.length === 0) {
+          setSources(DEFAULT_SOURCES);
+          return;
+        }
+        setSources(data.map((r: any) => ({ key: r.source_key, label: r.display_name })));
+      } catch {
+        setSources(DEFAULT_SOURCES);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   // Filters
   const filtered = useMemo(() => {
@@ -395,7 +419,7 @@ function LeadsPage() {
         <KpiCard icon={Target} label="Active Leads" value={String(activeLeads.length)} />
         <KpiCard icon={TrendingUp} label="Conversion Rate" value={`${conversionRate}%`} />
         <KpiCard icon={Flame} label="New This Week" value={String(newThisWeek)} />
-        <KpiCard icon={Users} label="Top Source" value={topSource ? SOURCES.find((s) => s.key === topSource[0])?.label ?? topSource[0] : "—"} sub={topSource ? `${topSource[1]} leads` : undefined} />
+        <KpiCard icon={Users} label="Top Source" value={topSource ? sources.find((s) => s.key === topSource[0])?.label ?? topSource[0] : "—"} sub={topSource ? `${topSource[1]} leads` : undefined} />
       </section>
 
       {/* Filters */}
@@ -409,7 +433,7 @@ function LeadsPage() {
           <select value={sourceFilter} onChange={(e) => setSourceFilter(e.target.value)}
             className="h-10 rounded-lg border border-input bg-surface px-3 text-sm">
             <option value="all">All Sources</option>
-            {SOURCES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+            {sources.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
           {staffList.length > 0 && (
             <select value={staffFilter} onChange={(e) => setStaffFilter(e.target.value)}
@@ -474,7 +498,7 @@ function LeadsPage() {
                               </div>
                               {lead.source && (
                                 <div className="mt-0.5 truncate text-[11px] text-muted-foreground">
-                                  {SOURCES.find((s) => s.key === lead.source)?.label ?? lead.source}
+                                  {sources.find((s) => s.key === lead.source)?.label ?? lead.source}
                                 </div>
                               )}
                               <div className="mt-2 flex items-center justify-between gap-1">
@@ -532,7 +556,7 @@ function LeadsPage() {
                       </div>
                       {lead.source && (
                         <div className="text-xs text-muted-foreground mt-0.5">
-                          {SOURCES.find((s) => s.key === lead.source)?.label ?? lead.source}
+                          {sources.find((s) => s.key === lead.source)?.label ?? lead.source}
                         </div>
                       )}
                       <div className="mt-1 flex items-center justify-between">
@@ -569,7 +593,7 @@ function LeadsPage() {
                 <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Source</span>
                 <select value={draft.source} onChange={(e) => setDraft({ ...draft, source: e.target.value })}
                   className="h-10 w-full rounded-lg border border-input bg-surface px-3 text-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/30">
-                  {SOURCES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+                  {sources.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
                 </select>
               </label>
               <Field label="Source Details" placeholder="e.g. Instagram DM about Botox" value={draft.source_details} onChange={(v) => setDraft({ ...draft, source_details: v })} />
@@ -659,7 +683,7 @@ function LeadsPage() {
             {/* Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-5 py-4 text-sm">
               <div><span className="text-muted-foreground">Stage:</span> <span className="ml-1 font-medium">{STAGES.find((s) => s.id === detailLead.stage)?.label ?? detailLead.stage}</span></div>
-              <div><span className="text-muted-foreground">Source:</span> <span className="ml-1 font-medium">{SOURCES.find((s) => s.key === detailLead.source)?.label ?? detailLead.source ?? "—"}</span></div>
+              <div><span className="text-muted-foreground">Source:</span> <span className="ml-1 font-medium">{sources.find((s) => s.key === detailLead.source)?.label ?? detailLead.source ?? "—"}</span></div>
               <div><span className="text-muted-foreground">Value:</span> <span className="ml-1 font-medium text-primary">{money(detailLead.estimated_value_cents)}</span></div>
               <div><span className="text-muted-foreground">Assigned:</span> <span className="ml-1 font-medium">{staffList.find((s) => s.id === detailLead.assigned_to)?.display_name ?? "Unassigned"}</span></div>
               {detailLead.service_interest && <div className="col-span-2"><span className="text-muted-foreground">Interested in:</span> <span className="ml-1 font-medium">{servicesList.find((s) => s.id === detailLead.service_interest)?.name ?? "—"}</span></div>}
@@ -827,7 +851,7 @@ function CsvImportModal({ clinicId, onClose, onDone }: { clinicId: string; onClo
         name: `${row.first_name} ${row.last_name}`.trim(),
         email: row.email || null,
         phone: row.phone || null,
-        source: SOURCES.some((s) => s.key === row.source) ? row.source : "other",
+        source: sources.some((s) => s.key === row.source) ? row.source : "other",
         stage: "new" as Stage,
         notes: row.notes || null,
         estimated_value_cents: 0,
