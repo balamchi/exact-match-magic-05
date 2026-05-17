@@ -408,7 +408,7 @@ function Metric({ label, value, icon }: { label: string; value: string; icon: Re
   );
 }
 
-function ClientRow({ client, onEdit, onDelete }: { client: Client; onEdit: (c: Client) => void; onDelete: (c: Client) => void }) {
+function ClientRow({ client, onEdit, onDelete, canEdit, canDelete }: { client: Client; onEdit: (c: Client) => void; onDelete: (c: Client) => void; canEdit: boolean; canDelete: boolean }) {
   const fullName = [client.first_name, client.last_name].filter(Boolean).join(" ");
   return (
     <article className="group grid gap-4 p-4 transition hover:bg-surface/60 md:grid-cols-[1.4fr_1fr_auto] md:items-center">
