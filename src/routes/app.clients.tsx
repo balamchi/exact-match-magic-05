@@ -115,6 +115,7 @@ function ClientsPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!activeClinic || !form.first_name.trim()) return;
+    if (!canWriteClients) { toast.error("You don't have permission to modify clients"); return; }
     setSaving(true);
     const payload: Record<string, any> = {
       clinic_id: activeClinic.clinic_id,
