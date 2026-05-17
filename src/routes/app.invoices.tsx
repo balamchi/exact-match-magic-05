@@ -52,6 +52,9 @@ function daysFromNow(date: string) {
 
 function InvoicesPage() {
   const { activeClinic } = useAuth();
+  const canReadBilling = hasPermission(activeClinic?.role, "billing.read");
+  const canProcessPayments = hasPermission(activeClinic?.role, "payments.process");
+  const canRefundPayments = hasPermission(activeClinic?.role, "payments.refund");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
