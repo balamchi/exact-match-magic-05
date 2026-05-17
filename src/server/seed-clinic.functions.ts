@@ -1060,6 +1060,90 @@ async function seedMessageTemplatesInternal(
   return result;
 }
 
+async function seedSoapTemplatesInternal(
+  supabase: SupabaseClient,
+  userId: string,
+  clinicId: string,
+  clinicTypes: string[],
+): Promise<SeedResult> {
+  const targetTypes = clinicTypes.length > 0 ? new Set(clinicTypes) : null;
+  const filtered = targetTypes
+    ? soapTemplatesLibrary.filter(
+        (t) => t.clinicType.includes("universal") || t.clinicType.some((ct) => targetTypes.has(ct)),
+      )
+    : soapTemplatesLibrary;
+
+  const rows = filtered.map((t) => ({
+    clinic_id: clinicId,
+    name: t.name,
+    subjective_template: t.subjective_template,
+    objective_template: t.objective_template,
+    assessment_template: t.assessment_template,
+    plan_template: t.plan_template,
+    is_active: t.is_active ?? true,
+    is_default: t.is_default ?? false,
+  }));
+
+  const { error } = await supabase
+    .from("soap_templates")
+    .upsert(rows, { onConflict: "clinic_id,name" });
+
+  const { count } = await supabase
+    .from("soap_templates")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  const succeeded = error ? 0 : Math.min(count ?? 0, rows.length);
+  const result: SeedResult = {
+    resource: "soap_templates",
+    attempted: rows.length,
+    succeeded,
+    inserted: succeeded,
+    updated: 0,
+    errors: error ? [error.message] : [],
+    status: error ? "failed" : (succeeded >= rows.length ? "success" : "partial"),
+  };
+  await logSeedActivity(supabase, clinicId, userId, "seed", "soap_templates", result);
+  return result;
+}
+
+async function seedLeadSourcesInternal(
+  supabase: SupabaseClient,
+  userId: string,
+  clinicId: string,
+  _clinicTypes: string[],
+): Promise<SeedResult> {
+  const rows = leadSourcesLibrary.map((s) => ({
+    clinic_id: clinicId,
+    source_key: s.source_key,
+    display_name: s.display_name,
+    is_active: s.is_active ?? true,
+  }));
+
+  const { error } = await supabase
+    .from("lead_sources_config")
+    .upsert(rows, { onConflict: "clinic_id,source_key" });
+
+  const { count } = await supabase
+    .from("lead_sources_config")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  const succeeded = error ? 0 : Math.min(count ?? 0, rows.length);
+  const result: SeedResult = {
+    resource: "lead_sources",
+    attempted: rows.length,
+    succeeded,
+    inserted: succeeded,
+    updated: 0,
+    errors: error ? [error.message] : [],
+    status: error ? "failed" : (succeeded >= rows.length ? "success" : "partial"),
+  };
+  await logSeedActivity(supabase, clinicId, userId, "seed", "lead_sources", result);
+  return result;
+}
+
+
 // ============================================================================
 // EXPORTED SERVER FUNCTIONS
 // ============================================================================
