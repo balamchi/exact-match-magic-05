@@ -1122,6 +1122,7 @@ export const getClinicSeedStatus = createServerFn({ method: "GET" })
       clinicId,
       seededClinicTypes,
       counts: {
+        messageTemplates: messageTemplatesRes.count ?? 0,
         services: services.count ?? 0,
         consentForms: consentFormsRes.count ?? 0,
         automations: automations.count ?? 0,
