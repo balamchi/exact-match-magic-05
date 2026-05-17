@@ -134,7 +134,7 @@ function ServicesPage() {
   const [saving, setSaving] = useState(false);
   const [showSelector, setShowSelector] = useState(false);
   const [seederLoading, setSeederLoading] = useState(false);
-  const [refreshingResource, setRefreshingResource] = useState<null | "services" | "consent_forms" | "automations" | "memberships">(null);
+  const [refreshingResource, setRefreshingResource] = useState<null | "services" | "consent_forms" | "automations" | "memberships" | "message_templates">(null);
   const canRunSeed = hasPermission(activeClinic?.role, "seed.run");
 
   const handleConfirmSeed = async (categories: string[]) => {
