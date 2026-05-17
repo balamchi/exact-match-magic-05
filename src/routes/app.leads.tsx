@@ -558,9 +558,11 @@ function LeadsPage() {
                     </span>
                     <span className="text-xs text-muted-foreground">{items.length}</span>
                   </div>
-                  <button onClick={() => openCreate(stage.id)} className="rounded-md p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
-                    <Plus className="h-3.5 w-3.5" />
-                  </button>
+                  {canWriteClients && (
+                    <button onClick={() => openCreate(stage.id)} className="rounded-md p-1 text-muted-foreground hover:bg-surface hover:text-foreground">
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </header>
                 <div className="divide-y divide-border">
                   {items.length === 0 ? (
