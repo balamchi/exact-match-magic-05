@@ -372,6 +372,14 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
   // Services
   const [allServices, setAllServices] = useState<ServiceRow[]>([]);
   const [staffServices, setStaffServices] = useState<Set<string>>(new Set());
+  const [initialServices, setInitialServices] = useState<Set<string>>(new Set());
+
+  // Locations
+  const [allLocations, setAllLocations] = useState<LocationRow[]>([]);
+  const [staffLocations, setStaffLocations] = useState<Set<string>>(new Set());
+  const [initialLocations, setInitialLocations] = useState<Set<string>>(new Set());
+  const [primaryLocation, setPrimaryLocation] = useState<string | null>(null);
+  const [initialPrimaryLocation, setInitialPrimaryLocation] = useState<string | null>(null);
 
   // Load related data when editing
   useEffect(() => {
