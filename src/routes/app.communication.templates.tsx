@@ -63,19 +63,6 @@ const SAMPLE_DATA: Record<string, string> = {
   "{{booking_link}}": "https://clinicpro.io/book",
 };
 
-const DEFAULT_TEMPLATES: Omit<Template, "id" | "clinic_id" | "use_count" | "is_active" | "created_at" | "updated_at">[] = [
-  { name: "Appointment Reminder (24h)", category: "reminder", channel: null, body: "Hi {{first_name}}, this is a friendly reminder of your appointment with {{clinic_name}} tomorrow at {{appointment_time}}. Reply Y to confirm or N to reschedule." },
-  { name: "Appointment Confirmed", category: "appointment", channel: null, body: "Hi {{first_name}}, your appointment for {{service_name}} on {{appointment_date}} at {{appointment_time}} is confirmed. See you soon! — {{clinic_name}}" },
-  { name: "Booking Thank You", category: "appointment", channel: null, body: "Thank you for booking with {{clinic_name}}, {{first_name}}! We look forward to seeing you on {{appointment_date}}. If you need to reschedule, please reply to this message." },
-  { name: "Post-Treatment Follow-up", category: "follow_up", channel: null, body: "Hi {{first_name}}, hope you're feeling great after your {{service_name}}! Please let us know if you have any questions or concerns. — {{clinic_name}}" },
-  { name: "Review Request", category: "review_request", channel: null, body: "Hi {{first_name}}, thank you for visiting {{clinic_name}}! Would you mind taking a moment to leave us a review? It really helps us. {{review_link}}" },
-  { name: "Birthday Wish", category: "birthday", channel: null, body: "Happy Birthday, {{first_name}}! 🎉 As a little gift, enjoy 15% off your next service at {{clinic_name}}. Use code BDAY15 within 30 days." },
-  { name: "Reschedule Response", category: "support", channel: null, body: "Hi {{first_name}}, no problem! Please call us at {{clinic_phone}} or reply with a few times that work for you. We'll find a new time that fits your schedule." },
-  { name: "Welcome New Client", category: "general", channel: null, body: "Welcome to {{clinic_name}}, {{first_name}}! We're thrilled to have you. If you have any questions before your first visit, just reply to this message." },
-  { name: "New Service Promotion", category: "marketing", channel: null, body: "Hi {{first_name}}! We're excited to announce our new service at {{clinic_name}}. Book in the next 7 days to receive a 20% introductory discount." },
-  { name: "Missed Appointment", category: "support", channel: null, body: "Hi {{first_name}}, we noticed you missed your appointment today. Is everything okay? Please reach out so we can reschedule. — {{clinic_name}}" },
-];
-
 function substitute(body: string): string {
   let result = body;
   for (const [key, value] of Object.entries(SAMPLE_DATA)) {
@@ -103,22 +90,7 @@ function TemplatesPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Auto-seed defaults
-  useEffect(() => {
-    if (!clinicId || loading) return;
-    if (templates.length > 0) return;
-    const key = `templates-seeded-${clinicId}`;
-    if (typeof window === "undefined" || localStorage.getItem(key)) return;
-    (async () => {
-      const rows = DEFAULT_TEMPLATES.map((t) => ({ ...t, clinic_id: clinicId }));
-      const { error } = await supabase.from("message_templates").insert(rows);
-      if (!error) {
-        localStorage.setItem(key, "true");
-        toast.success("Seeded 10 starter templates");
-        load();
-      }
-    })();
-  }, [clinicId, templates.length, loading, load]);
+
 
   const filtered = useMemo(() => {
     return templates.filter((t) => {
