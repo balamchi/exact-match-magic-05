@@ -73,6 +73,8 @@ interface ServiceRow {
   active: boolean;
 }
 
+type LocationRow = { id: string; name: string; is_primary: boolean; active: boolean };
+
 const COLOR_PALETTE = [
   { name: "Purple", value: "#a78bfa" },
   { name: "Pink", value: "#f472b6" },
