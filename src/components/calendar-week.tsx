@@ -1025,9 +1025,11 @@ export function CalendarWeek() {
                 <CalendarDays className="h-12 w-12 text-muted-foreground/40 mb-4" />
                 <h3 className="text-lg font-semibold text-muted-foreground">No appointments this week</h3>
                 <p className="mt-1 text-sm text-muted-foreground/70">Create one to get started.</p>
-                <Button onClick={openNew} className="mt-4 gap-2 bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground">
-                  <Plus className="h-4 w-4" /> New Appointment
-                </Button>
+                {canWriteAppointments && (
+                  <Button onClick={openNew} className="mt-4 gap-2 bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground">
+                    <Plus className="h-4 w-4" /> New Appointment
+                  </Button>
+                )}
               </div>
             )}
           </div>
