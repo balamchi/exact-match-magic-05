@@ -292,25 +292,11 @@ export function CalendarWeek() {
 
   /* ── Slot Click Handlers ── */
   const openSlot = (day: Date, hour: number, minute: number, staffId?: string) => {
+    if (!canWriteAppointments) return toast.error("You don't have permission to create appointments");
     const start = new Date(day);
-    start.setHours(hour, minute, 0, 0);
-    const end = new Date(start.getTime() + 60 * 60000);
-    setEditing(null);
-    setOverrideConflict(false);
-    setShowCancelReason(false);
-    setCancelReason("");
-    setClientSearch("");
-    setDraft({
-      ...emptyDraft,
-      starts_at: toLocalInput(start),
-      ends_at: toLocalInput(end),
-      staff_id: staffId ?? "",
-      location_id: filterLocationId !== "all" ? filterLocationId : "",
-    });
-    setOpen(true);
-  };
-
+...
   const openNew = () => {
+    if (!canWriteAppointments) return toast.error("You don't have permission to create appointments");
     const now = new Date();
     const nextSlot = new Date(now);
     nextSlot.setMinutes(Math.ceil(now.getMinutes() / 30) * 30, 0, 0);
