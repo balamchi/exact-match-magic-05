@@ -940,7 +940,7 @@ export function CalendarWeek() {
                         return (
                           <button
                             key={slot}
-                            onClick={() => openSlot(day, hour, minute)}
+                            onClick={() => { if (!canWriteAppointments) return; openSlot(day, hour, minute); }}
                             className={cn(
                               "block w-full border-b border-border/30 transition hover:bg-primary/5",
                               minute === 0 && "border-border/60"
