@@ -30,7 +30,8 @@ const STAGES: { id: Stage; label: string; tint: string }[] = [
 // Keep old stages for backward compat in DB but hide from kanban
 const VISIBLE_STAGES = STAGES;
 
-const SOURCES = [
+// Default hardcoded sources — used as fallback if lead_sources_config query fails or is empty.
+const DEFAULT_SOURCES = [
   { key: "booking_widget", label: "Booking Widget" },
   { key: "google_ads", label: "Google Ads" },
   { key: "meta_ads", label: "Meta Ads" },
@@ -120,6 +121,29 @@ function LeadsPage() {
 
   useEffect(() => { load(); }, [load]);
   useRealtimeTable("leads", clinicId, load);
+
+  const [sources, setSources] = useState<Array<{ key: string; label: string }>>(DEFAULT_SOURCES);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("lead_sources_config")
+          .select("source_key, display_name")
+          .eq("is_active", true)
+          .order("display_name");
+        if (!mounted) return;
+        if (error || !data || data.length === 0) {
+          setSources(DEFAULT_SOURCES);
+          return;
+        }
+        setSources(data.map((r: any) => ({ key: r.source_key, label: r.display_name })));
+      } catch {
+        setSources(DEFAULT_SOURCES);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   // Filters
   const filtered = useMemo(() => {
