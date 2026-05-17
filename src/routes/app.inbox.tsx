@@ -220,57 +220,6 @@ function InboxPage() {
     return () => { supabase.removeChannel(channel); };
   }, [clinicId, selectedId, loadConversations, loadMessages]);
 
-  // Seed sample data once
-  useEffect(() => {
-    if (!clinicId || loading) return;
-    if (conversations.length > 0) return;
-    const key = `inbox-seeded-${clinicId}`;
-    if (typeof window === "undefined" || localStorage.getItem(key)) return;
-    (async () => {
-      const { data: someClients } = await supabase
-        .from("clients")
-        .select("id, first_name, last_name, phone, email")
-        .eq("clinic_id", clinicId)
-        .limit(3);
-      if (!someClients || someClients.length === 0) return;
-      for (const c of someClients) {
-        const handle = c.phone || c.email;
-        if (!handle) continue;
-        const channel: Channel = c.phone ? "sms" : "email";
-        const { data: conv } = await supabase
-          .from("conversations")
-          .insert({
-            clinic_id: clinicId,
-            client_id: c.id,
-            channel,
-            contact_name: `${c.first_name} ${c.last_name ?? ""}`.trim(),
-            contact_handle: handle,
-            status: "open",
-          })
-          .select().single();
-        if (!conv) continue;
-        const baseTime = Date.now() - 1000 * 60 * 30;
-        await supabase.from("messages").insert([
-          {
-            conversation_id: conv.id, clinic_id: clinicId,
-            direction: "inbound", channel,
-            body: `Hi! I'd like to book an appointment for next week. What times do you have available?`,
-            status: "received",
-            created_at: new Date(baseTime).toISOString(),
-          },
-          {
-            conversation_id: conv.id, clinic_id: clinicId,
-            direction: "outbound", channel,
-            body: `Hi ${c.first_name}! We have openings on Tuesday at 2pm or Thursday at 10am. Which works better for you?`,
-            status: "delivered", sent_by_name: "Reception",
-            created_at: new Date(baseTime + 5 * 60000).toISOString(),
-          },
-        ]);
-      }
-      localStorage.setItem(key, "true");
-      loadConversations();
-    })();
-  }, [clinicId, conversations.length, loading, loadConversations]);
 
   const selected = useMemo(
     () => conversations.find((c) => c.id === selectedId) ?? null,
