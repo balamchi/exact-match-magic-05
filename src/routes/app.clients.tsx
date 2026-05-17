@@ -257,7 +257,7 @@ function ClientsPage() {
             {canWriteClients && <Button onClick={openCreate} className="mt-5 gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90"><Plus className="h-4 w-4" /> Add first client</Button>}
           </div>
         ) : (
-          <div className="divide-y divide-border">{filteredClients.map((client) => <ClientRow key={client.id} client={client} onEdit={openEdit} onDelete={deleteClient} />)}</div>
+          <div className="divide-y divide-border">{filteredClients.map((client) => <ClientRow key={client.id} client={client} onEdit={openEdit} onDelete={deleteClient} canEdit={canWriteClients} canDelete={canDeleteClients} />)}</div>
         )}
       </section>
 
