@@ -126,6 +126,7 @@ const staffSchema = z.object({
 function StaffPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id ?? null;
+  const canWriteStaff = hasPermission(activeClinic?.role, "staff.write");
 
   const [rows, setRows] = useState<StaffRow[]>([]);
   const [loading, setLoading] = useState(true);
