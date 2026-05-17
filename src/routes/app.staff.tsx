@@ -173,12 +173,14 @@ function StaffPage() {
   }), [rows]);
 
   const toggleActive = async (row: StaffRow) => {
+    if (!canWriteStaff) { toast.error("You don't have permission to modify staff"); return; }
     const { error } = await supabase.from("staff").update({ active: !row.active }).eq("id", row.id);
     if (error) toast.error(error.message);
     else toast.success(row.active ? `${row.display_name} archived` : `${row.display_name} reactivated`);
   };
 
   const remove = async (row: StaffRow) => {
+    if (!canWriteStaff) { toast.error("You don't have permission to modify staff"); return; }
     if (!confirm(`Remove ${row.display_name} from staff?`)) return;
     const { error } = await supabase.from("staff").delete().eq("id", row.id);
     if (error) toast.error(error.message);
