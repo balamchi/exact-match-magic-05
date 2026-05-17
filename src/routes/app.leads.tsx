@@ -500,7 +500,7 @@ function LeadsPage() {
                       )
                     ) : (
                       items.map((lead) => (
-                        <div key={lead.id} draggable
+                        <div key={lead.id} draggable={canWriteClients}
                           onDragStart={() => setDragging(lead.id)}
                           onDragEnd={() => { setDragging(null); setDragOver(null); }}
                           onClick={() => openDetail(lead)}
