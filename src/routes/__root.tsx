@@ -5,6 +5,11 @@ import { AuthProvider } from "@/lib/auth-context";
 import { LocaleProvider } from "@/lib/locale-context";
 import { ThemeProvider } from "@/lib/theme-context";
 import { Toaster } from "@/components/ui/sonner";
+import { initSentry, Sentry } from "@/lib/sentry";
+
+if (typeof window !== "undefined") {
+  initSentry();
+}
 
 function NotFoundComponent() {
   return (
@@ -99,14 +104,33 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <ThemeProvider>
-      <LocaleProvider>
-        <AuthProvider>
-          <Outlet />
-          <Toaster />
-        </AuthProvider>
-      </LocaleProvider>
-    </ThemeProvider>
+    <Sentry.ErrorBoundary
+      fallback={({ error: _error, resetError }) => (
+        <div className="min-h-screen flex items-center justify-center bg-background p-6">
+          <div className="max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-card">
+            <h1 className="font-display text-xl font-bold">Something went wrong</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We've been notified. Please try again or contact support if it persists.
+            </p>
+            <button
+              onClick={resetError}
+              className="mt-6 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      )}
+    >
+      <ThemeProvider>
+        <LocaleProvider>
+          <AuthProvider>
+            <Outlet />
+            <Toaster />
+          </AuthProvider>
+        </LocaleProvider>
+      </ThemeProvider>
+    </Sentry.ErrorBoundary>
   );
 }
 // Trigger fresh production build - 20260504T234141Z

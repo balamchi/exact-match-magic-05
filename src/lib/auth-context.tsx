@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { setSentryUser } from "@/lib/sentry";
 
 export type ClinicRole =
   | "owner"
@@ -101,6 +102,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const activeClinic = memberships.find((m) => m.clinic_id === activeClinicId) ?? memberships[0] ?? null;
+
+  useEffect(() => {
+    setSentryUser(session?.user?.id ?? null, activeClinic?.clinic_id ?? null);
+  }, [session?.user?.id, activeClinic?.clinic_id]);
 
   const value: AuthContextValue = {
     session,
