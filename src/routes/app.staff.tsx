@@ -935,6 +935,97 @@ function ServicesPicker({ allServices, staffServices, setStaffServices }: {
   );
 }
 
+function LocationsPicker({ allLocations, staffLocations, setStaffLocations, primaryLocation, setPrimaryLocation }: {
+  allLocations: LocationRow[];
+  staffLocations: Set<string>;
+  setStaffLocations: React.Dispatch<React.SetStateAction<Set<string>>>;
+  primaryLocation: string | null;
+  setPrimaryLocation: React.Dispatch<React.SetStateAction<string | null>>;
+}) {
+  const [locSearch, setLocSearch] = useState("");
+  const filtered = useMemo(() => {
+    const q = locSearch.trim().toLowerCase();
+    return q ? allLocations.filter(l => l.name.toLowerCase().includes(q)) : allLocations;
+  }, [allLocations, locSearch]);
+
+  const toggle = (id: string) => {
+    setStaffLocations(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+        if (primaryLocation === id) setPrimaryLocation(null);
+      } else {
+        next.add(id);
+        if (!primaryLocation) setPrimaryLocation(id);
+      }
+      return next;
+    });
+  };
+
+  const promoteToPrimary = (id: string) => {
+    if (!staffLocations.has(id)) return;
+    setPrimaryLocation(id);
+  };
+
+  if (allLocations.length === 0) {
+    return (
+      <div className="space-y-4">
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          No active locations yet. <a href="/app/locations" className="text-primary hover:underline">Add locations first.</a>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input value={locSearch} onChange={e => setLocSearch(e.target.value)} placeholder="Search locations…" className="pl-9" />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => {
+            setStaffLocations(new Set(allLocations.map(l => l.id)));
+            if (!primaryLocation && allLocations.length > 0) setPrimaryLocation(allLocations[0].id);
+          }}>Select all</Button>
+          <Button size="sm" variant="outline" onClick={() => { setStaffLocations(new Set()); setPrimaryLocation(null); }}>Clear all</Button>
+        </div>
+        <span className="text-xs text-muted-foreground">Selected: <strong className="text-foreground">{staffLocations.size}</strong></span>
+      </div>
+      <p className="text-[11px] text-muted-foreground">Click the star to mark a primary location. The primary location is used as the default for new appointments.</p>
+      <div className="rounded-lg border border-border/60 overflow-hidden">
+        <div className="divide-y divide-border/20">
+          {filtered.map(l => {
+            const checked = staffLocations.has(l.id);
+            const isPrimary = primaryLocation === l.id && checked;
+            return (
+              <div key={l.id} className={cn("flex items-center gap-2.5 px-3 py-2 text-sm transition hover:bg-surface/30",
+                checked && "bg-primary/5"
+              )}>
+                <input type="checkbox" checked={checked} onChange={() => toggle(l.id)} className="accent-primary" />
+                <span className="flex-1 cursor-pointer" onClick={() => toggle(l.id)}>{l.name}</span>
+                {checked && (
+                  <button
+                    type="button"
+                    onClick={() => promoteToPrimary(l.id)}
+                    title={isPrimary ? "Primary location" : "Set as primary"}
+                    className={cn("rounded-full p-1 transition",
+                      isPrimary ? "text-amber-300" : "text-muted-foreground hover:text-amber-300"
+                    )}
+                  >
+                    <Star className={cn("h-3.5 w-3.5", isPrimary && "fill-current")} />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Helpers ──────────────────────────────────────────── */
 
 function FormField({ label, children }: { label: string; children: React.ReactNode }) {
