@@ -386,25 +386,45 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
     if (!row) return;
     const loadRelated = async () => {
       setHrLoading(true);
-      const [hrRes, commRes, svcRes] = await Promise.all([
+      const [hrRes, commRes, svcRes, locRes, staffSvcRes, staffLocRes] = await Promise.all([
         supabase.from("staff_hr").select("*").eq("staff_id", row.id).maybeSingle(),
         supabase.from("staff_commissions").select("*").eq("staff_id", row.id).order("created_at"),
         supabase.from("services").select("id, name, category, active").eq("clinic_id", clinicId).eq("active", true).order("name"),
+        supabase.from("locations").select("id, name, is_primary, active").eq("clinic_id", clinicId).eq("active", true).order("name"),
+        supabase.from("staff_services").select("service_id").eq("staff_id", row.id),
+        supabase.from("staff_locations").select("location_id, primary_location").eq("staff_id", row.id),
       ]);
       if (hrRes.data) setHr(hrRes.data as any);
       else setHr({ staff_id: row.id, clinic_id: clinicId, email: "", phone: "", employment_type: "full_time", hire_date: "", hourly_rate_cents: null, salary_cents: null, emergency_contact_name: "", emergency_contact_phone: "", notes: "" });
       if (commRes.data) setCommissions(commRes.data as any[]);
       if (svcRes.data) setAllServices(svcRes.data as ServiceRow[]);
+      if (locRes.data) setAllLocations(locRes.data as LocationRow[]);
+      if (staffSvcRes.data) {
+        const ids = new Set(staffSvcRes.data.map((r: any) => r.service_id as string));
+        setStaffServices(ids);
+        setInitialServices(ids);
+      }
+      if (staffLocRes.data) {
+        const ids = new Set(staffLocRes.data.map((r: any) => r.location_id as string));
+        setStaffLocations(ids);
+        setInitialLocations(ids);
+        const primary = staffLocRes.data.find((r: any) => r.primary_location);
+        const primaryId = primary ? (primary.location_id as string) : null;
+        setPrimaryLocation(primaryId);
+        setInitialPrimaryLocation(primaryId);
+      }
       setHrLoading(false);
     };
     loadRelated();
   }, [row?.id, clinicId]);
 
-  // Load services for new staff
+  // Load services and locations for new staff
   useEffect(() => {
     if (row) return;
     supabase.from("services").select("id, name, category, active").eq("clinic_id", clinicId).eq("active", true).order("name")
       .then(({ data }) => { if (data) setAllServices(data as ServiceRow[]); });
+    supabase.from("locations").select("id, name, is_primary, active").eq("clinic_id", clinicId).eq("active", true).order("name")
+      .then(({ data }) => { if (data) setAllLocations(data as LocationRow[]); });
   }, [clinicId, row]);
 
   const saveStaff = async () => {
