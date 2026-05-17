@@ -152,6 +152,9 @@ const emptyDraft: DraftForm = {
 /* ═════════════════════════════════════════════════════════════════ */
 export function CalendarWeek() {
   const { activeClinic } = useAuth();
+  const canWriteAppointments = hasPermission(activeClinic?.role, "appointments.write");
+  const canCancelAppointments = hasPermission(activeClinic?.role, "appointments.cancel");
+  const canCheckIn = hasPermission(activeClinic?.role, "appointments.checkin");
   const [weekStart, setWeekStart] = useState(() => startOfWeekMon(new Date()));
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
