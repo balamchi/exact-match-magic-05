@@ -4,6 +4,7 @@ import {
   UserCog, Plus, Search, Users, Stethoscope, Sparkles, ShieldCheck,
   Edit3, Trash2, X, Power, PowerOff, Crown, Briefcase, Calendar,
   Phone, Mail, AlertTriangle, Loader2, Save, Palette, Check,
+  MapPin, Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -71,6 +72,8 @@ interface ServiceRow {
   category: string | null;
   active: boolean;
 }
+
+type LocationRow = { id: string; name: string; is_primary: boolean; active: boolean };
 
 const COLOR_PALETTE = [
   { name: "Purple", value: "#a78bfa" },
@@ -327,7 +330,7 @@ function KpiCard({ label, value, icon, accent }: { label: string; value: number;
 
 /* ── Staff Composer (tabbed modal) ────────────────────── */
 
-type TabKey = "profile" | "contact" | "role" | "services" | "schedule" | "hr" | "commissions";
+type TabKey = "profile" | "contact" | "role" | "services" | "locations" | "schedule" | "hr" | "commissions";
 
 function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | null; clinicId: string; onClose: () => void; onSaved: () => void }) {
   const { activeClinic } = useAuth();
@@ -369,31 +372,59 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
   // Services
   const [allServices, setAllServices] = useState<ServiceRow[]>([]);
   const [staffServices, setStaffServices] = useState<Set<string>>(new Set());
+  const [initialServices, setInitialServices] = useState<Set<string>>(new Set());
+
+  // Locations
+  const [allLocations, setAllLocations] = useState<LocationRow[]>([]);
+  const [staffLocations, setStaffLocations] = useState<Set<string>>(new Set());
+  const [initialLocations, setInitialLocations] = useState<Set<string>>(new Set());
+  const [primaryLocation, setPrimaryLocation] = useState<string | null>(null);
+  const [initialPrimaryLocation, setInitialPrimaryLocation] = useState<string | null>(null);
 
   // Load related data when editing
   useEffect(() => {
     if (!row) return;
     const loadRelated = async () => {
       setHrLoading(true);
-      const [hrRes, commRes, svcRes] = await Promise.all([
+      const [hrRes, commRes, svcRes, locRes, staffSvcRes, staffLocRes] = await Promise.all([
         supabase.from("staff_hr").select("*").eq("staff_id", row.id).maybeSingle(),
         supabase.from("staff_commissions").select("*").eq("staff_id", row.id).order("created_at"),
         supabase.from("services").select("id, name, category, active").eq("clinic_id", clinicId).eq("active", true).order("name"),
+        supabase.from("locations").select("id, name, is_primary, active").eq("clinic_id", clinicId).eq("active", true).order("name"),
+        supabase.from("staff_services").select("service_id").eq("staff_id", row.id),
+        supabase.from("staff_locations").select("location_id, primary_location").eq("staff_id", row.id),
       ]);
       if (hrRes.data) setHr(hrRes.data as any);
       else setHr({ staff_id: row.id, clinic_id: clinicId, email: "", phone: "", employment_type: "full_time", hire_date: "", hourly_rate_cents: null, salary_cents: null, emergency_contact_name: "", emergency_contact_phone: "", notes: "" });
       if (commRes.data) setCommissions(commRes.data as any[]);
       if (svcRes.data) setAllServices(svcRes.data as ServiceRow[]);
+      if (locRes.data) setAllLocations(locRes.data as LocationRow[]);
+      if (staffSvcRes.data) {
+        const ids = new Set(staffSvcRes.data.map((r: any) => r.service_id as string));
+        setStaffServices(ids);
+        setInitialServices(ids);
+      }
+      if (staffLocRes.data) {
+        const ids = new Set(staffLocRes.data.map((r: any) => r.location_id as string));
+        setStaffLocations(ids);
+        setInitialLocations(ids);
+        const primary = staffLocRes.data.find((r: any) => r.primary_location);
+        const primaryId = primary ? (primary.location_id as string) : null;
+        setPrimaryLocation(primaryId);
+        setInitialPrimaryLocation(primaryId);
+      }
       setHrLoading(false);
     };
     loadRelated();
   }, [row?.id, clinicId]);
 
-  // Load services for new staff
+  // Load services and locations for new staff
   useEffect(() => {
     if (row) return;
     supabase.from("services").select("id, name, category, active").eq("clinic_id", clinicId).eq("active", true).order("name")
       .then(({ data }) => { if (data) setAllServices(data as ServiceRow[]); });
+    supabase.from("locations").select("id, name, is_primary, active").eq("clinic_id", clinicId).eq("active", true).order("name")
+      .then(({ data }) => { if (data) setAllLocations(data as LocationRow[]); });
   }, [clinicId, row]);
 
   const saveStaff = async () => {
@@ -416,12 +447,65 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
         photo_url: photoUrl || null,
       };
 
+      let staffId: string;
       if (editing && row) {
         const { error } = await supabase.from("staff").update(payload).eq("id", row.id);
         if (error) throw error;
+        staffId = row.id;
       } else {
-        const { error } = await supabase.from("staff").insert(payload);
+        const { data, error } = await supabase.from("staff").insert(payload).select("id").single();
         if (error) throw error;
+        if (!data?.id) throw new Error("Failed to retrieve new staff ID");
+        staffId = data.id as string;
+      }
+
+      // Sync staff_services (diff against initialServices)
+      const svcInitial = editing ? initialServices : new Set<string>();
+      const svcToAdd = Array.from(staffServices).filter(id => !svcInitial.has(id));
+      const svcToRemove = Array.from(svcInitial).filter(id => !staffServices.has(id));
+      const joinErrors: string[] = [];
+      if (svcToAdd.length > 0) {
+        const rows = svcToAdd.map(service_id => ({ staff_id: staffId, service_id, clinic_id: clinicId }));
+        const { error } = await supabase.from("staff_services").insert(rows);
+        if (error) joinErrors.push(`services add: ${error.message}`);
+      }
+      if (svcToRemove.length > 0) {
+        const { error } = await supabase.from("staff_services").delete().eq("staff_id", staffId).in("service_id", svcToRemove);
+        if (error) joinErrors.push(`services remove: ${error.message}`);
+      }
+
+      // Sync staff_locations (diff against initialLocations + primary toggle)
+      const locInitial = editing ? initialLocations : new Set<string>();
+      const locToAdd = Array.from(staffLocations).filter(id => !locInitial.has(id));
+      const locToRemove = Array.from(locInitial).filter(id => !staffLocations.has(id));
+      if (locToRemove.length > 0) {
+        const { error } = await supabase.from("staff_locations").delete().eq("staff_id", staffId).in("location_id", locToRemove);
+        if (error) joinErrors.push(`locations remove: ${error.message}`);
+      }
+      if (locToAdd.length > 0) {
+        const rows = locToAdd.map(location_id => ({
+          staff_id: staffId,
+          location_id,
+          primary_location: location_id === primaryLocation,
+        }));
+        const { error } = await supabase.from("staff_locations").insert(rows);
+        if (error) joinErrors.push(`locations add: ${error.message}`);
+      }
+      // If primary changed for an existing location, update it
+      if (editing && primaryLocation !== initialPrimaryLocation) {
+        if (initialPrimaryLocation && staffLocations.has(initialPrimaryLocation)) {
+          await supabase.from("staff_locations").update({ primary_location: false }).eq("staff_id", staffId).eq("location_id", initialPrimaryLocation);
+        }
+        if (primaryLocation && staffLocations.has(primaryLocation) && !locToAdd.includes(primaryLocation)) {
+          await supabase.from("staff_locations").update({ primary_location: true }).eq("staff_id", staffId).eq("location_id", primaryLocation);
+        }
+      }
+
+      if (joinErrors.length > 0) {
+        toast.warning(`${editing ? "Staff updated" : "Staff member added"}, but: ${joinErrors.join("; ")}`);
+        onSaved();
+        onClose();
+        return;
       }
 
       toast.success(editing ? "Staff updated" : "Staff member added");
@@ -485,6 +569,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
     { key: "contact", label: "Contact", icon: <Phone className="h-3.5 w-3.5" /> },
     { key: "role", label: "Role", icon: <ShieldCheck className="h-3.5 w-3.5" /> },
     { key: "services", label: "Services", icon: <Sparkles className="h-3.5 w-3.5" /> },
+    { key: "locations", label: "Locations", icon: <MapPin className="h-3.5 w-3.5" /> },
     { key: "schedule", label: "Schedule", icon: <Calendar className="h-3.5 w-3.5" /> },
     { key: "hr", label: "HR", icon: <Briefcase className="h-3.5 w-3.5" />, ownerOnly: true },
     { key: "commissions", label: "Commissions", icon: <Stethoscope className="h-3.5 w-3.5" />, ownerOnly: true },
@@ -613,6 +698,16 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
 
           {tab === "services" && (
             <ServicesPicker allServices={allServices} staffServices={staffServices} setStaffServices={setStaffServices} />
+          )}
+
+          {tab === "locations" && (
+            <LocationsPicker
+              allLocations={allLocations}
+              staffLocations={staffLocations}
+              setStaffLocations={setStaffLocations}
+              primaryLocation={primaryLocation}
+              setPrimaryLocation={setPrimaryLocation}
+            />
           )}
 
           {tab === "schedule" && (
@@ -835,6 +930,97 @@ function ServicesPicker({ allServices, staffServices, setStaffServices }: {
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function LocationsPicker({ allLocations, staffLocations, setStaffLocations, primaryLocation, setPrimaryLocation }: {
+  allLocations: LocationRow[];
+  staffLocations: Set<string>;
+  setStaffLocations: React.Dispatch<React.SetStateAction<Set<string>>>;
+  primaryLocation: string | null;
+  setPrimaryLocation: React.Dispatch<React.SetStateAction<string | null>>;
+}) {
+  const [locSearch, setLocSearch] = useState("");
+  const filtered = useMemo(() => {
+    const q = locSearch.trim().toLowerCase();
+    return q ? allLocations.filter(l => l.name.toLowerCase().includes(q)) : allLocations;
+  }, [allLocations, locSearch]);
+
+  const toggle = (id: string) => {
+    setStaffLocations(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+        if (primaryLocation === id) setPrimaryLocation(null);
+      } else {
+        next.add(id);
+        if (!primaryLocation) setPrimaryLocation(id);
+      }
+      return next;
+    });
+  };
+
+  const promoteToPrimary = (id: string) => {
+    if (!staffLocations.has(id)) return;
+    setPrimaryLocation(id);
+  };
+
+  if (allLocations.length === 0) {
+    return (
+      <div className="space-y-4">
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          No active locations yet. <a href="/app/locations" className="text-primary hover:underline">Add locations first.</a>
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input value={locSearch} onChange={e => setLocSearch(e.target.value)} placeholder="Search locations…" className="pl-9" />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => {
+            setStaffLocations(new Set(allLocations.map(l => l.id)));
+            if (!primaryLocation && allLocations.length > 0) setPrimaryLocation(allLocations[0].id);
+          }}>Select all</Button>
+          <Button size="sm" variant="outline" onClick={() => { setStaffLocations(new Set()); setPrimaryLocation(null); }}>Clear all</Button>
+        </div>
+        <span className="text-xs text-muted-foreground">Selected: <strong className="text-foreground">{staffLocations.size}</strong></span>
+      </div>
+      <p className="text-[11px] text-muted-foreground">Click the star to mark a primary location. The primary location is used as the default for new appointments.</p>
+      <div className="rounded-lg border border-border/60 overflow-hidden">
+        <div className="divide-y divide-border/20">
+          {filtered.map(l => {
+            const checked = staffLocations.has(l.id);
+            const isPrimary = primaryLocation === l.id && checked;
+            return (
+              <div key={l.id} className={cn("flex items-center gap-2.5 px-3 py-2 text-sm transition hover:bg-surface/30",
+                checked && "bg-primary/5"
+              )}>
+                <input type="checkbox" checked={checked} onChange={() => toggle(l.id)} className="accent-primary" />
+                <span className="flex-1 cursor-pointer" onClick={() => toggle(l.id)}>{l.name}</span>
+                {checked && (
+                  <button
+                    type="button"
+                    onClick={() => promoteToPrimary(l.id)}
+                    title={isPrimary ? "Primary location" : "Set as primary"}
+                    className={cn("rounded-full p-1 transition",
+                      isPrimary ? "text-amber-300" : "text-muted-foreground hover:text-amber-300"
+                    )}
+                  >
+                    <Star className={cn("h-3.5 w-3.5", isPrimary && "fill-current")} />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
