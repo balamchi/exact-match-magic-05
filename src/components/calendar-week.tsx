@@ -712,9 +712,11 @@ export function CalendarWeek() {
             {byProvider ? "Combined" : "By Provider"}
           </Button>
 
-          <Button onClick={openNew} className="gap-2 bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground shadow-lg hover:opacity-90">
-            <Plus className="h-4 w-4" /> New Appointment
-          </Button>
+          {canWriteAppointments && (
+            <Button onClick={openNew} className="gap-2 bg-gradient-to-r from-primary to-fuchsia-500 text-primary-foreground shadow-lg hover:opacity-90">
+              <Plus className="h-4 w-4" /> New Appointment
+            </Button>
+          )}
         </div>
       </section>
 
