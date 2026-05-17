@@ -216,14 +216,20 @@ function ClientsPage() {
           <p className="mt-1.5 text-sm text-muted-foreground">Manage profiles, contact details, tags, and care notes.</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" onClick={exportClients} className="gap-2"><Download className="h-4 w-4" /> Export</Button>
-          <label>
-            <input type="file" accept=".csv" className="hidden" onChange={importClients} />
-            <Button variant="outline" className="gap-2" asChild><span><Upload className="h-4 w-4" /> Import</span></Button>
-          </label>
-          <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-            <Plus className="h-4 w-4" /> Add client
-          </Button>
+          {canExportClients && (
+            <Button variant="outline" onClick={exportClients} className="gap-2"><Download className="h-4 w-4" /> Export</Button>
+          )}
+          {canWriteClients && (
+            <label>
+              <input type="file" accept=".csv" className="hidden" onChange={importClients} />
+              <Button variant="outline" className="gap-2" asChild><span><Upload className="h-4 w-4" /> Import</span></Button>
+            </label>
+          )}
+          {canWriteClients && (
+            <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+              <Plus className="h-4 w-4" /> Add client
+            </Button>
+          )}
         </div>
       </section>
 
