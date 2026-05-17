@@ -309,6 +309,7 @@ function LeadsPage() {
   };
 
   const moveLead = async (leadId: string, newStage: Stage) => {
+    if (!canWriteClients) return toast.error("You don't have permission to update leads");
     const lead = leads.find((l) => l.id === leadId);
     if (!lead || lead.stage === newStage || !clinicId) return;
     const oldStage = lead.stage;
