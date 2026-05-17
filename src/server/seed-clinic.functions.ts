@@ -918,6 +918,51 @@ async function seedMembershipsInternal(
   return result;
 }
 
+async function seedMessageTemplatesInternal(
+  supabase: SupabaseClient,
+  userId: string,
+  clinicId: string,
+  clinicTypes: string[],
+): Promise<SeedResult> {
+  const targetTypes = clinicTypes.length > 0 ? new Set(clinicTypes) : null;
+  const filtered = targetTypes
+    ? messageTemplatesLibrary.filter(
+        (t) => t.clinicType.includes("universal") || t.clinicType.some((ct) => targetTypes.has(ct)),
+      )
+    : messageTemplatesLibrary;
+
+  const rows = filtered.map((t) => ({
+    clinic_id: clinicId,
+    name: t.name,
+    category: t.category,
+    channel: t.channel,
+    body: t.body,
+    is_active: t.is_active ?? true,
+  }));
+
+  const { error } = await supabase
+    .from("message_templates")
+    .upsert(rows, { onConflict: "clinic_id,name" });
+
+  const { count } = await supabase
+    .from("message_templates")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  const succeeded = error ? 0 : Math.min(count ?? 0, rows.length);
+  const result: SeedResult = {
+    resource: "message_templates",
+    attempted: rows.length,
+    succeeded,
+    inserted: succeeded,
+    updated: 0,
+    errors: error ? [error.message] : [],
+    status: error ? "failed" : (succeeded >= rows.length ? "success" : "partial"),
+  };
+  await logSeedActivity(supabase, clinicId, userId, "seed", "message_templates", result);
+  return result;
+}
+
 // ============================================================================
 // EXPORTED SERVER FUNCTIONS
 // ============================================================================
