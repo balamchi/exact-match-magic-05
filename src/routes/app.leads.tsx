@@ -301,6 +301,7 @@ function LeadsPage() {
 
   const remove = async () => {
     if (!editing || !clinicId) return;
+    if (!canDeleteClients) return toast.error("You don't have permission to delete leads");
     if (!confirm("Delete this lead?")) return;
     const { error } = await supabase.from("leads").delete().eq("id", editing.id).eq("clinic_id", clinicId);
     if (error) toast.error(error.message);
