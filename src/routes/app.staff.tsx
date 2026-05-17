@@ -465,7 +465,7 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
       const svcToRemove = Array.from(svcInitial).filter(id => !staffServices.has(id));
       const joinErrors: string[] = [];
       if (svcToAdd.length > 0) {
-        const rows = svcToAdd.map(service_id => ({ staff_id: staffId, service_id }));
+        const rows = svcToAdd.map(service_id => ({ staff_id: staffId, service_id, clinic_id: clinicId }));
         const { error } = await supabase.from("staff_services").insert(rows);
         if (error) joinErrors.push(`services add: ${error.message}`);
       }
