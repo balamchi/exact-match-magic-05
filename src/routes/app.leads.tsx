@@ -754,7 +754,7 @@ function LeadsPage() {
       )}
 
       {/* CSV Import Modal */}
-      {csvOpen && <CsvImportModal clinicId={clinicId!} onClose={() => setCsvOpen(false)} onDone={() => { setCsvOpen(false); load(); }} />}
+      {csvOpen && <CsvImportModal clinicId={clinicId!} onClose={() => setCsvOpen(false)} onDone={() => { setCsvOpen(false); load(); }} sources={sources} />}
     </div>
   );
 }
@@ -803,7 +803,7 @@ function Field({ label, value, onChange, type = "text", required = false, placeh
 
 interface CsvRow { first_name: string; last_name: string; email: string; phone: string; source: string; notes: string }
 
-function CsvImportModal({ clinicId, onClose, onDone }: { clinicId: string; onClose: () => void; onDone: () => void }) {
+function CsvImportModal({ clinicId, onClose, onDone, sources }: { clinicId: string; onClose: () => void; onDone: () => void; sources: Array<{ key: string; label: string }> }) {
   const [rows, setRows] = useState<CsvRow[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [importing, setImporting] = useState(false);
