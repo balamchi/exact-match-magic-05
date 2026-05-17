@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -125,6 +126,7 @@ const staffSchema = z.object({
 function StaffPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id ?? null;
+  const canWriteStaff = hasPermission(activeClinic?.role, "staff.write");
 
   const [rows, setRows] = useState<StaffRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -171,12 +173,14 @@ function StaffPage() {
   }), [rows]);
 
   const toggleActive = async (row: StaffRow) => {
+    if (!canWriteStaff) { toast.error("You don't have permission to modify staff"); return; }
     const { error } = await supabase.from("staff").update({ active: !row.active }).eq("id", row.id);
     if (error) toast.error(error.message);
     else toast.success(row.active ? `${row.display_name} archived` : `${row.display_name} reactivated`);
   };
 
   const remove = async (row: StaffRow) => {
+    if (!canWriteStaff) { toast.error("You don't have permission to modify staff"); return; }
     if (!confirm(`Remove ${row.display_name} from staff?`)) return;
     const { error } = await supabase.from("staff").delete().eq("id", row.id);
     if (error) toast.error(error.message);
@@ -193,9 +197,11 @@ function StaffPage() {
           <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Staff</h1>
           <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">Manage providers, front desk, and support team. Calendar colors flow through to your booking grid.</p>
         </div>
-        <Button onClick={() => setComposer("new")} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-          <Plus className="mr-1.5 h-4 w-4" /> Add staff
-        </Button>
+        {canWriteStaff && (
+          <Button onClick={() => setComposer("new")} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+            <Plus className="mr-1.5 h-4 w-4" /> Add staff
+          </Button>
+        )}
       </header>
 
       {/* KPIs */}
@@ -243,7 +249,7 @@ function StaffPage() {
             </div>
             <p className="text-sm font-medium">No team members yet</p>
             <p className="text-xs text-muted-foreground">Add your team to start scheduling appointments.</p>
-            {rows.length === 0 && <Button size="sm" onClick={() => setComposer("new")} className="mt-2"><Plus className="mr-1.5 h-3.5 w-3.5" /> Add staff</Button>}
+            {rows.length === 0 && canWriteStaff && <Button size="sm" onClick={() => setComposer("new")} className="mt-2"><Plus className="mr-1.5 h-3.5 w-3.5" /> Add staff</Button>}
           </div>
         </section>
       ) : (
@@ -280,13 +286,15 @@ function StaffPage() {
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center gap-1 border-t border-border/40 pt-3 opacity-0 transition group-hover:opacity-100">
-                  <Button size="sm" variant="ghost" onClick={() => setComposer(row)} className="h-7 flex-1 text-xs"><Edit3 className="mr-1 h-3 w-3" /> Edit</Button>
-                  <Button size="sm" variant="ghost" onClick={() => toggleActive(row)} className="h-7 px-2 text-xs" title={row.active ? "Archive" : "Reactivate"}>
-                    {row.active ? <PowerOff className="h-3 w-3" /> : <Power className="h-3 w-3" />}
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => remove(row)} className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></Button>
-                </div>
+                {canWriteStaff && (
+                  <div className="mt-4 flex items-center gap-1 border-t border-border/40 pt-3 opacity-0 transition group-hover:opacity-100">
+                    <Button size="sm" variant="ghost" onClick={() => setComposer(row)} className="h-7 flex-1 text-xs"><Edit3 className="mr-1 h-3 w-3" /> Edit</Button>
+                    <Button size="sm" variant="ghost" onClick={() => toggleActive(row)} className="h-7 px-2 text-xs" title={row.active ? "Archive" : "Reactivate"}>
+                      {row.active ? <PowerOff className="h-3 w-3" /> : <Power className="h-3 w-3" />}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => remove(row)} className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></Button>
+                  </div>
+                )}
               </article>
             );
           })}

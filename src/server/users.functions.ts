@@ -27,6 +27,59 @@ function unwrapInput<T>(input: T): T {
   return input;
 }
 
+const STAFF_LINKED_ROLES = ["provider", "manager"] as const;
+
+/**
+ * Auto-create a staff row for users invited as provider/manager so they
+ * appear in calendar/booking immediately. Idempotent: if a staff row
+ * already exists for this user_id + clinic_id, skip silently.
+ * Failure is non-fatal — the clinic_members insert is the source of truth.
+ */
+async function autoCreateStaffRow(args: {
+  clinicId: string;
+  userId: string;
+  email: string;
+  role: string;
+}): Promise<{ created: boolean; error?: string }> {
+  if (!STAFF_LINKED_ROLES.includes(args.role as typeof STAFF_LINKED_ROLES[number])) {
+    return { created: false };
+  }
+
+  const { data: existing } = await supabaseAdmin
+    .from("staff")
+    .select("id")
+    .eq("clinic_id", args.clinicId)
+    .eq("user_id", args.userId)
+    .maybeSingle();
+
+  if (existing) {
+    return { created: false };
+  }
+
+  const localPart = args.email.split("@")[0] ?? args.email;
+  const displayName = localPart
+    .replace(/[._-]+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase()) || args.email;
+
+  const { error: insertErr } = await supabaseAdmin.from("staff").insert({
+    clinic_id: args.clinicId,
+    user_id: args.userId,
+    display_name: displayName,
+    email: args.email,
+    role: args.role,
+    active: true,
+    online_booking_visible: args.role === "provider",
+  });
+
+  if (insertErr) {
+    console.error("autoCreateStaffRow failed", insertErr);
+    return { created: false, error: insertErr.message };
+  }
+
+  return { created: true };
+}
+
 export const inviteUserToClinic = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth, attachSupabaseAuth])
   .inputValidator((raw: unknown) => InviteSchema.parse(unwrapInput(raw)))
@@ -103,6 +156,8 @@ export const inviteUserToClinic = createServerFn({ method: "POST" })
         };
       }
 
+      await autoCreateStaffRow({ clinicId, userId: existingUser.id, email, role });
+
       return {
         success: true as const,
         addedExistingUser: true as const,
@@ -142,6 +197,8 @@ export const inviteUserToClinic = createServerFn({ method: "POST" })
         error: "Invite email sent, but failed to register clinic membership. Please contact support.",
       };
     }
+
+    await autoCreateStaffRow({ clinicId, userId: inviteResult.user.id, email, role });
 
     return {
       success: true as const,
