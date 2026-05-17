@@ -4,6 +4,7 @@ import {
   UserCog, Plus, Search, Users, Stethoscope, Sparkles, ShieldCheck,
   Edit3, Trash2, X, Power, PowerOff, Crown, Briefcase, Calendar,
   Phone, Mail, AlertTriangle, Loader2, Save, Palette, Check,
+  MapPin, Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
