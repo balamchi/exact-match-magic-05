@@ -2,12 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   FileText, Plus, Search, Send, CheckCircle2, AlertCircle, X, DollarSign,
-  Clock, TrendingUp, Download, Copy, Ban, Calendar as CalendarIcon, User,
+  Clock, TrendingUp, Download, Copy, Ban, Calendar as CalendarIcon, User, ShieldOff,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { hasPermission } from "@/lib/permissions";
 
 export const Route = createFileRoute("/app/invoices")({ component: InvoicesPage });
 
