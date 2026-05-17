@@ -1097,9 +1097,11 @@ export function CalendarWeek() {
                     placeholder="Optional reason..."
                     className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                   />
-                  <Button type="button" size="sm" variant="destructive" onClick={() => advanceStatus(editing!, "cancelled", cancelReason)}>
-                    Confirm Cancel
-                  </Button>
+                  {canCancelAppointments && (
+                    <Button type="button" size="sm" variant="destructive" onClick={() => advanceStatus(editing!, "cancelled", cancelReason)}>
+                      Confirm Cancel
+                    </Button>
+                  )}
                   <Button type="button" size="sm" variant="ghost" onClick={() => setShowCancelReason(false)}>
                     Back
                   </Button>
