@@ -653,7 +653,7 @@ function LeadsPage() {
               </label>
             </div>
             <div className="flex items-center justify-between gap-2 border-t border-border p-5">
-              <div>{editing && <Button type="button" variant="ghost" onClick={remove} className="text-destructive hover:text-destructive">Delete</Button>}</div>
+              <div>{editing && canDeleteClients && <Button type="button" variant="ghost" onClick={remove} className="text-destructive hover:text-destructive">Delete</Button>}</div>
               <div className="flex gap-2">
                 <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
                 <Button disabled={saving} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
