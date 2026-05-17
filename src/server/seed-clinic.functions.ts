@@ -1303,12 +1303,14 @@ export const getClinicSeedStatus = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const clinicId = await getUserClinicId(supabase, userId);
 
-    const [services, consentFormsRes, automations, memberships, messageTemplatesRes] = await Promise.all([
+    const [services, consentFormsRes, automations, memberships, messageTemplatesRes, soapTemplatesRes, leadSourcesRes] = await Promise.all([
       supabase.from("services").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("consent_form_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("automations").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("memberships").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
       supabase.from("message_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+      supabase.from("soap_templates").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
+      supabase.from("lead_sources_config").select("id", { count: "exact", head: true }).eq("clinic_id", clinicId),
     ]);
 
     let seededClinicTypes: string[] = [];
@@ -1327,6 +1329,8 @@ export const getClinicSeedStatus = createServerFn({ method: "GET" })
       clinicId,
       seededClinicTypes,
       counts: {
+        leadSources: leadSourcesRes.count ?? 0,
+        soapTemplates: soapTemplatesRes.count ?? 0,
         messageTemplates: messageTemplatesRes.count ?? 0,
         services: services.count ?? 0,
         consentForms: consentFormsRes.count ?? 0,
