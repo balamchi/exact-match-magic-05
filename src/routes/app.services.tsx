@@ -607,6 +607,35 @@ function ServicesPage() {
                   : <CreditCard className="mr-2 h-3.5 w-3.5" />}
                 Refresh memberships
               </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                disabled={refreshingResource !== null}
+                onClick={async () => {
+                  setRefreshingResource("message_templates");
+                  try {
+                    const r = await seedMessageTemplates({ data: {} });
+                    if (r.status === "failed") {
+                      toast.error(`Message templates refresh failed: ${r.errors.join(", ")}`, { duration: 8000 });
+                    } else if (r.status === "partial") {
+                      toast.warning(`Message templates partial: ${r.succeeded}/${r.attempted} rows`, { duration: 6000 });
+                    } else {
+                      toast.success(`Refreshed ${r.succeeded} message templates`);
+                    }
+                  } catch (err: any) {
+                    toast.error(`Message templates refresh error: ${err.message}`, { duration: 8000 });
+                    console.error("seedMessageTemplates error:", err);
+                  } finally {
+                    setRefreshingResource(null);
+                  }
+                }}
+              >
+                {refreshingResource === "message_templates"
+                  ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  : <MessageSquare className="mr-2 h-3.5 w-3.5" />}
+                Refresh message templates
+              </Button>
             </div>
           </details>}
         </div>
