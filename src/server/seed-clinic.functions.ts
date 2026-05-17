@@ -1195,6 +1195,24 @@ export const seedMessageTemplates = createServerFn({ method: "POST" })
     return seedMessageTemplatesInternal(supabase, userId, clinicId, resolveClinicTypes(data));
   });
 
+export const seedSoapTemplates = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }): Promise<SeedResult> => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+    return seedSoapTemplatesInternal(supabase, userId, clinicId, resolveClinicTypes(data));
+  });
+
+export const seedLeadSources = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
+  .handler(async ({ data, context }): Promise<SeedResult> => {
+    const { supabase, userId } = context;
+    const clinicId = await getUserClinicId(supabase, userId);
+    return seedLeadSourcesInternal(supabase, userId, clinicId, resolveClinicTypes(data));
+  });
+
 export const seedAll = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((input: unknown) => unwrapInput<SeedInput>(input))
