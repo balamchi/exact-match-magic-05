@@ -490,10 +490,14 @@ function LeadsPage() {
                   </div>
                   <div className="flex-1 space-y-2 p-2">
                     {items.length === 0 ? (
-                      <button onClick={() => openCreate(stage.id)}
-                        className="flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-border py-8 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-primary">
-                        <Plus className="h-3.5 w-3.5" /> Add lead
-                      </button>
+                      canWriteClients ? (
+                        <button onClick={() => openCreate(stage.id)}
+                          className="flex w-full items-center justify-center gap-1 rounded-lg border border-dashed border-border py-8 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-primary">
+                          <Plus className="h-3.5 w-3.5" /> Add lead
+                        </button>
+                      ) : (
+                        <div className="flex w-full items-center justify-center rounded-lg border border-dashed border-border py-8 text-xs text-muted-foreground">No leads</div>
+                      )
                     ) : (
                       items.map((lead) => (
                         <div key={lead.id} draggable
