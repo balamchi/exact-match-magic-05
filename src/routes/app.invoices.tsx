@@ -139,6 +139,25 @@ function InvoicesPage() {
     toast.success("Invoice duplicated as draft");
   }
 
+  if (!canReadBilling) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Billing</p>
+          <h1 className="mt-1 font-display text-2xl sm:text-4xl font-semibold tracking-tight">Invoices</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">Track outstanding balances, age receivables, and reconcile paid invoices.</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-10 text-center shadow-card">
+          <ShieldOff className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <h2 className="font-display text-lg font-semibold">Restricted</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            You don't have permission to view billing. Contact your clinic owner if you need access.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
