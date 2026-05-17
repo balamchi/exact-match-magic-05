@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { useRealtimeTable } from "@/hooks/use-realtime-table";
 import { cn } from "@/lib/utils";
+import { hasPermission } from "@/lib/permissions";
 
 type Lead = Tables<"leads">;
 type LeadActivity = Tables<"lead_activities">;
