@@ -413,12 +413,16 @@ function LeadsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setCsvOpen(true)} className="gap-2">
-            <Upload className="h-4 w-4" /> Import CSV
-          </Button>
-          <Button onClick={() => openCreate("new")} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-            <Plus className="h-4 w-4" /> Add lead
-          </Button>
+          {canWriteClients && (
+            <Button variant="outline" onClick={() => setCsvOpen(true)} className="gap-2">
+              <Upload className="h-4 w-4" /> Import CSV
+            </Button>
+          )}
+          {canWriteClients && (
+            <Button onClick={() => openCreate("new")} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+              <Plus className="h-4 w-4" /> Add lead
+            </Button>
+          )}
         </div>
       </section>
 
