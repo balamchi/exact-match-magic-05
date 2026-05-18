@@ -231,14 +231,45 @@ function BillingPage() {
       {!loading && subscription && (
         <>
           {isPastDue && (
-            <div className="flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-5">
-              <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
-              <div>
-                <div className="font-semibold text-destructive">Payment failed</div>
-                <p className="text-sm text-muted-foreground">
-                  We couldn't process your last payment. Please update your payment method to keep your subscription active.
-                </p>
+            <div className="flex flex-col gap-4 rounded-2xl border border-destructive/40 bg-destructive/10 p-5 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-destructive" />
+                <div className="space-y-1">
+                  <div className="font-semibold text-destructive">Payment failed — action required</div>
+                  <p className="text-sm text-muted-foreground">
+                    We couldn't process your last payment for the{" "}
+                    <span className="font-medium text-foreground">
+                      {subscription.plan_code
+                        ? subscription.plan_code.charAt(0).toUpperCase() + subscription.plan_code.slice(1)
+                        : "current"}
+                    </span>{" "}
+                    plan. Paddle will retry the charge automatically, but to avoid
+                    interruption please update your payment method now.
+                  </p>
+                  {subscription.current_period_end && (
+                    <p className="text-xs text-muted-foreground/80">
+                      Subscription will be canceled if not resolved by{" "}
+                      <span className="font-medium text-foreground">
+                        {new Date(subscription.current_period_end).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </span>
+                      .
+                    </p>
+                  )}
+                </div>
               </div>
+              <Button
+                onClick={openPortal}
+                disabled={portalLoading}
+                variant="destructive"
+                className="flex-shrink-0 self-stretch sm:self-start"
+              >
+                <CreditCard className="mr-2 h-4 w-4" />
+                {portalLoading ? "Opening…" : "Update payment method"}
+              </Button>
             </div>
           )}
 
