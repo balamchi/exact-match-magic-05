@@ -143,6 +143,29 @@ function WhatsAppPage() {
     unread: conversations.reduce((s, c) => s + (c.unread_count || 0), 0),
   }), [conversations]);
 
+  if (!limitsLoading && !canUseWhatsApp) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="max-w-md rounded-2xl border border-border bg-card/60 p-8 text-center shadow-card backdrop-blur">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-400">
+            <ShieldOff className="h-6 w-6" />
+          </div>
+          <h2 className="font-display text-xl font-semibold tracking-tight">
+            WhatsApp not included on {limits?.plan_name ?? "your plan"}
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Upgrade to Professional or Growth to send WhatsApp messages directly from ClinicPro.
+          </p>
+          <Button asChild className="mt-5 gap-1.5 bg-gradient-to-r from-primary to-primary/80">
+            <Link to="/app/settings/billing">
+              Upgrade plan <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="-mx-4 -my-6 sm:-mx-6 sm:-my-8 flex h-[calc(100vh-4rem)] flex-col">
       {/* Header */}
