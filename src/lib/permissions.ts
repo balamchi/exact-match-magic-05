@@ -64,6 +64,9 @@ export const PERMISSION_KEYS = [
   "before_after.write",
   "before_after.delete",
 
+  // Treatment plan templates (clinical configuration)
+  "treatment_templates.manage",
+
   // Automations
   "automations.read",
   "automations.write",
@@ -111,6 +114,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "consent_forms.read", "consent_forms.write", "consent_forms.sign",
     "soap_notes.read.own", "soap_notes.read.all", "soap_notes.write",
     "before_after.read", "before_after.write", "before_after.delete",
+    "treatment_templates.manage",
     "automations.read", "automations.write",
     "memberships.read", "memberships.write",
     "payments.process", "payments.refund",
@@ -132,6 +136,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "consent_forms.read", "consent_forms.write", "consent_forms.sign",
     "soap_notes.read.own", "soap_notes.read.all", "soap_notes.write",
     "before_after.read", "before_after.write", "before_after.delete",
+    "treatment_templates.manage",
     "automations.read", "automations.write",
     "memberships.read", "memberships.write",
     "payments.process", "payments.refund",
@@ -154,6 +159,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "consent_forms.read", "consent_forms.write", "consent_forms.sign",
     "soap_notes.read.own", "soap_notes.read.all", "soap_notes.write",
     "before_after.read", "before_after.write", "before_after.delete",
+    "treatment_templates.manage",
     "automations.read", "automations.write",
     "memberships.read", "memberships.write",
     "payments.process", "payments.refund",
@@ -174,6 +180,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "consent_forms.read", "consent_forms.write", "consent_forms.sign",
     "soap_notes.read.own", "soap_notes.read.all", "soap_notes.write",
     "before_after.read", "before_after.write", "before_after.delete",
+    "treatment_templates.manage",
     "automations.read", "automations.write",
     "memberships.read", "memberships.write",
     "payments.process",
@@ -194,6 +201,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "consent_forms.read", "consent_forms.sign",
     "soap_notes.read.own", "soap_notes.read.all", "soap_notes.write",
     "before_after.read", "before_after.write", "before_after.delete",
+    "treatment_templates.manage",
     "automations.read",
     "memberships.read",
     "payments.process",
@@ -214,6 +222,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "consent_forms.read", "consent_forms.sign",
     "soap_notes.read.own", "soap_notes.write",
     "before_after.read", "before_after.write", "before_after.delete",
+    "treatment_templates.manage",
     "memberships.read",
     "staff.read",
   ],

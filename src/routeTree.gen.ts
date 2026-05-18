@@ -100,6 +100,7 @@ import { Route as AppReportsBuilderRouteImport } from './routes/app.reports.buil
 import { Route as AppReferralsSettingsRouteImport } from './routes/app.referrals.settings'
 import { Route as AppCommunicationTemplatesRouteImport } from './routes/app.communication.templates'
 import { Route as AppClinicalTreatmentPlansRouteImport } from './routes/app.clinical.treatment-plans'
+import { Route as AppClinicalTreatmentPlanTemplatesRouteImport } from './routes/app.clinical.treatment-plan-templates'
 import { Route as AppClinicalSoapNotesRouteImport } from './routes/app.clinical.soap-notes'
 import { Route as AppClinicalConsentFormsRouteImport } from './routes/app.clinical.consent-forms'
 import { Route as AppClientsClientIdRouteImport } from './routes/app.clients_.$clientId'
@@ -594,6 +595,12 @@ const AppClinicalTreatmentPlansRoute =
     path: '/treatment-plans',
     getParentRoute: () => AppClinicalRoute,
   } as any)
+const AppClinicalTreatmentPlanTemplatesRoute =
+  AppClinicalTreatmentPlanTemplatesRouteImport.update({
+    id: '/treatment-plan-templates',
+    path: '/treatment-plan-templates',
+    getParentRoute: () => AppClinicalRoute,
+  } as any)
 const AppClinicalSoapNotesRoute = AppClinicalSoapNotesRouteImport.update({
   id: '/soap-notes',
   path: '/soap-notes',
@@ -875,6 +882,7 @@ export interface FileRoutesByFullPath {
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
   '/app/clinical/consent-forms': typeof AppClinicalConsentFormsRouteWithChildren
   '/app/clinical/soap-notes': typeof AppClinicalSoapNotesRouteWithChildren
+  '/app/clinical/treatment-plan-templates': typeof AppClinicalTreatmentPlanTemplatesRoute
   '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansRouteWithChildren
   '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
@@ -998,6 +1006,7 @@ export interface FileRoutesByTo {
   '/reviews/$publicToken': typeof ReviewsPublicTokenRoute
   '/api/public/booking': typeof ApiPublicBookingRoute
   '/app/clients/$clientId': typeof AppClientsClientIdRoute
+  '/app/clinical/treatment-plan-templates': typeof AppClinicalTreatmentPlanTemplatesRoute
   '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
   '/app/reports/builder': typeof AppReportsBuilderRoute
@@ -1126,6 +1135,7 @@ export interface FileRoutesById {
   '/app/clients_/$clientId': typeof AppClientsClientIdRoute
   '/app/clinical/consent-forms': typeof AppClinicalConsentFormsRouteWithChildren
   '/app/clinical/soap-notes': typeof AppClinicalSoapNotesRouteWithChildren
+  '/app/clinical/treatment-plan-templates': typeof AppClinicalTreatmentPlanTemplatesRoute
   '/app/clinical/treatment-plans': typeof AppClinicalTreatmentPlansRouteWithChildren
   '/app/communication/templates': typeof AppCommunicationTemplatesRoute
   '/app/referrals/settings': typeof AppReferralsSettingsRoute
@@ -1256,6 +1266,7 @@ export interface FileRouteTypes {
     | '/app/clients/$clientId'
     | '/app/clinical/consent-forms'
     | '/app/clinical/soap-notes'
+    | '/app/clinical/treatment-plan-templates'
     | '/app/clinical/treatment-plans'
     | '/app/communication/templates'
     | '/app/referrals/settings'
@@ -1379,6 +1390,7 @@ export interface FileRouteTypes {
     | '/reviews/$publicToken'
     | '/api/public/booking'
     | '/app/clients/$clientId'
+    | '/app/clinical/treatment-plan-templates'
     | '/app/communication/templates'
     | '/app/referrals/settings'
     | '/app/reports/builder'
@@ -1506,6 +1518,7 @@ export interface FileRouteTypes {
     | '/app/clients_/$clientId'
     | '/app/clinical/consent-forms'
     | '/app/clinical/soap-notes'
+    | '/app/clinical/treatment-plan-templates'
     | '/app/clinical/treatment-plans'
     | '/app/communication/templates'
     | '/app/referrals/settings'
@@ -2225,6 +2238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClinicalTreatmentPlansRouteImport
       parentRoute: typeof AppClinicalRoute
     }
+    '/app/clinical/treatment-plan-templates': {
+      id: '/app/clinical/treatment-plan-templates'
+      path: '/treatment-plan-templates'
+      fullPath: '/app/clinical/treatment-plan-templates'
+      preLoaderRoute: typeof AppClinicalTreatmentPlanTemplatesRouteImport
+      parentRoute: typeof AppClinicalRoute
+    }
     '/app/clinical/soap-notes': {
       id: '/app/clinical/soap-notes'
       path: '/soap-notes'
@@ -2545,12 +2565,15 @@ const AppClinicalTreatmentPlansRouteWithChildren =
 interface AppClinicalRouteChildren {
   AppClinicalConsentFormsRoute: typeof AppClinicalConsentFormsRouteWithChildren
   AppClinicalSoapNotesRoute: typeof AppClinicalSoapNotesRouteWithChildren
+  AppClinicalTreatmentPlanTemplatesRoute: typeof AppClinicalTreatmentPlanTemplatesRoute
   AppClinicalTreatmentPlansRoute: typeof AppClinicalTreatmentPlansRouteWithChildren
 }
 
 const AppClinicalRouteChildren: AppClinicalRouteChildren = {
   AppClinicalConsentFormsRoute: AppClinicalConsentFormsRouteWithChildren,
   AppClinicalSoapNotesRoute: AppClinicalSoapNotesRouteWithChildren,
+  AppClinicalTreatmentPlanTemplatesRoute:
+    AppClinicalTreatmentPlanTemplatesRoute,
   AppClinicalTreatmentPlansRoute: AppClinicalTreatmentPlansRouteWithChildren,
 }
 

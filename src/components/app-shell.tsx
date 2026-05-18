@@ -7,7 +7,7 @@ import {
   Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
-  Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
+  Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot, ClipboardList,
   Phone, BookOpen, Sun, Moon, MessageSquareText, HelpCircle,
   type LucideIcon,
 } from "lucide-react";
@@ -101,6 +101,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { to: "/app/clinical/soap-notes", label: "SOAP Notes", icon: Stethoscope },
       { to: "/app/clinical/treatment-plans", label: "Treatment Plans", icon: ListChecks },
+      { to: "/app/clinical/treatment-plan-templates", label: "Plan Templates", icon: ClipboardList },
       { to: "/app/clinical/consent-forms", label: "Consent Forms", icon: FileText },
       { to: "/app/injection-mapping", label: "Injection Mapping", icon: Syringe, beta: true },
       { to: "/app/before-after", label: "Before / After", icon: Images },
