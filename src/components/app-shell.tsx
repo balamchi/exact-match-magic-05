@@ -7,7 +7,7 @@ import {
   Bell, Plus, Settings, LogOut, ChevronDown, Sparkles,
   HeartPulse, UserCog, Menu, Languages, Brain, Globe,
   MapPin, CreditCard, FileText, ClipboardCheck, Inbox, BadgeCheck,
-  Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot,
+  Star, Share2, Syringe, ListChecks, Images, Stethoscope, Bot, ClipboardList,
   Phone, BookOpen, Sun, Moon, MessageSquareText, HelpCircle,
   type LucideIcon,
 } from "lucide-react";
