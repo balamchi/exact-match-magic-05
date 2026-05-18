@@ -355,7 +355,7 @@ function KpiCard({ label, value, icon, accent }: { label: string; value: number;
 
 type TabKey = "profile" | "contact" | "role" | "services" | "locations" | "schedule" | "hr" | "commissions";
 
-function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | null; clinicId: string; onClose: () => void; onSaved: () => void }) {
+function StaffComposer({ row, clinicId, onClose, onSaved, blockCreate = false, planName = null, seatLimit = null }: { row: StaffRow | null; clinicId: string; onClose: () => void; onSaved: () => void; blockCreate?: boolean; planName?: string | null; seatLimit?: number | null }) {
   const { activeClinic } = useAuth();
   const editing = !!row;
   const [tab, setTab] = useState<TabKey>("profile");
