@@ -52,6 +52,7 @@ function initials(name: string) {
 
 function WhatsAppPage() {
   const { activeClinic } = useAuth();
+  const { canUseWhatsApp, limits, loading: limitsLoading } = usePlanLimits();
   const clinicId = activeClinic?.clinic_id;
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
