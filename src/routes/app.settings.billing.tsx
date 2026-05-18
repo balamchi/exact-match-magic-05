@@ -553,8 +553,99 @@ function BillingPage() {
               ))}
             </ul>
           </section>
-        </>
-      )}
-    </div>
-  );
-}
+
+          {/* Payment History — read-only audit log */}
+          {hasPermission(activeClinic?.role, "clinic.billing.read") && (
+            <section className="rounded-2xl border border-border/60 bg-card/40 p-5 shadow-card">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Receipt className="h-4 w-4 text-primary" />
+                  <h2 className="text-sm font-semibold tracking-tight">Payment history</h2>
+                </div>
+                <span className="text-xs text-muted-foreground">Last 50 transactions</span>
+              </div>
+
+              {txLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-12 animate-pulse rounded-lg bg-muted/40" />
+                  ))}
+                </div>
+              ) : transactions.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-border/60 bg-card/30 p-8 text-center">
+                  <Receipt className="mx-auto mb-2 h-6 w-6 text-muted-foreground" />
+                  <p className="text-sm font-medium">No payments yet</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Your Paddle transactions will appear here once your first charge processes.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-xl border border-border/60">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 font-medium">Date</th>
+                        <th className="px-3 py-2 font-medium">Amount</th>
+                        <th className="px-3 py-2 font-medium">Status</th>
+                        <th className="px-3 py-2 font-medium">Plan</th>
+                        <th className="px-3 py-2 font-medium">Invoice</th>
+                        <th className="px-3 py-2 font-medium">Transaction</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transactions.map((tx) => {
+                        const badge = txStatusBadge(tx.status);
+                        const date = tx.billed_at ?? tx.created_at;
+                        return (
+                          <tr key={tx.id} className="border-t border-border/40 hover:bg-muted/20">
+                            <td className="px-3 py-2.5 text-sm">
+                              {new Date(date).toLocaleDateString("en-CA", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </td>
+                            <td className="px-3 py-2.5 font-medium">
+                              {formatMoney(tx.amount_cents, tx.currency)}
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <Badge variant="outline" className={cn("text-xs", badge.className)}>
+                                {badge.label}
+                              </Badge>
+                              {tx.error_reason && (
+                                <div className="mt-0.5 text-xs text-muted-foreground">
+                                  {tx.error_reason}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                              {tx.plan_code ?? "—"}
+                            </td>
+                            <td className="px-3 py-2.5 text-xs">
+                              {tx.invoice_pdf_url ? (
+                                <a
+                                  href={tx.invoice_pdf_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline"
+                                >
+                                  {tx.invoice_number ?? "Download"}
+                                </a>
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  {tx.invoice_number ?? "—"}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5 font-mono text-xs text-muted-foreground" title={tx.paddle_transaction_id}>
+                              {shortTxId(tx.paddle_transaction_id)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
