@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type ClinicRole } from "@/lib/auth-context";
+import { hasPermission } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
