@@ -119,6 +119,10 @@ function ClientsPage() {
     event.preventDefault();
     if (!activeClinic || !form.first_name.trim()) return;
     if (!canWriteClients) { toast.error("You don't have permission to modify clients"); return; }
+    if (!editing && atClientLimit) {
+      toast.error(`Your ${limits?.plan_name ?? "current"} plan allows only ${limits?.active_clients_limit} active clients. Upgrade to add more.`);
+      return;
+    }
     setSaving(true);
     const payload: Record<string, any> = {
       clinic_id: activeClinic.clinic_id,
