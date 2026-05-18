@@ -451,6 +451,10 @@ function StaffComposer({ row, clinicId, onClose, onSaved, blockCreate = false, p
   }, [clinicId, row]);
 
   const saveStaff = async () => {
+    if (blockCreate) {
+      toast.error(`Your ${planName ?? "current"} plan allows only ${seatLimit} staff seats. Upgrade to add more.`);
+      return;
+    }
     const parsed = staffSchema.safeParse({ display_name: displayName, title, color, active, role, bio, email, phone, online_booking_visible: onlineBookingVisible });
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message ?? "Check your inputs"); return; }
     setSaving(true);
