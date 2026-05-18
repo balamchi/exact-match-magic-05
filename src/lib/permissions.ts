@@ -59,6 +59,11 @@ export const PERMISSION_KEYS = [
   "soap_notes.read.all",
   "soap_notes.write",
 
+  // Before/After photos (clinical media)
+  "before_after.read",
+  "before_after.write",
+  "before_after.delete",
+
   // Automations
   "automations.read",
   "automations.write",
