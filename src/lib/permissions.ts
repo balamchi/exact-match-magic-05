@@ -64,6 +64,9 @@ export const PERMISSION_KEYS = [
   "before_after.write",
   "before_after.delete",
 
+  // Treatment plan templates (clinical configuration)
+  "treatment_templates.manage",
+
   // Automations
   "automations.read",
   "automations.write",
