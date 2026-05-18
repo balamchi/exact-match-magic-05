@@ -7,6 +7,8 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { hasPermission } from "@/lib/permissions";
+import { usePlanLimits } from "@/hooks/use-plan-limits";
+import { LimitGate, UsageMeter } from "@/components/limit-gate";
 
 export const Route = createFileRoute("/app/clients")({
   component: ClientsPage,
