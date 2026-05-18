@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import {
   Building2, Users, Globe, LogOut, Save, Mail, Shield, Trash2, Link2, Copy, ExternalLink,
@@ -44,6 +44,7 @@ interface SeedActivityRow { id: string; action: string; resource: string | null;
 
 function SettingsPage() {
   const { activeClinic, user, memberships, refreshMemberships, signOut } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const canWriteSettings = hasPermission(activeClinic?.role, "clinic.settings.write");
   const canReadAudit = hasPermission(activeClinic?.role, "audit.read");
   // Alias kept so the 50+ existing JSX usages of `isOwnerOrAdmin` (disabled props on
@@ -205,6 +206,7 @@ function SettingsPage() {
     setConfirmRemoveId(null);
   };
 
+  if (pathname.startsWith("/app/settings/")) return <Outlet />;
   if (!activeClinic) return <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">No clinic selected.</div>;
   if (!clinicData) return <div className="space-y-4"><Skeleton className="h-8 w-40" /><Skeleton className="h-96 rounded-2xl" /></div>;
 
