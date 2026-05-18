@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type ClinicRole } from "@/lib/auth-context";
+import { hasPermission } from "@/lib/permissions";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
@@ -441,7 +442,7 @@ function ClientDetailPage() {
           {activeTab === "overview" && <OverviewTab appointments={appointments} currency={currency} stats={stats} client={client} />}
           {activeTab === "appointments" && <AppointmentList appointments={appointments} currency={currency} />}
           {activeTab === "treatments" && <InjectionsList injections={injections} />}
-          {activeTab === "photos" && <PhotosList photos={photos} />}
+          {activeTab === "photos" && <PhotosList photos={photos} role={activeClinic?.role ?? null} />}
           {activeTab === "payments" && <FinancialTab invoices={invoices} appointments={appointments} currency={currency} />}
           {activeTab === "consents" && <ConsentsTab consents={signedConsents} onSend={() => setSendConsentOpen(true)} />}
           {activeTab === "soap" && <SoapNotesList notes={soapNotes} />}
@@ -732,23 +733,60 @@ function InjectionsList({ injections }: { injections: InjectionSite[] }) {
   );
 }
 
-function PhotosList({ photos }: { photos: BeforeAfter[] }) {
-  if (photos.length === 0) return <EmptyTab title="No photos yet" description="Before & after photos for this client will appear here." icon={<Camera className="h-8 w-8" />} />;
+function PhotosList({ photos, role }: { photos: BeforeAfter[]; role: ClinicRole | null }) {
+  const canRead = hasPermission(role, "before_after.read");
+  const canWrite = hasPermission(role, "before_after.write");
+  if (!canRead) {
+    return <EmptyTab title="Restricted" description="You don't have permission to view before/after photos." icon={<Camera className="h-8 w-8" />} />;
+  }
   return (
-    <div className="grid gap-4 p-4 sm:grid-cols-2">
-      {photos.map((p) => (
-        <div key={p.id} className="rounded-xl border border-border bg-surface/40 p-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {p.before_url ? <img src={p.before_url} alt="Before" className="h-32 w-full rounded-lg object-cover" /> : <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No before</div>}
-            {p.after_url ? <img src={p.after_url} alt="After" className="h-32 w-full rounded-lg object-cover" /> : <div className="flex h-32 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">No after</div>}
-          </div>
-          <div className="mt-2 flex items-center justify-between text-xs">
-            <span><span className="font-medium">{p.treatment ?? "Treatment"}</span> · {new Date(p.taken_on).toLocaleDateString()}</span>
-            {p.consent_given && <span className="text-emerald-400 text-[10px]">Consent ✓</span>}
-          </div>
+    <section className="space-y-3 p-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Before / After Photos</h3>
+        <Link to="/app/before-after" className="text-sm text-primary hover:underline">
+          View all →
+        </Link>
+      </div>
+      {photos && photos.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {photos.slice(0, 6).map((p) => (
+            <div key={p.id} className="space-y-2 rounded-2xl border border-border/60 bg-card/30 p-3">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Before</div>
+                  {p.before_url ? (
+                    <img src={p.before_url} alt="Before" className="aspect-square w-full rounded-lg object-cover" loading="lazy" />
+                  ) : (
+                    <div className="flex aspect-square w-full items-center justify-center rounded-lg border border-dashed border-border/60 text-xs text-muted-foreground">No photo</div>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">After</div>
+                  {p.after_url ? (
+                    <img src={p.after_url} alt="After" className="aspect-square w-full rounded-lg object-cover" loading="lazy" />
+                  ) : (
+                    <div className="flex aspect-square w-full items-center justify-center rounded-lg border border-dashed border-border/60 text-xs text-muted-foreground">No photo</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className="font-medium text-foreground">{p.treatment ?? "Treatment"}</span>
+                <span className="text-muted-foreground">{new Date(p.taken_on).toLocaleDateString()}</span>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-border/60 bg-card/30 p-8 text-center">
+          <p className="text-sm text-muted-foreground">No before/after photos yet for this client.</p>
+          {canWrite && (
+            <Link to="/app/before-after" className="mt-2 inline-block text-sm font-medium text-primary hover:underline">
+              Add photos →
+            </Link>
+          )}
+        </div>
+      )}
+    </section>
   );
 }
 
