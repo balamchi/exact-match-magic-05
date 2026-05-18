@@ -3,11 +3,12 @@ import { ComingSoonBanner } from "@/components/beta-badge";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { usePlanLimits } from "@/hooks/use-plan-limits";
 import { toast } from "sonner";
 import {
   Phone, Send, Search, Star, Clock, Archive, MoreHorizontal, X,
   Check, CheckCheck, AlertCircle, Sparkles, MessageCircle, Zap, ExternalLink,
-  CheckCircle2, RefreshCw,
+  CheckCircle2, RefreshCw, ShieldOff, ArrowUpRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
