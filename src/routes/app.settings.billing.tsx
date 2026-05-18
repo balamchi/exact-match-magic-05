@@ -74,6 +74,34 @@ function BillingPage() {
   const [plans, setPlans] = useState<PlanRow[]>([]);
   const [changingPlan, setChangingPlan] = useState<string | null>(null);
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
+  const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
+  const [txLoading, setTxLoading] = useState(true);
+
+  const clinicId = activeClinic?.clinic_id;
+  useEffect(() => {
+    if (!clinicId) return;
+    let active = true;
+    (async () => {
+      setTxLoading(true);
+      const env = subscription?.environment ?? "live";
+      const { data, error } = await supabase
+        .from("payment_transactions")
+        .select("*")
+        .eq("clinic_id", clinicId)
+        .eq("environment", env)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (!active) return;
+      if (error) {
+        console.error("Failed to load payment transactions", error);
+        setTransactions([]);
+      } else {
+        setTransactions((data ?? []) as PaymentTransaction[]);
+      }
+      setTxLoading(false);
+    })();
+    return () => { active = false; };
+  }, [clinicId, subscription?.environment]);
 
   // Post-checkout success — toast + poll until webhook upserts the real subscription
   useEffect(() => {
