@@ -234,12 +234,21 @@ function ClientsPage() {
             </label>
           )}
           {canWriteClients && (
-            <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+            <Button onClick={openCreate} disabled={atClientLimit} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 disabled:opacity-50">
               <Plus className="h-4 w-4" /> Add client
             </Button>
           )}
         </div>
       </section>
+
+      {atClientLimit && limits && usage && (
+        <LimitGate resource="clients" current={usage.active_client_count} limit={limits.active_clients_limit} planName={limits.plan_name} />
+      )}
+      {!atClientLimit && limits && usage && (
+        <div className="flex justify-end">
+          <UsageMeter resource="clients" current={usage.active_client_count} limit={limits.active_clients_limit} />
+        </div>
+      )}
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Metric label="Total clients" value={clients.length.toString()} icon={<Users className="h-4.5 w-4.5" />} />
