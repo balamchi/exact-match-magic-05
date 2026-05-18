@@ -22,7 +22,7 @@ const TrialCheckInEmail = ({ firstName, appUrl }: Props) => (
     <Preview>You&rsquo;re halfway through. Quick question.</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brand}>{BRAND.displayName}</Text>
+        <Text style={brand}>✦ ClinicPro</Text>
         <Heading style={h1}>Halfway there, {firstName}</Heading>
         <Text style={lead}>
           You&rsquo;re 7 days into your ClinicPro trial — 7 days left. I wanted to personally
