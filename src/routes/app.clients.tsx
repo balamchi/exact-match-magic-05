@@ -7,6 +7,8 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { hasPermission } from "@/lib/permissions";
+import { usePlanLimits } from "@/hooks/use-plan-limits";
+import { LimitGate, UsageMeter } from "@/components/limit-gate";
 
 export const Route = createFileRoute("/app/clients")({
   component: ClientsPage,
@@ -53,6 +55,7 @@ function ClientsPage() {
   const canWriteClients = hasPermission(activeClinic?.role, "clients.write");
   const canDeleteClients = hasPermission(activeClinic?.role, "clients.delete");
   const canExportClients = hasPermission(activeClinic?.role, "clients.export");
+  const { limits, usage, atClientLimit } = usePlanLimits();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -116,6 +119,10 @@ function ClientsPage() {
     event.preventDefault();
     if (!activeClinic || !form.first_name.trim()) return;
     if (!canWriteClients) { toast.error("You don't have permission to modify clients"); return; }
+    if (!editing && atClientLimit) {
+      toast.error(`Your ${limits?.plan_name ?? "current"} plan allows only ${limits?.active_clients_limit} active clients. Upgrade to add more.`);
+      return;
+    }
     setSaving(true);
     const payload: Record<string, any> = {
       clinic_id: activeClinic.clinic_id,
@@ -180,6 +187,7 @@ function ClientsPage() {
   // Import
   const importClients = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!canWriteClients) { toast.error("You don't have permission to import clients"); e.target.value = ""; return; }
+    if (atClientLimit) { toast.error(`Your ${limits?.plan_name ?? "current"} plan allows only ${limits?.active_clients_limit} active clients. Upgrade to import more.`); e.target.value = ""; return; }
     const file = e.target.files?.[0];
     if (!file || !activeClinic) return;
     const text = await file.text();
@@ -226,12 +234,21 @@ function ClientsPage() {
             </label>
           )}
           {canWriteClients && (
-            <Button onClick={openCreate} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
+            <Button onClick={openCreate} disabled={atClientLimit} className="gap-2 bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 disabled:opacity-50">
               <Plus className="h-4 w-4" /> Add client
             </Button>
           )}
         </div>
       </section>
+
+      {atClientLimit && limits && usage && (
+        <LimitGate resource="clients" current={usage.active_client_count} limit={limits.active_clients_limit} planName={limits.plan_name} />
+      )}
+      {!atClientLimit && limits && usage && (
+        <div className="flex justify-end">
+          <UsageMeter resource="clients" current={usage.active_client_count} limit={limits.active_clients_limit} />
+        </div>
+      )}
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Metric label="Total clients" value={clients.length.toString()} icon={<Users className="h-4.5 w-4.5" />} />

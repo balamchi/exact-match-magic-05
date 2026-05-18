@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { usePlanLimits } from "@/hooks/use-plan-limits";
+import { LimitGate, UsageMeter } from "@/components/limit-gate";
 
 export const Route = createFileRoute("/app/locations")({ component: LocationsPage });
 
@@ -103,6 +105,7 @@ const mapsUrl = (loc: LocationRow) => {
 function LocationsPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id ?? null;
+  const { limits, usage, atLocationLimit } = usePlanLimits();
 
   const [rows, setRows] = useState<LocationRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -183,6 +186,10 @@ function LocationsPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!clinicId) return;
+    if (!editing && atLocationLimit) {
+      toast.error(`Your ${limits?.plan_name ?? "current"} plan allows only ${limits?.locations_included} locations. Upgrade to add more.`);
+      return;
+    }
     const parsed = locationSchema.safeParse(form);
     if (!parsed.success) {
       const errs: Record<string, string> = {};
@@ -252,10 +259,19 @@ function LocationsPage() {
           <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight">Locations</h1>
           <p className="max-w-[95vw] sm:max-w-2xl text-sm text-muted-foreground">Manage clinic sites — addresses, timezones, tax rates, and operating hours.</p>
         </div>
-        <Button onClick={openCreate} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-          <Plus className="mr-1.5 h-4 w-4" /> Add location
-        </Button>
+        <div className="flex flex-col items-end gap-2">
+          <Button onClick={openCreate} disabled={atLocationLimit} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 disabled:opacity-50">
+            <Plus className="mr-1.5 h-4 w-4" /> Add location
+          </Button>
+          {limits && usage && !atLocationLimit && (
+            <UsageMeter resource="locations" current={usage.location_count} limit={limits.locations_included} />
+          )}
+        </div>
       </header>
+
+      {atLocationLimit && limits && usage && (
+        <LimitGate resource="locations" current={usage.location_count} limit={limits.locations_included} planName={limits.plan_name} />
+      )}
 
       {/* Metrics */}
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:grid-cols-4">

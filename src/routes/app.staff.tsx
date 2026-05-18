@@ -18,6 +18,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { PhotoUpload } from "@/components/photo-upload";
+import { usePlanLimits } from "@/hooks/use-plan-limits";
+import { LimitGate, UsageMeter } from "@/components/limit-gate";
 export const Route = createFileRoute("/app/staff")({ component: StaffPage });
 
 /* ── Types ────────────────────────────────────────────── */
@@ -127,6 +129,7 @@ function StaffPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id ?? null;
   const canWriteStaff = hasPermission(activeClinic?.role, "staff.write");
+  const { limits, usage, atSeatLimit } = usePlanLimits();
 
   const [rows, setRows] = useState<StaffRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -198,11 +201,20 @@ function StaffPage() {
           <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">Manage providers, front desk, and support team. Calendar colors flow through to your booking grid.</p>
         </div>
         {canWriteStaff && (
-          <Button onClick={() => setComposer("new")} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-            <Plus className="mr-1.5 h-4 w-4" /> Add staff
-          </Button>
+          <div className="flex flex-col items-end gap-2">
+            <Button onClick={() => setComposer("new")} disabled={atSeatLimit} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 disabled:opacity-50">
+              <Plus className="mr-1.5 h-4 w-4" /> Add staff
+            </Button>
+            {limits && usage && !atSeatLimit && (
+              <UsageMeter resource="staff" current={usage.staff_count} limit={limits.staff_seats_included} />
+            )}
+          </div>
         )}
       </header>
+
+      {atSeatLimit && limits && usage && (
+        <LimitGate resource="staff" current={usage.staff_count} limit={limits.staff_seats_included} planName={limits.plan_name} />
+      )}
 
       {/* KPIs */}
       <section className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
@@ -308,6 +320,9 @@ function StaffPage() {
           clinicId={clinicId}
           onClose={() => setComposer(null)}
           onSaved={load}
+          blockCreate={composer === "new" && atSeatLimit}
+          planName={limits?.plan_name ?? null}
+          seatLimit={limits?.staff_seats_included ?? null}
         />
       )}
     </div>
@@ -340,7 +355,7 @@ function KpiCard({ label, value, icon, accent }: { label: string; value: number;
 
 type TabKey = "profile" | "contact" | "role" | "services" | "locations" | "schedule" | "hr" | "commissions";
 
-function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | null; clinicId: string; onClose: () => void; onSaved: () => void }) {
+function StaffComposer({ row, clinicId, onClose, onSaved, blockCreate = false, planName = null, seatLimit = null }: { row: StaffRow | null; clinicId: string; onClose: () => void; onSaved: () => void; blockCreate?: boolean; planName?: string | null; seatLimit?: number | null }) {
   const { activeClinic } = useAuth();
   const editing = !!row;
   const [tab, setTab] = useState<TabKey>("profile");
@@ -436,6 +451,10 @@ function StaffComposer({ row, clinicId, onClose, onSaved }: { row: StaffRow | nu
   }, [clinicId, row]);
 
   const saveStaff = async () => {
+    if (blockCreate) {
+      toast.error(`Your ${planName ?? "current"} plan allows only ${seatLimit} staff seats. Upgrade to add more.`);
+      return;
+    }
     const parsed = staffSchema.safeParse({ display_name: displayName, title, color, active, role, bio, email, phone, online_booking_visible: onlineBookingVisible });
     if (!parsed.success) { toast.error(parsed.error.issues[0]?.message ?? "Check your inputs"); return; }
     setSaving(true);
