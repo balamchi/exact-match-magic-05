@@ -105,6 +105,7 @@ const mapsUrl = (loc: LocationRow) => {
 function LocationsPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id ?? null;
+  const { limits, usage, atLocationLimit } = usePlanLimits();
 
   const [rows, setRows] = useState<LocationRow[]>([]);
   const [loading, setLoading] = useState(true);
