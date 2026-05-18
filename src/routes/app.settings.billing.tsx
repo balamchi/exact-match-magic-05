@@ -29,6 +29,43 @@ interface PlanRow {
   display_order: number;
 }
 
+type PaymentTransaction = {
+  id: string;
+  paddle_transaction_id: string;
+  amount_cents: number;
+  currency: string;
+  status: string;
+  origin: string | null;
+  invoice_number: string | null;
+  invoice_pdf_url: string | null;
+  plan_code: string | null;
+  error_reason: string | null;
+  billed_at: string | null;
+  created_at: string;
+  environment: string;
+};
+
+function formatMoney(cents: number, currency: string) {
+  return new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: currency?.toUpperCase() || "CAD",
+  }).format((cents ?? 0) / 100);
+}
+
+function shortTxId(id: string) {
+  if (!id) return "—";
+  return `…${id.slice(-8)}`;
+}
+
+function txStatusBadge(status: string): { label: string; className: string } {
+  const s = (status ?? "").toLowerCase();
+  if (s === "paid" || s === "completed") return { label: "Paid", className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
+  if (s === "failed" || s === "error") return { label: "Failed", className: "bg-red-500/15 text-red-400 border-red-500/30" };
+  if (s === "refunded") return { label: "Refunded", className: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
+  if (s === "pending") return { label: "Pending", className: "bg-blue-500/15 text-blue-400 border-blue-500/30" };
+  return { label: status || "Unknown", className: "bg-muted text-muted-foreground border-border" };
+}
+
 function BillingPage() {
   const { activeClinic, user } = useAuth();
   const { subscription, loading, isActive, isTrialing, isPastDue, trialDaysLeft, refresh } = useSubscription();
