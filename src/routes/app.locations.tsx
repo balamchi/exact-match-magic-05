@@ -186,6 +186,10 @@ function LocationsPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!clinicId) return;
+    if (!editing && atLocationLimit) {
+      toast.error(`Your ${limits?.plan_name ?? "current"} plan allows only ${limits?.locations_included} locations. Upgrade to add more.`);
+      return;
+    }
     const parsed = locationSchema.safeParse(form);
     if (!parsed.success) {
       const errs: Record<string, string> = {};
