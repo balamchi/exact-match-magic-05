@@ -180,6 +180,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "consent_forms.read", "consent_forms.write", "consent_forms.sign",
     "soap_notes.read.own", "soap_notes.read.all", "soap_notes.write",
     "before_after.read", "before_after.write", "before_after.delete",
+    "treatment_templates.manage",
     "automations.read", "automations.write",
     "memberships.read", "memberships.write",
     "payments.process",
