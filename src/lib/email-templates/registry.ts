@@ -22,6 +22,9 @@ import { template as membershipChargeSuccess } from './membership-charge-success
 import { template as membershipChargeFailed } from './membership-charge-failed'
 import { template as membershipPaused } from './membership-paused'
 import { template as membershipCanceled } from './membership-canceled'
+import { template as trialCheckIn } from './trial-check-in'
+import { template as trialSetupTip } from './trial-setup-tip'
+import { template as trialWelcome } from './trial-welcome'
 
 /**
  * Template registry — maps template names to their React Email components.
@@ -40,4 +43,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'membership-charge-failed': membershipChargeFailed,
   'membership-paused': membershipPaused,
   'membership-canceled': membershipCanceled,
+  'trial-welcome': trialWelcome,
+  'trial-setup-tip': trialSetupTip,
+  'trial-check-in': trialCheckIn,
 }
