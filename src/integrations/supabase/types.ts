@@ -4818,6 +4818,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      extract_clinic_photo_path: { Args: { url: string }; Returns: string }
       has_active_subscription: {
         Args: { check_env?: string; clinic_uuid: string }
         Returns: boolean
