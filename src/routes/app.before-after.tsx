@@ -276,6 +276,18 @@ function BeforeAfterPage() {
     toast.success(`${type === "before" ? "Before" : "After"} image uploaded`);
   };
 
+  if (!canRead) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
+        <ShieldAlert className="h-12 w-12 text-muted-foreground" />
+        <h2 className="text-lg font-semibold">Restricted</h2>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          You don't have permission to view client before/after photos. Contact your clinic admin if you need access.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
