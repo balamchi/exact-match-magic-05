@@ -320,6 +320,9 @@ function StaffPage() {
           clinicId={clinicId}
           onClose={() => setComposer(null)}
           onSaved={load}
+          blockCreate={composer === "new" && atSeatLimit}
+          planName={limits?.plan_name ?? null}
+          seatLimit={limits?.staff_seats_included ?? null}
         />
       )}
     </div>
