@@ -9,7 +9,6 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-import { BRAND } from "@/lib/brand";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -70,8 +69,6 @@ export const template = {
   displayName: "Trial check-in (Day 7)",
   previewData: { firstName: "Sarah", appUrl: "https://www.clinicpro.io" },
 } satisfies TemplateEntry;
-
-void BRAND;
 
 const main = {
   backgroundColor: "#0a0a0a",
