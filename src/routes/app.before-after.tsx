@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,6 +92,9 @@ const emptyForm: PhotoFormState = {
 function BeforeAfterPage() {
   const { activeClinic } = useAuth();
   const clinicId = activeClinic?.clinic_id ?? null;
+  const canRead = hasPermission(activeClinic?.role, "before_after.read");
+  const canWrite = hasPermission(activeClinic?.role, "before_after.write");
+  const canDelete = hasPermission(activeClinic?.role, "before_after.delete");
   const [rows, setRows] = useState<PhotoRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -163,12 +167,14 @@ function BeforeAfterPage() {
   }, [rows]);
 
   const openCreate = () => {
+    if (!canWrite) return toast.error("You don't have permission to add photos.");
     setEditing(null);
     setForm(emptyForm);
     setComposerOpen(true);
   };
 
   const openEdit = (p: PhotoRow) => {
+    if (!canWrite) return toast.error("You don't have permission to edit photos.");
     setEditing(p);
     setForm({
       client_name: p.client_name,
@@ -190,6 +196,7 @@ function BeforeAfterPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!canWrite) return toast.error("You don't have permission to save photos.");
     if (!clinicId) return;
 
     const parsed = photoSchema.safeParse(form);
@@ -230,6 +237,7 @@ function BeforeAfterPage() {
   };
 
   const toggleConsent = async (p: PhotoRow) => {
+    if (!canWrite) return toast.error("You don't have permission to update consent.");
     const { error } = await supabase
       .from("before_after_photos")
       .update({ consent_given: !p.consent_given })
@@ -239,6 +247,7 @@ function BeforeAfterPage() {
   };
 
   const handleDelete = async (p: PhotoRow) => {
+    if (!canDelete) return toast.error("You don't have permission to delete photos.");
     if (!confirm(`Delete photo set for ${p.client_name}? This cannot be undone.`)) return;
     const { error } = await supabase.from("before_after_photos").delete().eq("id", p.id);
     if (error) toast.error("Failed to delete", { description: error.message });
@@ -247,6 +256,7 @@ function BeforeAfterPage() {
 
   const handleFileUpload = async (file: File | undefined, type: "before" | "after") => {
     if (!file || !clinicId) return;
+    if (!canWrite) return toast.error("You don't have permission to upload photos.");
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
     const path = `${clinicId}/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("clinic-photos").upload(path, file, { upsert: true });
@@ -254,8 +264,15 @@ function BeforeAfterPage() {
       toast.error(`Upload failed: ${error.message}`);
       return;
     }
-    const { data: urlData } = supabase.storage.from("clinic-photos").getPublicUrl(path);
-    setForm((prev) => ({ ...prev, [`${type}_url`]: urlData.publicUrl }));
+    // Signed URL (1-year TTL) — keeps PHI off the open web.
+    const { data: signedData, error: signedErr } = await supabase.storage
+      .from("clinic-photos")
+      .createSignedUrl(path, 60 * 60 * 24 * 365);
+    if (signedErr || !signedData?.signedUrl) {
+      toast.error("Failed to generate secure photo URL");
+      return;
+    }
+    setForm((prev) => ({ ...prev, [`${type}_url`]: signedData.signedUrl }));
     toast.success(`${type === "before" ? "Before" : "After"} image uploaded`);
   };
 
