@@ -224,19 +224,34 @@ function ReportsLibrary() {
           <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
         </TabsList>
         <TabsContent value="all" className="space-y-6 pt-4">
-          <Link to="/app/reports/builder"
-            className="group flex items-center gap-4 rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 transition hover:border-primary/60 hover:from-primary/15">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold">Build a custom report</div>
-              <div className="text-xs text-muted-foreground">Pick your dimensions, metrics, filters, and chart.</div>
-            </div>
-            <span className="hidden items-center gap-1 text-sm font-medium text-primary sm:inline-flex">
-              Start from scratch <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            </span>
-          </Link>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link to="/app/reports/builder"
+              className="group flex items-center gap-4 rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 transition hover:border-primary/60 hover:from-primary/15">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold">Build a custom report</div>
+                <div className="text-xs text-muted-foreground">Pick your dimensions, metrics, filters, and chart.</div>
+              </div>
+              <span className="hidden items-center gap-1 text-sm font-medium text-primary sm:inline-flex">
+                Start from scratch <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+            <Link to="/app/reports/scheduled"
+              className="group flex items-center gap-4 rounded-xl border border-border/60 bg-card/40 p-4 transition hover:border-primary/40 hover:bg-card/60">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                <CalendarClock className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold">Scheduled reports</div>
+                <div className="text-xs text-muted-foreground">Email yourself recurring digests — daily, weekly, or monthly.</div>
+              </div>
+              <span className="hidden items-center gap-1 text-sm font-medium text-primary sm:inline-flex">
+                Manage <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          </div>
           {sections.map((s) => (
             <section key={s.title} className="space-y-3">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{s.title}</h2>
