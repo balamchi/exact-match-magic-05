@@ -243,20 +243,43 @@ async function sendDunningEmail(clinicId: string, planCode: string | null) {
     .eq("id", clinicId)
     .maybeSingle();
 
-  const payload = {
-    template: "payment-failed",
-    recipientEmail: ownerEmail,
-    data: {
-      clinicName: clinic?.name ?? "your clinic",
-      planName: planNameFromCode(planCode),
-      billingPortalUrl: `${appBaseUrl()}/app/settings/billing`,
-    },
-  };
-  const { error } = await getSupabase().rpc("enqueue_email", {
-    queue_name: "transactional_emails",
-    payload,
-  });
-  if (error) console.error("enqueue dunning email failed", error);
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!serviceRoleKey) {
+    console.error("dunning email skipped — missing SUPABASE_SERVICE_ROLE_KEY");
+    return;
+  }
+
+  const sendUrl = `${appBaseUrl()}/lovable/email/transactional/send`;
+  try {
+    const res = await fetch(sendUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${serviceRoleKey}`,
+      },
+      body: JSON.stringify({
+        templateName: "payment-failed",
+        recipientEmail: ownerEmail,
+        templateData: {
+          clinicName: clinic?.name ?? "your clinic",
+          planName: planNameFromCode(planCode),
+          billingPortalUrl: `${appBaseUrl()}/app/settings/billing`,
+        },
+        idempotencyKey: `dunning_${clinicId}_${planCode ?? "unknown"}`,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "unknown");
+      console.error("dunning email send failed", {
+        status: res.status,
+        body: errText.slice(0, 500),
+        clinicId,
+      });
+    }
+  } catch (e) {
+    console.error("dunning email request failed", e);
+  }
 }
 
 async function handleWebhook(req: Request, env: PaddleEnv) {
