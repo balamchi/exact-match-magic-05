@@ -649,3 +649,8 @@ function BillingPage() {
               )}
             </section>
           )}
+        </>
+      )}
+    </div>
+  );
+}
