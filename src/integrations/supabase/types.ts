@@ -3393,6 +3393,59 @@ export type Database = {
           },
         ]
       }
+      scheduled_emails: {
+        Row: {
+          attempts: number
+          clinic_id: string | null
+          created_at: string
+          error_message: string | null
+          failed_at: string | null
+          id: string
+          recipient_email: string
+          send_at: string
+          sent_at: string | null
+          template_data: Json
+          template_name: string
+          user_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          clinic_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          failed_at?: string | null
+          id?: string
+          recipient_email: string
+          send_at: string
+          sent_at?: string | null
+          template_data?: Json
+          template_name: string
+          user_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          clinic_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          failed_at?: string | null
+          id?: string
+          recipient_email?: string
+          send_at?: string
+          sent_at?: string | null
+          template_data?: Json
+          template_name?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_emails_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scheduled_report_log: {
         Row: {
           error_message: string | null

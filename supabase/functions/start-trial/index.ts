@@ -121,6 +121,89 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ═══ Trigger welcome email sequence (best-effort, non-blocking) ═══
+    try {
+      const userId = user.id;
+      const email = user.email;
+      const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+      const firstName =
+        (meta.first_name as string) ||
+        (meta.full_name as string) ||
+        (email?.split("@")[0] ?? "there");
+
+      const planName =
+        planCode === "starter" ? "Starter" :
+        planCode === "professional" ? "Professional" :
+        planCode === "growth" ? "Growth" :
+        planCode === "enterprise" ? "Enterprise" : planCode;
+
+      const appUrl = Deno.env.get("APP_BASE_URL") || "https://www.clinicpro.io";
+
+      if (userId && email) {
+        // 1. Day 0 welcome — fire immediately via transactional-send route
+        try {
+          await fetch(`${appUrl}/lovable/email/transactional/send`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+            },
+            body: JSON.stringify({
+              templateName: "trial-welcome",
+              recipientEmail: email,
+              templateData: { firstName, planName, appUrl },
+              idempotencyKey: `trial_welcome_${userId}_${clinicId}`,
+            }),
+          });
+        } catch (e) {
+          console.error("trial-welcome enqueue failed (non-blocking)", e);
+        }
+
+        // 2. Day 3 setup tip — schedule if not already scheduled
+        const day3 = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        const day7 = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+        const { data: existingDay3 } = await admin
+          .from("scheduled_emails")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("template_name", "trial-setup-tip")
+          .maybeSingle();
+
+        if (!existingDay3) {
+          await admin.from("scheduled_emails").insert({
+            user_id: userId,
+            clinic_id: clinicId,
+            template_name: "trial-setup-tip",
+            recipient_email: email,
+            template_data: { firstName, appUrl },
+            send_at: day3.toISOString(),
+          });
+        }
+
+        // 3. Day 7 check-in — schedule if not already scheduled
+        const { data: existingDay7 } = await admin
+          .from("scheduled_emails")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("template_name", "trial-check-in")
+          .maybeSingle();
+
+        if (!existingDay7) {
+          await admin.from("scheduled_emails").insert({
+            user_id: userId,
+            clinic_id: clinicId,
+            template_name: "trial-check-in",
+            recipient_email: email,
+            template_data: { firstName, appUrl },
+            send_at: day7.toISOString(),
+          });
+        }
+      }
+    } catch (emailErr) {
+      console.error("Welcome email sequence setup failed (non-blocking)", emailErr);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
