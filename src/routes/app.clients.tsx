@@ -187,6 +187,7 @@ function ClientsPage() {
   // Import
   const importClients = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!canWriteClients) { toast.error("You don't have permission to import clients"); e.target.value = ""; return; }
+    if (atClientLimit) { toast.error(`Your ${limits?.plan_name ?? "current"} plan allows only ${limits?.active_clients_limit} active clients. Upgrade to import more.`); e.target.value = ""; return; }
     const file = e.target.files?.[0];
     if (!file || !activeClinic) return;
     const text = await file.text();
