@@ -201,11 +201,20 @@ function StaffPage() {
           <p className="max-w-[95vw] sm:max-w-xl text-sm text-muted-foreground">Manage providers, front desk, and support team. Calendar colors flow through to your booking grid.</p>
         </div>
         {canWriteStaff && (
-          <Button onClick={() => setComposer("new")} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90">
-            <Plus className="mr-1.5 h-4 w-4" /> Add staff
-          </Button>
+          <div className="flex flex-col items-end gap-2">
+            <Button onClick={() => setComposer("new")} disabled={atSeatLimit} className="bg-gradient-primary text-primary-foreground shadow-glow hover:opacity-90 disabled:opacity-50">
+              <Plus className="mr-1.5 h-4 w-4" /> Add staff
+            </Button>
+            {limits && usage && !atSeatLimit && (
+              <UsageMeter resource="staff" current={usage.staff_count} limit={limits.staff_seats_included} />
+            )}
+          </div>
         )}
       </header>
+
+      {atSeatLimit && limits && usage && (
+        <LimitGate resource="staff" current={usage.staff_count} limit={limits.staff_seats_included} planName={limits.plan_name} />
+      )}
 
       {/* KPIs */}
       <section className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
