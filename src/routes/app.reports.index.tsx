@@ -7,7 +7,7 @@ import {
   Award, Flame, TrendingUp, Crown,
   Megaphone, Mail,
   Boxes, PackageMinus, CalendarX,
-  Sparkles, ArrowRight,
+  Sparkles, ArrowRight, CalendarClock,
 } from "lucide-react";
 import { ReportCard } from "@/components/report-card";
 import { ReportDatePicker } from "@/components/report-date-picker";
