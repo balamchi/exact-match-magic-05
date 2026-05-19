@@ -5,7 +5,7 @@ export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
       { title: "Privacy Notice — ClinicPro" },
-      { name: "description", content: "How Divan Digital Corp collects, uses, and protects personal data in ClinicPro." },
+      { name: "description", content: "How Divan Group collects, uses, and protects personal data in ClinicPro." },
       { property: "og:title", content: "Privacy Notice — ClinicPro" },
       { property: "og:description", content: "How ClinicPro collects, uses, and protects personal data." },
     ],
@@ -17,10 +17,10 @@ function PrivacyPage() {
   return (
     <LegalPage title="Privacy Notice" updated="April 26, 2026">
       <p>
-        This Privacy Notice explains how <strong>Divan Digital Corp</strong> ("ClinicPro",
+        This Privacy Notice explains how <strong>Divan Group</strong> ("ClinicPro",
         "we", "us") collects, uses, shares, and protects personal data when you use the
         ClinicPro platform and websites (the "Service"). For the personal data you provide as
-        a user of the Service, Divan Digital Corp acts as the <strong>data controller</strong>.
+        a user of the Service, Divan Group acts as the <strong>data controller</strong>.
       </p>
       <p>
         Where you use ClinicPro to manage your own clinic's clients, you are the controller
@@ -165,7 +165,7 @@ function PrivacyPage() {
 
       <h2>12. Contact</h2>
       <p>
-        Divan Digital Corp · Toronto, Canada<br />
+        Divan Group · Toronto, Canada<br />
         Email: <a href="mailto:privacy@clinicpro.io">privacy@clinicpro.io</a>
       </p>
     </LegalPage>

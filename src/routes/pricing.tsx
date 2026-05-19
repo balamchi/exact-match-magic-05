@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — ClinicPro" },
-      { name: "description", content: "Plans starting at $39/mo. Free 14-day trial. No credit card required." },
+      { name: "description", content: "Plans starting at $39/mo. Free 7-day trial." },
     ],
   }),
 });
@@ -107,7 +107,7 @@ function PricingPage() {
             Pricing that scales with your clinic
           </h1>
           <p className="mt-6 text-lg text-muted-foreground">
-            14-day free trial on every plan. No credit card required. Cancel anytime.
+            7-day free trial on every plan. Cancel anytime.
           </p>
 
 
@@ -126,7 +126,7 @@ function PricingPage() {
                 interval === "annual" ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground"
               }`}
             >
-              Annual <span className="ms-1 text-[10px] uppercase tracking-wider text-success">Save 15%</span>
+              Annual <span className="ms-1 text-[10px] uppercase tracking-wider text-success">Save 20%</span>
             </button>
           </div>
         </div>

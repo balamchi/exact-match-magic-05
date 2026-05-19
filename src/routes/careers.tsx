@@ -3,7 +3,7 @@ import { PlaceholderPage } from "@/components/placeholder-page";
 
 export const Route = createFileRoute("/careers")({
   component: CareersPage,
-  head: () => ({ meta: [{ title: "Careers — ClinicPro" }, { name: "description", content: "Join the ClinicPro team at Divan Digital Corp." }] }),
+  head: () => ({ meta: [{ title: "Careers — ClinicPro" }, { name: "description", content: "Join the ClinicPro team at Divan Group." }] }),
 });
 
 function CareersPage() {

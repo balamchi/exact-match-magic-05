@@ -5,8 +5,8 @@ export const Route = createFileRoute("/about")({
   component: AboutPage,
   head: () => ({
     meta: [
-      { title: "About — ClinicPro by Divan Digital Corp" },
-      { name: "description", content: "ClinicPro is built by Divan Digital Corp, a Toronto-based company that has managed operations for 50+ clinics since 2019." },
+      { title: "About — ClinicPro by Divan Group" },
+      { name: "description", content: "ClinicPro is built by Divan Group, a Toronto-based company that has managed operations for medical aesthetic, dental, and wellness clinics across multiple markets since 2019." },
     ],
   }),
 });
@@ -21,9 +21,9 @@ function AboutPage() {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-foreground">Shahab Balamchi</h2>
-            <p className="text-sm text-muted-foreground">Founder & CEO · Divan Digital Corp</p>
+            <p className="text-sm text-muted-foreground">Founder & CEO · Divan Group</p>
             <p className="mt-4">
-              Since 2019, Divan Digital Corp has managed marketing and operations for 50+ medical aesthetic, dental, and wellness clinics across Toronto, Montreal, Dubai, and Los Angeles.
+              Since 2019, Divan Group has managed marketing and operations for medical aesthetic, dental, and wellness clinics across multiple markets.
             </p>
             <p className="mt-3">
               We built ClinicPro because every clinic we worked with said the same thing: their software was the bottleneck, not their growth. So we replaced six tools with one operating system.
@@ -32,10 +32,10 @@ function AboutPage() {
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-surface p-8">
-          <h3 className="text-xl font-bold text-foreground">Divan Digital Corp</h3>
+          <h3 className="text-xl font-bold text-foreground">Divan Group</h3>
           <p className="mt-2 text-muted-foreground">Toronto, Canada</p>
           <p className="mt-4">
-            Divan Digital Corp is a technology company focused on building software that helps clinics operate more efficiently. ClinicPro is our flagship product — the operating system for modern clinics.
+            Divan Group is a technology company focused on building software that helps clinics operate more efficiently. ClinicPro is our flagship product — the operating system for modern clinics.
           </p>
         </div>
 

@@ -16,7 +16,7 @@ export function TrialBanner() {
       >
         <Sparkles className="h-3.5 w-3.5 text-primary" />
         <span>
-          <strong>Start your 14-day free trial</strong> · No credit card required ·{" "}
+          <strong>Start your 7-day free trial</strong> ·{" "}
           <span className="underline decoration-primary/40 underline-offset-2">Choose a plan</span>
         </span>
       </Link>

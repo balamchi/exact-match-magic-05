@@ -17,7 +17,7 @@ function RefundPolicy() {
   return (
     <LegalPage title="Refund Policy" updated="April 26, 2026">
       <p>
-        ClinicPro is operated by <strong>Divan Digital Corp</strong>. We want you to be
+        ClinicPro is operated by <strong>Divan Group</strong>. We want you to be
         confident in your purchase, so we offer a clear, fair refund policy.
       </p>
 

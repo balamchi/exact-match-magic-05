@@ -125,7 +125,7 @@ function SignUp() {
 
         <div className="rounded-2xl border border-border bg-card p-7 shadow-elevated">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Create your clinic</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Start your free trial. No credit card required.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Start your free trial.</p>
 
           <button
             type="button"

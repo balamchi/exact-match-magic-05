@@ -148,7 +148,7 @@ function FeaturesPage() {
       <section className="border-t border-border/40 bg-gradient-to-b from-primary/5 to-background py-20 text-center">
         <h2 className="font-display text-3xl font-bold">Ready to see it in action?</h2>
         <p className="mx-auto mt-2 max-w-lg text-muted-foreground">
-          Start your 14-day free trial. No credit card required.
+          Start your 7-day free trial.
         </p>
         <div className="mt-6">
           <Link to="/auth">
