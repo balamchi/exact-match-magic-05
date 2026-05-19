@@ -12,7 +12,7 @@ function HelpPage() {
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-semibold text-foreground">How do I get started?</h3>
-          <p>Sign up for a free 14-day trial — no credit card required. Your clinic will be pre-loaded with 322 services and 73 consent forms.</p>
+          <p>Sign up for a free 7-day trial. Your clinic will be pre-loaded with 322 services and 73 consent forms.</p>
         </div>
         <div>
           <h3 className="text-lg font-semibold text-foreground">Can I migrate from another platform?</h3>

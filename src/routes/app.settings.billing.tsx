@@ -205,7 +205,7 @@ function BillingPage() {
         },
       });
       if (error) throw error;
-      toast.success(`Your 14-day free trial of ${planCode} has started!`);
+      toast.success(`Your 7-day free trial of ${planCode} has started!`);
       await refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to start trial");
@@ -252,9 +252,9 @@ function BillingPage() {
               <Sparkles className="h-6 w-6 text-primary-foreground" />
             </div>
             <div className="flex-1">
-              <h2 className="font-display text-xl font-semibold">Start your 14-day free trial</h2>
+              <h2 className="font-display text-xl font-semibold">Start your 7-day free trial</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Pick a plan below to unlock the full ClinicPro suite. No credit card required to start.
+                Pick a plan below to unlock the full ClinicPro suite.
               </p>
             </div>
           </div>

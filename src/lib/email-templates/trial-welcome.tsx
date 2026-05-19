@@ -22,13 +22,13 @@ interface Props {
 const TrialWelcomeEmail = ({ firstName, planName, appUrl }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your 14-day ClinicPro trial has started</Preview>
+    <Preview>Your 7-day ClinicPro trial has started</Preview>
     <Body style={main}>
       <Container style={container}>
         <Text style={brand}>{BRAND.displayName}</Text>
         <Heading style={h1}>Welcome, {firstName}</Heading>
         <Text style={lead}>
-          Your 14-day {planName} trial is live. No card was charged — you have full access to
+          Your 7-day {planName} trial is live. No card was charged — you have full access to
           every feature for the next two weeks.
         </Text>
 
