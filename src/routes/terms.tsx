@@ -5,7 +5,7 @@ export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
       { title: "Terms of Service — ClinicPro" },
-      { name: "description", content: "Terms governing your use of ClinicPro by Divan Digital Corp." },
+      { name: "description", content: "Terms governing your use of ClinicPro by Divan Group." },
       { property: "og:title", content: "Terms of Service — ClinicPro" },
       { property: "og:description", content: "Terms governing your use of ClinicPro." },
     ],
@@ -18,7 +18,7 @@ function TermsPage() {
     <LegalPage title="Terms of Service" updated="April 26, 2026">
       <p>
         These Terms of Service ("Terms") govern your access to and use of the ClinicPro
-        software and services ("Service"), provided by <strong>Divan Digital Corp</strong>
+        software and services ("Service"), provided by <strong>Divan Group</strong>
         {" "}("ClinicPro", "we", "us", or "our"). By creating an account, accessing, or using the
         Service, you agree to be bound by these Terms.
       </p>
@@ -66,7 +66,7 @@ function TermsPage() {
 
       <h2>6. Intellectual Property</h2>
       <p>
-        Divan Digital Corp owns and retains all right, title, and interest in and to the
+        Divan Group owns and retains all right, title, and interest in and to the
         Service, including all software, designs, documentation, trademarks, and any
         improvements or derivative works. No rights are granted to you other than the limited
         license expressly stated in these Terms.
@@ -138,7 +138,7 @@ function TermsPage() {
 
       <h2>13. Indemnification</h2>
       <p>
-        You agree to indemnify and hold harmless Divan Digital Corp from any claims, damages,
+        You agree to indemnify and hold harmless Divan Group from any claims, damages,
         liabilities, and expenses (including reasonable legal fees) arising from your
         Customer Data, your unlawful use of the Service, or your breach of these Terms.
       </p>
@@ -174,7 +174,7 @@ function TermsPage() {
 
       <h2>18. Contact</h2>
       <p>
-        Divan Digital Corp · Toronto, Canada · <a href="mailto:support@clinicpro.io">support@clinicpro.io</a>
+        Divan Group · Toronto, Canada · <a href="mailto:support@clinicpro.io">support@clinicpro.io</a>
       </p>
     </LegalPage>
   );
