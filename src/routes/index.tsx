@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowRight,
   Calendar,
@@ -14,7 +15,6 @@ import {
   BarChart3,
   Globe,
   Check,
-  Star,
   X,
   ChevronDown,
   Sun,
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "The operating system for modern clinics. Booking, payments, marketing, consent forms, AI insights — pre-loaded with 322 services and 73 forms. Free 14-day trial. From $69/mo.",
+          "The operating system for modern clinics. Booking, payments, marketing, consent forms, AI insights — pre-loaded with 322 services and 73 forms. From $39/mo USD. 7-day free trial.",
       },
       { name: "keywords", content: "clinic software, medical spa software, aesthetic clinic CRM, beauty salon booking, dental practice management, clinic operating system, MedSpa CRM, BeautyTech, ClinicTech" },
       { name: "robots", content: "index, follow" },
@@ -117,23 +117,74 @@ const COMPARISON_ROWS: Array<{ feature: string; mb: string; bd: string; fr: stri
   { feature: "Built-in AI insights", mb: "Limited", bd: "Yes", fr: "No", vg: "No", us: "GPT-4", mbT: "meh", bdT: "yes", frT: "no", vgT: "no" },
   { feature: "Multi-vertical (med spa + dental + wellness)", mb: "No", bd: "No", fr: "No", vg: "No", us: "Yes", mbT: "no", bdT: "no", frT: "no", vgT: "no" },
   { feature: "Setup time", mb: "Weeks", bd: "Days", fr: "Days", vg: "Days", us: "10 min", mbT: "plain", bdT: "plain", frT: "plain", vgT: "plain" },
-  { feature: "Starting price (per location)", mb: "$199/mo", bd: "$176/mo", fr: "Free*", vg: "$50/mo", us: "$69/mo", mbT: "plain", bdT: "plain", frT: "plain", vgT: "plain" },
+  { feature: "Starting price (per location)", mb: "$199/mo", bd: "$176/mo", fr: "Free*", vg: "$50/mo", us: "$39/mo", mbT: "plain", bdT: "plain", frT: "plain", vgT: "plain" },
 ];
 
-const PLANS = [
-  { name: "Starter", tag: "For solo or small clinics", price: "$69", annual: "$59", annualTotal: "$708", per: "/mo", featured: false, features: ["Up to 3 staff members", "1 location", "Online booking + Calendar", "CRM with 322 services pre-loaded", "SMS + Email (1,000 messages)", "10 consent form templates", "Integrated payments + deposits", "Basic reports"] },
-  { name: "Professional", tag: "For established clinics", price: "$199", annual: "$169", annualTotal: "$2,028", per: "/mo", featured: true, features: ["Up to 10 staff members", "Up to 3 locations", "Everything in Starter, plus:", "All 73 consent forms", "43 marketing automations", "WhatsApp Business integration", "5,000 SMS · 25,000 emails", "Injection mapping (Aesthetic)", "Gift cards + Memberships + Loyalty", "Advanced reports + Benchmarking"] },
-  { name: "Growth", tag: "For multi-location & franchises", price: "$449", annual: "$379", annualTotal: "$4,548", per: "/mo", featured: false, features: ["Unlimited staff", "Unlimited locations", "Everything in Professional, plus:", "AI Assistant", "Smart scheduling", "Voice-to-SOAP transcription", "Predictive churn analysis", "Custom report builder", "API access + webhooks", "Priority support"] },
-  { name: "Enterprise", tag: "For franchises & networks", price: "Custom", annual: "Custom", annualTotal: "", per: "", featured: false, features: ["Everything in Growth, plus:", "White-label option", "Custom integrations", "Dedicated account manager", "SLA + 99.99% uptime guarantee", "HIPAA + SOC 2 compliance pack", "Custom training + onboarding", "Volume pricing on transactions"] },
-];
+interface DbPlan {
+  code: string;
+  name: string;
+  tagline: string | null;
+  price_monthly_cents: number;
+  price_annual_cents: number;
+  features: string[];
+  is_popular: boolean;
+  display_order: number;
+}
 
-const TESTIMONIALS = [
-  { stars: 5, quote: "ClinicPro replaced 4 tools and saved us $200/month while giving us 3x the features. The 73 pre-loaded consent forms alone saved weeks of legal work.", author: "Dr. Maria", role: "Owner, Roda Clinic, Toronto", initials: "MR" },
-  { stars: 5, quote: "I run clinics in Toronto and Dubai. ClinicPro is the only platform that properly supports Persian and Arabic with right-to-left layouts. WhatsApp integration alone justified switching.", author: "Dr. Ahmad", role: "Founder, Dr. Ariana Aesthetics, Dubai", initials: "DA" },
-  { stars: 5, quote: "Took my first booking 12 minutes after signing up. The Botox annual package template alone has driven $48k in pre-paid revenue this quarter.", author: "Lana", role: "Owner, Lavista Cosmetic, Toronto", initials: "LA" },
-];
-
-const CLINIC_NAMES = ["Roda Clinic", "Lavista Cosmetic", "Dr. Ariana Aesthetics", "Glow Med Spa", "Zenith Dental"];
+const PLAN_FEATURES_DISPLAY: Record<string, string[]> = {
+  starter: [
+    "1 provider seat (+$25/mo for additional providers)",
+    "Unlimited admin and front desk users",
+    "500 active clients",
+    "20 services",
+    "10 GB photo storage",
+    "50 SMS credits included",
+    "5 consent form templates",
+    "5 report types",
+    "1 location",
+    "Online booking + Calendar",
+    "Integrated payments + deposits",
+  ],
+  professional: [
+    "3 provider seats (+$25/mo for additional providers)",
+    "Unlimited admin and front desk users",
+    "Everything in Starter, plus:",
+    "Unlimited clients",
+    "Unlimited services",
+    "50 GB photo storage",
+    "300 SMS · 5,000 emails included",
+    "All 73 consent form templates",
+    "18 report types",
+    "AI Assistant (100 queries/mo)",
+    "Treatment plans, memberships, gift cards",
+    "Smart scheduling + waitlist",
+    "Welcome email sequence",
+    "Two-way SMS",
+    "HIPAA + BAA included",
+  ],
+  growth: [
+    "10 provider seats (+$25/mo for additional providers)",
+    "Unlimited admin and front desk users",
+    "Everything in Professional, plus:",
+    "200 GB photo storage",
+    "1,000 SMS · 25,000 emails included",
+    "AI Assistant (500 queries/mo) + AI Optimizer",
+    "QuickBooks sync",
+    "WhatsApp Business",
+    "Multi-location support",
+    "All report types",
+    "1-year audit log retention",
+  ],
+  enterprise: [
+    "Everything in Growth, plus:",
+    "Unlimited provider seats",
+    "Unlimited photo storage",
+    "Insurance billing",
+    "SSO",
+    "Dedicated success manager",
+    "Custom integrations + SLA",
+  ],
+};
 
 /* ------------------------------ Page ------------------------------ */
 function Landing() {
@@ -144,6 +195,20 @@ function Landing() {
   const [pricingInterval, setPricingInterval] = useState<"monthly" | "annual">("monthly");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFooterSection, setOpenFooterSection] = useState<string | null>(null);
+  const [plans, setPlans] = useState<DbPlan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("subscription_plans")
+      .select("code,name,tagline,price_monthly_cents,price_annual_cents,features,is_popular,display_order")
+      .eq("is_public", true)
+      .order("display_order")
+      .then(({ data }) => {
+        setPlans((data ?? []) as unknown as DbPlan[]);
+        setPlansLoading(false);
+      });
+  }, []);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -230,7 +295,7 @@ function Landing() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-glow opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-glow" />
             </span>
-            Trusted by clinics in Toronto · Dubai · LA · London
+            Built in Toronto for clinics worldwide
           </div>
           <h1 className="font-display text-[clamp(2.5rem,8vw,96px)] font-bold leading-[1] tracking-[-0.035em]">
             Run a clinic,<br />
@@ -248,11 +313,11 @@ function Landing() {
             injection mapping, AI insights. Pre-loaded with 322 services and 73 forms. Ready in 10 minutes.
           </p>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link to={ctaHref} className={`${btnPrimaryLg} w-full sm:w-auto`}>Start free 14-day trial <ArrowRight className="h-4 w-4" /></Link>
+            <Link to={ctaHref} className={`${btnPrimaryLg} w-full sm:w-auto`}>Start free 7-day trial <ArrowRight className="h-4 w-4" /></Link>
             <button onClick={() => setDemoOpen(true)} className={`${btnSecondary} w-full sm:w-auto`}>Watch 2-min demo</button>
           </div>
           <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
-            {["No credit card required", "Setup in 10 minutes", "Migrate from Boulevard or Mindbody free"].map((t) => (
+            {["Setup in 10 minutes", "Migrate from Boulevard or Mindbody free"].map((t) => (
               <span key={t} className="inline-flex items-center gap-2">
                 <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-success/40 bg-success/15 text-[9px] font-bold text-success">
                   <Check className="h-2 w-2" strokeWidth={4} />
@@ -354,15 +419,6 @@ function Landing() {
         <SectionLabel>Built by clinic operators</SectionLabel>
         <SectionTitle>Built by clinic operators, for clinic operators.</SectionTitle>
 
-        {/* Logo strip */}
-        <div className="mb-16">
-          <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Join clinics from</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {CLINIC_NAMES.map((name) => (
-              <span key={name} className="text-sm font-semibold text-muted-foreground">{name}</span>
-            ))}
-          </div>
-        </div>
 
         {/* Founder section */}
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
@@ -371,44 +427,19 @@ function Landing() {
               <span className="font-display text-6xl font-bold text-foreground">SB</span>
             </div>
             <h3 className="mt-6 font-display text-2xl font-bold">Shahab Balamchi</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Founder & CEO · Divan Digital Corp</p>
+            <p className="mt-1 text-sm text-muted-foreground">Founder & CEO · Divan Group</p>
           </div>
           <div>
             <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight max-md:text-3xl">Built by clinic operators, for clinic operators.</h3>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Built by Shahab Balamchi, founder of Divan Digital Corp. We've managed marketing and operations for 50+ medical aesthetic, dental, and wellness clinics across Toronto, Montreal, Dubai, and Los Angeles since 2019.
+              Built by Shahab Balamchi, founder of Divan Group. We've spent five years running marketing and operations for medical aesthetic, dental, and wellness clinics — and watched every one of them struggle with the same broken software stack. We built ClinicPro to fix it.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              We built ClinicPro because every clinic we worked with said the same thing: their software was the bottleneck, not their growth. So we replaced six tools with one operating system.
+              Every clinic we worked with said the same thing: their software was the bottleneck, not their growth. So we replaced six tools with one operating system.
             </p>
           </div>
         </div>
 
-        {/* Testimonials */}
-        <div className="mt-20 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <div
-              key={t.author}
-              className="group rounded-2xl border border-primary/20 bg-background p-4 sm:p-8 transition hover:border-primary/40 hover:shadow-[0_0_30px_-10px_rgba(147,51,234,0.3)]"
-            >
-              <div className="flex gap-0.5">
-                {Array.from({ length: t.stars }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">"{t.quote}"</p>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-                  <span className="text-xs font-bold text-foreground">{t.initials}</span>
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">{t.author}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       </Section>
 
       {/* FEATURES */}
@@ -499,7 +530,7 @@ function Landing() {
       <Section id="pricing">
         <SectionLabel>Simple, fair pricing</SectionLabel>
         <SectionTitle>Pay for what you need. Nothing you don't.</SectionTitle>
-        <SectionSub>14-day free trial on every plan. No credit card required. Cancel anytime.</SectionSub>
+        <SectionSub>7-day free trial on every plan. Cancel anytime.</SectionSub>
 
 
         {/* Billing toggle */}
@@ -519,57 +550,61 @@ function Landing() {
                 pricingInterval === "annual" ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground"
               }`}
             >
-              Annual <span className="ms-1 text-[10px] uppercase tracking-wider text-success">Save 15%</span>
+              Annual <span className="ms-1 text-[10px] uppercase tracking-wider text-success">Save 20%</span>
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {PLANS.map((p) => {
-            const displayPrice = p.name === "Enterprise" ? "Custom" : (pricingInterval === "monthly" ? p.price : p.annual);
-            const savingsPerYear = p.name !== "Enterprise" && pricingInterval === "annual"
-              ? (parseInt(p.price.replace("$", "")) * 12) - parseInt(p.annualTotal.replace(/[$,]/g, ""))
+          {plansLoading && <div className="col-span-4 text-center text-muted-foreground">Loading plans…</div>}
+          {plans.map((p) => {
+            const isEnterprise = p.code === "enterprise";
+            const monthlyCents = pricingInterval === "monthly" ? p.price_monthly_cents : Math.round(p.price_annual_cents / 12);
+            const displayPrice = isEnterprise ? "Custom" : `$${(monthlyCents / 100).toFixed(0)}`;
+            const annualSavings = !isEnterprise && pricingInterval === "annual"
+              ? Math.round((p.price_monthly_cents * 12 - p.price_annual_cents) / 100)
               : 0;
+            const featureList = PLAN_FEATURES_DISPLAY[p.code] ?? (Array.isArray(p.features) ? p.features : []);
             return (
               <div
-                key={p.name}
+                key={p.code}
                 className={
-                  p.featured
+                  p.is_popular
                     ? "relative rounded-3xl border border-primary/40 p-4 sm:p-8 shadow-[0_30px_60px_-20px_rgba(147,51,234,0.4)] [background:linear-gradient(180deg,rgba(147,51,234,0.08),var(--surface))]"
                     : "relative rounded-3xl border border-border/60 bg-surface p-4 sm:p-8"
                 }
               >
-                {p.featured && (
+                {p.is_popular && (
                   <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-foreground [background:linear-gradient(135deg,#9333EA,#D946EF)]">
                     Most Popular
                   </div>
                 )}
                 <div className="font-display text-[22px] font-bold">{p.name}</div>
-                <div className="mt-1 text-[13px] text-muted-foreground">{p.tag}</div>
+                <div className="mt-1 text-[13px] text-muted-foreground">{p.tagline}</div>
                 <div className="mt-6 flex items-baseline gap-1.5">
                   <span className="font-display text-[48px] font-bold leading-none">{displayPrice}</span>
-                  <span className="text-sm text-muted-foreground">{p.per}</span>
+                  {!isEnterprise && <span className="text-sm text-muted-foreground">/mo</span>}
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  {p.name === "Enterprise" ? "Talk to sales for pricing" : (
-                    pricingInterval === "annual"
-                      ? `Billed ${p.annualTotal} yearly`
-                      : "Billed monthly · per location"
-                  )}
+                  {isEnterprise
+                    ? "Talk to sales for pricing"
+                    : pricingInterval === "annual"
+                      ? `Billed $${(p.price_annual_cents / 100).toFixed(0)}/year`
+                      : "Billed monthly · per location"}
                 </div>
-                {savingsPerYear > 0 && (
+                {annualSavings > 0 && (
                   <div className="mt-2 inline-flex rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-semibold text-success">
-                    Save ${savingsPerYear}/year
+                    Save ${annualSavings}/year
                   </div>
                 )}
                 <Link
-                  to={p.name === "Enterprise" ? "/contact" : ctaHref}
-                  className={`mt-6 w-full ${p.featured ? btnPrimary : btnSecondary.replace("py-3.5", "py-2.5").replace("text-[15px]", "text-sm")}`}
+                  to={isEnterprise ? "/contact" : ctaHref}
+                  className={`mt-6 w-full ${p.is_popular ? btnPrimary : btnSecondary.replace("py-3.5", "py-2.5").replace("text-[15px]", "text-sm")}`}
                 >
-                  {p.name === "Enterprise" ? "Book a call" : "Start free trial"}
+                  {isEnterprise ? "Talk to sales" : "Start free trial"}
                 </Link>
                 <ul className="mt-6 border-t border-border/60 pt-6">
-                  {p.features.map((f) => (
+                  {featureList.map((f) => (
                     <li key={f} className="flex items-start gap-2 py-1.5 text-[13px] text-muted-foreground">
                       <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" strokeWidth={3} />
                       {f}
@@ -594,7 +629,7 @@ function Landing() {
             Your front desk is asleep at 9pm.<br className="hidden sm:block" />Your bookings shouldn't be.
           </h2>
           <p className="relative mx-auto mt-6 max-w-[560px] text-lg text-muted-foreground">
-            Start your free 14-day trial. No credit card. Be live in 10 minutes.
+            Start your free 7-day trial. Be live in 10 minutes.
           </p>
           <div className="relative mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link to={ctaHref} className={`${btnPrimaryLg} w-full sm:w-auto`}>Start free trial <ArrowRight className="h-4 w-4" /></Link>
@@ -613,7 +648,7 @@ function Landing() {
                 <span className="font-display text-[22px] font-bold tracking-tight">ClinicPro</span>
               </div>
               <p className="mt-4 max-w-[280px] text-sm leading-relaxed text-muted-foreground">
-                The operating system for modern clinics. Built by clinic owners. Trusted across Toronto, Dubai, LA, and London.
+                The operating system for modern clinics. Built in Toronto for clinics worldwide.
               </p>
             </div>
             <FooterCol
@@ -655,7 +690,7 @@ function Landing() {
             />
           </div>
           <div className="mt-12 flex flex-col items-start justify-between gap-2 border-t border-border/60 pt-8 text-[13px] text-muted-foreground/80 sm:flex-row sm:items-center">
-            <div>© 2026 ClinicPro · Built by Divan Digital Corp · Toronto, Canada</div>
+            <div>© 2026 ClinicPro · Built by Divan Group · Toronto, Canada</div>
             <div className="font-signature text-base text-foreground/70">Discipline · Consistency · Creativity</div>
           </div>
         </div>
@@ -703,7 +738,7 @@ function Landing() {
                 description: "The operating system for modern clinics.",
                 foundingDate: "2024",
                 founder: { "@type": "Person", name: "Shahab Balamchi" },
-                parentOrganization: { "@type": "Organization", name: "Divan Digital Corp" },
+                parentOrganization: { "@type": "Organization", name: "Divan Group" },
                 address: { "@type": "PostalAddress", addressLocality: "Toronto", addressCountry: "CA" },
               },
               {
@@ -712,9 +747,9 @@ function Landing() {
                 applicationCategory: "BusinessApplication",
                 operatingSystem: "Web",
                 offers: [
-                  { "@type": "Offer", name: "Starter", price: "69", priceCurrency: "USD", billingIncrement: "P1M" },
-                  { "@type": "Offer", name: "Professional", price: "199", priceCurrency: "USD", billingIncrement: "P1M" },
-                  { "@type": "Offer", name: "Growth", price: "449", priceCurrency: "USD", billingIncrement: "P1M" },
+                  { "@type": "Offer", name: "Starter", price: "39", priceCurrency: "USD", billingIncrement: "P1M" },
+                  { "@type": "Offer", name: "Professional", price: "129", priceCurrency: "USD", billingIncrement: "P1M" },
+                  { "@type": "Offer", name: "Growth", price: "299", priceCurrency: "USD", billingIncrement: "P1M" },
                 ],
               },
               {
