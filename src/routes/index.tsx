@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowRight,
   Calendar,
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "The operating system for modern clinics. Booking, payments, marketing, consent forms, AI insights — pre-loaded with 322 services and 73 forms. Free 14-day trial. From $69/mo.",
+          "The operating system for modern clinics. Booking, payments, marketing, consent forms, AI insights — pre-loaded with 322 services and 73 forms. From $39/mo USD. 7-day free trial.",
       },
       { name: "keywords", content: "clinic software, medical spa software, aesthetic clinic CRM, beauty salon booking, dental practice management, clinic operating system, MedSpa CRM, BeautyTech, ClinicTech" },
       { name: "robots", content: "index, follow" },
@@ -117,23 +118,74 @@ const COMPARISON_ROWS: Array<{ feature: string; mb: string; bd: string; fr: stri
   { feature: "Built-in AI insights", mb: "Limited", bd: "Yes", fr: "No", vg: "No", us: "GPT-4", mbT: "meh", bdT: "yes", frT: "no", vgT: "no" },
   { feature: "Multi-vertical (med spa + dental + wellness)", mb: "No", bd: "No", fr: "No", vg: "No", us: "Yes", mbT: "no", bdT: "no", frT: "no", vgT: "no" },
   { feature: "Setup time", mb: "Weeks", bd: "Days", fr: "Days", vg: "Days", us: "10 min", mbT: "plain", bdT: "plain", frT: "plain", vgT: "plain" },
-  { feature: "Starting price (per location)", mb: "$199/mo", bd: "$176/mo", fr: "Free*", vg: "$50/mo", us: "$69/mo", mbT: "plain", bdT: "plain", frT: "plain", vgT: "plain" },
+  { feature: "Starting price (per location)", mb: "$199/mo", bd: "$176/mo", fr: "Free*", vg: "$50/mo", us: "$39/mo", mbT: "plain", bdT: "plain", frT: "plain", vgT: "plain" },
 ];
 
-const PLANS = [
-  { name: "Starter", tag: "For solo or small clinics", price: "$69", annual: "$59", annualTotal: "$708", per: "/mo", featured: false, features: ["Up to 3 staff members", "1 location", "Online booking + Calendar", "CRM with 322 services pre-loaded", "SMS + Email (1,000 messages)", "10 consent form templates", "Integrated payments + deposits", "Basic reports"] },
-  { name: "Professional", tag: "For established clinics", price: "$199", annual: "$169", annualTotal: "$2,028", per: "/mo", featured: true, features: ["Up to 10 staff members", "Up to 3 locations", "Everything in Starter, plus:", "All 73 consent forms", "43 marketing automations", "WhatsApp Business integration", "5,000 SMS · 25,000 emails", "Injection mapping (Aesthetic)", "Gift cards + Memberships + Loyalty", "Advanced reports + Benchmarking"] },
-  { name: "Growth", tag: "For multi-location & franchises", price: "$449", annual: "$379", annualTotal: "$4,548", per: "/mo", featured: false, features: ["Unlimited staff", "Unlimited locations", "Everything in Professional, plus:", "AI Assistant", "Smart scheduling", "Voice-to-SOAP transcription", "Predictive churn analysis", "Custom report builder", "API access + webhooks", "Priority support"] },
-  { name: "Enterprise", tag: "For franchises & networks", price: "Custom", annual: "Custom", annualTotal: "", per: "", featured: false, features: ["Everything in Growth, plus:", "White-label option", "Custom integrations", "Dedicated account manager", "SLA + 99.99% uptime guarantee", "HIPAA + SOC 2 compliance pack", "Custom training + onboarding", "Volume pricing on transactions"] },
-];
+interface DbPlan {
+  code: string;
+  name: string;
+  tagline: string | null;
+  price_monthly_cents: number;
+  price_annual_cents: number;
+  features: string[];
+  is_popular: boolean;
+  display_order: number;
+}
 
-const TESTIMONIALS = [
-  { stars: 5, quote: "ClinicPro replaced 4 tools and saved us $200/month while giving us 3x the features. The 73 pre-loaded consent forms alone saved weeks of legal work.", author: "Dr. Maria", role: "Owner, Roda Clinic, Toronto", initials: "MR" },
-  { stars: 5, quote: "I run clinics in Toronto and Dubai. ClinicPro is the only platform that properly supports Persian and Arabic with right-to-left layouts. WhatsApp integration alone justified switching.", author: "Dr. Ahmad", role: "Founder, Dr. Ariana Aesthetics, Dubai", initials: "DA" },
-  { stars: 5, quote: "Took my first booking 12 minutes after signing up. The Botox annual package template alone has driven $48k in pre-paid revenue this quarter.", author: "Lana", role: "Owner, Lavista Cosmetic, Toronto", initials: "LA" },
-];
-
-const CLINIC_NAMES = ["Roda Clinic", "Lavista Cosmetic", "Dr. Ariana Aesthetics", "Glow Med Spa", "Zenith Dental"];
+const PLAN_FEATURES_DISPLAY: Record<string, string[]> = {
+  starter: [
+    "1 provider seat (+$25/mo for additional providers)",
+    "Unlimited admin and front desk users",
+    "500 active clients",
+    "20 services",
+    "10 GB photo storage",
+    "50 SMS credits included",
+    "5 consent form templates",
+    "5 report types",
+    "1 location",
+    "Online booking + Calendar",
+    "Integrated payments + deposits",
+  ],
+  professional: [
+    "3 provider seats (+$25/mo for additional providers)",
+    "Unlimited admin and front desk users",
+    "Everything in Starter, plus:",
+    "Unlimited clients",
+    "Unlimited services",
+    "50 GB photo storage",
+    "300 SMS · 5,000 emails included",
+    "All 73 consent form templates",
+    "18 report types",
+    "AI Assistant (100 queries/mo)",
+    "Treatment plans, memberships, gift cards",
+    "Smart scheduling + waitlist",
+    "Welcome email sequence",
+    "Two-way SMS",
+    "HIPAA + BAA included",
+  ],
+  growth: [
+    "10 provider seats (+$25/mo for additional providers)",
+    "Unlimited admin and front desk users",
+    "Everything in Professional, plus:",
+    "200 GB photo storage",
+    "1,000 SMS · 25,000 emails included",
+    "AI Assistant (500 queries/mo) + AI Optimizer",
+    "QuickBooks sync",
+    "WhatsApp Business",
+    "Multi-location support",
+    "All report types",
+    "1-year audit log retention",
+  ],
+  enterprise: [
+    "Everything in Growth, plus:",
+    "Unlimited provider seats",
+    "Unlimited photo storage",
+    "Insurance billing",
+    "SSO",
+    "Dedicated success manager",
+    "Custom integrations + SLA",
+  ],
+};
 
 /* ------------------------------ Page ------------------------------ */
 function Landing() {
