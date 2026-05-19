@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — ClinicPro" },
-      { name: "description", content: "Plans starting at $69/mo. Free 14-day trial. Founding member pricing for first 100 clinics." },
+      { name: "description", content: "Plans starting at $39/mo. Free 14-day trial. No credit card required." },
     ],
   }),
 });
@@ -110,19 +110,6 @@ function PricingPage() {
             14-day free trial on every plan. No credit card required. Cancel anytime.
           </p>
 
-          {/* Founding member banner */}
-          <div className="mx-auto mt-8 max-w-[95vw] sm:max-w-xl overflow-hidden rounded-2xl p-px [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-            <div className="rounded-[15px] px-4 sm:px-6 py-4 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
-              <div className="font-display text-lg font-bold text-foreground">🔒 Founding Member Pricing — Locked Forever</div>
-              <p className="mt-1 text-sm text-zinc-200">
-                First 100 clinics get <strong>$49/$149/$349</strong>/mo locked in for life.
-              </p>
-              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-foreground/10 px-3 py-1 text-xs font-semibold text-foreground">
-                <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                95 / 100 spots remaining
-              </div>
-            </div>
-          </div>
 
           <div className="mt-10 inline-flex items-center gap-1 rounded-full border border-border bg-card p-1">
             <button
