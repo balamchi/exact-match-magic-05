@@ -43,7 +43,7 @@ export const PLAN_FEATURES = {
     customizableInvoices: false,
     insuranceBilling: false,
   },
-  pro: {
+  professional: {
     providerSeats: 3,
     activeClients: -1,
     services: -1,
