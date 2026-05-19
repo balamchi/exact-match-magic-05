@@ -264,7 +264,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "memberships.read",
     "payments.process",
     "staff.read",
-    "sms.send",
+    "sms.send", "whatsapp.send",
   ],
 };
 
