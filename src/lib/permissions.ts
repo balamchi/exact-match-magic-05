@@ -94,6 +94,20 @@ export const PERMISSION_KEYS = [
   "seed.view_log",
   // Audit
   "audit.read",
+
+  // AI features (Pro+ tier gated)
+  "ai_assistant.use",
+  "ai_optimizer.use",
+
+  // Integrations (Growth+ tier gated)
+  "quickbooks.sync",
+  "multi_clinic.read",
+  "multi_clinic.write",
+
+  // Communications (add-on or tier gated)
+  "whatsapp.send",
+  "sms.send",
+  "insurance_billing.use",
 ] as const;
 
 export type PermissionKey = typeof PERMISSION_KEYS[number];
@@ -123,6 +137,9 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "staff.read", "staff.write",
     "seed.run", "seed.reset", "seed.view_log",
     "audit.read",
+    "ai_assistant.use", "ai_optimizer.use",
+    "quickbooks.sync", "multi_clinic.read", "multi_clinic.write",
+    "whatsapp.send", "sms.send", "insurance_billing.use",
   ],
 
   senior_admin: [
@@ -145,6 +162,9 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "staff.read", "staff.write",
     "seed.run", "seed.reset", "seed.view_log",
     "audit.read",
+    "ai_assistant.use", "ai_optimizer.use",
+    "quickbooks.sync", "multi_clinic.read",
+    "whatsapp.send", "sms.send", "insurance_billing.use",
   ],
 
   // Legacy — same as senior_admin for backwards compat
@@ -168,6 +188,9 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "staff.read", "staff.write",
     "seed.run", "seed.reset", "seed.view_log",
     "audit.read",
+    "ai_assistant.use", "ai_optimizer.use",
+    "quickbooks.sync", "multi_clinic.read",
+    "whatsapp.send", "sms.send", "insurance_billing.use",
   ],
 
   junior_admin: [
@@ -189,6 +212,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "staff.read",
     "seed.view_log",
     "audit.read",
+    "whatsapp.send", "sms.send",
   ],
 
   manager: [
@@ -210,6 +234,8 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "staff.read", "staff.write",
     "seed.view_log",
     "audit.read",
+    "ai_assistant.use",
+    "whatsapp.send", "sms.send",
   ],
 
   provider: [
@@ -225,6 +251,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "treatment_templates.manage",
     "memberships.read",
     "staff.read",
+    "ai_assistant.use",
   ],
 
   front_desk: [
@@ -236,6 +263,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "memberships.read",
     "payments.process",
     "staff.read",
+    "sms.send",
   ],
 };
 
