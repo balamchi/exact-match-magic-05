@@ -196,6 +196,20 @@ function Landing() {
   const [pricingInterval, setPricingInterval] = useState<"monthly" | "annual">("monthly");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFooterSection, setOpenFooterSection] = useState<string | null>(null);
+  const [plans, setPlans] = useState<DbPlan[]>([]);
+  const [plansLoading, setPlansLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("subscription_plans")
+      .select("code,name,tagline,price_monthly_cents,price_annual_cents,features,is_popular,display_order")
+      .eq("is_public", true)
+      .order("display_order")
+      .then(({ data }) => {
+        setPlans((data ?? []) as unknown as DbPlan[]);
+        setPlansLoading(false);
+      });
+  }, []);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -282,7 +296,7 @@ function Landing() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-glow opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-glow" />
             </span>
-            Trusted by clinics in Toronto · Dubai · LA · London
+            Built in Toronto for clinics worldwide
           </div>
           <h1 className="font-display text-[clamp(2.5rem,8vw,96px)] font-bold leading-[1] tracking-[-0.035em]">
             Run a clinic,<br />
@@ -300,11 +314,11 @@ function Landing() {
             injection mapping, AI insights. Pre-loaded with 322 services and 73 forms. Ready in 10 minutes.
           </p>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link to={ctaHref} className={`${btnPrimaryLg} w-full sm:w-auto`}>Start free 14-day trial <ArrowRight className="h-4 w-4" /></Link>
+            <Link to={ctaHref} className={`${btnPrimaryLg} w-full sm:w-auto`}>Start free 7-day trial <ArrowRight className="h-4 w-4" /></Link>
             <button onClick={() => setDemoOpen(true)} className={`${btnSecondary} w-full sm:w-auto`}>Watch 2-min demo</button>
           </div>
           <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
-            {["No credit card required", "Setup in 10 minutes", "Migrate from Boulevard or Mindbody free"].map((t) => (
+            {["Setup in 10 minutes", "Migrate from Boulevard or Mindbody free"].map((t) => (
               <span key={t} className="inline-flex items-center gap-2">
                 <span className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-success/40 bg-success/15 text-[9px] font-bold text-success">
                   <Check className="h-2 w-2" strokeWidth={4} />
@@ -406,15 +420,6 @@ function Landing() {
         <SectionLabel>Built by clinic operators</SectionLabel>
         <SectionTitle>Built by clinic operators, for clinic operators.</SectionTitle>
 
-        {/* Logo strip */}
-        <div className="mb-16">
-          <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Join clinics from</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {CLINIC_NAMES.map((name) => (
-              <span key={name} className="text-sm font-semibold text-muted-foreground">{name}</span>
-            ))}
-          </div>
-        </div>
 
         {/* Founder section */}
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
@@ -423,44 +428,19 @@ function Landing() {
               <span className="font-display text-6xl font-bold text-foreground">SB</span>
             </div>
             <h3 className="mt-6 font-display text-2xl font-bold">Shahab Balamchi</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Founder & CEO · Divan Digital Corp</p>
+            <p className="mt-1 text-sm text-muted-foreground">Founder & CEO · Divan Group</p>
           </div>
           <div>
             <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight max-md:text-3xl">Built by clinic operators, for clinic operators.</h3>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Built by Shahab Balamchi, founder of Divan Digital Corp. We've managed marketing and operations for 50+ medical aesthetic, dental, and wellness clinics across Toronto, Montreal, Dubai, and Los Angeles since 2019.
+              Built by Shahab Balamchi, founder of Divan Group. We've spent five years running marketing and operations for medical aesthetic, dental, and wellness clinics — and watched every one of them struggle with the same broken software stack. We built ClinicPro to fix it.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              We built ClinicPro because every clinic we worked with said the same thing: their software was the bottleneck, not their growth. So we replaced six tools with one operating system.
+              Every clinic we worked with said the same thing: their software was the bottleneck, not their growth. So we replaced six tools with one operating system.
             </p>
           </div>
         </div>
 
-        {/* Testimonials */}
-        <div className="mt-20 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <div
-              key={t.author}
-              className="group rounded-2xl border border-primary/20 bg-background p-4 sm:p-8 transition hover:border-primary/40 hover:shadow-[0_0_30px_-10px_rgba(147,51,234,0.3)]"
-            >
-              <div className="flex gap-0.5">
-                {Array.from({ length: t.stars }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">"{t.quote}"</p>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-                  <span className="text-xs font-bold text-foreground">{t.initials}</span>
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">{t.author}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       </Section>
 
       {/* FEATURES */}
@@ -551,7 +531,7 @@ function Landing() {
       <Section id="pricing">
         <SectionLabel>Simple, fair pricing</SectionLabel>
         <SectionTitle>Pay for what you need. Nothing you don't.</SectionTitle>
-        <SectionSub>14-day free trial on every plan. No credit card required. Cancel anytime.</SectionSub>
+        <SectionSub>7-day free trial on every plan. Cancel anytime.</SectionSub>
 
 
         {/* Billing toggle */}
@@ -571,57 +551,61 @@ function Landing() {
                 pricingInterval === "annual" ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground"
               }`}
             >
-              Annual <span className="ms-1 text-[10px] uppercase tracking-wider text-success">Save 15%</span>
+              Annual <span className="ms-1 text-[10px] uppercase tracking-wider text-success">Save 20%</span>
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {PLANS.map((p) => {
-            const displayPrice = p.name === "Enterprise" ? "Custom" : (pricingInterval === "monthly" ? p.price : p.annual);
-            const savingsPerYear = p.name !== "Enterprise" && pricingInterval === "annual"
-              ? (parseInt(p.price.replace("$", "")) * 12) - parseInt(p.annualTotal.replace(/[$,]/g, ""))
+          {plansLoading && <div className="col-span-4 text-center text-muted-foreground">Loading plans…</div>}
+          {plans.map((p) => {
+            const isEnterprise = p.code === "enterprise";
+            const monthlyCents = pricingInterval === "monthly" ? p.price_monthly_cents : Math.round(p.price_annual_cents / 12);
+            const displayPrice = isEnterprise ? "Custom" : `$${(monthlyCents / 100).toFixed(0)}`;
+            const annualSavings = !isEnterprise && pricingInterval === "annual"
+              ? Math.round((p.price_monthly_cents * 12 - p.price_annual_cents) / 100)
               : 0;
+            const featureList = PLAN_FEATURES_DISPLAY[p.code] ?? (Array.isArray(p.features) ? p.features : []);
             return (
               <div
-                key={p.name}
+                key={p.code}
                 className={
-                  p.featured
+                  p.is_popular
                     ? "relative rounded-3xl border border-primary/40 p-4 sm:p-8 shadow-[0_30px_60px_-20px_rgba(147,51,234,0.4)] [background:linear-gradient(180deg,rgba(147,51,234,0.08),var(--surface))]"
                     : "relative rounded-3xl border border-border/60 bg-surface p-4 sm:p-8"
                 }
               >
-                {p.featured && (
+                {p.is_popular && (
                   <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-foreground [background:linear-gradient(135deg,#9333EA,#D946EF)]">
                     Most Popular
                   </div>
                 )}
                 <div className="font-display text-[22px] font-bold">{p.name}</div>
-                <div className="mt-1 text-[13px] text-muted-foreground">{p.tag}</div>
+                <div className="mt-1 text-[13px] text-muted-foreground">{p.tagline}</div>
                 <div className="mt-6 flex items-baseline gap-1.5">
                   <span className="font-display text-[48px] font-bold leading-none">{displayPrice}</span>
-                  <span className="text-sm text-muted-foreground">{p.per}</span>
+                  {!isEnterprise && <span className="text-sm text-muted-foreground">/mo</span>}
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  {p.name === "Enterprise" ? "Talk to sales for pricing" : (
-                    pricingInterval === "annual"
-                      ? `Billed ${p.annualTotal} yearly`
-                      : "Billed monthly · per location"
-                  )}
+                  {isEnterprise
+                    ? "Talk to sales for pricing"
+                    : pricingInterval === "annual"
+                      ? `Billed $${(p.price_annual_cents / 100).toFixed(0)}/year`
+                      : "Billed monthly · per location"}
                 </div>
-                {savingsPerYear > 0 && (
+                {annualSavings > 0 && (
                   <div className="mt-2 inline-flex rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-semibold text-success">
-                    Save ${savingsPerYear}/year
+                    Save ${annualSavings}/year
                   </div>
                 )}
                 <Link
-                  to={p.name === "Enterprise" ? "/contact" : ctaHref}
-                  className={`mt-6 w-full ${p.featured ? btnPrimary : btnSecondary.replace("py-3.5", "py-2.5").replace("text-[15px]", "text-sm")}`}
+                  to={isEnterprise ? "/contact" : ctaHref}
+                  className={`mt-6 w-full ${p.is_popular ? btnPrimary : btnSecondary.replace("py-3.5", "py-2.5").replace("text-[15px]", "text-sm")}`}
                 >
-                  {p.name === "Enterprise" ? "Book a call" : "Start free trial"}
+                  {isEnterprise ? "Talk to sales" : "Start free trial"}
                 </Link>
                 <ul className="mt-6 border-t border-border/60 pt-6">
-                  {p.features.map((f) => (
+                  {featureList.map((f) => (
                     <li key={f} className="flex items-start gap-2 py-1.5 text-[13px] text-muted-foreground">
                       <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" strokeWidth={3} />
                       {f}
