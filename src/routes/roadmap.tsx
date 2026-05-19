@@ -13,7 +13,7 @@ function RoadmapPage() {
         <div className="rounded-xl border border-primary/30 bg-primary/5 p-6">
           <div className="text-xs font-bold uppercase tracking-wider text-primary">Q2 2026</div>
           <h3 className="mt-2 text-lg font-semibold text-foreground">Beta Launch</h3>
-          <p>First 100 founding member clinics. Core features live. Feedback-driven iteration.</p>
+          <p>Core features live for early-access clinics. Feedback-driven iteration.</p>
         </div>
         <div className="rounded-xl border border-border/60 bg-surface p-6">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Q3 2026</div>
