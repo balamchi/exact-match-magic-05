@@ -9,7 +9,7 @@ export const Route = createFileRoute("/customers")({
 function CustomersPage() {
   return (
     <PlaceholderPage title="Customer Stories">
-      <p>Founding members coming soon. Reach out to be featured.</p>
+      <p>Customer stories coming soon. Reach out to be featured.</p>
       <p className="mt-4">Email us at <a href="mailto:support@clinicpro.io" className="text-primary hover:underline">support@clinicpro.io</a> to share your story.</p>
     </PlaceholderPage>
   );

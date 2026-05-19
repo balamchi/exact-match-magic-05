@@ -501,19 +501,6 @@ function Landing() {
         <SectionTitle>Pay for what you need. Nothing you don't.</SectionTitle>
         <SectionSub>14-day free trial on every plan. No credit card required. Cancel anytime.</SectionSub>
 
-        {/* Founding member banner */}
-        <div className="mb-12 overflow-hidden rounded-2xl p-px [background:linear-gradient(135deg,#9333EA,#D946EF)]">
-          <div className="rounded-[15px] px-4 sm:px-8 py-4 sm:py-6 text-center [background:linear-gradient(135deg,rgba(147,51,234,0.3),rgba(217,70,239,0.2))]">
-            <div className="font-display text-xl font-bold text-foreground sm:text-2xl">🔒 Founding Member Pricing — Locked Forever</div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              First 100 clinics get <strong>$49/$149/$349</strong> per month locked in for life. No price increases, ever.
-            </p>
-            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-foreground/10 px-4 py-1.5 text-sm font-semibold text-foreground">
-              <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-              95 / 100 spots remaining
-            </div>
-          </div>
-        </div>
 
         {/* Billing toggle */}
         <div className="mb-10 flex justify-center">
