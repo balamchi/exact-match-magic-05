@@ -252,6 +252,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "memberships.read",
     "staff.read",
     "ai_assistant.use",
+    "sms.send", "whatsapp.send",
   ],
 
   front_desk: [
@@ -263,7 +264,7 @@ export const ROLE_PERMISSIONS: Record<ClinicRole, ReadonlyArray<PermissionKey>> 
     "memberships.read",
     "payments.process",
     "staff.read",
-    "sms.send",
+    "sms.send", "whatsapp.send",
   ],
 };
 
