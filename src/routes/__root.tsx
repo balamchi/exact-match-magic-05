@@ -45,9 +45,9 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "The operating system for modern clinics. Booking, payments, marketing, consent forms, AI insights — pre-loaded with 322 services and 73 forms. Free 14-day trial. From $69/mo.",
+          "The operating system for modern clinics. Booking, payments, marketing, consent forms, AI insights — pre-loaded with 322 services and 73 forms. From $39/mo USD. 7-day free trial.",
       },
-      { name: "author", content: "Divan Digital Corp" },
+      { name: "author", content: "Divan Group" },
       { name: "robots", content: "index, follow" },
       { name: "theme-color", content: "#9333EA" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
