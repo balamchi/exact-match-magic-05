@@ -15,7 +15,6 @@ import {
   BarChart3,
   Globe,
   Check,
-  Star,
   X,
   ChevronDown,
   Sun,
@@ -630,7 +629,7 @@ function Landing() {
             Your front desk is asleep at 9pm.<br className="hidden sm:block" />Your bookings shouldn't be.
           </h2>
           <p className="relative mx-auto mt-6 max-w-[560px] text-lg text-muted-foreground">
-            Start your free 14-day trial. No credit card. Be live in 10 minutes.
+            Start your free 7-day trial. Be live in 10 minutes.
           </p>
           <div className="relative mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link to={ctaHref} className={`${btnPrimaryLg} w-full sm:w-auto`}>Start free trial <ArrowRight className="h-4 w-4" /></Link>
@@ -649,7 +648,7 @@ function Landing() {
                 <span className="font-display text-[22px] font-bold tracking-tight">ClinicPro</span>
               </div>
               <p className="mt-4 max-w-[280px] text-sm leading-relaxed text-muted-foreground">
-                The operating system for modern clinics. Built by clinic owners. Trusted across Toronto, Dubai, LA, and London.
+                The operating system for modern clinics. Built in Toronto for clinics worldwide.
               </p>
             </div>
             <FooterCol
@@ -691,7 +690,7 @@ function Landing() {
             />
           </div>
           <div className="mt-12 flex flex-col items-start justify-between gap-2 border-t border-border/60 pt-8 text-[13px] text-muted-foreground/80 sm:flex-row sm:items-center">
-            <div>© 2026 ClinicPro · Built by Divan Digital Corp · Toronto, Canada</div>
+            <div>© 2026 ClinicPro · Built by Divan Group · Toronto, Canada</div>
             <div className="font-signature text-base text-foreground/70">Discipline · Consistency · Creativity</div>
           </div>
         </div>
@@ -739,7 +738,7 @@ function Landing() {
                 description: "The operating system for modern clinics.",
                 foundingDate: "2024",
                 founder: { "@type": "Person", name: "Shahab Balamchi" },
-                parentOrganization: { "@type": "Organization", name: "Divan Digital Corp" },
+                parentOrganization: { "@type": "Organization", name: "Divan Group" },
                 address: { "@type": "PostalAddress", addressLocality: "Toronto", addressCountry: "CA" },
               },
               {
@@ -748,9 +747,9 @@ function Landing() {
                 applicationCategory: "BusinessApplication",
                 operatingSystem: "Web",
                 offers: [
-                  { "@type": "Offer", name: "Starter", price: "69", priceCurrency: "USD", billingIncrement: "P1M" },
-                  { "@type": "Offer", name: "Professional", price: "199", priceCurrency: "USD", billingIncrement: "P1M" },
-                  { "@type": "Offer", name: "Growth", price: "449", priceCurrency: "USD", billingIncrement: "P1M" },
+                  { "@type": "Offer", name: "Starter", price: "39", priceCurrency: "USD", billingIncrement: "P1M" },
+                  { "@type": "Offer", name: "Professional", price: "129", priceCurrency: "USD", billingIncrement: "P1M" },
+                  { "@type": "Offer", name: "Growth", price: "299", priceCurrency: "USD", billingIncrement: "P1M" },
                 ],
               },
               {
