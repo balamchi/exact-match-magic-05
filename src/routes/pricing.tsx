@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — ClinicPro" },
-      { name: "description", content: "Plans starting at $69/mo. Free 14-day trial. Founding member pricing for first 100 clinics." },
+      { name: "description", content: "Plans starting at $39/mo. Free 14-day trial. No credit card required." },
     ],
   }),
 });
